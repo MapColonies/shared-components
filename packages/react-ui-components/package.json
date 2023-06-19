@@ -1,11 +1,16 @@
 {
-  "name": "react-ui-components",
+  "name": "@map-colonies/react-core",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "module": "dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "clean": "rimraf dist",
+    "build": "yarn run clean && tsc --project tsbuildconfig.json && vite build",
+    "postbuild": "copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "copyassets:all": "yarn run copyassets:md-font",
@@ -23,5 +28,9 @@
     "rc-tooltip": "^6.0.1",
     "react-router-dom": "^6.13.0",
     "storybook-dark-mode": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.13",
+    "rimraf": "^5.0.1"
   }
 }

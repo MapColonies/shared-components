@@ -5,6 +5,6 @@ export default getBaseConfig({
   lib: {
     entry: path.resolve(__dirname, "src/index.ts"),
     name: "reactUiComponents",
-    fileName: "react-ui-components",
+    fileName: "@map-colonies/react-core",
   },
 });

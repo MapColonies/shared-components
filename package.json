@@ -47,12 +47,12 @@
     "vite": "^4.3.9"
   },
   "scripts": {
-    "storybook:react-components": "lerna run --scope react-components storybook --stream",
-    "build:react-components": "lerna run --scope react-components build --stream",
-    "test:react-components": "lerna run --scope react-components test --stream",
-    "storybook:react-ui-components": "lerna run --scope react-ui-components storybook --stream",
-    "build:react-ui-components": "lerna run --scope react-ui-components build --stream",
-    "test:react-ui-components": "lerna run --scope react-ui-components test --stream",
+    "storybook:react-components": "lerna run --scope @map-colonies/react-components storybook --stream",
+    "build:react-components": "lerna run --scope @map-colonies/react-components build --stream",
+    "test:react-components": "lerna run --scope @map-colonies/react-components test --stream",
+    "storybook:react-ui-components": "lerna run --scope @map-colonies/react-core storybook --stream",
+    "build:react-ui-components": "lerna run --scope @map-colonies/react-core build --stream",
+    "test:react-ui-components": "lerna run --scope @map-colonies/react-core test --stream",
     "storybook:all": "npx lerna run storybook --parallel",
     "build": "lerna run build --stream",
     "test": "NODE_ENV=test jest --coverage"
