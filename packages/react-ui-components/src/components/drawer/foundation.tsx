@@ -1,21 +1,9 @@
-import {
-  MDCModalDrawerFoundation,
-  MDCDismissibleDrawerFoundation,
-} from '@material/drawer';
+import { MDCModalDrawerFoundation, MDCDismissibleDrawerFoundation } from '@material/drawer';
 import { DrawerProps } from '.';
-import {
-  useFoundation,
-  FocusTrap,
-  focusTrapFactory,
-  triggerWindowResize,
-} from '../base';
+import { useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '../base';
 import React, { useRef, useEffect, useCallback } from 'react';
 
-const useDrawerFoundationFactory = (
-  MDCConstructor:
-    | typeof MDCModalDrawerFoundation
-    | typeof MDCDismissibleDrawerFoundation
-) =>
+const useDrawerFoundationFactory = (MDCConstructor: typeof MDCModalDrawerFoundation | typeof MDCDismissibleDrawerFoundation) =>
   function useDrawerFoundation(props: DrawerProps & React.HTMLProps<any>) {
     const focusTrapRef = useRef<FocusTrap>();
 
@@ -32,24 +20,17 @@ const useDrawerFoundationFactory = (
           addClass: (className: string) => rootEl.addClass(className),
           removeClass: (className: string) => rootEl.removeClass(className),
           hasClass: (className: string) => rootEl.hasClass(className),
-          elementHasClass: (element: HTMLElement, className: string) =>
-            element.classList.contains(className),
+          elementHasClass: (element: HTMLElement, className: string) => element.classList.contains(className),
           saveFocus: () => {
             previousFocusEl = document.activeElement as HTMLElement;
           },
           restoreFocus: () => {
-            if (
-              rootEl.ref &&
-              rootEl.ref.contains(document.activeElement) &&
-              previousFocusEl
-            ) {
+            if (rootEl.ref && rootEl.ref.contains(document.activeElement) && previousFocusEl) {
               previousFocusEl.focus();
             }
           },
           focusActiveNavigationItem: () => {
-            const activeNavItemEl = rootEl.ref?.querySelector(
-              `.mdc-list-item--activated`
-            );
+            const activeNavItemEl = rootEl.ref?.querySelector(`.mdc-list-item--activated`);
             if (activeNavItemEl) {
               (activeNavItemEl as HTMLElement).focus();
             }
@@ -130,10 +111,6 @@ const useDrawerFoundationFactory = (
     return { foundation, ...elements };
   };
 
-export const useDismissableDrawerFoundation = useDrawerFoundationFactory(
-  MDCDismissibleDrawerFoundation
-);
+export const useDismissableDrawerFoundation = useDrawerFoundationFactory(MDCDismissibleDrawerFoundation);
 
-export const useModalDrawerFoundation = useDrawerFoundationFactory(
-  MDCModalDrawerFoundation
-);
+export const useModalDrawerFoundation = useDrawerFoundationFactory(MDCModalDrawerFoundation);

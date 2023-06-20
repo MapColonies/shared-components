@@ -8,9 +8,7 @@ import { useFoundation } from '../base';
 import { MDCSwitchFoundation, MDCSwitchAdapter } from '@material/switch';
 
 export const useSwitchFoundation = (props: SwitchProps & SwitchHTMLProps) => {
-  const { renderToggle, toggleRootProps, id } = useToggleFoundation<
-    MDCSwitchFoundation
-  >(props);
+  const { renderToggle, toggleRootProps, id } = useToggleFoundation<MDCSwitchFoundation>(props);
 
   const { foundation, ...elements } = useFoundation({
     props,
@@ -22,12 +20,9 @@ export const useSwitchFoundation = (props: SwitchProps & SwitchHTMLProps) => {
       return new MDCSwitchFoundation({
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
-        setNativeControlChecked: (checked: boolean) =>
-          checkboxEl.setProp('checked', checked),
-        setNativeControlDisabled: (disabled: boolean) =>
-          checkboxEl.setProp('disabled', disabled),
-        setNativeControlAttr: (attr: string, value: string) =>
-          rootEl.setProp(attr as any, value),
+        setNativeControlChecked: (checked: boolean) => checkboxEl.setProp('checked', checked),
+        setNativeControlDisabled: (disabled: boolean) => checkboxEl.setProp('disabled', disabled),
+        setNativeControlAttr: (attr: string, value: string) => rootEl.setProp(attr as any, value),
       } as MDCSwitchAdapter);
     },
   });
@@ -36,12 +31,8 @@ export const useSwitchFoundation = (props: SwitchProps & SwitchHTMLProps) => {
 
   // On mount, sync the values with the native checkbox
   useEffect(() => {
-    checkboxEl.ref &&
-      (foundation as any).updateCheckedStyling_(
-        (checkboxEl.ref as HTMLInputElement).checked
-      );
-    checkboxEl.ref &&
-      foundation.setDisabled((checkboxEl.ref as HTMLInputElement).disabled);
+    checkboxEl.ref && (foundation as any).updateCheckedStyling_((checkboxEl.ref as HTMLInputElement).checked);
+    checkboxEl.ref && foundation.setDisabled((checkboxEl.ref as HTMLInputElement).disabled);
   }, [checkboxEl.ref, foundation]);
 
   // sync checked

@@ -49,10 +49,7 @@ export interface GridCellProps {
 }
 
 /** A Grid cell */
-export const GridCell = createComponent<GridCellProps>(function GridCell(
-  props,
-  ref
-) {
+export const GridCell = createComponent<GridCellProps>(function GridCell(props, ref) {
   const { span, phone, tablet, desktop, order, align, ...rest } = props;
   const className = useClassNames(props, [
     'mdc-layout-grid__cell',
@@ -61,10 +58,8 @@ export const GridCell = createComponent<GridCellProps>(function GridCell(
       [`mdc-layout-grid__cell--align-${align || ''}`]: align !== undefined,
       [`mdc-layout-grid__cell--span-${span || ''}`]: span !== undefined,
       [`mdc-layout-grid__cell--span-${phone || ''}-phone`]: phone !== undefined,
-      [`mdc-layout-grid__cell--span-${tablet || ''}-tablet`]:
-        tablet !== undefined,
-      [`mdc-layout-grid__cell--span-${desktop || ''}-desktop`]:
-        props.desktop !== undefined,
+      [`mdc-layout-grid__cell--span-${tablet || ''}-tablet`]: tablet !== undefined,
+      [`mdc-layout-grid__cell--span-${desktop || ''}-desktop`]: props.desktop !== undefined,
     },
   ]);
   return <Tag {...rest} ref={ref} className={className} />;
@@ -74,10 +69,7 @@ export const GridCell = createComponent<GridCellProps>(function GridCell(
 export interface GridRowProps {}
 
 /** By default, an inner grid component is included inside of <Grid>. Use GridRow when doing nested Grids. */
-export const GridRow = createComponent<GridRowProps>(function GridRow(
-  props,
-  ref
-) {
+export const GridRow = createComponent<GridRowProps>(function GridRow(props, ref) {
   const className = useClassNames(props, ['mdc-layout-grid__inner']);
   return <Tag {...props} ref={ref} className={className} />;
 });

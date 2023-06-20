@@ -7,15 +7,7 @@ type IconStrategyT = 'auto' | 'ligature' | 'className' | 'url' | 'component' | '
 
 type TooltipActivationT = 'hover' | 'click' | 'focus';
 
-type TooltipAlignT =
-  | 'left'
-  | 'right'
-  | 'top'
-  | 'bottom'
-  | 'topLeft'
-  | 'topRight'
-  | 'bottomLeft'
-  | 'bottomRight';
+type TooltipAlignT = 'left' | 'right' | 'top' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 
 type TooltipOptions = {
   /** How to align the tooltip. Defaults to `top`. */

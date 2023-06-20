@@ -8,9 +8,7 @@ import { useFoundation } from '../base';
 import { MDCRadioFoundation } from '@material/radio';
 
 export const useRadioFoundation = (props: RadioProps & RadioHTMLProps) => {
-  const { renderToggle, toggleRootProps, id } = useToggleFoundation<
-    MDCRadioFoundation
-  >(props);
+  const { renderToggle, toggleRootProps, id } = useToggleFoundation<MDCRadioFoundation>(props);
 
   const { foundation, ...elements } = useFoundation({
     props,

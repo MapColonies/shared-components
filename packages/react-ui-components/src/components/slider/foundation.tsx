@@ -7,15 +7,12 @@ import { debounce } from '../base';
 
 import { MDCSliderFoundation } from '@material/slider';
 
-export const useSliderFoundation = (
-  props: SliderProps & React.HTMLProps<any>
-) => {
+export const useSliderFoundation = (props: SliderProps & React.HTMLProps<any>) => {
   const trackRef = useRef<HTMLElement>();
   const setTrackRef = (element: HTMLElement) => (trackRef.current = element);
 
   const trackmarkerContainerRef = useRef<HTMLElement>();
-  const setTrackMarkerContainerRef = (element: HTMLElement) =>
-    (trackmarkerContainerRef.current = element);
+  const setTrackMarkerContainerRef = (element: HTMLElement) => (trackmarkerContainerRef.current = element);
 
   const { foundation, ...elements } = useFoundation({
     props,
@@ -29,60 +26,33 @@ export const useSliderFoundation = (
         hasClass: (className: string) => rootEl.hasClass(className),
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
-        getAttribute: (name: string) =>
-          rootEl.getProp(name as any) as string | null,
-        setAttribute: debounce(
-          (name: string, value: any) => rootEl.setProp(name as any, value),
-          300
-        ),
+        getAttribute: (name: string) => rootEl.getProp(name as any) as string | null,
+        setAttribute: debounce((name: string, value: any) => rootEl.setProp(name as any, value), 300),
         removeAttribute: (name: string) => rootEl.removeProp(name as any),
-        computeBoundingRect: () =>
-          rootEl.ref ? rootEl.ref.getBoundingClientRect() : emptyClientRect,
+        computeBoundingRect: () => (rootEl.ref ? rootEl.ref.getBoundingClientRect() : emptyClientRect),
         getTabIndex: () => (rootEl.ref ? rootEl.ref.tabIndex : 0),
-        registerInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        registerInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           rootEl.addEventListener(evtType, handler);
         },
-        deregisterInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        deregisterInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           rootEl.removeEventListener(evtType, handler);
         },
-        registerThumbContainerInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        registerThumbContainerInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           thumbContainerEl.addEventListener(evtType, handler);
         },
-        deregisterThumbContainerInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        deregisterThumbContainerInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           thumbContainerEl.removeEventListener(evtType, handler);
         },
-        registerBodyInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        registerBodyInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           document.body && document.body.addEventListener(evtType, handler);
         },
-        deregisterBodyInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {
+        deregisterBodyInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {
           document.body && document.body.removeEventListener(evtType, handler);
         },
-        registerResizeHandler: (
-          handler: SpecificEventListener<'resize'>
-        ): void => {
+        registerResizeHandler: (handler: SpecificEventListener<'resize'>): void => {
           window.addEventListener('resize', handler);
         },
-        deregisterResizeHandler: (
-          handler: SpecificEventListener<'resize'>
-        ): void => {
+        deregisterResizeHandler: (handler: SpecificEventListener<'resize'>): void => {
           window.removeEventListener('resize', handler);
         },
         notifyInput: () => {
@@ -111,13 +81,9 @@ export const useSliderFoundation = (
           const markerBkgdImage = `linear-gradient(to right, currentColor ${markerWidth}, transparent 0)`;
           const markerBkgdLayout = `0 center / calc((100% - ${markerWidth}) / ${markerAmount}) 100% repeat-x`;
           const markerBkgdShorthand = `${markerBkgdImage} ${markerBkgdLayout}`;
-          trackmarkerContainerRef.current?.style.setProperty(
-            'background',
-            markerBkgdShorthand
-          );
+          trackmarkerContainerRef.current?.style.setProperty('background', markerBkgdShorthand);
         },
-        isRTL: () =>
-          !!rootEl.ref && getComputedStyle(rootEl.ref).direction === 'rtl',
+        isRTL: () => !!rootEl.ref && getComputedStyle(rootEl.ref).direction === 'rtl',
       });
     },
   });
@@ -134,23 +100,18 @@ export const useSliderFoundation = (
 
   // value
   useEffect(() => {
-    let value =
-      props.value !== undefined ? Number(props.value) : foundation.getValue();
+    let value = props.value !== undefined ? Number(props.value) : foundation.getValue();
 
     const min = foundation.getMin();
     const max = foundation.getMax();
     // make value in bounds
     if (value < min) {
-      console.warn(
-        `Attempted to set slider to ${value} which is less than min: ${min}`
-      );
+      console.warn(`Attempted to set slider to ${value} which is less than min: ${min}`);
       value = min;
     }
 
     if (value > max) {
-      console.warn(
-        `Attempted to set slider to ${value} which is greater than max: ${max}`
-      );
+      console.warn(`Attempted to set slider to ${value} which is greater than max: ${max}`);
       value = max;
     }
 
@@ -183,10 +144,7 @@ export const useSliderFoundation = (
   useEffect(() => {
     // @ts-ignore unsafe private variable access
     const hasTrackMarker = foundation.hasTrackMarker_;
-    if (
-      props.displayMarkers !== undefined &&
-      props.displayMarkers !== hasTrackMarker
-    ) {
+    if (props.displayMarkers !== undefined && props.displayMarkers !== hasTrackMarker) {
       // @ts-ignore unsafe private variable access
       foundation.hasTrackMarker_ = props.displayMarkers;
       window.requestAnimationFrame(() => foundation.setupTrackMarker());

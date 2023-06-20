@@ -12,32 +12,25 @@ export interface NotchedOutlineProps {
  * Notched Outline
  *********************************************************************/
 
-export const NotchedOutline = createComponent<NotchedOutlineProps>(
-  function NotchedOutline(props, ref) {
-    const { children, ...rest } = props;
-    const { rootEl, notchedEl } = useNotchedOutlineFoundation(props);
+export const NotchedOutline = createComponent<NotchedOutlineProps>(function NotchedOutline(props, ref) {
+  const { children, ...rest } = props;
+  const { rootEl, notchedEl } = useNotchedOutlineFoundation(props);
 
-    return (
-      <Tag
-        {...rest}
-        element={rootEl}
-        className={'mdc-notched-outline'}
-        ref={ref}
+  return (
+    <Tag {...rest} element={rootEl} className={'mdc-notched-outline'} ref={ref}>
+      <NotchedOutlineLeading />
+      <div
+        {...notchedEl.props({
+          className: 'mdc-notched-outline__notch',
+        })}
+        ref={notchedEl.setRef}
       >
-        <NotchedOutlineLeading />
-        <div
-          {...notchedEl.props({
-            className: 'mdc-notched-outline__notch',
-          })}
-          ref={notchedEl.setRef}
-        >
-          {children}
-        </div>
-        <NotchedOutlineTrailing />
-      </Tag>
-    );
-  }
-);
+        {children}
+      </div>
+      <NotchedOutlineTrailing />
+    </Tag>
+  );
+});
 
 /*********************************************************************
  * Bits

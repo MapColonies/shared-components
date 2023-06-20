@@ -41,26 +41,17 @@ export interface ChipProps {
   /** A callback for click or enter key. This should be used over onClick for accessibility reasons. evt.detail = { chipId: string }  */
   onInteraction?: (evt: ChipOnInteractionEventT) => void;
   /** A callback for click or enter key for the trailing icon. material-components-web always treats this as an intent to remove the chip. evt.detail = { chipId: string } */
-  onTrailingIconInteraction?: (
-    evt: ChipOnTrailingIconInteractionEventT
-  ) => void;
+  onTrailingIconInteraction?: (evt: ChipOnTrailingIconInteractionEventT) => void;
   /** A callback that is fired once the chip is in an exited state from removing it. evt.detail = { chipId: string } */
   onRemove?: (evt: ChipOnRemoveEventT) => void;
   /** Advanced: A reference to the MDCFoundation. */
   foundationRef?: React.Ref<MDCChipFoundation>;
 }
 
-export type ChipHTMLProps = RMWC.HTMLProps<
-  HTMLDivElement,
-  Omit<React.AllHTMLAttributes<HTMLDivElement>, 'label'>
->;
+export type ChipHTMLProps = RMWC.HTMLProps<HTMLDivElement, Omit<React.AllHTMLAttributes<HTMLDivElement>, 'label'>>;
 
 /** A Chip component. */
-export const Chip: RMWC.ComponentType<
-  ChipProps,
-  ChipHTMLProps,
-  'div'
-> = withRipple()(
+export const Chip: RMWC.ComponentType<ChipProps, ChipHTMLProps, 'div'> = withRipple()(
   createComponent<ChipProps, ChipHTMLProps>(function Chip(props, ref) {
     const {
       onInteraction,
@@ -88,37 +79,19 @@ export const Chip: RMWC.ComponentType<
     ]);
 
     return (
-      <Tag
-        role="row"
-        {...rest}
-        element={rootEl}
-        className={className}
-        ref={ref}
-      >
+      <Tag role="row" {...rest} element={rootEl} className={className} ref={ref}>
         <ChipRipple />
-        {!!icon && (
-          <ChipIcon icon={icon} leading hidden={selected && checkmark} />
-        )}
+        {!!icon && <ChipIcon icon={icon} leading hidden={selected && checkmark} />}
         {!!checkmark && <ChipCheckmark ref={checkmarkEl.setRef} />}
         <span role="gridcell">
-          <span
-            role="button"
-            className="mdc-chip__text__primary-action"
-            tabIndex={0}
-          >
+          <span role="button" className="mdc-chip__text__primary-action" tabIndex={0}>
             <span className="mdc-chip__text">
               {label}
               {children}
             </span>
           </span>
         </span>
-        {!!trailingIcon && (
-          <ChipIcon
-            icon={trailingIcon}
-            trailing
-            {...trailingIconEl.props({})}
-          />
-        )}
+        {!!trailingIcon && <ChipIcon icon={trailingIcon} trailing {...trailingIconEl.props({})} />}
       </Tag>
     );
   })
@@ -138,12 +111,7 @@ const ChipCheckmark = React.memo(
     return (
       <div ref={ref} className="mdc-chip__checkmark">
         <svg className="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
-          <path
-            className="mdc-chip__checkmark-path"
-            fill="none"
-            stroke="black"
-            d="M1.73,12.91 8.1,19.28 22.79,4.59"
-          />
+          <path className="mdc-chip__checkmark-path" fill="none" stroke="black" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
         </svg>
       </div>
     );
@@ -158,9 +126,7 @@ interface ChipIconProps extends IconProps {
 }
 
 /** Icons inside of a chip. This is an instance of the Icon component. To make the icons interactive, add props tabIndex="0" and role="button". */
-const ChipIcon = React.memo(function ChipIcon(
-  props: ChipIconProps & RMWC.HTMLProps
-) {
+const ChipIcon = React.memo(function ChipIcon(props: ChipIconProps & RMWC.HTMLProps) {
   const { leading, trailing, hidden, ...rest } = props;
   const className = useClassNames(props, [
     'mdc-chip__icon',
@@ -170,13 +136,8 @@ const ChipIcon = React.memo(function ChipIcon(
       'mdc-chip__icon--trailing': trailing,
     },
   ]);
-  const hasInteractionHandler = Object.keys(props).some((p) =>
-    p.startsWith('on')
-  );
-  const trailingProps =
-    props.trailing || hasInteractionHandler
-      ? { role: 'button', tabIndex: 0 }
-      : {};
+  const hasInteractionHandler = Object.keys(props).some((p) => p.startsWith('on'));
+  const trailingProps = props.trailing || hasInteractionHandler ? { role: 'button', tabIndex: 0 } : {};
 
   return <Icon {...trailingProps} {...rest} className={className} />;
 });
@@ -194,10 +155,7 @@ export interface ChipSetProps {
 }
 
 /** A container for multiple chips. */
-export const ChipSet = createComponent<ChipSetProps>(function ChipSet(
-  props,
-  ref
-) {
+export const ChipSet = createComponent<ChipSetProps>(function ChipSet(props, ref) {
   const { choice, filter, ...rest } = props;
 
   const className = useClassNames(props, [

@@ -11,18 +11,6 @@ describe('Slider SSR', () => {
   });
 
   it('renders with all props', () => {
-    mount(
-      <Slider
-        value={50}
-        discrete
-        displayMarkers
-        min={0}
-        max={100}
-        step={10}
-        disabled
-        onChange={() => {}}
-        onInput={() => {}}
-      />
-    );
+    mount(<Slider value={50} discrete displayMarkers min={0} max={100} step={10} disabled onChange={() => {}} onInput={() => {}} />);
   });
 });

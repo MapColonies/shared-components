@@ -14,9 +14,7 @@ export interface SelectIconProps extends IconProps {
   apiRef?: (api: SelectIconApi | null) => void;
 }
 
-export const SelectIcon = function SelectIcon(
-  props: SelectIconProps & RMWC.HTMLProps
-) {
+export const SelectIcon = function SelectIcon(props: SelectIconProps & RMWC.HTMLProps) {
   const { apiRef, ...rest } = props;
   const { rootEl } = useSelectIconFoundation(props);
   const className = useClassNames(props, ['mdc-select__icon']);

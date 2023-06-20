@@ -32,10 +32,7 @@ const possiblyFocusElement = (el: Element | null) => {
   return false;
 };
 
-const getNextSibling = (
-  el: HTMLElement | null,
-  isBack: boolean
-): HTMLElement | null => {
+const getNextSibling = (el: HTMLElement | null, isBack: boolean): HTMLElement | null => {
   if (!el) return null;
 
   const next = isBack ? el.previousElementSibling : el.nextElementSibling;
@@ -48,16 +45,10 @@ const getNextSibling = (
 };
 
 /** A collapsible list component. */
-export class CollapsibleList extends React.Component<
-  CollapsibleListProps & RMWC.HTMLProps,
-  CollapsibleState
-> {
+export class CollapsibleList extends React.Component<CollapsibleListProps & RMWC.HTMLProps, CollapsibleState> {
   static displayName = 'CollapsibleList';
 
-  static getDerivedStateFromProps(
-    props: CollapsibleListProps,
-    state: CollapsibleState
-  ) {
+  static getDerivedStateFromProps(props: CollapsibleListProps, state: CollapsibleState) {
     if (props.open !== undefined && props.open !== state.open) {
       return {
         ...state,
@@ -89,10 +80,7 @@ export class CollapsibleList extends React.Component<
     this.syncOpenState();
   }
 
-  componentDidUpdate(
-    prevProps: CollapsibleListProps,
-    prevState: CollapsibleState
-  ) {
+  componentDidUpdate(prevProps: CollapsibleListProps, prevState: CollapsibleState) {
     if (prevState.open !== this.state.open) {
       this.syncOpenState();
     }
@@ -106,9 +94,7 @@ export class CollapsibleList extends React.Component<
   syncOpenState() {
     const { onOpen, onClose } = this.props;
     const childrenStyle = {
-      maxHeight: this.childContainer
-        ? `${this.childContainer.offsetHeight}px`
-        : '0px',
+      maxHeight: this.childContainer ? `${this.childContainer.offsetHeight}px` : '0px',
     };
 
     this.setState({ childrenStyle }, () => {
@@ -136,11 +122,7 @@ export class CollapsibleList extends React.Component<
 
   correctFocus(back: boolean) {
     this.rafId = window.requestAnimationFrame(() => {
-      if (
-        !this.state.open &&
-        this.root &&
-        this.root.contains(document.activeElement)
-      ) {
+      if (!this.state.open && this.root && this.root.contains(document.activeElement)) {
         const sibling = getNextSibling(this.root, back);
 
         if (possiblyFocusElement(sibling)) {
@@ -197,30 +179,14 @@ export class CollapsibleList extends React.Component<
   }
 
   handleFocus(evt: React.FocusEvent) {
-    if (
-      !this.state.open &&
-      this.root &&
-      this.childContainer &&
-      this.childContainer.contains(document.activeElement)
-    ) {
-      const el = this.root.querySelector(
-        '.rmwc-collapsible-list__handle .mdc-list-item'
-      );
+    if (!this.state.open && this.root && this.childContainer && this.childContainer.contains(document.activeElement)) {
+      const el = this.root.querySelector('.rmwc-collapsible-list__handle .mdc-list-item');
       el && (el as HTMLElement).focus();
     }
   }
 
   render() {
-    const {
-      children,
-      handle,
-      onOpen,
-      onClose,
-      open: openProp,
-      defaultOpen,
-      className,
-      ...rest
-    } = this.props;
+    const { children, handle, onOpen, onClose, open: openProp, defaultOpen, className, ...rest } = this.props;
     const { open, childrenStyle } = this.state;
 
     return (
@@ -240,10 +206,7 @@ export class CollapsibleList extends React.Component<
           })}
         </div>
         <div className="rmwc-collapsible-list__children" style={childrenStyle}>
-          <div
-            className="rmwc-collapsible-list__children-inner"
-            ref={(el) => (this.childContainer = el)}
-          >
+          <div className="rmwc-collapsible-list__children-inner" ref={(el) => (this.childContainer = el)}>
             {children}
           </div>
         </div>

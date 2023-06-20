@@ -5,16 +5,7 @@
 import React from 'react';
 import { renderToString as mount } from 'react-dom/server';
 
-import {
-  DataTable,
-  DataTableContent,
-  DataTableHead,
-  DataTableBody,
-  DataTableHeadCell,
-  DataTableRow,
-  DataTableCell,
-  SimpleDataTable,
-} from './';
+import { DataTable, DataTableContent, DataTableHead, DataTableBody, DataTableHeadCell, DataTableRow, DataTableCell, SimpleDataTable } from './';
 
 describe('DataTable', () => {
   it('renders', () => {

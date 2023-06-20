@@ -1,13 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerSubtitle,
-  DrawerAppContent,
-} from './';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerSubtitle, DrawerAppContent } from './';
 
 describe('Drawer', () => {
   it('Drawer renders', () => {
@@ -70,11 +63,9 @@ describe('Drawer', () => {
     });
   });
   it('can have custom classnames', () => {
-    [Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle].forEach(
-      (Component: React.ComponentType<any>) => {
-        const el = mount(<Component className={'my-custom-classname'} />);
-        expect(!!~el.html().search('my-custom-classname')).toEqual(true);
-      }
-    );
+    [Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle].forEach((Component: React.ComponentType<any>) => {
+      const el = mount(<Component className={'my-custom-classname'} />);
+      expect(!!~el.html().search('my-custom-classname')).toEqual(true);
+    });
   });
 });

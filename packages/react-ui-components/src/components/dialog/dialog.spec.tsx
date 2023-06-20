@@ -1,16 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogButton,
-  SimpleDialog,
-  createDialogQueue,
-  DialogQueue,
-} from './';
+import { Dialog, DialogTitle, DialogContent, DialogActions, DialogButton, SimpleDialog, createDialogQueue, DialogQueue } from './';
 import { wait, actWait } from '../base/utils/test-utils';
 import { act } from 'react-dom/test-utils';
 
@@ -28,13 +19,7 @@ describe('Dialog', () => {
   });
 
   it('simple Dialog renders with no children', () => {
-    mount(
-      <SimpleDialog
-        title="This is a simple dialog"
-        open
-        onClose={(evt) => {}}
-      />
-    );
+    mount(<SimpleDialog title="This is a simple dialog" open onClose={(evt) => {}} />);
   });
 
   it('simple Dialog renders with children', () => {

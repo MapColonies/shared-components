@@ -18,10 +18,7 @@ export type TabIndicatorApi = {
   computeContentClientRect: () => ClientRect;
 };
 
-export function TabIndicator(
-  props: TabIndicatorProps &
-    RMWC.HTMLProps & { apiRef?: (api: TabIndicatorApi | null) => void }
-) {
+export function TabIndicator(props: TabIndicatorProps & RMWC.HTMLProps & { apiRef?: (api: TabIndicatorApi | null) => void }) {
   const { rootEl, contentEl } = useTabIndicatorFoundation(props);
 
   const { icon, transition } = props;
@@ -40,9 +37,7 @@ export function TabIndicator(
         // @ts-ignore icon prop not always present, this is ok
         icon={icon}
         element={contentEl}
-        className={`mdc-tab-indicator__content mdc-tab-indicator__content--${
-          icon ? 'icon' : 'underline'
-        }`}
+        className={`mdc-tab-indicator__content mdc-tab-indicator__content--${icon ? 'icon' : 'underline'}`}
       />
     </Tag>
   );

@@ -33,9 +33,7 @@ describe('Theme', () => {
 describe('ThemeProvider', () => {
   test('renders', () => {
     const el = mount(
-      <ThemeProvider
-        options={{ primary: 'red', secondary: '#fff', surface: '#000000' }}
-      >
+      <ThemeProvider options={{ primary: 'red', secondary: '#fff', surface: '#000000' }}>
         <div />
       </ThemeProvider>
     );

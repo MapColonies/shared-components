@@ -8,11 +8,7 @@ export const deprecationWarning = (message: string) => {
   }
 };
 
-export const handleDeprecations = (
-  props: any,
-  deprecate: DeprecateT,
-  displayName: string
-) => {
+export const handleDeprecations = (props: any, deprecate: DeprecateT, displayName: string) => {
   props = { ...props };
   for (const oldPropName in deprecate) {
     const newProp = deprecate[oldPropName];
@@ -29,11 +25,7 @@ export const handleDeprecations = (
     if (props[oldPropName] !== undefined) {
       if (newPropName === '') {
         /* istanbul ignore next */
-        deprecationWarning(
-          `${
-            displayName || ''
-          } component prop '${oldPropName}' has been removed from and is no longer a valid prop.`
-        );
+        deprecationWarning(`${displayName || ''} component prop '${oldPropName}' has been removed from and is no longer a valid prop.`);
       } else {
         props[newPropName] = transformProp(props[oldPropName]);
         let propTransformMessage = '';
@@ -42,11 +34,7 @@ export const handleDeprecations = (
         }
 
         /* istanbul ignore next */
-        deprecationWarning(
-          `${
-            displayName || ''
-          } component prop '${oldPropName}' has been replaced with '${newPropName}'. ${propTransformMessage}`
-        );
+        deprecationWarning(`${displayName || ''} component prop '${oldPropName}' has been replaced with '${newPropName}'. ${propTransformMessage}`);
       }
 
       delete props[oldPropName];

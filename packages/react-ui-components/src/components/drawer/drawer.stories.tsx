@@ -1,13 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
-import {
-  Drawer,
-  DrawerHeader,
-  DrawerContent,
-  DrawerTitle,
-  DrawerSubtitle,
-} from './';
+import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from './';
 import { List, ListItem, ListItemGraphic } from '../list';
 import { useKnob } from '../base/utils/use-knob';
 import '../avatar/styles';

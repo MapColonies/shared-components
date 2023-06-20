@@ -1,12 +1,6 @@
 import * as RMWC from '../types';
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Snackbar,
-  SnackbarProps,
-  SnackbarAction,
-  SnackbarActionProps,
-  SnackbarHTMLProps,
-} from './snackbar';
+import { Snackbar, SnackbarProps, SnackbarAction, SnackbarActionProps, SnackbarHTMLProps } from './snackbar';
 import { IconPropT } from '../types';
 import { ArrayEmitter } from '../base';
 
@@ -14,15 +8,10 @@ interface SnackbarQueueMessageBase {
   title?: React.ReactNode;
   body?: React.ReactNode;
   icon?: IconPropT;
-  actions?: Array<
-    NotificationAction | (SnackbarActionProps & SnackbarHTMLProps)
-  >;
+  actions?: Array<NotificationAction | (SnackbarActionProps & SnackbarHTMLProps)>;
 }
 
-export interface SnackbarQueueMessage
-  extends SnackbarProps,
-    SnackbarQueueMessageBase,
-    Omit<NotificationOptions, keyof SnackbarQueueMessageBase> {}
+export interface SnackbarQueueMessage extends SnackbarProps, SnackbarQueueMessageBase, Omit<NotificationOptions, keyof SnackbarQueueMessageBase> {}
 
 /** A snackbar queue for rendering messages */
 export interface SnackbarQueueProps extends SnackbarProps {
@@ -30,15 +19,10 @@ export interface SnackbarQueueProps extends SnackbarProps {
 }
 
 /** A snackbar queue for rendering messages */
-export function SnackbarQueue({
-  messages,
-  ...defaultSnackbarProps
-}: SnackbarQueueProps & RMWC.HTMLProps) {
+export function SnackbarQueue({ messages, ...defaultSnackbarProps }: SnackbarQueueProps & RMWC.HTMLProps) {
   const currentMessage = messages.array[0];
   const [, setIteration] = useState(0);
-  const [message, setMessage] = useState<SnackbarQueueMessage | undefined>(
-    messages.array[0]
-  );
+  const [message, setMessage] = useState<SnackbarQueueMessage | undefined>(messages.array[0]);
 
   const removeMessage = useCallback(
     (message?: SnackbarQueueMessage) => {
@@ -62,20 +46,9 @@ export function SnackbarQueue({
     };
   }, [messages, message]);
 
-  const {
-    body = '',
-    image,
-    title = '',
-    onClose,
-    actions,
-    ...messageSnackbarProps
-  } = message || {};
+  const { body = '', image, title = '', onClose, actions, ...messageSnackbarProps } = message || {};
 
-  const actionProp = actions
-    ? actions.map(({ title, label, ...rest }: any) => (
-        <SnackbarAction {...rest} label={label || title} />
-      ))
-    : null;
+  const actionProp = actions ? actions.map(({ title, label, ...rest }: any) => <SnackbarAction {...rest} label={label || title} />) : null;
 
   // We are open if we have a message
   // and the current one is the one in state
@@ -99,11 +72,7 @@ export function SnackbarQueue({
                 textAlign: 'center',
               }}
             >
-              <img
-                src={image}
-                alt={`${image}`}
-                style={{ maxWidth: '100%', maxHeight: '18rem' }}
-              />
+              <img src={image} alt={`${image}`} style={{ maxWidth: '100%', maxHeight: '18rem' }} />
             </div>
           )}
         </>

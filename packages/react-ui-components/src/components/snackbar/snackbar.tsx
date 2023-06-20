@@ -46,112 +46,81 @@ export interface SnackbarProps {
   foundationRef?: React.Ref<MDCSnackbarFoundation | null>;
 }
 
-export type SnackbarHTMLProps = RMWC.HTMLProps<
-  HTMLDivElement,
-  Omit<React.AllHTMLAttributes<HTMLDivElement>, 'action'>
->;
+export type SnackbarHTMLProps = RMWC.HTMLProps<HTMLDivElement, Omit<React.AllHTMLAttributes<HTMLDivElement>, 'action'>>;
 
 /** A Snackbar component for notifications. */
-export const Snackbar: RMWC.ComponentType<
-  SnackbarProps,
-  SnackbarHTMLProps,
-  'div'
-> = createComponent<SnackbarProps, SnackbarHTMLProps>(function Snackbar(
-  props,
-  ref
-) {
-  const { rootEl, surfaceEl, labelEl } = useSnackbarFoundation(props);
+export const Snackbar: RMWC.ComponentType<SnackbarProps, SnackbarHTMLProps, 'div'> = createComponent<SnackbarProps, SnackbarHTMLProps>(
+  function Snackbar(props, ref) {
+    const { rootEl, surfaceEl, labelEl } = useSnackbarFoundation(props);
 
-  const {
-    open,
-    message,
-    timeout,
-    dismissIcon,
-    onOpen,
-    onClose,
-    children,
-    action,
-    icon,
-    leading,
-    stacked,
-    dismissesOnAction,
-    foundationRef,
-    ...rest
-  } = props;
+    const {
+      open,
+      message,
+      timeout,
+      dismissIcon,
+      onOpen,
+      onClose,
+      children,
+      action,
+      icon,
+      leading,
+      stacked,
+      dismissesOnAction,
+      foundationRef,
+      ...rest
+    } = props;
 
-  const className = useClassNames(props, [
-    'mdc-snackbar',
-    {
-      'mdc-snackbar--leading': leading,
-      'mdc-snackbar--stacked': stacked,
-    },
-  ]);
+    const className = useClassNames(props, [
+      'mdc-snackbar',
+      {
+        'mdc-snackbar--leading': leading,
+        'mdc-snackbar--stacked': stacked,
+      },
+    ]);
 
-  const actions: SnackbarProps['action'][] = Array.isArray(action)
-    ? action
-    : action
-    ? [action]
-    : [];
+    const actions: SnackbarProps['action'][] = Array.isArray(action) ? action : action ? [action] : [];
 
-  return (
-    <Tag
-      {...rest}
-      ref={ref}
-      element={rootEl}
-      aria-live="assertive"
-      aria-atomic
-      aria-hidden
-      className={className}
-    >
-      <div {...surfaceEl.props({})} className="mdc-snackbar__surface">
-        {!!icon && (
-          <Icon
-            style={{
-              color: 'rgba(255, 255, 255, 0.87)',
-              fill: 'currentColor',
-              marginLeft: '1rem',
-            }}
-            icon={icon}
-          />
-        )}
-        <SnackbarLabel>
-          {message}
-          {/**
-           * Fixes bug https://github.com/jamesmfriedman/rmwc/issues/418
-           * Wrapping the content for accessibility so it can be announced for screen readers
-           */}
-          <div style={{ display: 'none' }} ref={labelEl.setRef} />
-        </SnackbarLabel>
-
-        <SnackbarActions>
-          {actions.map((a, i) => (
-            <React.Fragment key={i}>{a}</React.Fragment>
-          ))}
-          {dismissIcon && (
-            <SnackbarDismiss
-              icon={dismissIcon === true ? 'close' : dismissIcon}
+    return (
+      <Tag {...rest} ref={ref} element={rootEl} aria-live="assertive" aria-atomic aria-hidden className={className}>
+        <div {...surfaceEl.props({})} className="mdc-snackbar__surface">
+          {!!icon && (
+            <Icon
+              style={{
+                color: 'rgba(255, 255, 255, 0.87)',
+                fill: 'currentColor',
+                marginLeft: '1rem',
+              }}
+              icon={icon}
             />
           )}
-        </SnackbarActions>
-        {children}
-      </div>
-    </Tag>
-  );
-});
+          <SnackbarLabel>
+            {message}
+            {/**
+             * Fixes bug https://github.com/jamesmfriedman/rmwc/issues/418
+             * Wrapping the content for accessibility so it can be announced for screen readers
+             */}
+            <div style={{ display: 'none' }} ref={labelEl.setRef} />
+          </SnackbarLabel>
+
+          <SnackbarActions>
+            {actions.map((a, i) => (
+              <React.Fragment key={i}>{a}</React.Fragment>
+            ))}
+            {dismissIcon && <SnackbarDismiss icon={dismissIcon === true ? 'close' : dismissIcon} />}
+          </SnackbarActions>
+          {children}
+        </div>
+      </Tag>
+    );
+  }
+);
 
 /*********************************************************************
  * Bits
  *********************************************************************/
 
 function SnackbarLabel(props: { children: React.ReactNode }) {
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="mdc-snackbar__label"
-      {...props}
-    />
-  );
+  return <div role="status" aria-live="polite" className="mdc-snackbar__label" {...props} />;
 }
 
 function SnackbarActions(props: { children: React.ReactNode }) {
@@ -165,27 +134,14 @@ export interface SnackbarActionProps extends ButtonProps {
 }
 
 /** A button for a snackbar action. */
-export const SnackbarAction: RMWC.ComponentType<
+export const SnackbarAction: RMWC.ComponentType<SnackbarActionProps, SnackbarHTMLProps, 'button'> = createComponent<
   SnackbarActionProps,
-  SnackbarHTMLProps,
-  'button'
-> = createComponent<SnackbarActionProps, SnackbarHTMLProps>(
-  function SnackbarAction(props, ref) {
-    const className = useClassNames(props, ['mdc-snackbar__action']);
-    const {
-      action = MDCSnackbarFoundation.strings.REASON_ACTION,
-      ...rest
-    } = props;
-    return (
-      <Button
-        {...rest}
-        className={className}
-        ref={ref}
-        data-mdc-snackbar-action={action}
-      />
-    );
-  }
-);
+  SnackbarHTMLProps
+>(function SnackbarAction(props, ref) {
+  const className = useClassNames(props, ['mdc-snackbar__action']);
+  const { action = MDCSnackbarFoundation.strings.REASON_ACTION, ...rest } = props;
+  return <Button {...rest} className={className} ref={ref} data-mdc-snackbar-action={action} />;
+});
 
 function SnackbarDismiss(props: IconButtonProps) {
   return <IconButton {...props} className="mdc-snackbar__dismiss" />;

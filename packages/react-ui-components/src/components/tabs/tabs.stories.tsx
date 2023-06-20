@@ -57,11 +57,7 @@ class TabBarStory extends React.Component {
           <Button raised onClick={(evt: any) => this.onAddTab(evt)}>
             Add Tab
           </Button>{' '}
-          <Button
-            disabled={this.state.tabs.length <= 1}
-            raised
-            onClick={(evt: any) => this.onRemoveLastTab(evt)}
-          >
+          <Button disabled={this.state.tabs.length <= 1} raised onClick={(evt: any) => this.onRemoveLastTab(evt)}>
             Remove Last Tab
           </Button>{' '}
           <input
@@ -73,11 +69,7 @@ class TabBarStory extends React.Component {
           />
         </div>
         Controlled
-        <TabBar
-          activeTabIndex={this.state.activeTabIndex}
-          onActivate={(evt: any) => this.onChange(evt)}
-          foundationRef={console.log}
-        >
+        <TabBar activeTabIndex={this.state.activeTabIndex} onActivate={(evt: any) => this.onChange(evt)} foundationRef={console.log}>
           {this.state.tabs.map((label) => (
             <Tab key={label}>{label}</Tab>
           ))}
@@ -87,12 +79,7 @@ class TabBarStory extends React.Component {
         Uncontrolled
         <TabBar>
           {this.state.tabs.map((label, index) => (
-            <Tab
-              key={label}
-              label={label}
-              icon={this.state.icons[index]}
-              foundationRef={console.log}
-            />
+            <Tab key={label} label={label} icon={this.state.icons[index]} foundationRef={console.log} />
           ))}
         </TabBar>
         <br />
@@ -100,13 +87,7 @@ class TabBarStory extends React.Component {
         Icons
         <TabBar>
           {this.state.tabs.map((label, index) => (
-            <Tab
-              stacked
-              restrictIndicator
-              key={label}
-              label={label}
-              icon={this.state.icons[index]}
-            />
+            <Tab stacked restrictIndicator key={label} label={label} icon={this.state.icons[index]} />
           ))}
         </TabBar>
         <br />
@@ -138,10 +119,7 @@ export const TabBarScrolls = () => {
   const [tabIndex, setTabIndex] = React.useState(0);
 
   return (
-    <TabBar
-      activeTabIndex={tabIndex}
-      onActivate={(evt) => setTabIndex(evt.detail.index)}
-    >
+    <TabBar activeTabIndex={tabIndex} onActivate={(evt) => setTabIndex(evt.detail.index)}>
       {/* Tabs automatically scroll with lots of content. */}
       <Tab>Cookies</Tab>
       <Tab>Pizza</Tab>

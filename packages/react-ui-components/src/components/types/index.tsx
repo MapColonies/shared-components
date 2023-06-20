@@ -53,19 +53,12 @@ export interface WithRippleProps {
  */
 export type TagT = string | React.ComponentType<any>;
 
-export type CustomEventT<T> = CustomEvent<T> &
-  React.SyntheticEvent<EventTarget>;
+export type CustomEventT<T> = CustomEvent<T> & React.SyntheticEvent<EventTarget>;
 
 type IconElementT = React.ReactNode;
 export type IconSizeT = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge';
 
-export type IconStrategyT =
-  | 'auto'
-  | 'ligature'
-  | 'className'
-  | 'url'
-  | 'component'
-  | 'custom';
+export type IconStrategyT = 'auto' | 'ligature' | 'className' | 'url' | 'component' | 'custom';
 
 export interface IconOptions {
   icon: IconElementT;
@@ -88,10 +81,7 @@ export interface IconOptions {
   /** A base className for the icon namespace, i.e. material-icons. */
   basename?: string;
   /** A render function to use when using the 'custom' strategy. */
-  render?: (props: {
-    content: IconElementT;
-    className: string;
-  }) => React.ReactNode;
+  render?: (props: { content: IconElementT; className: string }) => React.ReactNode;
   /** A size to render the icon  */
   size?: IconSizeT;
   /** Additional props */
@@ -107,11 +97,7 @@ export type HTMLProps<T = HTMLElement, A = React.AllHTMLAttributes<T>> = A &
     ref?: React.HTMLProps<T>['ref'];
   };
 
-export type ComponentProps<
-  Props extends {},
-  ElementProps extends {},
-  Tag extends React.ElementType
-> = Props &
+export type ComponentProps<Props extends {}, ElementProps extends {}, Tag extends React.ElementType> = Props &
   (
     | ElementProps
     | (React.ComponentPropsWithRef<Tag> & {
@@ -120,14 +106,7 @@ export type ComponentProps<
       })
   );
 
-export type ComponentType<
-  Props,
-  ElementProps,
-  Element extends React.ElementType<any>
-> = {
-  <Tag extends React.ElementType<any> = Element>(
-    props: ComponentProps<Props, ElementProps, Tag>,
-    ref: any
-  ): JSX.Element;
+export type ComponentType<Props, ElementProps, Element extends React.ElementType<any>> = {
+  <Tag extends React.ElementType<any> = Element>(props: ComponentProps<Props, ElementProps, Tag>, ref: any): JSX.Element;
   displayName?: string;
 };

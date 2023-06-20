@@ -1,13 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  MenuSurfaceAnchor,
-  Menu,
-  MenuSurface,
-  MenuItem,
-  SimpleMenu,
-  SimpleMenuSurface,
-} from './';
+import { MenuSurfaceAnchor, Menu, MenuSurface, MenuItem, SimpleMenu, SimpleMenuSurface } from './';
 
 describe('Menu', () => {
   it('renders', () => {
@@ -85,11 +78,7 @@ describe('Menu', () => {
     let val = null;
 
     const el = mount(
-      <SimpleMenu
-        handle={<button>Test</button>}
-        open
-        onSelect={(evt) => (val = evt.detail.index)}
-      >
+      <SimpleMenu handle={<button>Test</button>} open onSelect={(evt) => (val = evt.detail.index)}>
         <MenuItem>
           <span>Cookies</span>
         </MenuItem>
@@ -136,11 +125,9 @@ describe('Menu', () => {
   });
 
   it('can have custom classnames', () => {
-    [MenuSurfaceAnchor, Menu, MenuItem].forEach(
-      (Component: React.ComponentType<any>) => {
-        const el = mount(<Component className={'my-custom-classname'} />);
-        expect(!!~el.html().search('my-custom-classname')).toEqual(true);
-      }
-    );
+    [MenuSurfaceAnchor, Menu, MenuItem].forEach((Component: React.ComponentType<any>) => {
+      const el = mount(<Component className={'my-custom-classname'} />);
+      expect(!!~el.html().search('my-custom-classname')).toEqual(true);
+    });
   });
 });

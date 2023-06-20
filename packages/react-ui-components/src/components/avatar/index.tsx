@@ -2,12 +2,7 @@ import * as RMWC from '../types';
 import React from 'react';
 import { Icon, IconProps } from '../icon';
 import { withRipple } from '../ripple';
-import {
-  useClassNames,
-  Tag,
-  createComponent,
-  createMemoComponent,
-} from '../base';
+import { useClassNames, Tag, createComponent, createMemoComponent } from '../base';
 
 /** An Avatar component for displaying users in a system. */
 export interface AvatarProps extends RMWC.WithRippleProps {
@@ -55,15 +50,7 @@ interface AvatarRootProps extends IconProps, RMWC.WithRippleProps {
 
 const AvatarRoot = withRipple()(
   createMemoComponent<AvatarRootProps>(function AvatarRoot(props, ref) {
-    const {
-      isCount,
-      overflow,
-      smallerText,
-      square,
-      interactive,
-      hasImage,
-      ...rest
-    } = props;
+    const { isCount, overflow, smallerText, square, interactive, hasImage, ...rest } = props;
 
     const className = useClassNames(props, [
       'rmwc-avatar',
@@ -89,26 +76,21 @@ export interface AvatarGroupProps {
 }
 
 /** A container for groups of Avatars */
-export const AvatarGroup = createComponent<AvatarGroupProps>(
-  function AvatarGroup(props, ref) {
-    const { dense, ...rest } = props;
+export const AvatarGroup = createComponent<AvatarGroupProps>(function AvatarGroup(props, ref) {
+  const { dense, ...rest } = props;
 
-    const className = useClassNames(props, [
-      'rmwc-avatar-group',
-      {
-        'rmwc-avatar-group--dense': dense,
-      },
-    ]);
+  const className = useClassNames(props, [
+    'rmwc-avatar-group',
+    {
+      'rmwc-avatar-group--dense': dense,
+    },
+  ]);
 
-    return <Tag {...rest} ref={ref} className={className} />;
-  }
-);
+  return <Tag {...rest} ref={ref} className={className} />;
+});
 
 /** An Avatar component for displaying users in a system. */
-export const Avatar = createComponent<AvatarProps>(function Avatar(
-  { src, size, name = '', interactive = false, contain = false, ...rest },
-  ref
-) {
+export const Avatar = createComponent<AvatarProps>(function Avatar({ src, size, name = '', interactive = false, contain = false, ...rest }, ref) {
   const initials = getInitialsForName(name);
   const avatarStyle = src
     ? {
@@ -157,33 +139,28 @@ export interface AvatarCountProps {
 }
 
 /** An Avatar count for displaying list overflow. */
-export const AvatarCount = createMemoComponent<AvatarCountProps>(
-  function AvatarCount(
-    { value, overflow, size, interactive = false, ...rest },
-    ref
-  ) {
-    const smallerText = String(value).length > 2;
-    return (
-      <AvatarRoot
-        ref={ref}
-        ripple={interactive}
-        interactive={interactive}
-        isCount
-        size={size}
-        overflow={overflow}
-        smallerText={smallerText}
-        tag={'span'}
-        {...rest}
-        icon={{
-          icon: (
-            <>
-              <div className="rmwc-avatar__text">
-                <div className="rmwc-avatar__text-inner">{value}</div>
-              </div>
-            </>
-          ),
-        }}
-      />
-    );
-  }
-);
+export const AvatarCount = createMemoComponent<AvatarCountProps>(function AvatarCount({ value, overflow, size, interactive = false, ...rest }, ref) {
+  const smallerText = String(value).length > 2;
+  return (
+    <AvatarRoot
+      ref={ref}
+      ripple={interactive}
+      interactive={interactive}
+      isCount
+      size={size}
+      overflow={overflow}
+      smallerText={smallerText}
+      tag={'span'}
+      {...rest}
+      icon={{
+        icon: (
+          <>
+            <div className="rmwc-avatar__text">
+              <div className="rmwc-avatar__text-inner">{value}</div>
+            </div>
+          </>
+        ),
+      }}
+    />
+  );
+});

@@ -22,14 +22,9 @@ export interface ToggleableProps<Foundation> {
   foundationRef?: React.Ref<Foundation>;
 }
 
-export type ToggleHTMLProps = RMWC.HTMLProps<
-  HTMLInputElement,
-  Omit<React.AllHTMLAttributes<HTMLInputElement>, 'label'>
->;
+export type ToggleHTMLProps = RMWC.HTMLProps<HTMLInputElement, Omit<React.AllHTMLAttributes<HTMLInputElement>, 'label'>>;
 
-export function useToggleFoundation<Foundation>(
-  props: ToggleableProps<Foundation> & ToggleHTMLProps
-) {
+export function useToggleFoundation<Foundation>(props: ToggleableProps<Foundation> & ToggleHTMLProps) {
   const { className, style, rootProps, label, children, disabled } = props;
   const hasLabel = props.label || props.children;
   const id = useId('toggle-', props);

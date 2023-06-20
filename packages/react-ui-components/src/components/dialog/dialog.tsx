@@ -3,13 +3,7 @@ import React from 'react';
 
 import { MDCDialogFoundation } from '@material/dialog';
 
-import {
-  useClassNames,
-  Tag,
-  createComponent,
-  PortalPropT,
-  PortalChild,
-} from '../base';
+import { useClassNames, Tag, createComponent, PortalPropT, PortalChild } from '../base';
 import { Button, ButtonProps } from '../button';
 import { useDialogFoundation } from './foundation';
 
@@ -71,13 +65,7 @@ export const Dialog = createComponent<DialogProps>(function Dialog(props, ref) {
     <PortalChild renderTo={renderToPortal}>
       <Tag {...rest} element={rootEl} className={className} ref={ref}>
         <div className="mdc-dialog__container">
-          <div
-            className="mdc-dialog__surface"
-            role="alertdialog"
-            aria-modal
-            aria-labelledby={ariaLabelledby}
-            aria-describedby={ariaDescribedBy}
-          >
+          <div className="mdc-dialog__surface" role="alertdialog" aria-modal aria-labelledby={ariaLabelledby} aria-describedby={ariaDescribedBy}>
             {children}
           </div>
         </div>
@@ -105,63 +93,42 @@ export interface SimpleDialogProps extends DialogProps {
   children?: React.ReactNode;
 }
 
-export type SimpleDialogHTMLProps = RMWC.HTMLProps<
-  HTMLDivElement,
-  Omit<React.AllHTMLAttributes<HTMLDivElement>, 'title'>
->;
+export type SimpleDialogHTMLProps = RMWC.HTMLProps<HTMLDivElement, Omit<React.AllHTMLAttributes<HTMLDivElement>, 'title'>>;
 
 /** A SimpleDialog component for ease of use. */
-export const SimpleDialog: RMWC.ComponentType<
+export const SimpleDialog: RMWC.ComponentType<SimpleDialogProps, SimpleDialogHTMLProps, 'div'> = createComponent<
   SimpleDialogProps,
-  SimpleDialogHTMLProps,
-  'div'
-> = createComponent<SimpleDialogProps, SimpleDialogHTMLProps>(
-  function SimpleDialog(
-    {
-      title,
-      header,
-      body,
-      footer,
-      acceptLabel = 'Accept',
-      cancelLabel = 'Cancel',
-      children,
-      open,
-      ...rest
-    },
-    ref
-  ) {
-    return (
-      <Dialog open={open} {...rest} ref={ref}>
-        {(!!title || !!header) && (
-          <DialogTitle>
-            {!!title && title}
-            {!!header && header}
-          </DialogTitle>
-        )}
-        {(!!body || children) && (
-          <DialogContent>
-            {body}
-            {children}
-          </DialogContent>
-        )}
+  SimpleDialogHTMLProps
+>(function SimpleDialog({ title, header, body, footer, acceptLabel = 'Accept', cancelLabel = 'Cancel', children, open, ...rest }, ref) {
+  return (
+    <Dialog open={open} {...rest} ref={ref}>
+      {(!!title || !!header) && (
+        <DialogTitle>
+          {!!title && title}
+          {!!header && header}
+        </DialogTitle>
+      )}
+      {(!!body || children) && (
+        <DialogContent>
+          {body}
+          {children}
+        </DialogContent>
+      )}
 
-        {(!!cancelLabel || !!acceptLabel || !!footer) && (
-          <DialogActions>
-            {!!footer && footer}
-            {!!cancelLabel && (
-              <DialogButton action="close">{cancelLabel}</DialogButton>
-            )}
-            {!!acceptLabel && (
-              <DialogButton action="accept" isDefaultAction>
-                {acceptLabel}
-              </DialogButton>
-            )}
-          </DialogActions>
-        )}
-      </Dialog>
-    );
-  }
-);
+      {(!!cancelLabel || !!acceptLabel || !!footer) && (
+        <DialogActions>
+          {!!footer && footer}
+          {!!cancelLabel && <DialogButton action="close">{cancelLabel}</DialogButton>}
+          {!!acceptLabel && (
+            <DialogButton action="accept" isDefaultAction>
+              {acceptLabel}
+            </DialogButton>
+          )}
+        </DialogActions>
+      )}
+    </Dialog>
+  );
+});
 
 /*********************************************************************
  * Bits
@@ -171,12 +138,8 @@ interface DialogScrimProps {
   disableInteraction?: boolean;
 }
 
-const DialogScrim = React.memo(function DialogScrim({
-  disableInteraction,
-}: DialogScrimProps) {
-  const style: React.CSSProperties = disableInteraction
-    ? { pointerEvents: 'none' }
-    : {};
+const DialogScrim = React.memo(function DialogScrim({ disableInteraction }: DialogScrimProps) {
+  const style: React.CSSProperties = disableInteraction ? { pointerEvents: 'none' } : {};
   return <div className="mdc-dialog__scrim" style={style} />;
 });
 
@@ -184,34 +147,28 @@ const DialogScrim = React.memo(function DialogScrim({
 export interface DialogTitleProps {}
 
 /** The Dialog title. */
-export const DialogTitle = createComponent<DialogTitleProps>(
-  function DialogTitle(props, ref) {
-    const className = useClassNames(props, ['mdc-dialog__title']);
-    return <Tag tag="h2" {...props} ref={ref} className={className} />;
-  }
-);
+export const DialogTitle = createComponent<DialogTitleProps>(function DialogTitle(props, ref) {
+  const className = useClassNames(props, ['mdc-dialog__title']);
+  return <Tag tag="h2" {...props} ref={ref} className={className} />;
+});
 
 /** The Dialog content. */
 export interface DialogContentProps {}
 
 /** The Dialog content. */
-export const DialogContent = createComponent<DialogContentProps>(
-  function DialogContent(props, ref) {
-    const className = useClassNames(props, ['mdc-dialog__content']);
-    return <Tag {...props} ref={ref} className={className} />;
-  }
-);
+export const DialogContent = createComponent<DialogContentProps>(function DialogContent(props, ref) {
+  const className = useClassNames(props, ['mdc-dialog__content']);
+  return <Tag {...props} ref={ref} className={className} />;
+});
 
 /** Actions container for the Dialog. */
 export interface DialogActionsProps {}
 
 /** Actions container for the Dialog. */
-export const DialogActions = createComponent<DialogActionsProps>(
-  function DialogActions(props, ref) {
-    const className = useClassNames(props, ['mdc-dialog__actions']);
-    return <Tag {...props} ref={ref} className={className} />;
-  }
-);
+export const DialogActions = createComponent<DialogActionsProps>(function DialogActions(props, ref) {
+  const className = useClassNames(props, ['mdc-dialog__actions']);
+  return <Tag {...props} ref={ref} className={className} />;
+});
 
 /** Action buttons for the Dialog. */
 export interface DialogButtonProps extends ButtonProps {
@@ -222,22 +179,10 @@ export interface DialogButtonProps extends ButtonProps {
 }
 
 /** Action buttons for the Dialog. */
-export const DialogButton = createComponent<DialogButtonProps>(
-  function DialogButton(props, ref) {
-    const className = useClassNames(props, ['mdc-dialog__button']);
-    const { action = '', isDefaultAction, ...rest } = props;
-    const defaultProp = !!isDefaultAction
-      ? { [MDCDialogFoundation.strings.BUTTON_DEFAULT_ATTRIBUTE]: true }
-      : {};
+export const DialogButton = createComponent<DialogButtonProps>(function DialogButton(props, ref) {
+  const className = useClassNames(props, ['mdc-dialog__button']);
+  const { action = '', isDefaultAction, ...rest } = props;
+  const defaultProp = !!isDefaultAction ? { [MDCDialogFoundation.strings.BUTTON_DEFAULT_ATTRIBUTE]: true } : {};
 
-    return (
-      <Button
-        {...rest}
-        {...defaultProp}
-        ref={ref}
-        className={className}
-        data-mdc-dialog-action={action}
-      />
-    );
-  }
-);
+  return <Button {...rest} {...defaultProp} ref={ref} className={className} data-mdc-dialog-action={action} />;
+});

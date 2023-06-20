@@ -7,8 +7,7 @@ import { TabBarContext } from './tab-bar-context';
 
 export const useTabFoundation = (props: TabProps & React.HTMLProps<any>) => {
   const tabIndicatorApi = useRef<TabIndicatorApi | null>();
-  const setTabIndicatorApi = (api: TabIndicatorApi | null) =>
-    (tabIndicatorApi.current = api);
+  const setTabIndicatorApi = (api: TabIndicatorApi | null) => (tabIndicatorApi.current = api);
 
   const contextApi = useContext(TabBarContext);
   const id = useId('tab', props);
@@ -19,13 +18,11 @@ export const useTabFoundation = (props: TabProps & React.HTMLProps<any>) => {
     foundation: ({ rootEl, contentEl, emit, getProps }) => {
       return new MDCTabFoundation(
         /** @type {!MDCTabAdapter} */ {
-          setAttr: (attr: string, value: any) =>
-            rootEl.setProp(attr as any, value),
+          setAttr: (attr: string, value: any) => rootEl.setProp(attr as any, value),
           addClass: (className: string) => rootEl.addClass(className),
           removeClass: (className: string) => rootEl.removeClass(className),
           hasClass: (className: string) => rootEl.hasClass(className),
-          activateIndicator: (previousIndicatorClientRect: ClientRect) =>
-            tabIndicatorApi.current?.activate(previousIndicatorClientRect),
+          activateIndicator: (previousIndicatorClientRect: ClientRect) => tabIndicatorApi.current?.activate(previousIndicatorClientRect),
           deactivateIndicator: () => tabIndicatorApi.current?.deactivate(),
           notifyInteracted: () => {
             const evt = emit('onInteraction', { tabId: id }, true /* bubble */);
@@ -54,18 +51,13 @@ export const useTabFoundation = (props: TabProps & React.HTMLProps<any>) => {
   const tabApi = useMemo<TabApi>(() => {
     return {
       getActive: () => foundation.isActive(),
-      activate: (computeIndicatorClientRect: ClientRect) =>
-        foundation.activate(computeIndicatorClientRect),
+      activate: (computeIndicatorClientRect: ClientRect) => foundation.activate(computeIndicatorClientRect),
       deactivate: () => foundation.deactivate(),
-      computeIndicatorClientRect: () =>
-        tabIndicatorApi.current?.computeContentClientRect() || emptyClientRect,
+      computeIndicatorClientRect: () => tabIndicatorApi.current?.computeContentClientRect() || emptyClientRect,
       computeDimensions: () => foundation.computeDimensions(),
       focus: () => rootEl.ref && rootEl.ref.focus(),
       id,
-      getIndex: () =>
-        rootEl.ref?.parentElement
-          ? Array.from(rootEl.ref.parentElement.children).indexOf(rootEl.ref)
-          : -1,
+      getIndex: () => (rootEl.ref?.parentElement ? Array.from(rootEl.ref.parentElement.children).indexOf(rootEl.ref) : -1),
     };
   }, [foundation, rootEl.ref, id]);
 
@@ -78,8 +70,7 @@ export const useTabFoundation = (props: TabProps & React.HTMLProps<any>) => {
   }, [contextApi, tabApi]);
 
   useEffect(() => {
-    props.focusOnActivate !== undefined &&
-      foundation.setFocusOnActivate(props.focusOnActivate);
+    props.focusOnActivate !== undefined && foundation.setFocusOnActivate(props.focusOnActivate);
   }, [foundation, props.focusOnActivate]);
 
   return {

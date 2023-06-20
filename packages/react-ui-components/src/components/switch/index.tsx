@@ -1,13 +1,7 @@
 import * as RMWC from '../types';
 import React from 'react';
 import { MDCSwitchFoundation } from '@material/switch';
-import {
-  classNames,
-  mergeRefs,
-  Tag,
-  useClassNames,
-  createComponent,
-} from '../base';
+import { classNames, mergeRefs, Tag, useClassNames, createComponent } from '../base';
 import { withRipple } from '../ripple';
 import { ToggleableProps, ToggleHTMLProps } from '../toggleable';
 import { useSwitchFoundation } from './foundation';
@@ -17,42 +11,22 @@ import { useSwitchFoundation } from './foundation';
  *********************************************************************/
 
 /** A Switch component. */
-export interface SwitchProps
-  extends RMWC.WithRippleProps,
-    ToggleableProps<MDCSwitchFoundation> {}
+export interface SwitchProps extends RMWC.WithRippleProps, ToggleableProps<MDCSwitchFoundation> {}
 
 export type SwitchHTMLProps = ToggleHTMLProps;
 
 /** A Switch component. */
-export const Switch: RMWC.ComponentType<
-  SwitchProps,
-  SwitchHTMLProps,
-  'input'
-> = createComponent<SwitchProps, SwitchHTMLProps>(function Switch(props, ref) {
-  const {
-    renderToggle,
-    id,
-    toggleRootProps,
-    rootEl,
-    checkboxEl,
-  } = useSwitchFoundation(props);
+export const Switch: RMWC.ComponentType<SwitchProps, SwitchHTMLProps, 'input'> = createComponent<SwitchProps, SwitchHTMLProps>(function Switch(
+  props,
+  ref
+) {
+  const { renderToggle, id, toggleRootProps, rootEl, checkboxEl } = useSwitchFoundation(props);
 
   const rootClassName = useClassNames(toggleRootProps, ['mdc-switch']);
-  const {
-    children,
-    className,
-    label,
-    style,
-    inputRef,
-    foundationRef,
-    ...rest
-  } = props;
+  const { children, className, label, style, inputRef, foundationRef, ...rest } = props;
 
   const renderedSwitch = (
-    <Tag
-      {...rootEl.props({ ...toggleRootProps, className: rootClassName })}
-      ref={ref}
-    >
+    <Tag {...rootEl.props({ ...toggleRootProps, className: rootClassName })} ref={ref}>
       <SwitchTrack />
       <SwitchThumbUnderlay>
         <SwitchThumb />
@@ -94,17 +68,6 @@ const SwitchThumb = React.memo(function SwitchThumb() {
 const SwitchThumbUnderlay = withRipple({
   unbounded: true,
   surface: false,
-})(function SwitchThumbUnderlay({
-  className,
-  ...rest
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={classNames(className, 'mdc-switch__thumb-underlay')}
-      {...rest}
-    />
-  );
+})(function SwitchThumbUnderlay({ className, ...rest }: { className?: string; children: React.ReactNode }) {
+  return <div className={classNames(className, 'mdc-switch__thumb-underlay')} {...rest} />;
 });

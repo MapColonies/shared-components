@@ -25,6 +25,6 @@
   "filesGlob": [
     "**/*.ts"
   ],
-  "include": ["src", "vite.config.ts"],
+  "include": ["packages", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

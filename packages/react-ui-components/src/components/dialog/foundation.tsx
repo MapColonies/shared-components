@@ -1,12 +1,5 @@
 import { MDCDialogFoundation } from '@material/dialog';
-import {
-  closest,
-  matches,
-  useFoundation,
-  FocusTrap,
-  focusTrapFactory,
-  triggerWindowResize,
-} from '../base';
+import { closest, matches, useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '../base';
 import { DialogProps } from '.';
 import React, { useRef, useEffect, useMemo } from 'react';
 
@@ -20,9 +13,7 @@ const areTopsMisaligned = (els: HTMLElement[] | null) => {
   return tops.size > 1;
 };
 
-export const useDialogFoundation = (
-  props: DialogProps & React.HTMLProps<any>
-) => {
+export const useDialogFoundation = (props: DialogProps & React.HTMLProps<any>) => {
   const focusTrap = useRef<FocusTrap>();
   const defaultButton = useRef<HTMLElement | null>(null);
   const buttons = useRef<HTMLElement[] | null>(null);
@@ -38,12 +29,9 @@ export const useDialogFoundation = (
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
         hasClass: (className: string) => rootEl.hasClass(className),
-        addBodyClass: (className: string) =>
-          document.body && document.body.classList.add(className),
-        removeBodyClass: (className: string) =>
-          document.body && document.body.classList.remove(className),
-        eventTargetMatches: (target: HTMLElement, selector: string) =>
-          matches(target, selector),
+        addBodyClass: (className: string) => document.body && document.body.classList.add(className),
+        removeBodyClass: (className: string) => document.body && document.body.classList.remove(className),
+        eventTargetMatches: (target: HTMLElement, selector: string) => matches(target, selector),
         trapFocus: () => {
           try {
             // we don't always have an item to focus
@@ -52,22 +40,12 @@ export const useDialogFoundation = (
           } catch (err) {}
         },
         releaseFocus: () => focusTrap.current?.releaseFocus(),
-        isContentScrollable: () =>
-          !!content.current && isScrollable(content.current),
+        isContentScrollable: () => !!content.current && isScrollable(content.current),
         areButtonsStacked: () => areTopsMisaligned(buttons.current),
-        getActionFromEvent: (
-          evt: React.SyntheticEvent<HTMLElement> & Event
-        ) => {
-          const element = closest(
-            evt.target,
-            `[${MDCDialogFoundation.strings.ACTION_ATTRIBUTE}]`
-          );
+        getActionFromEvent: (evt: React.SyntheticEvent<HTMLElement> & Event) => {
+          const element = closest(evt.target, `[${MDCDialogFoundation.strings.ACTION_ATTRIBUTE}]`);
 
-          return (
-            element?.getAttribute(
-              MDCDialogFoundation.strings.ACTION_ATTRIBUTE
-            ) || null
-          );
+          return element?.getAttribute(MDCDialogFoundation.strings.ACTION_ATTRIBUTE) || null;
         },
         clickDefaultButton: () => {
           defaultButton.current?.click();
@@ -75,10 +53,7 @@ export const useDialogFoundation = (
         reverseButtons: () => {
           buttons.current?.reverse();
 
-          buttons.current?.forEach(
-            (button) =>
-              button.parentElement && button.parentElement.appendChild(button)
-          );
+          buttons.current?.forEach((button) => button.parentElement && button.parentElement.appendChild(button));
         },
         notifyOpening: () => emit('onOpen', {}),
         notifyOpened: () => {
@@ -87,14 +62,9 @@ export const useDialogFoundation = (
           // Layout for events
           triggerWindowResize();
         },
-        notifyClosing: (action: string) =>
-          emit('onClose', action ? { action } : {}),
-        notifyClosed: (action: string) =>
-          emit('onClosed', action ? { action } : {}),
-        getInitialFocusEl: () =>
-          document.querySelector(
-            `[${MDCDialogFoundation.strings.INITIAL_FOCUS_ATTRIBUTE}]`
-          ),
+        notifyClosing: (action: string) => emit('onClose', action ? { action } : {}),
+        notifyClosed: (action: string) => emit('onClosed', action ? { action } : {}),
+        getInitialFocusEl: () => document.querySelector(`[${MDCDialogFoundation.strings.INITIAL_FOCUS_ATTRIBUTE}]`),
       });
     },
   });
@@ -115,32 +85,18 @@ export const useDialogFoundation = (
   useEffect(() => {
     // Default button
     defaultButton.current =
-      (rootEl.ref &&
-        rootEl.ref.querySelector<HTMLElement>(
-          `[${MDCDialogFoundation.strings.BUTTON_DEFAULT_ATTRIBUTE}]`
-        )) ||
-      null;
+      (rootEl.ref && rootEl.ref.querySelector<HTMLElement>(`[${MDCDialogFoundation.strings.BUTTON_DEFAULT_ATTRIBUTE}]`)) || null;
 
     // Buttons
-    buttons.current =
-      rootEl.ref &&
-      [].slice.call(
-        rootEl.ref.querySelectorAll(MDCDialogFoundation.strings.BUTTON_SELECTOR)
-      );
+    buttons.current = rootEl.ref && [].slice.call(rootEl.ref.querySelectorAll(MDCDialogFoundation.strings.BUTTON_SELECTOR));
 
     // Content
-    content.current =
-      rootEl.ref?.querySelector(MDCDialogFoundation.strings.CONTENT_SELECTOR) ||
-      null;
+    content.current = rootEl.ref?.querySelector(MDCDialogFoundation.strings.CONTENT_SELECTOR) || null;
   }, [rootEl.ref]);
 
   // Create the focus trap
   useEffect(() => {
-    const surface =
-      rootEl.ref &&
-      rootEl.ref.querySelector<HTMLElement>(
-        MDCDialogFoundation.strings.SURFACE_SELECTOR
-      );
+    const surface = rootEl.ref && rootEl.ref.querySelector<HTMLElement>(MDCDialogFoundation.strings.SURFACE_SELECTOR);
 
     if (surface) {
       focusTrap.current = focusTrapFactory(surface, {

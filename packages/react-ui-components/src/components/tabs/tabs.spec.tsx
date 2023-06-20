@@ -120,9 +120,7 @@ describe('Tabs', () => {
     el.find(Tab).first().simulate('click');
 
     window.requestAnimationFrame(() => {
-      expect(el.find(Tab).last().html().includes('mdc-tab--active')).toEqual(
-        true
-      );
+      expect(el.find(Tab).last().html().includes('mdc-tab--active')).toEqual(true);
       el.unmount();
       done();
     });

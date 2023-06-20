@@ -7,9 +7,7 @@ export default {
   title: 'Inputs and Controls',
 };
 
-export const _Slider = () => (
-  <Slider onChange={action('onChange')} onInput={action('onInput')} />
-);
+export const _Slider = () => <Slider onChange={action('onChange')} onInput={action('onInput')} />;
 
 export const SliderControlled = () => {
   const [value, setValue] = useKnob('number', 'value', 0);

@@ -170,14 +170,8 @@ const luminance = (r: number, g: number, b: number) => {
   return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
 };
 
-const contrast = (
-  rgb1: [number, number, number],
-  rgb2: [number, number, number]
-) => {
-  return (
-    (luminance(rgb1[0], rgb1[1], rgb1[2]) + 0.05) /
-    (luminance(rgb2[0], rgb2[1], rgb2[2]) + 0.05)
-  );
+const contrast = (rgb1: [number, number, number], rgb2: [number, number, number]) => {
+  return (luminance(rgb1[0], rgb1[1], rgb1[2]) + 0.05) / (luminance(rgb2[0], rgb2[1], rgb2[2]) + 0.05);
 };
 
 export const getRgb = (color: string) => {
@@ -204,34 +198,21 @@ const paletteMap: { [key: string]: Array<[string, number]> } = {
   ],
 };
 
-const lightTextPalette = [
-  'rgba(0, 0, 0, 0.87)',
-  'rgba(0, 0, 0, 0.54)',
-  'rgba(0, 0, 0, 0.38)',
-];
+const lightTextPalette = ['rgba(0, 0, 0, 0.87)', 'rgba(0, 0, 0, 0.54)', 'rgba(0, 0, 0, 0.38)'];
 
-const darkTextPalette = [
-  'rgba(255, 255, 255, 1)',
-  'rgba(255, 255, 255, 0.7)',
-  'rgba(255, 255, 255, 0.5)',
-];
+const darkTextPalette = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.7)', 'rgba(255, 255, 255, 0.5)'];
 
 export const getAutoColorsForTheme = (colors: { [key: string]: string }) => {
-  const autoColors = Object.keys(paletteMap).reduce(
-    (acc: { [key: string]: string }, key) => {
-      if (colors[key]) {
-        const palette = isDark(colors[key])
-          ? lightTextPalette
-          : darkTextPalette;
+  const autoColors = Object.keys(paletteMap).reduce((acc: { [key: string]: string }, key) => {
+    if (colors[key]) {
+      const palette = isDark(colors[key]) ? lightTextPalette : darkTextPalette;
 
-        paletteMap[key].forEach((k) => {
-          acc[k[0]] = palette[k[1]];
-        });
-      }
-      return acc;
-    },
-    {}
-  );
+      paletteMap[key].forEach((k) => {
+        acc[k[0]] = palette[k[1]];
+      });
+    }
+    return acc;
+  }, {});
 
   return {
     ...autoColors,

@@ -32,11 +32,7 @@ const processAutoStrategy = (content: React.ReactNode): RMWC.IconStrategyT => {
 /**
  * Get the actual icon strategy to use
  */
-export const getIconStrategy = (
-  content: React.ReactNode,
-  strategy: string | null,
-  providerStrategy: string | null
-) => {
+export const getIconStrategy = (content: React.ReactNode, strategy: string | null, providerStrategy: string | null) => {
   strategy = strategy || providerStrategy || 'auto';
 
   if (strategy === 'auto') {
@@ -46,16 +42,9 @@ export const getIconStrategy = (
   return strategy;
 };
 
-const renderLigature = ({ content, ...rest }: { content: React.ReactNode }) => (
-  <IconRoot {...rest}>{content}</IconRoot>
-);
+const renderLigature = ({ content, ...rest }: { content: React.ReactNode }) => <IconRoot {...rest}>{content}</IconRoot>;
 
-const renderClassName = ({
-  content,
-  ...rest
-}: {
-  content: React.ReactNode;
-}) => <IconRoot {...rest} />;
+const renderClassName = ({ content, ...rest }: { content: React.ReactNode }) => <IconRoot {...rest} />;
 
 const renderUrl = ({ content, ...rest }: { content: string }) => (
   <IconRoot
@@ -67,12 +56,7 @@ const renderUrl = ({ content, ...rest }: { content: string }) => (
   />
 );
 
-const renderComponent = ({
-  content,
-  ...rest
-}: {
-  content: React.ReactElement<any>;
-}) => {
+const renderComponent = ({ content, ...rest }: { content: React.ReactElement<any> }) => {
   if (content.type === 'svg') {
     const { children, ...svgRest } = content.props;
     return (
@@ -104,18 +88,12 @@ const buildIconOptions = (icon?: RMWC.IconPropT) => {
   return icon as RMWC.IconOptions;
 };
 
-const IconRoot = React.forwardRef(function IconRoot(
-  props: any,
-  ref: React.Ref<any>
-) {
+const IconRoot = React.forwardRef(function IconRoot(props: any, ref: React.Ref<any>) {
   return <Tag tag="i" {...props} ref={ref} />;
 });
 
 /** An Icon component. Most of these options can be set once globally, read the documentation on Provider for more info. */
-export const Icon = createComponent<IconProps, IconHTMLProps>(function (
-  { icon, ...rest },
-  ref
-) {
+export const Icon = createComponent<IconProps, IconHTMLProps>(function ({ icon, ...rest }, ref) {
   const providerContext = useProviderContext();
 
   // Build icon options object
@@ -141,30 +119,18 @@ export const Icon = createComponent<IconProps, IconHTMLProps>(function (
 
   const contentToUse = content;
 
-  const strategyToUse = getIconStrategy(
-    contentToUse,
-    strategy || null,
-    providerStrategy || null
-  );
+  const strategyToUse = getIconStrategy(contentToUse, strategy || null, providerStrategy || null);
   const prefixToUse = prefix || providerPrefix;
   const basenameToUse = basename === undefined ? providerBasename : basename;
-  const iconClassName =
-    strategyToUse === 'className' && typeof content === 'string'
-      ? `${String(prefixToUse)}${content}`
-      : null;
+  const iconClassName = strategyToUse === 'className' && typeof content === 'string' ? `${String(prefixToUse)}${content}` : null;
 
   const rendererFromMap = !!strategyToUse && iconRenderMap[strategyToUse];
 
   // For some reason TS thinks the render method will return undefined...
-  const renderToUse: any =
-    strategyToUse === 'custom'
-      ? render || providerRender
-      : rendererFromMap || null;
+  const renderToUse: any = strategyToUse === 'custom' ? render || providerRender : rendererFromMap || null;
 
   if (!renderToUse) {
-    console.error(
-      `Icon: rendering not implemented for ${String(strategyToUse)}.`
-    );
+    console.error(`Icon: rendering not implemented for ${String(strategyToUse)}.`);
     return null;
   }
 
@@ -173,35 +139,21 @@ export const Icon = createComponent<IconProps, IconHTMLProps>(function (
     ...optionsRest,
     ref,
     content: contentToUse,
-    className: classNames(
-      'rmwc-icon',
-      `rmwc-icon--${strategyToUse}`,
-      basenameToUse,
-      rest.className,
-      optionsRest.className,
-      iconClassName,
-      {
-        [`rmwc-icon--size-${size || ''}`]: !!size,
-      }
-    ),
+    className: classNames('rmwc-icon', `rmwc-icon--${strategyToUse}`, basenameToUse, rest.className, optionsRest.className, iconClassName, {
+      [`rmwc-icon--size-${size || ''}`]: !!size,
+    }),
   });
 
   const childDisplayName = getDisplayName(rendered.props.children);
 
-  if (
-    childDisplayName.includes('Avatar') ||
-    childDisplayName.includes('Icon')
-  ) {
+  if (childDisplayName.includes('Avatar') || childDisplayName.includes('Icon')) {
     return React.cloneElement(rendered.props.children, {
       ...rendered.props.children.props,
       ...rendered.props,
       ref,
       // prevents an infinite loop
       children: rendered.props.children.props.children,
-      className: classNames(
-        rendered.props.className,
-        rendered.props.children.props.className
-      ),
+      className: classNames(rendered.props.className, rendered.props.children.props.className),
     });
   }
 

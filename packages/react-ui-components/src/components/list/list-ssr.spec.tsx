@@ -4,14 +4,7 @@
 
 import React from 'react';
 import { renderToString as mount } from 'react-dom/server';
-import {
-  List,
-  ListItem,
-  ListItemPrimaryText,
-  ListItemGraphic,
-  ListItemMeta,
-  SimpleListItem,
-} from './';
+import { List, ListItem, ListItemPrimaryText, ListItemGraphic, ListItemMeta, SimpleListItem } from './';
 
 describe('List SSR', () => {
   it('renders', () => {

@@ -1,7 +1,4 @@
-export const closest = (
-  element: HTMLElement | EventTarget | null,
-  selector: string
-): HTMLElement | null => {
+export const closest = (element: HTMLElement | EventTarget | null, selector: string): HTMLElement | null => {
   if (element instanceof Element) {
     /* istanbul ignore else  */
     if (element && element.closest) {

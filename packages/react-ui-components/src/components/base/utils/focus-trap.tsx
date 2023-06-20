@@ -40,7 +40,4 @@ export declare class FocusTrap {
 
 const _FocusTrap = domUtils.focusTrap.FocusTrap;
 
-export const focusTrapFactory = (
-  el: HTMLElement,
-  focusOptions?: FocusOptions
-): FocusTrap => new _FocusTrap(el, focusOptions);
+export const focusTrapFactory = (el: HTMLElement, focusOptions?: FocusOptions): FocusTrap => new _FocusTrap(el, focusOptions);

@@ -7,9 +7,7 @@ class ChipFiltering extends React.Component {
   };
 
   toggle(value: any) {
-    this.state.selected.has(value)
-      ? this.state.selected.delete(value)
-      : this.state.selected.add(value);
+    this.state.selected.has(value) ? this.state.selected.delete(value) : this.state.selected.add(value);
 
     this.forceUpdate();
   }
@@ -17,28 +15,9 @@ class ChipFiltering extends React.Component {
   render() {
     return (
       <ChipSet filter>
-        <Chip
-          selected={this.state.selected.has(1)}
-          onClick={() => this.toggle(1)}
-          label="Cookies"
-          checkmark
-          trailingIcon="close"
-        />
-        <Chip
-          selected={this.state.selected.has(2)}
-          onClick={() => this.toggle(2)}
-          label="Pizza"
-          checkmark
-          trailingIcon="close"
-        />
-        <Chip
-          selected={this.state.selected.has(3)}
-          onClick={() => this.toggle(3)}
-          label="Icecream"
-          checkmark
-          icon="favorite"
-          trailingIcon="close"
-        />
+        <Chip selected={this.state.selected.has(1)} onClick={() => this.toggle(1)} label="Cookies" checkmark trailingIcon="close" />
+        <Chip selected={this.state.selected.has(2)} onClick={() => this.toggle(2)} label="Pizza" checkmark trailingIcon="close" />
+        <Chip selected={this.state.selected.has(3)} onClick={() => this.toggle(3)} label="Icecream" checkmark icon="favorite" trailingIcon="close" />
       </ChipSet>
     );
   }

@@ -20,43 +20,34 @@ export interface LinearProgressProps {
 }
 
 /** A component to display linear progress. */
-export const LinearProgress = createComponent<LinearProgressProps>(
-  function LinearProgress(props, ref) {
-    const {
-      reversed,
-      closed,
-      progress,
-      buffer,
-      foundationRef,
-      ...rest
-    } = props;
-    const className = useClassNames(props, [
-      'mdc-linear-progress',
-      {
-        'mdc-linear-progress--reversed': reversed,
-        'mdc-linear-progress--closed': closed,
-      },
-    ]);
-    const { rootEl } = useLinearProgressFoundation(props);
+export const LinearProgress = createComponent<LinearProgressProps>(function LinearProgress(props, ref) {
+  const { reversed, closed, progress, buffer, foundationRef, ...rest } = props;
+  const className = useClassNames(props, [
+    'mdc-linear-progress',
+    {
+      'mdc-linear-progress--reversed': reversed,
+      'mdc-linear-progress--closed': closed,
+    },
+  ]);
+  const { rootEl } = useLinearProgressFoundation(props);
 
-    return (
-      <Tag
-        aria-label="Progress Bar"
-        {...rest}
-        aria-valuemin={0}
-        aria-valuemax={1}
-        aria-valuenow={progress}
-        tag="nav"
-        role="progressbar"
-        element={rootEl}
-        className={className}
-        ref={ref}
-      >
-        <LinearProgressBody />
-      </Tag>
-    );
-  }
-);
+  return (
+    <Tag
+      aria-label="Progress Bar"
+      {...rest}
+      aria-valuemin={0}
+      aria-valuemax={1}
+      aria-valuenow={progress}
+      tag="nav"
+      role="progressbar"
+      element={rootEl}
+      className={className}
+      ref={ref}
+    >
+      <LinearProgressBody />
+    </Tag>
+  );
+});
 
 const LinearProgressBody = React.memo(function LinearProgressBody() {
   return (

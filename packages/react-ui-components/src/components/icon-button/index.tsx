@@ -34,45 +34,30 @@ export interface IconButtonProps extends RMWC.WithRippleProps {
   foundationRef?: React.Ref<MDCIconButtonToggleFoundation>;
 }
 
-export type IconButtonHTMLProps = RMWC.HTMLProps<
-  HTMLInputElement,
-  Omit<React.AllHTMLAttributes<HTMLButtonElement>, 'onChange'>
->;
+export type IconButtonHTMLProps = RMWC.HTMLProps<HTMLInputElement, Omit<React.AllHTMLAttributes<HTMLButtonElement>, 'onChange'>>;
 
 /** An IconButton component that can also be used as a toggle. */
-export const IconButton: RMWC.ComponentType<
-  IconButtonProps,
-  IconButtonHTMLProps,
-  'button'
-> = createComponent<IconButtonProps, IconButtonHTMLProps>(function IconButton(
-  { ...rest },
-  ref
-) {
-  if (rest.onIcon) {
-    return <IconButtonToggle {...rest} ref={ref} />;
-  }
+export const IconButton: RMWC.ComponentType<IconButtonProps, IconButtonHTMLProps, 'button'> = createComponent<IconButtonProps, IconButtonHTMLProps>(
+  function IconButton({ ...rest }, ref) {
+    if (rest.onIcon) {
+      return <IconButtonToggle {...rest} ref={ref} />;
+    }
 
-  return <IconButtonRoot tag="button" {...rest} ref={ref} />;
-});
-
-const IconButtonToggle = createComponent<IconButtonProps>(
-  function IconButtonToggle(props, ref) {
-    const { icon, onIcon, foundationRef, ...rest } = props;
-    const { isOn, rootEl } = useIconButtonFoundation(props);
-
-    return (
-      <IconButtonToggleRoot
-        aria-pressed={isOn}
-        {...rootEl.props(rest)}
-        tag="button"
-        ref={ref}
-      >
-        <IconButtonIcon icon={icon} />
-        <IconButtonIcon icon={onIcon} on />
-      </IconButtonToggleRoot>
-    );
+    return <IconButtonRoot tag="button" {...rest} ref={ref} />;
   }
 );
+
+const IconButtonToggle = createComponent<IconButtonProps>(function IconButtonToggle(props, ref) {
+  const { icon, onIcon, foundationRef, ...rest } = props;
+  const { isOn, rootEl } = useIconButtonFoundation(props);
+
+  return (
+    <IconButtonToggleRoot aria-pressed={isOn} {...rootEl.props(rest)} tag="button" ref={ref}>
+      <IconButtonIcon icon={icon} />
+      <IconButtonIcon icon={onIcon} on />
+    </IconButtonToggleRoot>
+  );
+});
 
 /*********************************************************************
  * Bits
@@ -90,16 +75,7 @@ const IconButtonRoot = withRipple({
         'mdc-icon-button--on': checked,
       },
     ]);
-    return (
-      <Icon
-        role="button"
-        tabIndex={0}
-        aria-label={label}
-        {...rest}
-        className={className}
-        ref={ref}
-      />
-    );
+    return <Icon role="button" tabIndex={0} aria-label={label} {...rest} className={className} ref={ref} />;
   })
 );
 
@@ -115,16 +91,7 @@ const IconButtonToggleRoot = withRipple({
         'mdc-icon-button--on': checked,
       },
     ]);
-    return (
-      <Tag
-        tag="button"
-        role="button"
-        tabIndex={0}
-        {...rest}
-        className={className}
-        ref={ref}
-      />
-    );
+    return <Tag tag="button" role="button" tabIndex={0} {...rest} className={className} ref={ref} />;
   })
 );
 
@@ -132,9 +99,7 @@ interface IconButtonIconProps extends IconProps {
   on?: boolean;
 }
 
-const IconButtonIcon = React.memo(function IconButtonIcon(
-  props: IconButtonIconProps
-) {
+const IconButtonIcon = React.memo(function IconButtonIcon(props: IconButtonIconProps) {
   const { on, ...rest } = props;
   const className = useClassNames(props, [
     'mdc-icon-button__icon',

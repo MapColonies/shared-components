@@ -1,12 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { useKnob } from '../base/utils/use-knob';
-import {
-  SnackbarQueue,
-  createSnackbarQueue,
-  Snackbar,
-  SnackbarAction,
-} from '.';
+import { SnackbarQueue, createSnackbarQueue, Snackbar, SnackbarAction } from '.';
 import { Button } from '../button';
 
 const { messages, notify, clearAll } = createSnackbarQueue();
@@ -37,12 +32,7 @@ export const _Snackbar = () => {
       stacked={stacked}
       foundationRef={console.log}
       dismissesOnAction={dismissesOnAction}
-      action={
-        <SnackbarAction
-          label={actionText}
-          onClick={() => console.log('Click Me')}
-        />
-      }
+      action={<SnackbarAction label={actionText} onClick={() => console.log('Click Me')} />}
       timeout={timeout}
       onClose={() => {
         setOpen(false);

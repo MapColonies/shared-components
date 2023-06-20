@@ -1,17 +1,15 @@
-import type { Preview } from "@storybook/react";
+import type { Preview } from '@storybook/react';
 
 const preview: Preview = {
   parameters: {
-    actions: { argTypesRegex: "^on[A-Z].*" },
+    actions: { argTypesRegex: '^on[A-Z].*' },
     options: {
       storySort: (a, b) => {
-        console.log('HERE?!?!?@#?!@#')
-        return a.title === b.title
-            ? 0
-            : a.id.localeCompare(b.id, { numeric: true });
+        console.log('HERE?!?!?@#?!@#');
+        return a.title === b.title ? 0 : a.id.localeCompare(b.id, { numeric: true });
       },
     },
-    layout: "fullscreen",
+    layout: 'fullscreen',
     controls: {
       matchers: {
         color: /(background|color)$/i,

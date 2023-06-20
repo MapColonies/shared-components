@@ -6,15 +6,9 @@ import { EventType, SpecificEventListener } from '@material/base/types';
 
 import { MDCRippleFoundation, util } from '@material/ripple';
 
-type ActivateEventTypes<S> =
-  | React.MouseEvent<S>
-  | React.TouchEvent<S>
-  | React.KeyboardEvent<S>
-  | React.FocusEvent<S>;
+type ActivateEventTypes<S> = React.MouseEvent<S> | React.TouchEvent<S> | React.KeyboardEvent<S> | React.FocusEvent<S>;
 
-export const useRippleFoundation = (
-  props: RippleProps & React.HTMLProps<any> & { domNode?: Element }
-) => {
+export const useRippleFoundation = (props: RippleProps & React.HTMLProps<any> & { domNode?: Element }) => {
   const isTouched = useRef(false);
 
   const { foundation, ...elements } = useFoundation({
@@ -40,44 +34,17 @@ export const useRippleFoundation = (
         removeClass: (className: string) => {
           surfaceEl.removeClass(className);
         },
-        containsEventTarget: (target: HTMLElement) =>
-          !!rootEl.ref && rootEl.ref.contains(target),
-        registerInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {},
-        deregisterInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void => {},
-        registerDocumentInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ): void =>
-          document.documentElement.addEventListener(
-            evtType,
-            handler,
-            applyPassive()
-          ),
-        deregisterDocumentInteractionHandler: <K extends EventType>(
-          evtType: K,
-          handler: SpecificEventListener<K>
-        ) =>
-          document.documentElement.removeEventListener(
-            evtType,
-            handler,
-            applyPassive() as any
-          ),
-        registerResizeHandler: (
-          handler: SpecificEventListener<'resize'>
-        ): void => window.addEventListener('resize', handler),
-        deregisterResizeHandler: (
-          handler: SpecificEventListener<'resize'>
-        ): void => window.removeEventListener('resize', handler),
-        updateCssVariable: (varName: string, value: string) =>
-          surfaceEl.setStyle(varName, value),
-        computeBoundingRect: () =>
-          rootEl.ref ? rootEl.ref.getBoundingClientRect() : emptyClientRect,
+        containsEventTarget: (target: HTMLElement) => !!rootEl.ref && rootEl.ref.contains(target),
+        registerInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {},
+        deregisterInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {},
+        registerDocumentInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
+          document.documentElement.addEventListener(evtType, handler, applyPassive()),
+        deregisterDocumentInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>) =>
+          document.documentElement.removeEventListener(evtType, handler, applyPassive() as any),
+        registerResizeHandler: (handler: SpecificEventListener<'resize'>): void => window.addEventListener('resize', handler),
+        deregisterResizeHandler: (handler: SpecificEventListener<'resize'>): void => window.removeEventListener('resize', handler),
+        updateCssVariable: (varName: string, value: string) => surfaceEl.setStyle(varName, value),
+        computeBoundingRect: () => (rootEl.ref ? rootEl.ref.getBoundingClientRect() : emptyClientRect),
         getWindowPageOffset: () => ({
           x: window.pageXOffset,
           y: window.pageYOffset,

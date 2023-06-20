@@ -1,15 +1,6 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogButton,
-  SimpleDialog,
-  createDialogQueue,
-  DialogQueue,
-} from './';
+import { Dialog, DialogTitle, DialogContent, DialogActions, DialogButton, SimpleDialog, createDialogQueue, DialogQueue } from './';
 import { useKnob } from '../base/utils/use-knob';
 import { Button } from '../button';
 
@@ -52,11 +43,7 @@ export const _Dialog = () => {
 export const _SimpleDialog = () => {
   const [open, setOpen] = useKnob('boolean', 'open', true);
   const [title] = useKnob('text', 'title', 'This is a simple dialog');
-  const [body] = useKnob(
-    'text',
-    'body',
-    'You can pass the body prop, or anything you want as children.'
-  );
+  const [body] = useKnob('text', 'body', 'You can pass the body prop, or anything you want as children.');
   const [acceptLabel] = useKnob('text', 'acceptLabel', 'Accept');
   const [cancelLabel] = useKnob('text', 'cancelLabel', 'Cancel');
 
@@ -78,8 +65,7 @@ export const _SimpleDialog = () => {
 export const _DialogQueue = () => {
   const fireAlert = () => alert({}).then((res) => console.log(res));
   const fireConfirm = () => confirm({}).then((res) => console.log(res));
-  const firePrompt = () =>
-    prompt({ inputProps: { outlined: true } }).then((res) => console.log(res));
+  const firePrompt = () => prompt({ inputProps: { outlined: true } }).then((res) => console.log(res));
 
   return (
     <>

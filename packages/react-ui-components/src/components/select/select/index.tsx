@@ -6,22 +6,14 @@ import { FloatingLabel } from '../../floating-label';
 import { LineRipple } from '../../line-ripple';
 
 import { NotchedOutline } from '../../notched-outline';
-import {
-  Menu,
-  MenuItem,
-  MenuItems,
-  MenuProps,
-  MenuApi,
-  MenuOnSelectEventT,
-} from '../../menu';
+import { Menu, MenuItem, MenuItems, MenuProps, MenuApi, MenuOnSelectEventT } from '../../menu';
 import { ListGroup, ListGroupSubheader, ListDivider } from '../../list';
 import { withRipple } from '../../ripple';
 
 import { useSelectFoundation } from './foundation';
 import { SelectIcon } from '../select-icon';
 
-export interface FormattedOption
-  extends Omit<React.AllHTMLAttributes<any>, 'label'> {
+export interface FormattedOption extends Omit<React.AllHTMLAttributes<any>, 'label'> {
   label: React.ReactNode;
   value?: string;
   options?: FormattedOption[];
@@ -59,10 +51,7 @@ export interface SelectProps {
   foundationRef?: React.Ref<MDCSelectFoundation>;
 }
 
-export type SelectHTMLProps = RMWC.HTMLProps<
-  HTMLSelectElement,
-  Omit<React.AllHTMLAttributes<HTMLSelectElement>, 'onSelect'>
->;
+export type SelectHTMLProps = RMWC.HTMLProps<HTMLSelectElement, Omit<React.AllHTMLAttributes<HTMLSelectElement>, 'onSelect'>>;
 
 /**
  * Takes multiple structures for options and returns [{label: 'label', value: 'value', ...rest}]
@@ -109,23 +98,9 @@ function NativeMenu(
     defaultValue?: any;
   } & React.HTMLProps<HTMLSelectElement>
 ) {
-  const {
-    selectOptions,
-    placeholder = '',
-    children,
-    elementRef,
-    ...rest
-  } = props;
+  const { selectOptions, placeholder = '', children, elementRef, ...rest } = props;
 
-  const renderOption = ({
-    label,
-    option,
-    index,
-  }: {
-    label: React.ReactNode;
-    option: FormattedOption;
-    index: number;
-  }) => {
+  const renderOption = ({ label, option, index }: { label: React.ReactNode; option: FormattedOption; index: number }) => {
     return (
       <option key={index} {...(option as any)} value={option.value}>
         {label}
@@ -136,41 +111,34 @@ function NativeMenu(
   const isEmptyValue = !props.value && !props.defaultValue;
 
   return (
-    <select
-      tabIndex={0}
-      {...rest}
-      ref={elementRef}
-      className={`rmwc-select__native-control ${rest.className || ''}`}
-    >
+    <select tabIndex={0} {...rest} ref={elementRef} className={`rmwc-select__native-control ${rest.className || ''}`}>
       {(props.placeholder !== undefined || isEmptyValue) && (
         <option value="" disabled={isEmptyValue}>
           {placeholder}
         </option>
       )}
       {!!selectOptions &&
-        selectOptions.map(
-          ({ label, options, ...option }: FormattedOption, index: number) => {
-            if (options) {
-              return (
-                <optgroup label={label as string} key={index}>
-                  {options.map(({ label, ...option }, index) =>
-                    renderOption({
-                      label,
-                      option: option as FormattedOption,
-                      index,
-                    })
-                  )}
-                </optgroup>
-              );
-            }
-
-            return renderOption({
-              label,
-              option: option as FormattedOption,
-              index,
-            });
+        selectOptions.map(({ label, options, ...option }: FormattedOption, index: number) => {
+          if (options) {
+            return (
+              <optgroup label={label as string} key={index}>
+                {options.map(({ label, ...option }, index) =>
+                  renderOption({
+                    label,
+                    option: option as FormattedOption,
+                    index,
+                  })
+                )}
+              </optgroup>
+            );
           }
-        )}
+
+          return renderOption({
+            label,
+            option: option as FormattedOption,
+            index,
+          });
+        })}
       {children}
     </select>
   );
@@ -191,35 +159,17 @@ interface EnhancedMenuProps extends MenuProps {
 }
 
 function EnhancedMenu(props: EnhancedMenuProps & SelectHTMLProps) {
-  const {
-    selectOptions,
-    menuApiRef,
-    value,
-    placeholder,
-    children,
-    selectedIndex,
-    ...rest
-  } = props;
+  const { selectOptions, menuApiRef, value, placeholder, children, selectedIndex, ...rest } = props;
 
   let currentIndex = 0;
 
-  const renderOption = ({
-    label,
-    option,
-  }: {
-    label: React.ReactNode;
-    option: FormattedOption;
-  }) => {
+  const renderOption = ({ label, option }: { label: React.ReactNode; option: FormattedOption }) => {
     currentIndex += 1;
 
     return (
       <MenuItem
         key={`${label}-${option.value}`}
-        activated={
-          value !== undefined
-            ? option.value === value
-            : currentIndex - 1 === selectedIndex
-        }
+        activated={value !== undefined ? option.value === value : currentIndex - 1 === selectedIndex}
         // {...option}
         data-value={option.value}
       >
@@ -229,55 +179,35 @@ function EnhancedMenu(props: EnhancedMenuProps & SelectHTMLProps) {
   };
 
   return (
-    <Menu
-      {...rest}
-      apiRef={menuApiRef}
-      className="mdc-select__menu"
-      focusOnOpen
-    >
+    <Menu {...rest} apiRef={menuApiRef} className="mdc-select__menu" focusOnOpen>
       {!!props.placeholder && (
-        <MenuItem
-          selected={currentIndex - 1 === selectedIndex}
-          data-value=""
-          theme="textDisabledOnBackground"
-        >
+        <MenuItem selected={currentIndex - 1 === selectedIndex} data-value="" theme="textDisabledOnBackground">
           {placeholder}
         </MenuItem>
       )}
 
-      {selectOptions.map(
-        ({ label, options, ...option }: FormattedOption, i: number) => {
-          if (options) {
-            return (
-              <ListGroup key={i}>
-                {label && (
-                  <ListGroupSubheader theme="textDisabledOnBackground">
-                    {label}
-                  </ListGroupSubheader>
-                )}
-                <MenuItems>
-                  {options.map(({ label, ...option }) =>
-                    renderOption({ label, option: option as FormattedOption })
-                  )}
-                </MenuItems>
-                {i < selectOptions.length - 1 && <ListDivider />}
-              </ListGroup>
-            );
-          }
-
-          return renderOption({ label, option: option as FormattedOption });
+      {selectOptions.map(({ label, options, ...option }: FormattedOption, i: number) => {
+        if (options) {
+          return (
+            <ListGroup key={i}>
+              {label && <ListGroupSubheader theme="textDisabledOnBackground">{label}</ListGroupSubheader>}
+              <MenuItems>{options.map(({ label, ...option }) => renderOption({ label, option: option as FormattedOption }))}</MenuItems>
+              {i < selectOptions.length - 1 && <ListDivider />}
+            </ListGroup>
+          );
         }
-      )}
+
+        return renderOption({ label, option: option as FormattedOption });
+      })}
       {children}
     </Menu>
   );
 }
 
-export const Select: RMWC.ComponentType<
-  SelectProps,
-  SelectHTMLProps,
-  'select'
-> = createComponent<SelectProps, SelectHTMLProps>(function Select(props, ref) {
+export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> = createComponent<SelectProps, SelectHTMLProps>(function Select(
+  props,
+  ref
+) {
   const {
     placeholder,
     children,
@@ -338,8 +268,7 @@ export const Select: RMWC.ComponentType<
 
   const enhancedMenuProps = typeof enhanced === 'object' ? enhanced : {};
 
-  const defaultValue =
-    value !== undefined ? undefined : props.defaultValue || '';
+  const defaultValue = value !== undefined ? undefined : props.defaultValue || '';
 
   const renderedLabel = (
     <FloatingLabel float={floatLabel} apiRef={setFloatingLabel} htmlFor={id}>
@@ -354,25 +283,14 @@ export const Select: RMWC.ComponentType<
       return null;
     }
 
-    const shouldSpread =
-      typeof helpText === 'object' && !React.isValidElement(helpText);
+    const shouldSpread = typeof helpText === 'object' && !React.isValidElement(helpText);
 
-    return helpText && shouldSpread ? (
-      <SelectHelperText {...(helpText as any)} />
-    ) : (
-      <SelectHelperText>{helpText}</SelectHelperText>
-    );
+    return helpText && shouldSpread ? <SelectHelperText {...(helpText as any)} /> : <SelectHelperText>{helpText}</SelectHelperText>;
   };
 
   return (
     <>
-      <Tag
-        role="listbox"
-        {...rootProps}
-        element={rootEl}
-        ref={ref}
-        className={className}
-      >
+      <Tag role="listbox" {...rootProps} element={rootEl} ref={ref} className={className}>
         <div className="mdc-select__anchor">
           {!!icon && <SelectIcon apiRef={setLeadingIcon} icon={icon} />}
           <SelectDropdownArrow />
@@ -409,9 +327,7 @@ export const Select: RMWC.ComponentType<
               elementRef={setNativeControl}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              onChange={(evt: React.ChangeEvent<HTMLSelectElement>) =>
-                handleMenuSelected(evt.currentTarget.selectedIndex)
-              }
+              onChange={(evt: React.ChangeEvent<HTMLSelectElement>) => handleMenuSelected(evt.currentTarget.selectedIndex)}
             />
           )}
         </div>
@@ -451,22 +367,17 @@ export interface SelectHelperTextProps {
 }
 
 /** A help text component */
-export const SelectHelperText: RMWC.ComponentType<
-  SelectHelperTextProps,
-  RMWC.HTMLProps,
-  'div'
-> = createComponent<SelectHelperTextProps>(function SelectHelperText(
-  props: SelectHelperTextProps & RMWC.HTMLProps,
-  ref: React.Ref<any>
-) {
-  const { persistent, validationMsg, ...rest } = props;
-  const className = useClassNames(props, [
-    'mdc-select-helper-text',
-    {
-      'mdc-select-helper-text--persistent': persistent,
-      'mdc-select-helper-text--validation-msg': validationMsg,
-    },
-  ]);
+export const SelectHelperText: RMWC.ComponentType<SelectHelperTextProps, RMWC.HTMLProps, 'div'> = createComponent<SelectHelperTextProps>(
+  function SelectHelperText(props: SelectHelperTextProps & RMWC.HTMLProps, ref: React.Ref<any>) {
+    const { persistent, validationMsg, ...rest } = props;
+    const className = useClassNames(props, [
+      'mdc-select-helper-text',
+      {
+        'mdc-select-helper-text--persistent': persistent,
+        'mdc-select-helper-text--validation-msg': validationMsg,
+      },
+    ]);
 
-  return <Tag tag="p" {...rest} className={className} ref={ref} />;
-});
+    return <Tag tag="p" {...rest} className={className} ref={ref} />;
+  }
+);

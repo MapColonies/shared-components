@@ -1,19 +1,13 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { useFoundation, raf } from '../../base';
-import {
-  MDCSelectFoundation,
-  MDCSelectAdapter,
-  cssClasses,
-} from '@material/select';
+import { MDCSelectFoundation, MDCSelectAdapter, cssClasses } from '@material/select';
 import { FloatingLabelApi } from '../../floating-label';
 import { MenuApi } from '../../menu';
 import { Corner } from '@material/menu-surface';
 import { SelectIconApi } from '../select-icon';
 import { SelectProps } from './';
 
-export const useSelectFoundation = (
-  props: SelectProps & React.HTMLProps<any>
-) => {
+export const useSelectFoundation = (props: SelectProps & React.HTMLProps<any>) => {
   const [notchWidth, setNotchWidth] = useState<number>();
   const [lineRippleActive, setLineRippleActive] = useState(false);
   const [lineRippleCenter, setLineRippleCenter] = useState(0);
@@ -58,17 +52,10 @@ export const useSelectFoundation = (
 
       const getSelectAdapterMethods = (): Partial<MDCSelectAdapter> => {
         const items = (): HTMLElement[] =>
-          (isNative()
-            ? Array.apply<null, any, HTMLOptionElement[]>(
-                null,
-                nativeControl.current?.options
-              )
-            : menu.current?.items()) || [];
+          (isNative() ? Array.apply<null, any, HTMLOptionElement[]>(null, nativeControl.current?.options) : menu.current?.items()) || [];
 
         const getValue = (el: Element) => {
-          return (
-            el.getAttribute('data-value') || el.getAttribute('value') || ''
-          );
+          return el.getAttribute('data-value') || el.getAttribute('value') || '';
         };
 
         return {
@@ -78,11 +65,7 @@ export const useSelectFoundation = (
             }
 
             if (selectedIndex.current === -1) {
-              return (
-                menu.current
-                  ?.getSurfaceElement()
-                  ?.querySelector('.mdc-list-item--activated') || null
-              );
+              return menu.current?.getSurfaceElement()?.querySelector('.mdc-list-item--activated') || null;
             } else {
               return items()[selectedIndex.current];
             }
@@ -97,11 +80,7 @@ export const useSelectFoundation = (
           setSelectedText: (text: string) => {
             setSelectedTextContent(text);
           },
-          isSelectedTextFocused: () =>
-            !!(
-              selectedTextEl.ref &&
-              selectedTextEl.ref === document.activeElement
-            ),
+          isSelectedTextFocused: () => !!(selectedTextEl.ref && selectedTextEl.ref === document.activeElement),
           getSelectedTextAttr: (attr: any) => selectedTextEl.getProp(attr),
           setSelectedTextAttr: (attr: any, value: string) => {
             if (attr === 'tabindex') {
@@ -120,18 +99,14 @@ export const useSelectFoundation = (
           },
           getAnchorElement: () => anchor.current,
           setMenuAnchorElement: (anchorEl: HTMLElement) => setAnchor(anchorEl),
-          setMenuAnchorCorner: (anchorCorner: Corner) =>
-            menu.current?.setAnchorCorner(anchorCorner),
+          setMenuAnchorCorner: (anchorCorner: Corner) => menu.current?.setAnchorCorner(anchorCorner),
           setMenuWrapFocus: (wrapFocus: boolean) => {
             //(this.menu_.wrapFocus = wrapFocus)
           },
 
-          setAttributeAtIndex: (...args) =>
-            menu.current?.setAttributeForElementIndex(...args),
-          removeAttributeAtIndex: (index: number, attributeName: string) =>
-            menu.current?.items()[index].removeAttribute(attributeName),
-          focusMenuItemAtIndex: (...args) =>
-            menu.current?.focusItemAtIndex(...args),
+          setAttributeAtIndex: (...args) => menu.current?.setAttributeForElementIndex(...args),
+          removeAttributeAtIndex: (index: number, attributeName: string) => menu.current?.items()[index].removeAttribute(attributeName),
+          focusMenuItemAtIndex: (...args) => menu.current?.focusItemAtIndex(...args),
           getMenuItemCount: () => {
             return items().length;
           },
@@ -140,10 +115,8 @@ export const useSelectFoundation = (
             return items()[index].textContent as string;
           },
 
-          addClassAtIndex: (...args) =>
-            menu.current?.addClassToElementIndex(...args),
-          removeClassAtIndex: (...args) =>
-            menu.current?.removeClassFromElementAtIndex(...args),
+          addClassAtIndex: (...args) => menu.current?.addClassToElementIndex(...args),
+          removeClassAtIndex: (...args) => menu.current?.removeClassFromElementAtIndex(...args),
         };
       };
 
@@ -156,11 +129,7 @@ export const useSelectFoundation = (
             rootEl.removeClass(className);
           },
           hasClass: (className: string) => rootEl.hasClass(className),
-          isRtl: () =>
-            rootEl.ref &&
-            window
-              .getComputedStyle(rootEl.ref)
-              .getPropertyValue('direction') === 'rtl',
+          isRtl: () => rootEl.ref && window.getComputedStyle(rootEl.ref).getPropertyValue('direction') === 'rtl',
           setRippleCenter: (normalizedX: number) => {
             setLineRippleCenter(normalizedX);
           },
@@ -207,9 +176,7 @@ export const useSelectFoundation = (
 
       const getFoundationMap = () => {
         return {
-          leadingIcon:
-            (leadingIcon.current && leadingIcon.current.getFoundation()) ||
-            undefined,
+          leadingIcon: (leadingIcon.current && leadingIcon.current.getFoundation()) || undefined,
         };
       };
 
@@ -350,16 +317,12 @@ export const useSelectFoundation = (
   const foundationValue = foundation.getValue();
 
   // Use the value OR the default value if there is no index selected
-  const value =
-    props.value ??
-    ((selectedIndex.current === -1 ? props.defaultValue : undefined) as string);
+  const value = props.value ?? ((selectedIndex.current === -1 ? props.defaultValue : undefined) as string);
 
   // Use the length of the options as an indication we need to re-render and
   // check if our value is accurate. This is for situations where people populate the select
   // async. We can't rely on object identity since lots of people pass options inline.
-  const optionsLength = Array.isArray(props.options)
-    ? props.options.length
-    : Object.values(props.options || {}).length;
+  const optionsLength = Array.isArray(props.options) ? props.options.length : Object.values(props.options || {}).length;
 
   // MDC Select is a bit of a mess here...
   // - We have to set our value

@@ -6,21 +6,9 @@ import { FoundationElement } from './foundation-component';
 
 type ClassNamesInputT<Props> =
   | undefined
-  | ((
-      props: Props
-    ) => Array<
-      | string
-      | undefined
-      | null
-      | { [className: string]: boolean | undefined | string | number }
-    >)
+  | ((props: Props) => Array<string | undefined | null | { [className: string]: boolean | undefined | string | number }>)
   | string[]
-  | Array<
-      | string
-      | undefined
-      | null
-      | { [className: string]: boolean | undefined | string | number }
-    >;
+  | Array<string | undefined | null | { [className: string]: boolean | undefined | string | number }>;
 
 export const Tag = React.forwardRef<
   any,
@@ -34,10 +22,7 @@ export const Tag = React.forwardRef<
   return <TagEl {...finalProps} ref={finalRef} />;
 });
 
-export const useClassNames = <Props extends { [key: string]: any }>(
-  props: Props,
-  classNames: ClassNamesInputT<Props>
-) => {
+export const useClassNames = <Props extends { [key: string]: any }>(props: Props, classNames: ClassNamesInputT<Props>) => {
   return classNamesFunc(
     props.className,
     ...(!!props.theme ? parseThemeOptions(props.theme) : []),
@@ -46,23 +31,20 @@ export const useClassNames = <Props extends { [key: string]: any }>(
   );
 };
 
-export const mergeRefs = (
-  ...refs: Array<React.Ref<any> | undefined | null>
-) => (el: any) => {
-  for (const ref of refs) {
-    if (typeof ref === 'function') {
-      ref(el);
-    } else if (ref && 'current' in ref) {
-      // @ts-ignore
-      ref.current = el;
+export const mergeRefs =
+  (...refs: Array<React.Ref<any> | undefined | null>) =>
+  (el: any) => {
+    for (const ref of refs) {
+      if (typeof ref === 'function') {
+        ref(el);
+      } else if (ref && 'current' in ref) {
+        // @ts-ignore
+        ref.current = el;
+      }
     }
-  }
-};
+  };
 
-export const handleRef = <T extends any>(
-  ref: React.Ref<T> | null | undefined,
-  value: T
-) => {
+export const handleRef = <T extends any>(ref: React.Ref<T> | null | undefined, value: T) => {
   if (typeof ref === 'function') {
     ref(value);
   } else if (ref && 'current' in ref) {
@@ -71,22 +53,15 @@ export const handleRef = <T extends any>(
   }
 };
 
-export function createComponent<
-  P extends {},
-  ElementP extends {} = React.HTMLProps<HTMLElement>
->(Component: React.RefForwardingComponent<any, P & ElementP>) {
-  const ForwardComponent = React.forwardRef<
-    any,
-    RMWC.ComponentProps<P, ElementP, any>
-  >(Component);
+export function createComponent<P extends {}, ElementP extends {} = React.HTMLProps<HTMLElement>>(
+  Component: React.RefForwardingComponent<any, P & ElementP>
+) {
+  const ForwardComponent = React.forwardRef<any, RMWC.ComponentProps<P, ElementP, any>>(Component);
 
   // Interestingly enough, we only need this declaration
   // for a generic placeholder for typescript inference,
   // we don't actually have to pay the penalty for using it at runtime :)
-  const WrappedComponent = <Tag extends React.ElementType = 'div'>(
-    props: RMWC.ComponentProps<P, ElementP, Tag>,
-    ref: any
-  ) => {
+  const WrappedComponent = <Tag extends React.ElementType = 'div'>(props: RMWC.ComponentProps<P, ElementP, Tag>, ref: any) => {
     return <></>;
   };
 
@@ -96,10 +71,9 @@ export function createComponent<
   return ForwardComponent as typeof WrappedComponent;
 }
 
-export function createMemoComponent<
-  P extends {},
-  ElementP extends {} = React.HTMLProps<HTMLDivElement>
->(Component: React.RefForwardingComponent<any, P & ElementP>) {
+export function createMemoComponent<P extends {}, ElementP extends {} = React.HTMLProps<HTMLDivElement>>(
+  Component: React.RefForwardingComponent<any, P & ElementP>
+) {
   const Comp = createComponent<P, ElementP>(Component);
   return React.memo(Comp) as typeof Comp;
 }

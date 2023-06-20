@@ -11,13 +11,7 @@ export function Portal() {
   return <div ref={el} id={PORTAL_ID} />;
 }
 
-export function PortalChild({
-  children,
-  renderTo,
-}: {
-  children: React.ReactNode;
-  renderTo?: PortalPropT;
-}) {
+export function PortalChild({ children, renderTo }: { children: React.ReactNode; renderTo?: PortalPropT }) {
   const [portalEl, setPortalEl] = useState<Element | undefined>();
 
   useEffect(() => {
@@ -27,16 +21,11 @@ export function PortalChild({
       element = document.getElementById(PORTAL_ID) || undefined;
 
       !element &&
-        console.warn(
-          'No default Portal found. Did you forget to include it in the root of your app? `import { Portal } from "@rmwc/base";`'
-        );
+        console.warn('No default Portal found. Did you forget to include it in the root of your app? `import { Portal } from "@rmwc/base";`');
     } else if (typeof renderTo === 'string') {
       element = document.querySelector(renderTo) || undefined;
 
-      !element &&
-        console.warn(
-          `The selector you provided for renderToPortal "${renderTo}" didn't find any elements.`
-        );
+      !element && console.warn(`The selector you provided for renderToPortal "${renderTo}" didn't find any elements.`);
     } else if (renderTo instanceof Element) {
       element = renderTo;
     }

@@ -2,16 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { TopAppBarProps } from '.';
 import { useFoundation } from '../base';
 
-import {
-  MDCTopAppBarFoundation,
-  MDCFixedTopAppBarFoundation,
-  MDCShortTopAppBarFoundation,
-  MDCTopAppBarAdapter,
-} from '@material/top-app-bar';
+import { MDCTopAppBarFoundation, MDCFixedTopAppBarFoundation, MDCShortTopAppBarFoundation, MDCTopAppBarAdapter } from '@material/top-app-bar';
 
-export const useTopAppBarFoundation = (
-  props: TopAppBarProps & React.HTMLProps<any>
-) => {
+export const useTopAppBarFoundation = (props: TopAppBarProps & React.HTMLProps<any>) => {
   const scrollTargetRef = useRef<EventTarget | null>(null);
   const navIconRef = useRef<HTMLElement | null>(null);
 
@@ -25,23 +18,16 @@ export const useTopAppBarFoundation = (
         hasClass: (className: string) => rootEl.hasClass(className),
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
-        setStyle: (property: string, value: string) =>
-          rootEl.setStyle(property, value),
+        setStyle: (property: string, value: string) => rootEl.setStyle(property, value),
 
         getTopAppBarHeight: () => rootEl.ref?.clientHeight || 0,
         notifyNavigationIconClicked: () => emit('onNav', {}),
         getViewportScrollY: () => {
           const target = scrollTargetRef.current as any;
-          return target
-            ? target['pageYOffset' in target ? 'pageYOffset' : 'scrollTop']
-            : 0;
+          return target ? target['pageYOffset' in target ? 'pageYOffset' : 'scrollTop'] : 0;
         },
         getTotalActionItems: () => {
-          return rootEl.ref
-            ? rootEl.ref.querySelectorAll(
-                MDCTopAppBarFoundation.strings.ACTION_ITEM_SELECTOR
-              ).length
-            : 0;
+          return rootEl.ref ? rootEl.ref.querySelectorAll(MDCTopAppBarFoundation.strings.ACTION_ITEM_SELECTOR).length : 0;
         },
       };
 
@@ -61,8 +47,7 @@ export const useTopAppBarFoundation = (
   const { rootEl } = elements;
 
   useEffect(() => {
-    const target =
-      props.scrollTarget || rootEl.ref?.ownerDocument?.defaultView || window;
+    const target = props.scrollTarget || rootEl.ref?.ownerDocument?.defaultView || window;
     const handleTargetScroll = foundation.handleTargetScroll.bind(foundation);
     target.addEventListener('scroll', handleTargetScroll as EventListener);
     scrollTargetRef.current = target;
@@ -73,10 +58,7 @@ export const useTopAppBarFoundation = (
   }, [props.scrollTarget, scrollTargetRef, foundation, rootEl.ref]);
 
   useEffect(() => {
-    navIconRef.current =
-      rootEl.ref?.querySelector<HTMLElement>(
-        MDCTopAppBarFoundation.strings.NAVIGATION_ICON_SELECTOR
-      ) || null;
+    navIconRef.current = rootEl.ref?.querySelector<HTMLElement>(MDCTopAppBarFoundation.strings.NAVIGATION_ICON_SELECTOR) || null;
 
     const handler = foundation.handleNavigationClick.bind(foundation);
     navIconRef.current?.addEventListener('click', handler);

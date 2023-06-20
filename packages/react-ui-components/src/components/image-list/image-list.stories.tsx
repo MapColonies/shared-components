@@ -1,13 +1,6 @@
 import React from 'react';
 import { boolean } from '@storybook/addon-knobs';
-import {
-  ImageList,
-  ImageListItem,
-  ImageListImageAspectContainer,
-  ImageListImage,
-  ImageListSupporting,
-  ImageListLabel,
-} from './';
+import { ImageList, ImageListItem, ImageListImageAspectContainer, ImageListImage, ImageListSupporting, ImageListLabel } from './';
 
 const images = [
   'https://material-components-web.appspot.com/images/photos/3x2/1.jpg',
@@ -35,13 +28,8 @@ export default {
 export const Default = () => (
   <ImageList withTextProtection={boolean('withTextProtection', false)}>
     {images.map((src) => (
-      <ImageListItem
-        key={src}
-        style={{ margin: '2px', width: 'calc(100% / 5 - 4.2px)' }}
-      >
-        <ImageListImageAspectContainer
-          style={{ paddingBottom: 'calc(100% / 1.5)' }}
-        >
+      <ImageListItem key={src} style={{ margin: '2px', width: 'calc(100% / 5 - 4.2px)' }}>
+        <ImageListImageAspectContainer style={{ paddingBottom: 'calc(100% / 1.5)' }}>
           <ImageListImage src={src} />
         </ImageListImageAspectContainer>
         <ImageListSupporting>

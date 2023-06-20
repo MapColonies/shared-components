@@ -9,17 +9,13 @@ export default () => {
     });
 
     if (!(window as any)['HTMLCanvasElement']) {
-      Object.defineProperty(
-        (window as any)['HTMLCanvasElement'].prototype,
-        'getContext',
-        {
-          writable: true,
-          value: () => ({
-            font: '',
-            measureText: () => ({ width: 0 }),
-          }),
-        }
-      );
+      Object.defineProperty((window as any)['HTMLCanvasElement'].prototype, 'getContext', {
+        writable: true,
+        value: () => ({
+          font: '',
+          measureText: () => ({ width: 0 }),
+        }),
+      });
     }
 
     if (!(window as any).scrollTo) {
@@ -29,7 +25,6 @@ export default () => {
       });
     }
 
-    (window as any)['MutationObserver'] =
-      (window as any)['MutationObserver'] || require('mutation-observer');
+    (window as any)['MutationObserver'] = (window as any)['MutationObserver'] || require('mutation-observer');
   }
 };

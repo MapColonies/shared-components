@@ -8,11 +8,7 @@ export default {
 };
 
 export const _Fab = () => (
-  <Fab
-    mini={boolean('mini', false)}
-    ripple={boolean('ripple', true)}
-    onClick={action('onClick')}
-  >
+  <Fab mini={boolean('mini', false)} ripple={boolean('ripple', true)} onClick={action('onClick')}>
     favorite
   </Fab>
 );

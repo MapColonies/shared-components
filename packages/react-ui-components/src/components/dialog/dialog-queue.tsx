@@ -1,18 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as RMWC from '../types';
 import React, { useState, useEffect } from 'react';
-import {
-  SimpleDialog,
-  SimpleDialogProps,
-  SimpleDialogHTMLProps,
-  DialogOnCloseEventT,
-} from './dialog';
+import { SimpleDialog, SimpleDialogProps, SimpleDialogHTMLProps, DialogOnCloseEventT } from './dialog';
 import { ArrayEmitter, randomId } from '../base';
 import { TextField, TextFieldProps, TextFieldHTMLProps } from '../textfield';
 
-export interface DialogQueueInput
-  extends SimpleDialogProps,
-    SimpleDialogHTMLProps {
+export interface DialogQueueInput extends SimpleDialogProps, SimpleDialogHTMLProps {
   id?: string;
   /** Props for the input when using the prompt dialog. Only applies to prompt. */
   inputProps?: TextFieldProps & TextFieldHTMLProps;
@@ -30,14 +23,9 @@ export interface DialogQueueProps extends SimpleDialogProps {
 }
 
 /** A snackbar queue for rendering messages */
-export function DialogQueue({
-  dialogs,
-  ...defaultDialogProps
-}: DialogQueueProps) {
+export function DialogQueue({ dialogs, ...defaultDialogProps }: DialogQueueProps) {
   const [, setIteration] = useState(0);
-  const [closingDialogs, setClosingDialogs] = useState<{ [key: string]: true }>(
-    {}
-  );
+  const [closingDialogs, setClosingDialogs] = useState<{ [key: string]: true }>({});
 
   useEffect(() => {
     const forceUpdate = () => setIteration((val) => val + 1);
@@ -104,10 +92,7 @@ export function DialogQueue({
  * A base dialog factory that handle setting up the promise
  * With some consistent behavior
  */
-const dialogFactory = (
-  factory: (dialog: DialogQueueSpec) => DialogQueueSpec,
-  queue: ArrayEmitter<DialogQueueSpec>
-) => (dialog: DialogQueueInput) => {
+const dialogFactory = (factory: (dialog: DialogQueueSpec) => DialogQueueSpec, queue: ArrayEmitter<DialogQueueSpec>) => (dialog: DialogQueueInput) => {
   return new Promise((resolve, reject) => {
     const d = factory({ id: randomId(), ...dialog, resolve, reject });
     queue.push(d);
@@ -152,13 +137,7 @@ function PromptBody({
 const promptFactory = (dialog: DialogQueueSpec): DialogQueueSpec => {
   let getValue: any = () => '';
 
-  const body = (
-    <PromptBody
-      body={dialog.body}
-      inputProps={dialog.inputProps}
-      apiRef={(_getValue) => (getValue = _getValue)}
-    />
-  );
+  const body = <PromptBody body={dialog.body} inputProps={dialog.inputProps} apiRef={(_getValue) => (getValue = _getValue)} />;
 
   return {
     title: 'Prompt',
@@ -188,8 +167,7 @@ const confirmFactory = (dialog: DialogQueueSpec): DialogQueueSpec => ({
   acceptLabel: 'OK',
   cancelLabel: 'Cancel',
   ...dialog,
-  resolve: (evt: DialogOnCloseEventT) =>
-    dialog.resolve(evt.detail.action === 'accept'),
+  resolve: (evt: DialogOnCloseEventT) => dialog.resolve(evt.detail.action === 'accept'),
 });
 
 /** Creates a snackbar queue */

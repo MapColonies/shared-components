@@ -11,11 +11,7 @@ function MutatingSelect(props: any) {
   const [label] = useKnob('text', 'label', 'Label');
   const [enhanced] = useKnob('boolean', 'enhanced', false);
   const [disabled] = useKnob('boolean', 'disabled', false);
-  const [options] = useKnob('array', 'options', [
-    'Cookies',
-    'Pizza',
-    'Icecream',
-  ]);
+  const [options] = useKnob('array', 'options', ['Cookies', 'Pizza', 'Icecream']);
 
   return (
     <Select
@@ -44,13 +40,7 @@ function EnhancedSelect() {
   return (
     <div>
       <div>
-        <Select
-          label={'Foods'}
-          placeholder={'Select a Food'}
-          enhanced
-          options={['Cookies', 'Pizza', 'Icecream']}
-          icon="favorite"
-        />
+        <Select label={'Foods'} placeholder={'Select a Food'} enhanced options={['Cookies', 'Pizza', 'Icecream']} icon="favorite" />
       </div>
 
       <div>
@@ -220,12 +210,7 @@ function ControlledSelect() {
 
       <hr />
 
-      <Select
-        value="Cookies"
-        onChange={(evt) => {}}
-        label="Array"
-        options={opts2}
-      />
+      <Select value="Cookies" onChange={(evt) => {}} label="Array" options={opts2} />
       <Select label="Array" options={opts2} />
       <Select label="Array" enhanced options={opts2} />
     </>
@@ -298,12 +283,7 @@ export const SelectEnhanced = () => (
 );
 export const SelectEnhancedWithPortal = () => <EnhancedSelectWithPortal />;
 
-export const SelectWithoutPlaceholder = () => (
-  <Select
-    label={text('label', 'Foods')}
-    options={array('options', ['Cookies', 'Pizza', 'Icecream'])}
-  />
-);
+export const SelectWithoutPlaceholder = () => <Select label={text('label', 'Foods')} options={array('options', ['Cookies', 'Pizza', 'Icecream'])} />;
 
 export const SelectWithInitialValue = () => (
   <Select
@@ -317,10 +297,7 @@ export const SelectWithInitialValue = () => (
 export const SelectWithManyValues = () => (
   <>
     <Select options={[...Array(100)].map(() => Math.random().toString(16))} />
-    <Select
-      enhanced
-      options={[...Array(100)].map(() => Math.random().toString(16))}
-    />
+    <Select enhanced options={[...Array(100)].map(() => Math.random().toString(16))} />
   </>
 );
 
@@ -336,14 +313,7 @@ export const _ControlledSelect = () => <ControlledSelect />;
 
 export const _MutatingSelect = () => <MutatingSelect />;
 
-export const AutoFocus = () => (
-  <Select
-    label="Autofocus"
-    autoFocus
-    value="one"
-    options={['one', 'two', 'three']}
-  />
-);
+export const AutoFocus = () => <Select label="Autofocus" autoFocus value="one" options={['one', 'two', 'three']} />;
 
 export const ControlledSingle = () => (
   <Select

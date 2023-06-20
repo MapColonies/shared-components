@@ -1,13 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  ImageList,
-  ImageListItem,
-  ImageListImageAspectContainer,
-  ImageListImage,
-  ImageListSupporting,
-  ImageListLabel,
-} from './';
+import { ImageList, ImageListItem, ImageListImageAspectContainer, ImageListImage, ImageListSupporting, ImageListLabel } from './';
 
 const images = [
   'https://material-components-web.appspot.com/images/photos/3x2/1.jpg',
@@ -32,13 +25,8 @@ describe('ImageList', () => {
     mount(
       <ImageList>
         {images.map((src) => (
-          <ImageListItem
-            key={src}
-            style={{ margin: '2px', width: 'calc(100% / 5 - 4.2px)' }}
-          >
-            <ImageListImageAspectContainer
-              style={{ paddingBottom: 'calc(100% / 1.5)' }}
-            >
+          <ImageListItem key={src} style={{ margin: '2px', width: 'calc(100% / 5 - 4.2px)' }}>
+            <ImageListImageAspectContainer style={{ paddingBottom: 'calc(100% / 1.5)' }}>
               <ImageListImage src={src} />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
@@ -57,8 +45,6 @@ describe('ImageList', () => {
 
   test('masonry withTextProtection', () => {
     const el = mount(<ImageList withTextProtection />);
-    expect(el.html().includes('mdc-image-list--with-text-protection')).toBe(
-      true
-    );
+    expect(el.html().includes('mdc-image-list--with-text-protection')).toBe(true);
   });
 });

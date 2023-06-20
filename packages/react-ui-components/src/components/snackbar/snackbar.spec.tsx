@@ -1,24 +1,11 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  Snackbar,
-  SnackbarAction,
-  createSnackbarQueue,
-  SnackbarQueue,
-} from './';
+import { Snackbar, SnackbarAction, createSnackbarQueue, SnackbarQueue } from './';
 import { wait } from '../base/utils/test-utils';
 
 describe('Snackbar', () => {
   it('renders', (done) => {
-    const el = mount(
-      <Snackbar
-        open
-        timeout={1000}
-        onClose={() => {}}
-        message="This is a new message"
-        action={<div />}
-      />
-    );
+    const el = mount(<Snackbar open timeout={1000} onClose={() => {}} message="This is a new message" action={<div />} />);
 
     setTimeout(() => {
       expect(!!~el.html().search('mdc-snackbar')).toBe(true);
@@ -32,9 +19,7 @@ describe('Snackbar', () => {
   });
 
   it('can have an icon', () => {
-    const el = mount(
-      <Snackbar icon="favorite" open message="This is a new message" leading />
-    );
+    const el = mount(<Snackbar icon="favorite" open message="This is a new message" leading />);
     expect(!!~el.html().search('favorite')).toBe(true);
   });
 
@@ -43,9 +28,7 @@ describe('Snackbar', () => {
   });
 
   it('can dismissesOnAction', () => {
-    const el = mount(
-      <Snackbar open message="This is a new message" dismissesOnAction />
-    );
+    const el = mount(<Snackbar open message="This is a new message" dismissesOnAction />);
     el.setProps({ dismissesOnAction: false });
   });
 
@@ -61,14 +44,7 @@ describe('Snackbar', () => {
 
   it('handles events', () => {
     const el = mount(
-      <Snackbar
-        open
-        timeout={1000}
-        onClose={() => {}}
-        message="This is a new message"
-        dismissIcon
-        action={<SnackbarAction label="foo" />}
-      />
+      <Snackbar open timeout={1000} onClose={() => {}} message="This is a new message" dismissIcon action={<SnackbarAction label="foo" />} />
     );
 
     el.simulate('keydown');

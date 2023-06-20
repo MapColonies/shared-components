@@ -12,21 +12,15 @@ export interface WithThemeProps {
 /**
  * Actually parses the theme options
  */
-export const parseThemeOptions = (
-  theme: undefined | string | Array<string | undefined>
-): string[] => {
+export const parseThemeOptions = (theme: undefined | string | Array<string | undefined>): string[] => {
   const themeItems = Array.isArray(theme) ? theme : [theme];
-  return themeItems
-    .filter((v) => !!v)
-    .map((v) => `mdc-theme--${toDashCase(v!)}`);
+  return themeItems.filter((v) => !!v).map((v) => `mdc-theme--${toDashCase(v!)}`);
 };
 
 /**
  * HOC that adds themeability to any component
  */
-export const withTheme = <P extends any>(
-  Component: React.ComponentType<any>
-): React.ComponentType<P & WithThemeProps & any> => {
+export const withTheme = <P extends any>(Component: React.ComponentType<any>): React.ComponentType<P & WithThemeProps & any> => {
   const HOC = ({ theme, className, ...rest }: WithThemeProps) => {
     if (theme) {
       const classes = classNames(className, parseThemeOptions(theme));

@@ -23,16 +23,10 @@ const TopAppBarStory = (props: TopAppBarProps) => (
           <TopAppBarActionItem aria-label="Download" alt="Download">
             file_download
           </TopAppBarActionItem>
-          <TopAppBarActionItem
-            aria-label="Print this page"
-            alt="Print this page"
-          >
+          <TopAppBarActionItem aria-label="Print this page" alt="Print this page">
             print
           </TopAppBarActionItem>
-          <TopAppBarActionItem
-            aria-label="Bookmark this page"
-            alt="Bookmark this page"
-          >
+          <TopAppBarActionItem aria-label="Bookmark this page" alt="Bookmark this page">
             bookmark
           </TopAppBarActionItem>
         </TopAppBarSection>

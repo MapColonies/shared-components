@@ -17,13 +17,10 @@ export const _Icon = () => (
     </li>
     <li>
       Url child:
-      <Icon>
-        https://www2.le.ac.uk/departments/law/images/twitter-follow-us-icon
-      </Icon>
+      <Icon>https://www2.le.ac.uk/departments/law/images/twitter-follow-us-icon</Icon>
     </li>
     <li>
-      Url use:{' '}
-      <Icon icon="https://www2.le.ac.uk/departments/law/images/twitter-follow-us-icon" />
+      Url use: <Icon icon="https://www2.le.ac.uk/departments/law/images/twitter-follow-us-icon" />
     </li>
     <li>
       Component child:{' '}
@@ -33,39 +30,16 @@ export const _Icon = () => (
     </li>
     <li>
       Component Use:
-      <Icon
-        icon={
-          <div
-            style={{ background: 'purple', width: '24px', height: '24px' }}
-          />
-        }
-      />
+      <Icon icon={<div style={{ background: 'purple', width: '24px', height: '24px' }} />} />
     </li>
     <li>
       Nested Icon Child:{' '}
       <Icon>
-        <Icon
-          icon={
-            <div
-              style={{ background: 'blue', width: '24px', height: '24px' }}
-            />
-          }
-        />
+        <Icon icon={<div style={{ background: 'blue', width: '24px', height: '24px' }} />} />
       </Icon>
     </li>
     <li>
-      Nested Icon Use:{' '}
-      <Icon
-        icon={
-          <Icon
-            icon={
-              <div
-                style={{ background: 'blue', width: '24px', height: '24px' }}
-              />
-            }
-          />
-        }
-      />
+      Nested Icon Use: <Icon icon={<Icon icon={<div style={{ background: 'blue', width: '24px', height: '24px' }} />} />} />
     </li>
     <li>
       className use:{' '}

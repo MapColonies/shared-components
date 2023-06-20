@@ -1,15 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  DataTable,
-  DataTableContent,
-  DataTableHead,
-  DataTableBody,
-  DataTableHeadCell,
-  DataTableRow,
-  DataTableCell,
-  SimpleDataTable,
-} from './';
+import { DataTable, DataTableContent, DataTableHead, DataTableBody, DataTableHeadCell, DataTableRow, DataTableCell, SimpleDataTable } from './';
 
 describe('DataTable', () => {
   it('renders', () => {
@@ -134,9 +125,7 @@ describe('DataTable', () => {
           <DataTableHead>
             <DataTableRow>
               <DataTableHeadCell alignStart>Item</DataTableHeadCell>
-              <DataTableHeadCell alignMiddle>
-                Quantity (Click Me)
-              </DataTableHeadCell>
+              <DataTableHeadCell alignMiddle>Quantity (Click Me)</DataTableHeadCell>
               <DataTableHeadCell alignEnd>Unit price</DataTableHeadCell>
             </DataTableRow>
           </DataTableHead>
@@ -151,9 +140,7 @@ describe('DataTable', () => {
       </DataTable>
     );
     expect(el.html().includes('rmwc-data-table__cell--align-start')).toBe(true);
-    expect(el.html().includes('rmwc-data-table__cell--align-middle')).toBe(
-      true
-    );
+    expect(el.html().includes('rmwc-data-table__cell--align-middle')).toBe(true);
     expect(el.html().includes('rmwc-data-table__cell--align-end')).toBe(true);
   });
 
@@ -182,26 +169,20 @@ describe('DataTable', () => {
     };
 
     let el = getComp();
-    expect(el.html().includes('rmwc-data-table__head-cell--sortable')).toBe(
-      true
-    );
+    expect(el.html().includes('rmwc-data-table__head-cell--sortable')).toBe(true);
 
     clickCell(el);
     expect(dir).toBe(1);
 
     el = getComp();
-    expect(
-      el.html().includes('rmwc-data-table__head-cell--sorted-ascending')
-    ).toBe(true);
+    expect(el.html().includes('rmwc-data-table__head-cell--sorted-ascending')).toBe(true);
 
     clickCell(el);
     expect(dir).toBe(-1);
 
     el = getComp();
 
-    expect(
-      el.html().includes('rmwc-data-table__head-cell--sorted-descending')
-    ).toBe(true);
+    expect(el.html().includes('rmwc-data-table__head-cell--sorted-descending')).toBe(true);
 
     clickCell(el);
     expect(dir).toBe(null);
@@ -217,11 +198,7 @@ it('Sorted columns can have an onClick', () => {
         <DataTableHead>
           <DataTableRow>
             <DataTableHeadCell>Item</DataTableHeadCell>
-            <DataTableHeadCell
-              sort={null}
-              onClick={(evt) => (value = 1)}
-              onSortChange={(d) => {}}
-            >
+            <DataTableHeadCell sort={null} onClick={(evt) => (value = 1)} onSortChange={(d) => {}}>
               Quantity (Click Me)
             </DataTableHeadCell>
             <DataTableHeadCell>Unit price</DataTableHeadCell>
@@ -282,9 +259,7 @@ describe('SimpleDataTable', () => {
           return row[1] > 100 ? { activated: true } : {};
         }}
         getCellProps={(cell, index, isHead) => {
-          return !isHead && index === 2 && !cell.includes('$')
-            ? { style: { color: 'red' } }
-            : {};
+          return !isHead && index === 2 && !cell.includes('$') ? { style: { color: 'red' } } : {};
         }}
         headers={[['Item', 'Quantity', 'Value']]}
         data={[

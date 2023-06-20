@@ -1,0 +1,13 @@
+**/dist/**
+**/build/**
+**/loader/**
+**/node_modules/**
+**/storybook-static/**
+
+*.md
+*.d.ts
+*.json
+*.html
+*.yml
+.prettierrc
+.eslintrc

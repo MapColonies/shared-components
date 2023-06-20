@@ -14,10 +14,7 @@ export interface FormFieldProps {
 }
 
 /** A FormField component. */
-export const FormField = createComponent<FormFieldProps>(function FormField(
-  props,
-  ref
-) {
+export const FormField = createComponent<FormFieldProps>(function FormField(props, ref) {
   useFormfieldFoundation(props);
 
   const { alignEnd, foundationRef, ...rest } = props;

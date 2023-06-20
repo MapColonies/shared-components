@@ -7,13 +7,6 @@ import { Snackbar } from './snackbar';
 
 describe('Snackbar', () => {
   it('renders', () => {
-    mount(
-      <Snackbar
-        open
-        onClose={(evt) => {}}
-        message="This is a new message"
-        action={<div />}
-      />
-    );
+    mount(<Snackbar open onClose={(evt) => {}} message="This is a new message" action={<div />} />);
   });
 });

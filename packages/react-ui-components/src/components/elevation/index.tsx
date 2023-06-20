@@ -15,16 +15,10 @@ export interface ElevationProps {
 }
 
 /** The Elevation Component */
-export const Elevation = createComponent<ElevationProps>(function Elevation(
-  props,
-  ref
-) {
+export const Elevation = createComponent<ElevationProps>(function Elevation(props, ref) {
   const { z = 0, transition = false, wrap, ...rest } = props;
 
-  const className = useClassNames(props, [
-    `mdc-elevation--z${z}`,
-    { 'mdc-elevation-transition': transition },
-  ]);
+  const className = useClassNames(props, [`mdc-elevation--z${z}`, { 'mdc-elevation-transition': transition }]);
 
   if (wrap) {
     return wrapChild({ ...rest, className, ref });

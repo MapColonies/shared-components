@@ -7,29 +7,29 @@ import '../src/components/rmwc/styles';
 import { Preview } from '@storybook/react';
 
 export default {
-parameters: [
-  {
-    docs: {
-      theme: themes.dark,
+  parameters: [
+    {
+      docs: {
+        theme: themes.dark,
+      },
     },
-  }
-],
-decorators: [
-  (story) => {
-    const prefersDarkMode = useDarkMode();
-    const theme = prefersDarkMode ? Themes.darkTheme : Themes.lightTheme;
-    return <ThemeProvider options={theme}>{story()}</ThemeProvider>;
-  },
-  (story) => (
-    <div className="mdc-typography" style={{ padding: '24px', height: '100%' }}>
-      <style>{`
+  ],
+  decorators: [
+    (story) => {
+      const prefersDarkMode = useDarkMode();
+      const theme = prefersDarkMode ? Themes.darkTheme : Themes.lightTheme;
+      return <ThemeProvider options={theme}>{story()}</ThemeProvider>;
+    },
+    (story) => (
+      <div className="mdc-typography" style={{ padding: '24px', height: '100%' }}>
+        <style>{`
       body {
         margin: 0;
       }
       
       `}</style>
-      {story()}
-    </div>
-  )
-]
-} as Preview
+        {story()}
+      </div>
+    ),
+  ],
+} as Preview;

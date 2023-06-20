@@ -31,46 +31,23 @@ export const useChipFoundation = (props: ChipProps & ChipHTMLProps) => {
           // handled by props
         },
         eventTargetHasClass: (target: HTMLElement, className) => {
-          return (
-            rootEl.hasClass(className) || target.classList.contains(className)
-          );
+          return rootEl.hasClass(className) || target.classList.contains(className);
         },
-        notifyInteraction: () =>
-          emit('onInteraction', { chipId }, true /* shouldBubble */),
-        notifySelection: (selected) =>
-          emit(
-            'onSelect',
-            { chipId, selected: selected },
-            true /* shouldBubble */
-          ),
-        notifyTrailingIconInteraction: () =>
-          emit(
-            'onTrailingIconInteraction',
-            { chipId },
-            true /* shouldBubble */
-          ),
-        notifyRemoval: () =>
-          emit(
-            'onRemove',
-            { chipId, root: rootEl.ref },
-            true /* shouldBubble */
-          ),
+        notifyInteraction: () => emit('onInteraction', { chipId }, true /* shouldBubble */),
+        notifySelection: (selected) => emit('onSelect', { chipId, selected: selected }, true /* shouldBubble */),
+        notifyTrailingIconInteraction: () => emit('onTrailingIconInteraction', { chipId }, true /* shouldBubble */),
+        notifyRemoval: () => emit('onRemove', { chipId, root: rootEl.ref }, true /* shouldBubble */),
         notifyNavigation: (key: string, source: EventSource) => {
           //TODO, but probably not needed in case of React
         },
-        getComputedStyleValue: (propertyName) =>
-          rootEl.ref
-            ? window.getComputedStyle(rootEl.ref).getPropertyValue(propertyName)
-            : '',
+        getComputedStyleValue: (propertyName) => (rootEl.ref ? window.getComputedStyle(rootEl.ref).getPropertyValue(propertyName) : ''),
         setStyleProperty: (propertyName, value) => {
           rootEl.setStyle(propertyName, value);
         },
         getAttribute: (attrName) => rootEl.ref?.getAttribute(attrName),
         hasLeadingIcon: () => !!props.icon,
-        getRootBoundingClientRect: () =>
-          rootEl.ref?.getBoundingClientRect() || emptyClientRect,
-        getCheckmarkBoundingClientRect: () =>
-          checkmarkEl.ref?.getBoundingClientRect() || emptyClientRect,
+        getRootBoundingClientRect: () => rootEl.ref?.getBoundingClientRect() || emptyClientRect,
+        getCheckmarkBoundingClientRect: () => checkmarkEl.ref?.getBoundingClientRect() || emptyClientRect,
         setPrimaryActionAttr: (attr: string, value: string) => {
           // Not clear in documentation what this should be used for
         },
@@ -89,11 +66,7 @@ export const useChipFoundation = (props: ChipProps & ChipHTMLProps) => {
           trailingIconEl.ref?.focus();
         },
         isRTL: () => {
-          return rootEl.ref
-            ? window
-                .getComputedStyle(rootEl.ref)
-                .getPropertyValue('direction') === 'rtl'
-            : false;
+          return rootEl.ref ? window.getComputedStyle(rootEl.ref).getPropertyValue('direction') === 'rtl' : false;
         },
       } as MDCChipAdapter),
   });
@@ -101,9 +74,7 @@ export const useChipFoundation = (props: ChipProps & ChipHTMLProps) => {
   const { rootEl, trailingIconEl, foundation } = foundationWithElements;
 
   const handleInteraction = useCallback(
-    (
-      evt: React.MouseEvent & React.KeyboardEvent & MouseEvent & KeyboardEvent
-    ) => {
+    (evt: React.MouseEvent & React.KeyboardEvent & MouseEvent & KeyboardEvent) => {
       if (evt.type === 'click') props.onClick?.(evt as any);
       if (evt.type === 'keydown') props.onKeyDown?.(evt as any);
       return foundation.handleInteraction(evt);
@@ -127,9 +98,7 @@ export const useChipFoundation = (props: ChipProps & ChipHTMLProps) => {
 
   // Allow customizing the behavior of the trailing icon
   useEffect(() => {
-    foundation.setShouldRemoveOnTrailingIconClick(
-      props.trailingIconRemovesChip ?? true
-    );
+    foundation.setShouldRemoveOnTrailingIconClick(props.trailingIconRemovesChip ?? true);
   }, [foundation, props.trailingIconRemovesChip]);
 
   rootEl.setProp('onClick', handleInteraction, true);

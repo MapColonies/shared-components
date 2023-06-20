@@ -6,11 +6,4 @@ export default {
   component: IconButton,
 };
 
-export const _IconButton = () => (
-  <IconButton
-    icon="star"
-    onIcon="favorite_border"
-    label="Rate this!"
-    foundationRef={console.log}
-  />
-);
+export const _IconButton = () => <IconButton icon="star" onIcon="favorite_border" label="Rate this!" foundationRef={console.log} />;

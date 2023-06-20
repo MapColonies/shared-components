@@ -57,11 +57,7 @@ export const ComponentTest = () => {
         Box
       </Elevation>
 
-      <Elevation
-        z={10}
-        style={elevationStyle}
-        ref={(el: any) => console.log(el)}
-      >
+      <Elevation z={10} style={elevationStyle} ref={(el: any) => console.log(el)}>
         Ref
       </Elevation>
 

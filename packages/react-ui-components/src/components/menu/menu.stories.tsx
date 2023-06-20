@@ -10,9 +10,7 @@ class MenuStory extends React.Component {
   };
   render() {
     return (
-      <MenuSurfaceAnchor
-        style={{ position: 'absolute', top: '24px', left: '24px' }}
-      >
+      <MenuSurfaceAnchor style={{ position: 'absolute', top: '24px', left: '24px' }}>
         <Button
           raised
           onClick={(evt) => {
@@ -28,16 +26,7 @@ class MenuStory extends React.Component {
           anchorCorner={
             select(
               'anchorCorner',
-              [
-                'bottomEnd',
-                'bottomLeft',
-                'bottomRight',
-                'bottomStart',
-                'topEnd',
-                'topLeft',
-                'topRight',
-                'topStart',
-              ],
+              ['bottomEnd', 'bottomLeft', 'bottomRight', 'bottomStart', 'topEnd', 'topLeft', 'topRight', 'topStart'],
               'topStart'
             ) as any
           }
@@ -76,16 +65,7 @@ class MenuSurfaceStory extends React.Component {
           anchorCorner={
             select(
               'anchorCorner',
-              [
-                'bottomEnd',
-                'bottomLeft',
-                'bottomRight',
-                'bottomStart',
-                'topEnd',
-                'topLeft',
-                'topRight',
-                'topStart',
-              ],
+              ['bottomEnd', 'bottomLeft', 'bottomRight', 'bottomStart', 'topEnd', 'topLeft', 'topRight', 'topStart'],
               'topStart'
             ) as any
           }
@@ -105,11 +85,7 @@ function MenuHoist() {
   const [selected, setSelected] = useKnob('number', 'Last selected index', -1);
   const [hoisted] = useKnob('boolean', 'hoisted', true);
   const [open, setOpen] = React.useState(true);
-  const [options] = useKnob('array', 'options', [
-    'Cookies',
-    'Pizza',
-    'Icecream',
-  ]);
+  const [options] = useKnob('array', 'options', ['Cookies', 'Pizza', 'Icecream']);
 
   return (
     <div style={{ margin: '200px', height: '56px', overflow: 'hidden' }}>
@@ -122,12 +98,7 @@ function MenuHoist() {
         >
           Open Menu
         </Button>
-        <Menu
-          open={open}
-          renderToPortal={hoisted}
-          onSelect={(evt) => setSelected(evt.detail.index)}
-          onClose={() => setOpen(false)}
-        >
+        <Menu open={open} renderToPortal={hoisted} onSelect={(evt) => setSelected(evt.detail.index)} onClose={() => setOpen(false)}>
           {options.map((o: string, index: number) => (
             <MenuItem key={o} activated={selected === index}>
               {o}

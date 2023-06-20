@@ -10,9 +10,7 @@ describe('', () => {
   });
 
   it('handles prop changes', () => {
-    const el = mount(
-      <IconButton onIcon="favorite" icon="favorite_border" checked={false} />
-    );
+    const el = mount(<IconButton onIcon="favorite" icon="favorite_border" checked={false} />);
 
     el.setProps({ checked: true }, () => {
       expect(el.html().includes('mdc-icon-button--on')).toBe(true);
@@ -24,25 +22,12 @@ describe('', () => {
   });
 
   it('renders controlled', () => {
-    mount(
-      <IconButton
-        checked={true}
-        onClick={() => {}}
-        onIcon="star"
-        icon="star_border"
-      />
-    );
+    mount(<IconButton checked={true} onClick={() => {}} onIcon="star" icon="star_border" />);
   });
 
   it('handles onChange', () => {
     let value = 0;
-    const el = mount(
-      <IconButton
-        onChange={() => (value += 1)}
-        onIcon="favorite"
-        icon="favorite_border"
-      />
-    );
+    const el = mount(<IconButton onChange={() => (value += 1)} onIcon="favorite" icon="favorite_border" />);
 
     el.find('button').simulate('change');
 
@@ -50,9 +35,7 @@ describe('', () => {
   });
 
   it('can have custom classnames', () => {
-    const el = mount(
-      <IconButton icon="star" className={'my-custom-classname'} />
-    );
+    const el = mount(<IconButton icon="star" className={'my-custom-classname'} />);
     expect(el.html().includes('my-custom-classname')).toEqual(true);
   });
 });

@@ -6,15 +6,10 @@ import { TabScrollerApi } from './tab-scroller';
 import { MDCTabInteractionEvent } from '@material/tab';
 import { TabApi } from './tab';
 
-export const useTabBarFoundation = (
-  props: TabBarProps & React.HTMLProps<any>
-) => {
-  const [activeTabIndex, setActiveTabIndex] = useState(
-    props.activeTabIndex || 0
-  );
+export const useTabBarFoundation = (props: TabBarProps & React.HTMLProps<any>) => {
+  const [activeTabIndex, setActiveTabIndex] = useState(props.activeTabIndex || 0);
   const tabScrollerApi = useRef<TabScrollerApi>();
-  const setTabScrollerApi = (api: TabScrollerApi) =>
-    (tabScrollerApi.current = api);
+  const setTabScrollerApi = (api: TabScrollerApi) => (tabScrollerApi.current = api);
 
   const tabListRef = useRef<TabApi[]>([]);
 
@@ -29,20 +24,12 @@ export const useTabBarFoundation = (
         incrementScroll: (scrollXIncrement: number) => {
           tabScrollerApi.current?.incrementScroll(scrollXIncrement);
         },
-        getScrollPosition: () =>
-          tabScrollerApi.current?.getScrollPosition() || 0,
-        getScrollContentWidth: () =>
-          tabScrollerApi.current?.getScrollContentWidth() || 0,
+        getScrollPosition: () => tabScrollerApi.current?.getScrollPosition() || 0,
+        getScrollContentWidth: () => tabScrollerApi.current?.getScrollContentWidth() || 0,
         getOffsetWidth: () => (rootEl.ref ? rootEl.ref.offsetWidth : 0),
-        isRTL: () =>
-          !!rootEl.ref &&
-          window.getComputedStyle(rootEl.ref).getPropertyValue('direction') ===
-            'rtl',
+        isRTL: () => !!rootEl.ref && window.getComputedStyle(rootEl.ref).getPropertyValue('direction') === 'rtl',
         setActiveTab: (index: number) => {
-          if (
-            props.activeTabIndex === index ||
-            props.activeTabIndex === undefined
-          ) {
+          if (props.activeTabIndex === index || props.activeTabIndex === undefined) {
             setActiveTabIndex(index);
           } else {
             // ignore clicks when using controlled tabs, but we still need to notify
@@ -52,18 +39,12 @@ export const useTabBarFoundation = (
           }
         },
         activateTabAtIndex: (index: number, clientRect: ClientRect) => {
-          tabListRef.current[index] &&
-            tabListRef.current[index].activate(clientRect);
+          tabListRef.current[index] && tabListRef.current[index].activate(clientRect);
         },
-        deactivateTabAtIndex: (index: number) =>
-          tabListRef.current[index] && tabListRef.current[index].deactivate(),
+        deactivateTabAtIndex: (index: number) => tabListRef.current[index] && tabListRef.current[index].deactivate(),
         focusTabAtIndex: (index: number) => tabListRef.current[index].focus(),
-        getTabIndicatorClientRectAtIndex: (index: number) =>
-          tabListRef.current[index] &&
-          tabListRef.current[index].computeIndicatorClientRect(),
-        getTabDimensionsAtIndex: (index: number) =>
-          tabListRef.current[index] &&
-          tabListRef.current[index].computeDimensions(),
+        getTabIndicatorClientRectAtIndex: (index: number) => tabListRef.current[index] && tabListRef.current[index].computeIndicatorClientRect(),
+        getTabDimensionsAtIndex: (index: number) => tabListRef.current[index] && tabListRef.current[index].computeDimensions(),
         getPreviousActiveTabIndex: () => {
           for (let i = 0; i < tabListRef.current.length; i++) {
             if (tabListRef.current[i].getActive()) {
@@ -73,11 +54,7 @@ export const useTabBarFoundation = (
           return -1;
         },
         getFocusedTabIndex: () => {
-          const tabElements: Element[] = [].slice.call(
-            rootEl.ref?.querySelectorAll(
-              MDCTabBarFoundation.strings.TAB_SELECTOR
-            )
-          );
+          const tabElements: Element[] = [].slice.call(rootEl.ref?.querySelectorAll(MDCTabBarFoundation.strings.TAB_SELECTOR));
           const activeElement = document.activeElement as Element;
           return tabElements ? tabElements.indexOf(activeElement) : -1;
         },
@@ -90,8 +67,7 @@ export const useTabBarFoundation = (
           return -1;
         },
         getTabListLength: () => tabListRef.current.length,
-        notifyTabActivated: (index: number) =>
-          emit('onActivate', { index }, true),
+        notifyTabActivated: (index: number) => emit('onActivate', { index }, true),
       });
     },
   });
@@ -124,8 +100,7 @@ export const useTabBarFoundation = (
 
   // sync active tab index
   useEffect(() => {
-    props.activeTabIndex !== undefined &&
-      setActiveTabIndex(props.activeTabIndex);
+    props.activeTabIndex !== undefined && setActiveTabIndex(props.activeTabIndex);
   }, [props.activeTabIndex]);
 
   // activate tabs
@@ -144,10 +119,7 @@ export const useTabBarFoundation = (
     adapter.notifyTabActivated(index);
 
     window.requestAnimationFrame(() => {
-      adapter.activateTabAtIndex(
-        index,
-        adapter.getTabIndicatorClientRectAtIndex(previousActiveIndex)
-      );
+      adapter.activateTabAtIndex(index, adapter.getTabIndicatorClientRectAtIndex(previousActiveIndex));
       foundation.scrollIntoView(index);
     });
 

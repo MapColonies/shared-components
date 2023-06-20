@@ -4,11 +4,7 @@ import * as knobTypes from '@storybook/addon-knobs';
 
 import { manager } from '@storybook/addon-knobs/dist/registerKnobs';
 
-export const useKnob = (
-  knobType: keyof typeof knobTypes,
-  name: string,
-  defaultValue: any
-) => {
+export const useKnob = (knobType: keyof typeof knobTypes, name: string, defaultValue: any) => {
   const knobFunc = knobTypes[knobType] as any;
   const [stateValue, _stateSetter] = useState(defaultValue);
   const knobValue = knobFunc(name, stateValue);

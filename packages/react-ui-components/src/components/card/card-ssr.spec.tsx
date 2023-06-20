@@ -25,10 +25,7 @@ describe('Card', () => {
           <div style={{ padding: '0 1rem 1rem 1rem' }}>
             <h2>Our Changing Planet</h2>
             <h3>by Kurt Wagner</h3>
-            <div>
-              Visit ten places on our planet that are undergoing the biggest
-              changes today.
-            </div>
+            <div>Visit ten places on our planet that are undergoing the biggest changes today.</div>
           </div>
         </CardPrimaryAction>
         <CardActions>

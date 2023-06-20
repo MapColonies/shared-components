@@ -47,15 +47,13 @@ export const Badge = createComponent<BadgeProps>(function Badge(props, ref) {
 export interface BadgeAnchorProps {}
 
 /** An anchor component for badges. */
-export const BadgeAnchor = createComponent<BadgeAnchorProps>(
-  function BadgeAnchor(props, ref) {
-    const { children, ...rest } = props;
+export const BadgeAnchor = createComponent<BadgeAnchorProps>(function BadgeAnchor(props, ref) {
+  const { children, ...rest } = props;
 
-    const className = useClassNames(props, ['rmwc-badge-anchor']);
-    return (
-      <Tag {...rest} className={className} ref={ref}>
-        {children}
-      </Tag>
-    );
-  }
-);
+  const className = useClassNames(props, ['rmwc-badge-anchor']);
+  return (
+    <Tag {...rest} className={className} ref={ref}>
+      {children}
+    </Tag>
+  );
+});

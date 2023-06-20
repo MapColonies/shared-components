@@ -2,11 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useFoundation } from '../base';
 import { EventType, SpecificEventListener } from '@material/base/types';
 import { MDCTextFieldFoundation } from '@material/textfield';
-import {
-  TextFieldProps,
-  TextFieldCharacterCountApi,
-  TextFieldIconApi,
-} from '.';
+import { TextFieldProps, TextFieldCharacterCountApi, TextFieldIconApi } from '.';
 import { FloatingLabelApi } from '../floating-label';
 
 export const useTextFieldFoundation = (props: TextFieldProps) => {
@@ -17,20 +13,16 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
   const [floatLabel, setFloatlabel] = useState(false);
 
   const characterCounter = useRef<TextFieldCharacterCountApi | null>();
-  const setCharacterCounter = (api: TextFieldCharacterCountApi | null) =>
-    (characterCounter.current = api);
+  const setCharacterCounter = (api: TextFieldCharacterCountApi | null) => (characterCounter.current = api);
 
   const leadingIcon = useRef<TextFieldIconApi | null>();
-  const setLeadingIcon = (api: TextFieldIconApi | null) =>
-    (leadingIcon.current = api);
+  const setLeadingIcon = (api: TextFieldIconApi | null) => (leadingIcon.current = api);
 
   const trailingIcon = useRef<TextFieldIconApi | null>();
-  const setTrailingIcon = (api: TextFieldIconApi | null) =>
-    (trailingIcon.current = api);
+  const setTrailingIcon = (api: TextFieldIconApi | null) => (trailingIcon.current = api);
 
   const floatingLabel = useRef<FloatingLabelApi | null>();
-  const setFloatingLabel = (api: FloatingLabelApi | null) =>
-    (floatingLabel.current = api);
+  const setFloatingLabel = (api: FloatingLabelApi | null) => (floatingLabel.current = api);
 
   const { foundation, ...elements } = useFoundation({
     props,
@@ -79,30 +71,20 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
 
       const getInputAdapterMethods = () => {
         return {
-          registerInputInteractionHandler: <K extends EventType>(
-            evtType: K,
-            handler: SpecificEventListener<K>
-          ): void => inputEl.addEventListener(evtType, handler),
-          deregisterInputInteractionHandler: <K extends EventType>(
-            evtType: K,
-            handler: SpecificEventListener<K>
-          ): void => inputEl.removeEventListener(evtType, handler),
+          registerInputInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
+            inputEl.addEventListener(evtType, handler),
+          deregisterInputInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
+            inputEl.removeEventListener(evtType, handler),
           getNativeInput: () => inputEl.ref as any,
         };
       };
 
       const getFoundationMap = () => {
         return {
-          characterCounter: characterCounter.current
-            ? characterCounter.current.getFoundation()
-            : undefined,
+          characterCounter: characterCounter.current ? characterCounter.current.getFoundation() : undefined,
           helperText: undefined,
-          leadingIcon: leadingIcon.current
-            ? leadingIcon.current.getFoundation()
-            : undefined,
-          trailingIcon: trailingIcon.current
-            ? trailingIcon.current.getFoundation()
-            : undefined,
+          leadingIcon: leadingIcon.current ? leadingIcon.current.getFoundation() : undefined,
+          trailingIcon: trailingIcon.current ? trailingIcon.current.getFoundation() : undefined,
         };
       };
 
@@ -111,23 +93,14 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
           addClass: (className: string) => rootEl.addClass(className),
           removeClass: (className: string) => rootEl.removeClass(className),
           hasClass: (className: string) => rootEl.hasClass(className),
-          registerTextFieldInteractionHandler: <K extends EventType>(
-            evtType: K,
-            handler: SpecificEventListener<K>
-          ): void => rootEl.addEventListener(evtType, handler),
-          deregisterTextFieldInteractionHandler: <K extends EventType>(
-            evtType: K,
-            handler: SpecificEventListener<K>
-          ): void => rootEl.removeEventListener(evtType, handler),
-          registerValidationAttributeChangeHandler: (
-            handler: (attributeNames: string[]) => void
-          ): MutationObserver => {
-            const getAttributesList = (mutationsList: MutationRecord[]) =>
-              mutationsList.map((mutation) => mutation.attributeName);
+          registerTextFieldInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
+            rootEl.addEventListener(evtType, handler),
+          deregisterTextFieldInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
+            rootEl.removeEventListener(evtType, handler),
+          registerValidationAttributeChangeHandler: (handler: (attributeNames: string[]) => void): MutationObserver => {
+            const getAttributesList = (mutationsList: MutationRecord[]) => mutationsList.map((mutation) => mutation.attributeName);
             if (inputEl.ref) {
-              const observer = new MutationObserver((mutationsList) =>
-                handler(getAttributesList(mutationsList) as string[])
-              );
+              const observer = new MutationObserver((mutationsList) => handler(getAttributesList(mutationsList) as string[]));
               const targetNode = inputEl.ref;
               const config = { attributes: true };
               targetNode && observer.observe(targetNode, config);
@@ -136,9 +109,7 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
 
             return {} as MutationObserver;
           },
-          deregisterValidationAttributeChangeHandler: (
-            observer: MutationObserver
-          ) => {
+          deregisterValidationAttributeChangeHandler: (observer: MutationObserver) => {
             observer && observer.disconnect();
           },
           isFocused: () => {

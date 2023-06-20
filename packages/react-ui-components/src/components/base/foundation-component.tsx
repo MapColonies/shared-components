@@ -8,8 +8,7 @@ import { toCamel } from './utils/strings';
 import { MDCFoundation } from '@material/base';
 import { handleRef } from './component';
 
-const reactPropFromEventName = (evtName: string) =>
-  (eventsMap as { [key: string]: string })[evtName] || evtName;
+const reactPropFromEventName = (evtName: string) => (eventsMap as { [key: string]: string })[evtName] || evtName;
 
 export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
   private _classes = new Set<string>();
@@ -101,10 +100,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
     const mergedEvents = Object.entries(propsToMerge).reduce(
       (acc: any, [key, possibleCallback]) => {
         const existingCallback = this._events[key];
-        if (
-          typeof possibleCallback === 'function' &&
-          typeof existingCallback === 'function'
-        ) {
+        if (typeof possibleCallback === 'function' && typeof existingCallback === 'function') {
           const wrappedCallback = (evt: any) => {
             existingCallback(evt);
             return possibleCallback(evt);
@@ -139,9 +135,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
    * Styles
    **************************************************/
   setStyle(propertyName: string, value: number | string | null) {
-    propertyName = propertyName.startsWith('--')
-      ? propertyName
-      : toCamel(propertyName);
+    propertyName = propertyName.startsWith('--') ? propertyName : toCamel(propertyName);
 
     if (this._style[propertyName] !== value) {
       this._style[propertyName] = value;
@@ -152,10 +146,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
   /**************************************************
    * Events
    **************************************************/
-  addEventListener(
-    evtName: string,
-    callback: any /*SpecificEventListener<any>*/
-  ) {
+  addEventListener(evtName: string, callback: any /*SpecificEventListener<any>*/) {
     const propName = reactPropFromEventName(evtName);
     if (this._events[propName] !== callback) {
       this._events[propName] = callback;
@@ -163,10 +154,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
     }
   }
 
-  removeEventListener(
-    evtName: string,
-    callback: any /*SpecificEventListener<any>*/
-  ) {
+  removeEventListener(evtName: string, callback: any /*SpecificEventListener<any>*/) {
     const propName = reactPropFromEventName(evtName);
     if (this._events[propName]) {
       delete this._events[propName];
@@ -188,39 +176,37 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
   }
 }
 
-const emitFactory = (props: { [key: string]: any }) => (
-  evtType: string,
-  evtData: any,
-  shouldBubble: boolean = false
-) => {
-  let evt;
+const emitFactory =
+  (props: { [key: string]: any }) =>
+  (evtType: string, evtData: any, shouldBubble: boolean = false) => {
+    let evt;
 
-  evt = new CustomEvent(evtType, {
-    detail: evtData,
-    bubbles: shouldBubble,
-  });
+    evt = new CustomEvent(evtType, {
+      detail: evtData,
+      bubbles: shouldBubble,
+    });
 
-  // bugfix for events coming from form elements
-  // and also fits with reacts form pattern better...
-  // This should always otherwise be null since there is no target
-  // for Custom Events
-  Object.defineProperty(evt, 'target', {
-    value: evtData,
-    writable: false,
-  });
+    // bugfix for events coming from form elements
+    // and also fits with reacts form pattern better...
+    // This should always otherwise be null since there is no target
+    // for Custom Events
+    Object.defineProperty(evt, 'target', {
+      value: evtData,
+      writable: false,
+    });
 
-  Object.defineProperty(evt, 'currentTarget', {
-    value: evtData,
-    writable: false,
-  });
+    Object.defineProperty(evt, 'currentTarget', {
+      value: evtData,
+      writable: false,
+    });
 
-  // Custom handling for React
-  const propName = evtType;
+    // Custom handling for React
+    const propName = evtType;
 
-  props[propName] && props[propName](evt);
+    props[propName] && props[propName](evt);
 
-  return evt;
-};
+    return evt;
+  };
 
 export const useFoundation = <
   Foundation extends MDCFoundation<any>,
@@ -246,11 +232,7 @@ export const useFoundation = <
       [key in keyof Elements]: FoundationElement<Props, HTMLElement>;
     } & {
       getProps: () => Props;
-      emit: (
-        evtType: string,
-        evtData: any,
-        shouldBubble?: boolean
-      ) => CustomEvent<any>;
+      emit: (evtType: string, evtData: any, shouldBubble?: boolean) => CustomEvent<any>;
     }
   ) => Foundation;
   props: Props;
@@ -264,11 +246,9 @@ export const useFoundation = <
 
   const elements = useMemo(
     () =>
-      Object.keys(elementsInput).reduce<
-        {
-          [key in keyof Elements]: FoundationElement<any, HTMLElement>;
-        }
-      >((acc, key: keyof Elements) => {
+      Object.keys(elementsInput).reduce<{
+        [key in keyof Elements]: FoundationElement<any, HTMLElement>;
+      }>((acc, key: keyof Elements) => {
         acc[key] = new FoundationElement<Props, HTMLElement>(() => {
           setIteration((val) => val + 1);
         });

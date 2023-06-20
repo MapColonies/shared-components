@@ -5,15 +5,7 @@ import { useProviderContext } from '../provider';
 
 export type TooltipActivationT = 'hover' | 'click' | 'focus';
 
-export type TooltipAlignT =
-  | 'left'
-  | 'right'
-  | 'top'
-  | 'bottom'
-  | 'topLeft'
-  | 'topRight'
-  | 'bottomLeft'
-  | 'bottomRight';
+export type TooltipAlignT = 'left' | 'right' | 'top' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 
 /** A Tooltip component for displaying informative popover information. */
 export interface TooltipProps {
@@ -38,13 +30,7 @@ export interface TooltipProps {
 }
 
 /** A Tooltip component for displaying informative popover information. */
-export const Tooltip = function Tooltip({
-  children,
-  content,
-  className,
-  open,
-  ...rest
-}: TooltipProps) {
+export const Tooltip = function Tooltip({ children, content, className, open, ...rest }: TooltipProps) {
   const providerContext = useProviderContext();
 
   // merge together provider options

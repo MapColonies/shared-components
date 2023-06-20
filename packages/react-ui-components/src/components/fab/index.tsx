@@ -23,15 +23,7 @@ export interface FabProps extends RMWC.WithRippleProps {
 /** A floating action button component */
 export const Fab = withRipple({ surface: false })(
   createComponent<FabProps>(function Fab(props, ref) {
-    const {
-      children,
-      label,
-      icon,
-      trailingIcon,
-      mini,
-      exited,
-      ...rest
-    } = props;
+    const { children, label, icon, trailingIcon, mini, exited, ...rest } = props;
 
     const className = useClassNames(props, [
       'mdc-fab',
@@ -43,9 +35,7 @@ export const Fab = withRipple({ surface: false })(
     ]);
 
     if (trailingIcon && !label) {
-      console.warn(
-        `FAB 'trailingIcon' prop should only be used in conjunction with 'label'`
-      );
+      console.warn(`FAB 'trailingIcon' prop should only be used in conjunction with 'label'`);
     }
 
     return (

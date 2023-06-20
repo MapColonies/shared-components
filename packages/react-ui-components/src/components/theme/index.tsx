@@ -1,14 +1,7 @@
 import * as RMWC from '../types';
 import React, { useMemo } from 'react';
 
-import {
-  toDashCase,
-  parseThemeOptions,
-  wrapChild,
-  createComponent,
-  Tag,
-  useClassNames,
-} from '../base';
+import { toDashCase, parseThemeOptions, wrapChild, createComponent, Tag, useClassNames } from '../base';
 
 import { getAutoColorsForTheme } from './utils';
 import { Themes } from '../theme/themes';
@@ -35,9 +28,7 @@ export const Theme = createComponent<ThemeProps>(function Theme(props, ref) {
     });
   }
 
-  return (
-    <Tag tag="span" theme={use} {...rest} ref={ref} className={className} />
-  );
+  return <Tag tag="span" theme={use} {...rest} ref={ref} className={className} />;
 });
 
 export interface IOptions {
@@ -71,48 +62,43 @@ export function useTheme() {
 }
 
 /** A ThemeProvider. This sets theme colors for its child tree. */
-export const ThemeProvider = createComponent<ThemeProviderProps>(
-  function ThemeProvider(props, ref) {
-    const parsed = JSON.stringify(props.options);
+export const ThemeProvider = createComponent<ThemeProviderProps>(function ThemeProvider(props, ref) {
+  const parsed = JSON.stringify(props.options);
 
-    const colors = useMemo(() => {
-      const processedColors = Object.keys(props.options).reduce(
-        (acc: any, key) => {
-          const val = props.options[key];
-          key = key.startsWith('--') ? key : `--mdc-theme-${toDashCase(key)}`;
-          acc[key] = val;
-          return acc;
-        },
-        {}
-      );
+  const colors = useMemo(() => {
+    const processedColors = Object.keys(props.options).reduce((acc: any, key) => {
+      const val = props.options[key];
+      key = key.startsWith('--') ? key : `--mdc-theme-${toDashCase(key)}`;
+      acc[key] = val;
+      return acc;
+    }, {});
 
-      return getAutoColorsForTheme(processedColors);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [parsed]);
+    return getAutoColorsForTheme(processedColors);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsed]);
 
-    const { options, style = {}, wrap, ...rest } = props;
-    const className = useClassNames(props, [
-      wrap &&
-        typeof rest.children === 'object' &&
-        // @ts-ignore
-        rest.children?.props?.className,
-    ]);
+  const { options, style = {}, wrap, ...rest } = props;
+  const className = useClassNames(props, [
+    wrap &&
+      typeof rest.children === 'object' &&
+      // @ts-ignore
+      rest.children?.props?.className,
+  ]);
 
-    const themeStyles = {
-      ...style,
-      ...colors,
-    } as React.CSSProperties;
+  const themeStyles = {
+    ...style,
+    ...colors,
+  } as React.CSSProperties;
 
-    if (wrap && rest.children) {
-      return wrapChild({ ...rest, style: themeStyles, ref });
-    }
-
-    return (
-      <ThemeContext.Provider value={options}>
-        <Tag {...rest} style={themeStyles} className={className} ref={ref} />
-      </ThemeContext.Provider>
-    );
+  if (wrap && rest.children) {
+    return wrapChild({ ...rest, style: themeStyles, ref });
   }
-);
+
+  return (
+    <ThemeContext.Provider value={options}>
+      <Tag {...rest} style={themeStyles} className={className} ref={ref} />
+    </ThemeContext.Provider>
+  );
+});
 
 export * from './themes';

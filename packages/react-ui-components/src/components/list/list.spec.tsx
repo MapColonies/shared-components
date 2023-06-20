@@ -1,14 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  List,
-  ListItem,
-  ListItemPrimaryText,
-  ListItemGraphic,
-  ListItemMeta,
-  SimpleListItem,
-  CollapsibleList,
-} from './';
+import { List, ListItem, ListItemPrimaryText, ListItemGraphic, ListItemMeta, SimpleListItem, CollapsibleList } from './';
 
 describe('List', () => {
   it('renders', () => {
@@ -52,29 +44,15 @@ describe('List', () => {
     mount(
       <List>
         <SimpleListItem graphic="star_border" text="Cookies" />
-        <SimpleListItem
-          graphic="star_border"
-          text="Cookies"
-          secondaryText="Chocolate chip"
-        />
-        <SimpleListItem
-          graphic="star_border"
-          text="Cookies"
-          secondaryText="Chocolate chip"
-          meta="info"
-        />
+        <SimpleListItem graphic="star_border" text="Cookies" secondaryText="Chocolate chip" />
+        <SimpleListItem graphic="star_border" text="Cookies" secondaryText="Chocolate chip" meta="info" />
       </List>
     );
   });
 
   it('SimpleListItem can have children', () => {
     const el = mount(
-      <SimpleListItem
-        graphic="star_border"
-        text="Cookies"
-        secondaryText="Chocolate chip"
-        meta="info"
-      >
+      <SimpleListItem graphic="star_border" text="Cookies" secondaryText="Chocolate chip" meta="info">
         <aside>Test</aside>
       </SimpleListItem>
     );
@@ -82,12 +60,10 @@ describe('List', () => {
   });
 
   it('can have custom classnames', () => {
-    [List, ListItem, ListItemPrimaryText].forEach(
-      (Component: React.ComponentType<any>) => {
-        const el = mount(<Component className={'my-custom-classname'} />);
-        expect(!!~el.html().search('my-custom-classname')).toEqual(true);
-      }
-    );
+    [List, ListItem, ListItemPrimaryText].forEach((Component: React.ComponentType<any>) => {
+      const el = mount(<Component className={'my-custom-classname'} />);
+      expect(!!~el.html().search('my-custom-classname')).toEqual(true);
+    });
   });
 
   it('can be activated', () => {
@@ -131,10 +107,7 @@ describe('Collapsible List', () => {
     const el = mount(
       <List>
         <ListItem>One</ListItem>
-        <CollapsibleList
-          defaultOpen
-          handle={<ListItem className="handle">Handle</ListItem>}
-        >
+        <CollapsibleList defaultOpen handle={<ListItem className="handle">Handle</ListItem>}>
           <ListItem>Two</ListItem>
         </CollapsibleList>
       </List>
@@ -155,10 +128,7 @@ describe('Collapsible List', () => {
     const el = mount(
       <List>
         <ListItem>One</ListItem>
-        <CollapsibleList
-          defaultOpen
-          handle={<ListItem className="handle">Handle</ListItem>}
-        >
+        <CollapsibleList defaultOpen handle={<ListItem className="handle">Handle</ListItem>}>
           <ListItem>Two</ListItem>
         </CollapsibleList>
       </List>

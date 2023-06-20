@@ -2,13 +2,7 @@
 import * as RMWC from '../types';
 import React, { useContext } from 'react';
 import { Icon } from '../icon';
-import {
-  useClassNames,
-  Tag,
-  createComponent,
-  DataTableHeadContext,
-  DataTableContext,
-} from '../base';
+import { useClassNames, Tag, createComponent, DataTableHeadContext, DataTableContext } from '../base';
 
 interface SharedDataTableCellProps {
   /** Changes alignment for numeric columns */
@@ -32,10 +26,7 @@ export interface DataTableProps {
 }
 
 /** The DataTable Component. */
-export const DataTable = createComponent<DataTableProps>(function DataTable(
-  props,
-  ref
-) {
+export const DataTable = createComponent<DataTableProps>(function DataTable(props, ref) {
   const { stickyColumns, stickyRows, ...rest } = props;
   const className = useClassNames(props, [
     'mdc-data-table',
@@ -57,38 +48,32 @@ export const DataTable = createComponent<DataTableProps>(function DataTable(
 export interface DataTableContentProps {}
 
 /** The data table content. */
-export const DataTableContent = createComponent<DataTableContentProps>(
-  function DataTableContent(props, ref) {
-    const className = useClassNames(props, ['mdc-data-table__table']);
-    return <Tag tag="table" {...props} ref={ref} className={className} />;
-  }
-);
+export const DataTableContent = createComponent<DataTableContentProps>(function DataTableContent(props, ref) {
+  const className = useClassNames(props, ['mdc-data-table__table']);
+  return <Tag tag="table" {...props} ref={ref} className={className} />;
+});
 
 /** A header for the data table. */
 export interface DataTableHeadProps {}
 
 /** A header for the data table. */
-export const DataTableHead = createComponent<DataTableHeadProps>(
-  function DataTableHead(props, ref) {
-    const className = useClassNames(props, ['rmwc-data-table__head']);
-    return (
-      <DataTableHeadContext.Provider value={true}>
-        <Tag tag="thead" {...props} ref={ref} className={className} />
-      </DataTableHeadContext.Provider>
-    );
-  }
-);
+export const DataTableHead = createComponent<DataTableHeadProps>(function DataTableHead(props, ref) {
+  const className = useClassNames(props, ['rmwc-data-table__head']);
+  return (
+    <DataTableHeadContext.Provider value={true}>
+      <Tag tag="thead" {...props} ref={ref} className={className} />
+    </DataTableHeadContext.Provider>
+  );
+});
 
 /** A body for the data table. */
 export interface DataTableBodyProps {}
 
 /** A body for the data table. */
-export const DataTableBody = createComponent<DataTableBodyProps>(
-  function DataTableBody(props, ref) {
-    const className = useClassNames(props, ['mdc-data-table__content']);
-    return <Tag tag="tbody" {...props} ref={ref} className={className} />;
-  }
-);
+export const DataTableBody = createComponent<DataTableBodyProps>(function DataTableBody(props, ref) {
+  const className = useClassNames(props, ['mdc-data-table__content']);
+  return <Tag tag="tbody" {...props} ref={ref} className={className} />;
+});
 
 /** A row for the data table. */
 export interface DataTableRowProps {
@@ -99,22 +84,20 @@ export interface DataTableRowProps {
 }
 
 /** A row for the data table. */
-export const DataTableRow = createComponent<DataTableRowProps>(
-  function DataTableRow(props, ref) {
-    const isHeaderRow = useContext(DataTableHeadContext);
-    const { activated, selected, ...rest } = props;
-    const className = useClassNames(props, [
-      'rmwc-data-table__row',
-      {
-        'mdc-data-table__header-row': isHeaderRow,
-        'mdc-data-table__row': !isHeaderRow,
-        'mdc-data-table__row--selected': props.selected || props.activated,
-        'rmwc-data-table__row--activated': props.activated,
-      },
-    ]);
-    return <Tag tag="tr" {...rest} ref={ref} className={className} />;
-  }
-);
+export const DataTableRow = createComponent<DataTableRowProps>(function DataTableRow(props, ref) {
+  const isHeaderRow = useContext(DataTableHeadContext);
+  const { activated, selected, ...rest } = props;
+  const className = useClassNames(props, [
+    'rmwc-data-table__row',
+    {
+      'mdc-data-table__header-row': isHeaderRow,
+      'mdc-data-table__row': !isHeaderRow,
+      'mdc-data-table__row--selected': props.selected || props.activated,
+      'rmwc-data-table__row--activated': props.activated,
+    },
+  ]);
+  return <Tag tag="tr" {...rest} ref={ref} className={className} />;
+});
 
 const DataTableSortIcon = React.memo(function DataTableSortIcon() {
   return (
@@ -122,10 +105,7 @@ const DataTableSortIcon = React.memo(function DataTableSortIcon() {
       className="rmwc-data-table__sort-icon"
       icon={
         <svg width="18" height="18" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
-          />
+          <path fill="currentColor" d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
         </svg>
       }
     />
@@ -143,94 +123,63 @@ export interface DataTableHeadCellProps extends SharedDataTableCellProps {
 }
 
 /** A header cell for the data table. */
-export const DataTableHeadCell = createComponent<DataTableHeadCellProps>(
-  function DataTableHeadCell(props, ref) {
-    const {
-      alignStart,
-      alignMiddle,
-      alignEnd,
-      isNumeric,
-      sort,
-      onSortChange,
-      onClick,
-      children,
-      hasFormControl,
-      ...rest
-    } = props;
+export const DataTableHeadCell = createComponent<DataTableHeadCellProps>(function DataTableHeadCell(props, ref) {
+  const { alignStart, alignMiddle, alignEnd, isNumeric, sort, onSortChange, onClick, children, hasFormControl, ...rest } = props;
 
-    const className = useClassNames(props, [
-      'rmwc-data-table__cell',
-      'mdc-data-table__header-cell',
-      {
-        'rmwc-data-table__head-cell--sortable': sort !== undefined,
-        'rmwc-data-table__head-cell--sorted': !!sort,
-        'rmwc-data-table__head-cell--sorted-ascending': sort === 1,
-        'rmwc-data-table__head-cell--sorted-descending': sort === -1,
-        'mdc-data-table__header-cell--checkbox': hasFormControl,
-        'mdc-data-table__header-cell--numeric': isNumeric,
-        'rmwc-data-table__cell--align-start': alignStart,
-        'rmwc-data-table__cell--align-middle': alignMiddle,
-        'rmwc-data-table__cell--align-end': alignEnd,
-      },
-    ]);
+  const className = useClassNames(props, [
+    'rmwc-data-table__cell',
+    'mdc-data-table__header-cell',
+    {
+      'rmwc-data-table__head-cell--sortable': sort !== undefined,
+      'rmwc-data-table__head-cell--sorted': !!sort,
+      'rmwc-data-table__head-cell--sorted-ascending': sort === 1,
+      'rmwc-data-table__head-cell--sorted-descending': sort === -1,
+      'mdc-data-table__header-cell--checkbox': hasFormControl,
+      'mdc-data-table__header-cell--numeric': isNumeric,
+      'rmwc-data-table__cell--align-start': alignStart,
+      'rmwc-data-table__cell--align-middle': alignMiddle,
+      'rmwc-data-table__cell--align-end': alignEnd,
+    },
+  ]);
 
-    const onClickProp =
-      sort !== undefined
-        ? {
-            onClick: (evt: any) => {
-              onSortChange &&
-                onSortChange(sort === null ? 1 : sort === 1 ? -1 : null);
+  const onClickProp =
+    sort !== undefined
+      ? {
+          onClick: (evt: any) => {
+            onSortChange && onSortChange(sort === null ? 1 : sort === 1 ? -1 : null);
 
-              onClick && onClick(evt);
-            },
-          }
-        : {};
+            onClick && onClick(evt);
+          },
+        }
+      : {};
 
-    return (
-      <Tag
-        tag="th"
-        {...rest}
-        {...onClickProp}
-        className={className}
-        ref={ref}
-        role="columnheader"
-        scope="col"
-      >
-        {sort !== undefined && <DataTableSortIcon />}
-        {children}
-      </Tag>
-    );
-  }
-);
+  return (
+    <Tag tag="th" {...rest} {...onClickProp} className={className} ref={ref} role="columnheader" scope="col">
+      {sort !== undefined && <DataTableSortIcon />}
+      {children}
+    </Tag>
+  );
+});
 
 /** A cell for the DataTable */
 export interface DataTableCellProps extends SharedDataTableCellProps {}
 
 /** A cell for the DataTable */
-export const DataTableCell = createComponent<DataTableCellProps>(
-  function DataTableCell(props, ref) {
-    const {
-      alignStart,
-      alignMiddle,
-      alignEnd,
-      isNumeric,
-      hasFormControl,
-      ...rest
-    } = props;
-    const className = useClassNames(props, [
-      'mdc-data-table__cell',
-      'rmwc-data-table__cell',
-      {
-        'mdc-data-table__cell--numeric': isNumeric,
-        'mdc-data-table__cell--checkbox': hasFormControl,
-        'rmwc-data-table__cell--align-start': props.alignStart,
-        'rmwc-data-table__cell--align-middle': props.alignMiddle,
-        'rmwc-data-table__cell--align-end': props.alignEnd,
-      },
-    ]);
-    return <Tag tag="td" {...rest} ref={ref} className={className} />;
-  }
-);
+export const DataTableCell = createComponent<DataTableCellProps>(function DataTableCell(props, ref) {
+  const { alignStart, alignMiddle, alignEnd, isNumeric, hasFormControl, ...rest } = props;
+  const className = useClassNames(props, [
+    'mdc-data-table__cell',
+    'rmwc-data-table__cell',
+    {
+      'mdc-data-table__cell--numeric': isNumeric,
+      'mdc-data-table__cell--checkbox': hasFormControl,
+      'rmwc-data-table__cell--align-start': props.alignStart,
+      'rmwc-data-table__cell--align-middle': props.alignMiddle,
+      'rmwc-data-table__cell--align-end': props.alignEnd,
+    },
+  ]);
+  return <Tag tag="td" {...rest} ref={ref} className={className} />;
+});
 
 /** A simple data table to render matrices. */
 export interface SimpleDataTableProps extends DataTableProps {

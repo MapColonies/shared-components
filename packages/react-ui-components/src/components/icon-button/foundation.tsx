@@ -3,9 +3,7 @@ import { useFoundation } from '../base';
 import { MDCIconButtonToggleFoundation } from '@material/icon-button';
 import { IconButtonProps } from '.';
 
-export const useIconButtonFoundation = (
-  props: IconButtonProps & React.HTMLProps<any>
-) => {
+export const useIconButtonFoundation = (props: IconButtonProps & React.HTMLProps<any>) => {
   const { foundation, ...elements } = useFoundation({
     props,
     elements: { rootEl: true },
@@ -14,8 +12,7 @@ export const useIconButtonFoundation = (
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
         hasClass: (className: string) => rootEl.hasClass(className),
-        setAttr: (attrName: string, attrValue: string | number | null) =>
-          rootEl.setProp(attrName as any, attrValue),
+        setAttr: (attrName: string, attrValue: string | number | null) => rootEl.setProp(attrName as any, attrValue),
         notifyChange: (evtData: { isOn: boolean }) => emit('onChange', evtData),
       });
     },

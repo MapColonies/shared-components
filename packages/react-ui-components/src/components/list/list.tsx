@@ -36,26 +36,13 @@ export interface ListApi {
   getClasses: () => string;
   addClassToElementIndex: (index: number, className: string) => void;
   removeClassFromElementAtIndex: (index: number, className: string) => void;
-  setAttributeForElementIndex: (
-    index: number,
-    attr: string,
-    value: any
-  ) => void;
+  setAttributeForElementIndex: (index: number, attr: string, value: any) => void;
   getListItemCount: () => number;
   focusItemAtIndex: (index: number) => void;
 }
 
 export const List = createComponent<ListProps>(function List(props, ref) {
-  const {
-    dense,
-    twoLine,
-    avatarList,
-    apiRef,
-    nonInteractive,
-    onAction,
-    foundationRef,
-    ...rest
-  } = props;
+  const { dense, twoLine, avatarList, apiRef, nonInteractive, onAction, foundationRef, ...rest } = props;
   const { rootEl } = useListFoundation(props);
   const className = useClassNames(props, [
     'mdc-list',
@@ -66,7 +53,5 @@ export const List = createComponent<ListProps>(function List(props, ref) {
       'mdc-list--non-interactive': nonInteractive,
     },
   ]);
-  return (
-    <Tag tag="ul" {...rest} element={rootEl} className={className} ref={ref} />
-  );
+  return <Tag tag="ul" {...rest} element={rootEl} className={className} ref={ref} />;
 });

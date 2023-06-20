@@ -5,16 +5,12 @@ import { Icon } from './';
 describe('Icon', () => {
   it('renders ligature', () => {
     const el = mount(<Icon icon="favorite" />);
-    expect(el.html()).toBe(
-      `<i class="rmwc-icon rmwc-icon--ligature material-icons">favorite</i>`
-    );
+    expect(el.html()).toBe(`<i class="rmwc-icon rmwc-icon--ligature material-icons">favorite</i>`);
   });
 
   it('renders Url', () => {
     const el2 = mount(<Icon icon="images/icons/twitter.png" />);
-    expect(el2.html()).toBe(
-      `<i class="rmwc-icon rmwc-icon--url material-icons" style="background-image: url(images/icons/twitter.png);"></i>`
-    );
+    expect(el2.html()).toBe(`<i class="rmwc-icon rmwc-icon--url material-icons" style="background-image: url(images/icons/twitter.png);"></i>`);
   });
 
   it('can have custom classnames', () => {
@@ -23,28 +19,12 @@ describe('Icon', () => {
   });
 
   it('renders with JSX', () => {
-    const el = mount(
-      <Icon
-        icon={
-          <div
-            style={{ background: 'purple', width: '24px', height: '24px' }}
-          />
-        }
-      />
-    );
+    const el = mount(<Icon icon={<div style={{ background: 'purple', width: '24px', height: '24px' }} />} />);
     expect(el.html()).toBe(
       `<i class="rmwc-icon rmwc-icon--component material-icons"><div style="background: purple; width: 24px; height: 24px;"></div></i>`
     );
 
-    const el2 = mount(
-      <Icon
-        icon={
-          <div
-            style={{ background: 'purple', width: '24px', height: '24px' }}
-          />
-        }
-      />
-    );
+    const el2 = mount(<Icon icon={<div style={{ background: 'purple', width: '24px', height: '24px' }} />} />);
     expect(el2.html()).toBe(
       `<i class="rmwc-icon rmwc-icon--component material-icons"><div style="background: purple; width: 24px; height: 24px;"></div></i>`
     );
@@ -60,9 +40,7 @@ describe('Icon', () => {
         }
       />
     );
-    expect(el.html()).toBe(
-      `<svg class="rmwc-icon rmwc-icon--component material-icons"><path></path></svg>`
-    );
+    expect(el.html()).toBe(`<svg class="rmwc-icon rmwc-icon--component material-icons"><path></path></svg>`);
   });
 
   it('renders nested Icons', () => {
@@ -90,9 +68,7 @@ describe('Icon', () => {
         }}
       />
     );
-    expect(el.html()).toBe(
-      `<i class="rmwc-icon rmwc-icon--className icon ion-ionic"></i>`
-    );
+    expect(el.html()).toBe(`<i class="rmwc-icon rmwc-icon--className icon ion-ionic"></i>`);
   });
 
   it('Errors when bad strategy is passed', () => {
@@ -124,8 +100,6 @@ describe('Icon', () => {
         }}
       />
     );
-    expect(el.html().replace(/<!--.+?-->/g, '')).toBe(
-      `<div>Customized-CUSTOM</div>`
-    );
+    expect(el.html().replace(/<!--.+?-->/g, '')).toBe(`<div>Customized-CUSTOM</div>`);
   });
 });

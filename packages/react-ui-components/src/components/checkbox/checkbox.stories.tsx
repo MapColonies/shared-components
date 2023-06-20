@@ -28,9 +28,7 @@ export const _CheckBox = () => {
       foundationRef={(ref) => console.log(ref)}
       onChange={(evt) => {
         setChecked(evt.currentTarget.checked);
-        action(
-          `onChange: ${evt.currentTarget.value} ${evt.currentTarget.checked}`
-        )();
+        action(`onChange: ${evt.currentTarget.value} ${evt.currentTarget.checked}`)();
       }}
       label={label}
     />

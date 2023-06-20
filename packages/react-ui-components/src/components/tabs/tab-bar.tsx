@@ -29,25 +29,12 @@ export interface TabBarProps {
 }
 
 export const TabBar = createComponent<TabBarProps>(function TabBar(props, ref) {
-  const {
-    children,
-    activeTabIndex,
-    onActivate,
-    foundationRef,
-    ...rest
-  } = props;
+  const { children, activeTabIndex, onActivate, foundationRef, ...rest } = props;
 
-  const {
-    rootEl,
-    handleTabInteraction,
-    setTabScrollerApi,
-    registerTab,
-    unregisterTab,
-  } = useTabBarFoundation(props);
+  const { rootEl, handleTabInteraction, setTabScrollerApi, registerTab, unregisterTab } = useTabBarFoundation(props);
 
   const contextApi = useRef<TabBarContextT>({
-    onTabInteraction: (evt: MDCTabInteractionEvent) =>
-      handleTabInteraction(evt),
+    onTabInteraction: (evt: MDCTabInteractionEvent) => handleTabInteraction(evt),
     registerTab,
     unregisterTab,
     indicatorTransition: props.indicatorTransition || 'slide',

@@ -36,10 +36,7 @@ export interface SliderProps {
   foundationRef?: React.Ref<MDCSliderFoundation>;
 }
 
-export type SliderHTMLProps = RMWC.HTMLProps<
-  HTMLDivElement,
-  Omit<React.AllHTMLAttributes<HTMLInputElement>, 'onChange' | 'onInput'>
->;
+export type SliderHTMLProps = RMWC.HTMLProps<HTMLDivElement, Omit<React.AllHTMLAttributes<HTMLInputElement>, 'onChange' | 'onInput'>>;
 
 const SliderTrack = React.memo(
   React.forwardRef(function SliderTrack(props: any, ref: React.Ref<any>) {
@@ -48,10 +45,7 @@ const SliderTrack = React.memo(
 );
 
 const SliderTrackMarkerContainer = React.memo(
-  React.forwardRef(function SliderTrackMarkerContainer(
-    props: any,
-    ref: React.Ref<any>
-  ) {
+  React.forwardRef(function SliderTrackMarkerContainer(props: any, ref: React.Ref<any>) {
     return <div ref={ref} className="mdc-slider__track-marker-container"></div>;
   })
 );
@@ -76,33 +70,13 @@ const SliderFocusRing = React.memo(function SliderFocusRing() {
   return <div className="mdc-slider__focus-ring" />;
 });
 
-export const Slider: RMWC.ComponentType<
-  SliderProps,
-  SliderHTMLProps,
-  'input'
-> = createComponent<SliderProps, SliderHTMLProps>(function Slider(props, ref) {
-  const {
-    rootEl,
-    thumbContainerEl,
-    sliderPinEl,
-    setTrackRef,
-    setTrackMarkerContainerRef,
-  } = useSliderFoundation(props);
+export const Slider: RMWC.ComponentType<SliderProps, SliderHTMLProps, 'input'> = createComponent<SliderProps, SliderHTMLProps>(function Slider(
+  props,
+  ref
+) {
+  const { rootEl, thumbContainerEl, sliderPinEl, setTrackRef, setTrackMarkerContainerRef } = useSliderFoundation(props);
 
-  const {
-    value,
-    min,
-    max,
-    discrete,
-    displayMarkers,
-    step,
-    disabled,
-    onChange,
-    onInput,
-    children,
-    foundationRef,
-    ...rest
-  } = props;
+  const { value, min, max, discrete, displayMarkers, step, disabled, onChange, onInput, children, foundationRef, ...rest } = props;
 
   const className = useClassNames(props, [
     'mdc-slider',
@@ -138,9 +112,7 @@ export const Slider: RMWC.ComponentType<
     >
       <div className="mdc-slider__track-container">
         <SliderTrack ref={setTrackRef} />
-        {displayMarkers && (
-          <SliderTrackMarkerContainer ref={setTrackMarkerContainerRef} />
-        )}
+        {displayMarkers && <SliderTrackMarkerContainer ref={setTrackMarkerContainerRef} />}
       </div>
       <Tag element={thumbContainerEl} className="mdc-slider__thumb-container">
         {discrete && <SliderPin value={sliderPinEl.getProp('value')} />}

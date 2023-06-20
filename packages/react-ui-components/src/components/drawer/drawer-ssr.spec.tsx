@@ -3,13 +3,7 @@
  */
 import React from 'react';
 import { renderToString as mount } from 'react-dom/server';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerSubtitle,
-} from './';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerSubtitle } from './';
 
 describe('Drawer SSR', () => {
   it('Drawer renders', () => {

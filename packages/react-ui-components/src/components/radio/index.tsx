@@ -11,44 +11,19 @@ import { useRadioFoundation } from './foundation';
  *********************************************************************/
 
 /** A Radio button component. */
-export interface RadioProps
-  extends RMWC.WithRippleProps,
-    ToggleableProps<MDCRadioFoundation> {}
+export interface RadioProps extends RMWC.WithRippleProps, ToggleableProps<MDCRadioFoundation> {}
 
 export type RadioHTMLProps = ToggleHTMLProps;
 
 /** A Radio button component. */
-export const Radio: RMWC.ComponentType<
-  RadioProps,
-  RadioHTMLProps,
-  'input'
-> = createComponent<RadioProps, RadioHTMLProps>(function Radio(props, ref) {
-  const { renderToggle, id, toggleRootProps, rootEl } = useRadioFoundation(
-    props
-  );
+export const Radio: RMWC.ComponentType<RadioProps, RadioHTMLProps, 'input'> = createComponent<RadioProps, RadioHTMLProps>(function Radio(props, ref) {
+  const { renderToggle, id, toggleRootProps, rootEl } = useRadioFoundation(props);
 
-  const {
-    children,
-    className,
-    label,
-    style,
-    inputRef,
-    foundationRef,
-    ...rest
-  } = props;
+  const { children, className, label, style, inputRef, foundationRef, ...rest } = props;
 
   const radio = (
-    <RadioRoot
-      {...rootEl.props(toggleRootProps)}
-      ref={mergeRefs(rootEl.setRef, ref)}
-    >
-      <input
-        {...rest}
-        className="mdc-radio__native-control"
-        type="radio"
-        id={id}
-        ref={inputRef}
-      />
+    <RadioRoot {...rootEl.props(toggleRootProps)} ref={mergeRefs(rootEl.setRef, ref)}>
+      <input {...rest} className="mdc-radio__native-control" type="radio" id={id} ref={inputRef} />
       <RadioBackground />
       <RadioRipple />
     </RadioRoot>
@@ -69,10 +44,7 @@ const RadioRoot = withRipple({
   surface: false,
   unbounded: true,
 })(
-  React.forwardRef<any, RadioProps & RMWC.HTMLProps>(function RadioRoot(
-    props,
-    ref
-  ) {
+  React.forwardRef<any, RadioProps & RMWC.HTMLProps>(function RadioRoot(props, ref) {
     const { disabled, ...rest } = props;
     const className = useClassNames(props, [
       'mdc-radio',

@@ -11,16 +11,12 @@ describe('Checkbox', () => {
 
   test('can be checked', () => {
     const checkbox = mount(<Checkbox checked={true} onChange={() => {}} />);
-    expect(
-      (checkbox.find('input').getDOMNode() as HTMLInputElement).checked
-    ).toEqual(true);
+    expect((checkbox.find('input').getDOMNode() as HTMLInputElement).checked).toEqual(true);
   });
 
   test('handles onChange', () => {
     let value = 0;
-    const checkbox = mount(
-      <Checkbox checked={true} onChange={() => value++} />
-    );
+    const checkbox = mount(<Checkbox checked={true} onChange={() => value++} />);
 
     checkbox.find('input').simulate('change');
     expect(value).toEqual(1);
@@ -28,16 +24,12 @@ describe('Checkbox', () => {
 
   test('can be disabled', () => {
     const checkbox = mount(<Checkbox disabled />);
-    expect(
-      (checkbox.find('input').getDOMNode() as HTMLInputElement).disabled
-    ).toEqual(true);
+    expect((checkbox.find('input').getDOMNode() as HTMLInputElement).disabled).toEqual(true);
   });
 
   test('can be indeterminate', () => {
     const checkbox = mount(<Checkbox indeterminate />);
-    expect(
-      (checkbox.find('input').getDOMNode() as HTMLInputElement).indeterminate
-    ).toEqual(true);
+    expect((checkbox.find('input').getDOMNode() as HTMLInputElement).indeterminate).toEqual(true);
   });
 
   test('can have a label', () => {

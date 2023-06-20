@@ -42,12 +42,8 @@ describe('TextField', () => {
 
     expect(el.contains('textHelpText')).toBe(true);
     expect(el2.contains('textHelpText')).toBe(true);
-    expect(
-      el2.html().includes('mdc-text-field-helper-text--validation-msg')
-    ).toBe(true);
-    expect(el2.html().includes('mdc-text-field-helper-text--persistent')).toBe(
-      true
-    );
+    expect(el2.html().includes('mdc-text-field-helper-text--validation-msg')).toBe(true);
+    expect(el2.html().includes('mdc-text-field-helper-text--persistent')).toBe(true);
   });
 
   it('can have custom classnames', () => {
@@ -58,36 +54,17 @@ describe('TextField', () => {
     );
 
     const html = el.html();
-    expect(
-      !!~html.search('mdc-text-field') && !!~html.search('my-custom-classname')
-    ).toEqual(true);
+    expect(!!~html.search('mdc-text-field') && !!~html.search('my-custom-classname')).toEqual(true);
   });
 
   it('can be bound', () => {
-    const el = mount(
-      <TextField
-        placeholder="test"
-        value="hello world"
-        onChange={(evt) => {}}
-      />
-    );
-    expect((el.find('input').getDOMNode() as HTMLInputElement).value).toBe(
-      'hello world'
-    );
+    const el = mount(<TextField placeholder="test" value="hello world" onChange={(evt) => {}} />);
+    expect((el.find('input').getDOMNode() as HTMLInputElement).value).toBe('hello world');
   });
 
   it('can be textarea', () => {
-    const el = mount(
-      <TextField
-        placeholder="test"
-        value="hello world"
-        textarea
-        onChange={(evt) => {}}
-      />
-    );
-    expect(
-      (el.find('textarea').getDOMNode() as HTMLTextAreaElement).value
-    ).toBe('hello world');
+    const el = mount(<TextField placeholder="test" value="hello world" textarea onChange={(evt) => {}} />);
+    expect((el.find('textarea').getDOMNode() as HTMLTextAreaElement).value).toBe('hello world');
   });
 
   it('can have custom classnames on input', () => {
@@ -109,8 +86,7 @@ describe('TextField', () => {
 
   it('can be required', async () => {
     const el = mount(<TextField value="" onChange={() => {}} required />);
-    const getValid = () =>
-      el.html().includes('mdc-text-field--invalid') === false;
+    const getValid = () => el.html().includes('mdc-text-field--invalid') === false;
 
     // should render valid to start
     expect(getValid()).toBe(true);

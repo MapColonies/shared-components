@@ -20,21 +20,13 @@ test('renders learn react link', (done) => {
 
 describe('Select', () => {
   it('renders', () => {
-    mount(
-      <Select
-        placeholder="Select a food"
-        options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }}
-      />
-    );
+    mount(<Select placeholder="Select a food" options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }} />);
   });
 
   it('helpText', () => {
     const el = mount(
       <div>
-        <Select
-          helpText="selectHelpText"
-          options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }}
-        />
+        <Select helpText="selectHelpText" options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }} />
       </div>
     );
 
@@ -53,21 +45,12 @@ describe('Select', () => {
 
     expect(el.contains('selectHelpText')).toBe(true);
     expect(el2.contains('selectHelpText')).toBe(true);
-    expect(el2.html().includes('mdc-select-helper-text--validation-msg')).toBe(
-      true
-    );
-    expect(el2.html().includes('mdc-select-helper-text--persistent')).toBe(
-      true
-    );
+    expect(el2.html().includes('mdc-select-helper-text--validation-msg')).toBe(true);
+    expect(el2.html().includes('mdc-select-helper-text--persistent')).toBe(true);
   });
 
   it('can have empty placeholder', () => {
-    const el = mount(
-      <Select
-        placeholder=""
-        options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }}
-      />
-    );
+    const el = mount(<Select placeholder="" options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }} />);
 
     // make sure the label is not floating
     expect(el.html().includes('mdc-select__label--float-above')).toBe(false);
@@ -129,16 +112,9 @@ describe('Select', () => {
   });
 
   it('can have custom classnames', () => {
-    const el = mount(
-      <Select
-        className={'my-custom-classname'}
-        options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }}
-      />
-    );
+    const el = mount(<Select className={'my-custom-classname'} options={{ 1: 'Cookies', 2: 'Pizza', 3: 'Icecream' }} />);
 
-    expect(
-      el.find('.mdc-select').first().hasClass('my-custom-classname')
-    ).toEqual(true);
+    expect(el.find('.mdc-select').first().hasClass('my-custom-classname')).toEqual(true);
   });
 
   // Problematic
@@ -149,8 +125,7 @@ describe('Select', () => {
 });
 
 describe('Select: Lifecycle', () => {
-  const getLabel = (el: ReactWrapper) =>
-    el.find('.mdc-select__selected-text').first().text().trim();
+  const getLabel = (el: ReactWrapper) => el.find('.mdc-select__selected-text').first().text().trim();
 
   it('SelectedText is blank with no value', () => {
     const el = mount(<Select options={['Cookies', 'Pizza', 'Icecream']} />);
@@ -158,73 +133,42 @@ describe('Select: Lifecycle', () => {
   });
 
   it('SelectedText is blank with no value, enhanced', () => {
-    const el = mount(
-      <Select enhanced options={['Cookies', 'Pizza', 'Icecream']} />
-    );
+    const el = mount(<Select enhanced options={['Cookies', 'Pizza', 'Icecream']} />);
     expect(getLabel(el)).toBe('');
   });
 
   it('SelectedText is blank with incorrect defaultValue', () => {
-    const el = mount(
-      <Select options={['Cookies', 'Pizza', 'Icecream']} defaultValue="Foo" />
-    );
+    const el = mount(<Select options={['Cookies', 'Pizza', 'Icecream']} defaultValue="Foo" />);
     expect(getLabel(el)).toBe('');
   });
 
   it('SelectedText is blank with incorrect defaultValue, enhanced', () => {
-    const el = mount(
-      <Select
-        enhanced
-        options={['Cookies', 'Pizza', 'Icecream']}
-        defaultValue="Foo"
-      />
-    );
+    const el = mount(<Select enhanced options={['Cookies', 'Pizza', 'Icecream']} defaultValue="Foo" />);
     expect(getLabel(el)).toBe('');
   });
 
   it('SelectedText is set to value', () => {
-    const el = mount(
-      <Select options={['Cookies', 'Pizza', 'Icecream']} value="Cookies" />
-    );
+    const el = mount(<Select options={['Cookies', 'Pizza', 'Icecream']} value="Cookies" />);
     expect(getLabel(el)).toBe('Cookies');
   });
 
   it('SelectedText is set to value, enhanced', () => {
-    const el = mount(
-      <Select
-        enhanced
-        options={['Cookies', 'Pizza', 'Icecream']}
-        value="Cookies"
-      />
-    );
+    const el = mount(<Select enhanced options={['Cookies', 'Pizza', 'Icecream']} value="Cookies" />);
     expect(getLabel(el)).toBe('Cookies');
   });
 
   it('SelectedText is set to default value', () => {
-    const el = mount(
-      <Select
-        options={['Cookies', 'Pizza', 'Icecream']}
-        defaultValue="Cookies"
-      />
-    );
+    const el = mount(<Select options={['Cookies', 'Pizza', 'Icecream']} defaultValue="Cookies" />);
     expect(getLabel(el)).toBe('Cookies');
   });
 
   it('SelectedText is set to default value, enhanced', () => {
-    const el = mount(
-      <Select
-        enhanced
-        options={['Cookies', 'Pizza', 'Icecream']}
-        defaultValue="Cookies"
-      />
-    );
+    const el = mount(<Select enhanced options={['Cookies', 'Pizza', 'Icecream']} defaultValue="Cookies" />);
     expect(getLabel(el)).toBe('Cookies');
   });
 
   it('SelectedText is set with async value', (done) => {
-    const el = mount(
-      <Select options={['Cookies', 'Pizza', 'Icecream']} value="" />
-    );
+    const el = mount(<Select options={['Cookies', 'Pizza', 'Icecream']} value="" />);
 
     setTimeout(() => {
       el.setProps({ value: 'Cookies' });
@@ -234,9 +178,7 @@ describe('Select: Lifecycle', () => {
   });
 
   it('SelectedText is set with async value, enhanced', (done) => {
-    const el = mount(
-      <Select enhanced options={['Cookies', 'Pizza', 'Icecream']} value="" />
-    );
+    const el = mount(<Select enhanced options={['Cookies', 'Pizza', 'Icecream']} value="" />);
 
     setTimeout(() => {
       el.setProps({ value: 'Cookies' });

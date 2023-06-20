@@ -5,15 +5,7 @@ import { useClassNames, Tag, createComponent } from '../../base';
 import { useMenuSurfaceFoundation } from './foundation';
 import { PortalChild, PortalPropT } from '../../base';
 
-export type AnchorT =
-  | 'bottomEnd'
-  | 'bottomLeft'
-  | 'bottomRight'
-  | 'bottomStart'
-  | 'topEnd'
-  | 'topLeft'
-  | 'topRight'
-  | 'topStart';
+export type AnchorT = 'bottomEnd' | 'bottomLeft' | 'bottomRight' | 'bottomStart' | 'topEnd' | 'topLeft' | 'topRight' | 'topStart';
 
 export type MenuSurfaceOnOpenEventT = RMWC.CustomEventT<{}>;
 export type MenuSurfaceOnCloseEventT = RMWC.CustomEventT<{}>;
@@ -52,39 +44,26 @@ export interface MenuSurfaceProps {
  ****************************************************************/
 
 /** A generic menu component for displaying any type of content. */
-export const MenuSurface = createComponent<MenuSurfaceProps>(
-  function MenuSurface(props, ref) {
-    const {
-      children,
-      open,
-      anchorCorner,
-      onOpen,
-      onClose,
-      renderToPortal,
-      fixed,
-      apiRef,
-      foundationRef,
-      ...rest
-    } = props;
+export const MenuSurface = createComponent<MenuSurfaceProps>(function MenuSurface(props, ref) {
+  const { children, open, anchorCorner, onOpen, onClose, renderToPortal, fixed, apiRef, foundationRef, ...rest } = props;
 
-    const { rootEl } = useMenuSurfaceFoundation(props);
+  const { rootEl } = useMenuSurfaceFoundation(props);
 
-    const className = useClassNames(props, [
-      'mdc-menu-surface',
-      {
-        'mdc-menu-surface--fixed': fixed,
-      },
-    ]);
+  const className = useClassNames(props, [
+    'mdc-menu-surface',
+    {
+      'mdc-menu-surface--fixed': fixed,
+    },
+  ]);
 
-    return (
-      <PortalChild renderTo={renderToPortal}>
-        <Tag {...rest} element={rootEl} className={className} ref={ref}>
-          {children}
-        </Tag>
-      </PortalChild>
-    );
-  }
-);
+  return (
+    <PortalChild renderTo={renderToPortal}>
+      <Tag {...rest} element={rootEl} className={className} ref={ref}>
+        {children}
+      </Tag>
+    </PortalChild>
+  );
+});
 
 /****************************************************************
  * MenuSurfaceAnchor
@@ -92,9 +71,7 @@ export const MenuSurface = createComponent<MenuSurfaceProps>(
 export interface MenuSurfaceAnchorProps {}
 
 /** A Menu Anchor. When using the anchorCorner prop of Menu, you must set MenuSurfaceAnchors css style position to absolute. */
-export const MenuSurfaceAnchor = createComponent<MenuSurfaceAnchorProps>(
-  function MenuSurfaceAnchor(props, ref) {
-    const className = useClassNames(props, ['mdc-menu-surface--anchor']);
-    return <Tag {...props} className={className} ref={ref} />;
-  }
-);
+export const MenuSurfaceAnchor = createComponent<MenuSurfaceAnchorProps>(function MenuSurfaceAnchor(props, ref) {
+  const className = useClassNames(props, ['mdc-menu-surface--anchor']);
+  return <Tag {...props} className={className} ref={ref} />;
+});

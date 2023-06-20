@@ -1,15 +1,7 @@
 import * as RMWC from '../types';
 import React from 'react';
 import { mount } from 'enzyme';
-import {
-  withTheme,
-  randomId,
-  wrapChild,
-  debounce,
-  toCamel,
-  toDashCase,
-  closest,
-} from './';
+import { withTheme, randomId, wrapChild, debounce, toCamel, toDashCase, closest } from './';
 import { FoundationElement } from './foundation-component';
 import { wait } from './utils/test-utils';
 
@@ -104,13 +96,7 @@ describe('FoundationElement', () => {
   it('FoundationElement: handles prop merging', async () => {
     let blueChangeCalled = false;
     let redChangeCalled = false;
-    const el = mount(
-      <div
-        className="blue"
-        style={{ background: 'blue' }}
-        onChange={() => (blueChangeCalled = true)}
-      />
-    );
+    const el = mount(<div className="blue" style={{ background: 'blue' }} onChange={() => (blueChangeCalled = true)} />);
     const inst = {
       root: new FoundationElement<any, any>(() => {}),
     };

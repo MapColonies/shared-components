@@ -1,0 +1,5 @@
+{
+    "parserOptions": { "project": ["./tsconfig.json"] },
+    "extends": ["@map-colonies/eslint-config/ts-base"],
+    "ignorePatterns": ["packages/react-ui-components/*/**", "vite.config.*", "commitlint.config.js"]
+}

@@ -2,16 +2,7 @@ import React from 'react';
 import { Select } from '../select';
 import { Switch } from '../switch';
 import { Checkbox } from '../checkbox';
-import {
-  DataTable,
-  DataTableBody,
-  DataTableContent,
-  DataTableCell,
-  DataTableHeadCell,
-  DataTableRow,
-  DataTableHead,
-  SimpleDataTable,
-} from '.';
+import { DataTable, DataTableBody, DataTableContent, DataTableCell, DataTableHeadCell, DataTableRow, DataTableHead, SimpleDataTable } from '.';
 
 export default {
   title: 'DataTable',
@@ -98,9 +89,7 @@ export const ControlledPropMutatingSort = () => {
 };
 
 export const WithFormControls = () => {
-  const [checked, setChecked] = React.useState<{ [index: number]: boolean }>(
-    {}
-  );
+  const [checked, setChecked] = React.useState<{ [index: number]: boolean }>({});
   const sampleRows = new Array(5).fill(undefined);
 
   return (
@@ -131,10 +120,7 @@ export const WithFormControls = () => {
               </DataTableCell>
               <DataTableCell>Label</DataTableCell>
               <DataTableCell>
-                <Select
-                  placeholder="--Select--"
-                  options={['Cookies', 'Pizza', 'Icecream']}
-                />
+                <Select placeholder="--Select--" options={['Cookies', 'Pizza', 'Icecream']} />
               </DataTableCell>
               <DataTableCell>R{i} C3</DataTableCell>
               <DataTableCell>
@@ -156,9 +142,7 @@ export const SimplifiedUsage = () => (
     getCellProps={(cell, index, isHead) => {
       const props = { isNumeric: index > 0, style: undefined };
 
-      return !isHead && index === 2 && !cell.includes('$')
-        ? { ...props, style: { color: 'red' } }
-        : props;
+      return !isHead && index === 2 && !cell.includes('$') ? { ...props, style: { color: 'red' } } : props;
     }}
     headers={[['Item', 'Quantity', 'Value']]}
     data={[

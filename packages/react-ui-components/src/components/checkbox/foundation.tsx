@@ -6,12 +6,8 @@ import { useFoundation } from '../base';
 import { MDCCheckboxFoundation } from '@material/checkbox';
 import React, { useEffect, useCallback } from 'react';
 
-export const useCheckboxFoundation = (
-  props: CheckboxProps & CheckboxHTMLProps
-) => {
-  const { renderToggle, toggleRootProps, id } = useToggleFoundation<
-    MDCCheckboxFoundation
-  >(props);
+export const useCheckboxFoundation = (props: CheckboxProps & CheckboxHTMLProps) => {
+  const { renderToggle, toggleRootProps, id } = useToggleFoundation<MDCCheckboxFoundation>(props);
 
   const { foundation, ...elements } = useFoundation({
     props,
@@ -23,18 +19,12 @@ export const useCheckboxFoundation = (
       return new MDCCheckboxFoundation({
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
-        setNativeControlAttr: (attr: string, value: any) =>
-          checkboxEl.setProp(attr as any, value),
-        removeNativeControlAttr: (attr: string) =>
-          checkboxEl.removeProp(attr as any),
+        setNativeControlAttr: (attr: string, value: any) => checkboxEl.setProp(attr as any, value),
+        removeNativeControlAttr: (attr: string) => checkboxEl.removeProp(attr as any),
         isIndeterminate: () => !!getProps().indeterminate,
-        isChecked: () =>
-          getProps().checked !== undefined
-            ? !!getProps().checked
-            : !!(checkboxEl.ref as HTMLInputElement)?.checked,
+        isChecked: () => (getProps().checked !== undefined ? !!getProps().checked : !!(checkboxEl.ref as HTMLInputElement)?.checked),
         hasNativeControl: () => !!checkboxEl.ref,
-        setNativeControlDisabled: (disabled: boolean) =>
-          checkboxEl.setProp('disabled', disabled),
+        setNativeControlDisabled: (disabled: boolean) => checkboxEl.setProp('disabled', disabled),
         forceLayout: () => rootEl.ref?.offsetWidth,
         isAttachedToDOM: () => true,
       });
@@ -46,9 +36,7 @@ export const useCheckboxFoundation = (
   // Handles syncing of indeterminate state
   const doSync = useCallback(() => {
     if (checkboxEl.ref) {
-      (checkboxEl.ref as HTMLInputElement).indeterminate = Boolean(
-        props.indeterminate
-      );
+      (checkboxEl.ref as HTMLInputElement).indeterminate = Boolean(props.indeterminate);
     }
     window.requestAnimationFrame(() => {
       foundation.handleChange();

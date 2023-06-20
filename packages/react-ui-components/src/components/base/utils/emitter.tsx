@@ -14,10 +14,7 @@ export class EventEmitter {
     this.events_ = this.events_ || {};
     if (event in this.events_ === false) return;
     for (var i = 0; i < this.events_[event].length; i++) {
-      this.events_[event][i].apply(
-        this,
-        Array.prototype.slice.call(arguments, 1)
-      );
+      this.events_[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
     }
   }
 }

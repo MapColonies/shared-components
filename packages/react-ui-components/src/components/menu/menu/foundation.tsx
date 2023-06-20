@@ -34,23 +34,18 @@ export const useMenuFoundation = (props: MenuProps & React.HTMLProps<any>) => {
     },
     foundation: ({ emit }) => {
       return new MDCMenuFoundation({
-        addClassToElementAtIndex: (...args) =>
-          listApi.current?.addClassToElementIndex(...args),
-        removeClassFromElementAtIndex: (...args) =>
-          listApi.current?.removeClassFromElementAtIndex(...args),
-        addAttributeToElementAtIndex: (...args) =>
-          listApi.current?.setAttributeForElementIndex(...args),
+        addClassToElementAtIndex: (...args) => listApi.current?.addClassToElementIndex(...args),
+        removeClassFromElementAtIndex: (...args) => listApi.current?.removeClassFromElementAtIndex(...args),
+        addAttributeToElementAtIndex: (...args) => listApi.current?.setAttributeForElementIndex(...args),
         removeAttributeFromElementAtIndex: (index: number, attr: string) => {
           const list = items();
           list[index].removeAttribute(attr);
         },
-        elementContainsClass: (element: HTMLElement, className: string) =>
-          element.classList.contains(className),
+        elementContainsClass: (element: HTMLElement, className: string) => element.classList.contains(className),
         closeSurface: () => {
           menuSurfaceApi.current?.setOpen(false);
         },
-        getElementIndex: (element: HTMLElement) =>
-          items().indexOf(element as HTMLLIElement),
+        getElementIndex: (element: HTMLElement) => items().indexOf(element as HTMLLIElement),
 
         notifySelected: (evtData: { index: number; item: HTMLElement }) =>
           emit('onSelect', {
@@ -58,8 +53,7 @@ export const useMenuFoundation = (props: MenuProps & React.HTMLProps<any>) => {
             item: items()[evtData.index],
           }),
         getMenuItemCount: () => listApi.current?.getListItemCount() || 0,
-        focusItemAtIndex: (...args) =>
-          listApi.current?.focusItemAtIndex(...args),
+        focusItemAtIndex: (...args) => listApi.current?.focusItemAtIndex(...args),
         focusListRoot: () => listApi.current?.focusRoot(),
       });
     },
@@ -86,12 +80,7 @@ export const useMenuFoundation = (props: MenuProps & React.HTMLProps<any>) => {
       // that we are selecting the list item
       // This is instead of trying to listen to an event on the list item
       // which is what MDC does
-      if (
-        evt.which === 13 &&
-        evt.target instanceof Element &&
-        listApi.current &&
-        evt.target.classList.contains(listApi.current.getClasses())
-      ) {
+      if (evt.which === 13 && evt.target instanceof Element && listApi.current && evt.target.classList.contains(listApi.current.getClasses())) {
         foundation.handleItemAction(evt.target);
       }
     },
@@ -102,11 +91,7 @@ export const useMenuFoundation = (props: MenuProps & React.HTMLProps<any>) => {
     (evt: MenuSurfaceOnOpenEventT) => {
       const list = items();
 
-      if (
-        (props.focusOnOpen || props.focusOnOpen === undefined) &&
-        list.length > 0 &&
-        !list.some((el) => el === document.activeElement)
-      ) {
+      if ((props.focusOnOpen || props.focusOnOpen === undefined) && list.length > 0 && !list.some((el) => el === document.activeElement)) {
         list[0].focus();
       }
       props.onOpen?.(evt);

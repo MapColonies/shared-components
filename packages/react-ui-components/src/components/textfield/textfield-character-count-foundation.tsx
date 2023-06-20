@@ -3,18 +3,12 @@ import { useFoundation } from '../base';
 import { TextFieldCharacterCountProps, TextFieldCharacterCountApi } from '.';
 import { MDCTextFieldCharacterCounterFoundation } from '@material/textfield';
 
-export const useTextFieldCharacterCountFoundation = (
-  props: TextFieldCharacterCountProps
-) => {
+export const useTextFieldCharacterCountFoundation = (props: TextFieldCharacterCountProps) => {
   const [content, setContent] = useState<string>();
 
   const { foundation, ...elements } = useFoundation({
     props,
-    api: ({
-      foundation,
-    }: {
-      foundation: MDCTextFieldCharacterCounterFoundation;
-    }): TextFieldCharacterCountApi => {
+    api: ({ foundation }: { foundation: MDCTextFieldCharacterCounterFoundation }): TextFieldCharacterCountApi => {
       return {
         getFoundation: () => foundation,
       };

@@ -6,16 +6,11 @@ import { useFoundation } from '../base';
 
 /** Monkey patch the foundation to accept dynamic reasons rather than just "action" */
 // @ts-ignore
-MDCSnackbarFoundation.prototype.handleActionButtonClick = function (
-  evt: any,
-  reason: string
-) {
+MDCSnackbarFoundation.prototype.handleActionButtonClick = function (evt: any, reason: string) {
   this.close(reason);
 };
 
-export function useSnackbarFoundation(
-  props: SnackbarProps & Omit<React.HTMLProps<any>, 'action'>
-) {
+export function useSnackbarFoundation(props: SnackbarProps & Omit<React.HTMLProps<any>, 'action'>) {
   const { foundation, ...elements } = useFoundation({
     props,
     elements: {
@@ -36,8 +31,7 @@ export function useSnackbarFoundation(
         notifyClosing: (reason: string) => {
           emit('onClose', reason ? { reason } : {});
         },
-        notifyClosed: (reason: string) =>
-          emit('onClosed', reason ? { reason } : {}),
+        notifyClosed: (reason: string) => emit('onClosed', reason ? { reason } : {}),
       });
     },
   });
@@ -58,10 +52,7 @@ export function useSnackbarFoundation(
         el = button;
       }
 
-      if (
-        props.dismissesOnAction &&
-        el.classList.contains('mdc-snackbar__action')
-      ) {
+      if (props.dismissesOnAction && el.classList.contains('mdc-snackbar__action')) {
         foundation.handleActionButtonClick(
           evt as MouseEvent,
           // @ts-ignore

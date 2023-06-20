@@ -21,9 +21,7 @@ export const _Switch = () => {
       foundationRef={(inst) => console.log(inst)}
       onChange={(evt) => {
         setChecked(evt.currentTarget.checked);
-        action(
-          `onChange: ${evt.currentTarget.value} ${evt.currentTarget.checked}`
-        )();
+        action(`onChange: ${evt.currentTarget.value} ${evt.currentTarget.checked}`)();
       }}
       label={label}
     />

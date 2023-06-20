@@ -3,14 +3,7 @@
  */
 import React from 'react';
 import { renderToString as mount } from 'react-dom/server';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogButton,
-  SimpleDialog,
-} from './';
+import { Dialog, DialogTitle, DialogContent, DialogActions, DialogButton, SimpleDialog } from './';
 
 describe('Dialog', () => {
   it('simple Dialog renders', () => {

@@ -54,13 +54,7 @@ describe('Chip', () => {
     let onInteraction = 0;
     let onRemove = 0;
 
-    const el = mount(
-      <Chip
-        trailingIcon="close"
-        onTrailingIconInteraction={() => onInteraction++}
-        onRemove={() => onRemove++}
-      />
-    );
+    const el = mount(<Chip trailingIcon="close" onTrailingIconInteraction={() => onInteraction++} onRemove={() => onRemove++} />);
     el.find('.mdc-chip__icon--trailing').first().simulate('click');
 
     expect(onInteraction).toEqual(1);

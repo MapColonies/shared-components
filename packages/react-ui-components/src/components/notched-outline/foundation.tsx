@@ -3,9 +3,7 @@ import { NotchedOutlineProps } from '.';
 import { useFoundation } from '../base';
 import { MDCNotchedOutlineFoundation } from '@material/notched-outline';
 
-export const useNotchedOutlineFoundation = (
-  props: NotchedOutlineProps & React.HTMLProps<any>
-) => {
+export const useNotchedOutlineFoundation = (props: NotchedOutlineProps & React.HTMLProps<any>) => {
   const { foundation, ...elements } = useFoundation({
     props,
     elements: {
@@ -16,8 +14,7 @@ export const useNotchedOutlineFoundation = (
       return new MDCNotchedOutlineFoundation({
         addClass: (className: string) => rootEl.addClass(className),
         removeClass: (className: string) => rootEl.removeClass(className),
-        setNotchWidthProperty: (width: number) =>
-          notchedEl.setStyle('width', width + 'px'),
+        setNotchWidthProperty: (width: number) => notchedEl.setStyle('width', width + 'px'),
         removeNotchWidthProperty: () => notchedEl.setStyle('width', ''),
       });
     },
@@ -31,8 +28,7 @@ export const useNotchedOutlineFoundation = (
   }, [props.notch, foundation]);
 
   useEffect(() => {
-    labelRef.current = (rootEl.ref?.querySelector('.mdc-floating-label') ||
-      undefined) as HTMLLabelElement | undefined;
+    labelRef.current = (rootEl.ref?.querySelector('.mdc-floating-label') || undefined) as HTMLLabelElement | undefined;
     const label = labelRef.current;
 
     if (label) {

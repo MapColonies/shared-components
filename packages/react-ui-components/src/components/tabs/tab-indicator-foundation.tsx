@@ -19,10 +19,7 @@ export const useTabIndicatorFoundation = (props: TabIndicatorProps) => {
         removeClass: (className: string) => {
           rootEl.removeClass(className);
         },
-        computeContentClientRect: () =>
-          contentEl.ref
-            ? contentEl.ref.getBoundingClientRect()
-            : emptyClientRect,
+        computeContentClientRect: () => (contentEl.ref ? contentEl.ref.getBoundingClientRect() : emptyClientRect),
         setContentStyleProperty: (prop: string, value: string) => {
           contentEl.setStyle(prop, value);
         },
@@ -34,11 +31,7 @@ export const useTabIndicatorFoundation = (props: TabIndicatorProps) => {
 
       return new MDCSlidingTabIndicatorFoundation(adapter);
     },
-    api: ({
-      foundation,
-    }: {
-      foundation: MDCTabIndicatorFoundation;
-    }): TabIndicatorApi => {
+    api: ({ foundation }: { foundation: MDCTabIndicatorFoundation }): TabIndicatorApi => {
       return {
         activate: (previousIndicatorClientRect?: ClientRect) => {
           foundation.activate(previousIndicatorClientRect);

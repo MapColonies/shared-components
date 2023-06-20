@@ -3,12 +3,7 @@ import React from 'react';
 
 import { MDCTabFoundation } from '@material/tab';
 
-import {
-  useClassNames,
-  Tag,
-  FoundationElement,
-  createComponent,
-} from '../base';
+import { useClassNames, Tag, FoundationElement, createComponent } from '../base';
 import { IconProps, Icon } from '../icon';
 import { withRipple, RippleSurface } from '../ripple';
 
@@ -79,30 +74,13 @@ const TabIcon = React.memo(function TabIcon(props: IconProps & RMWC.HTMLProps) {
 
 /** A Tab component */
 export const Tab = createComponent<TabProps>(function Tab(props, ref) {
-  const {
-    children,
-    label,
-    icon,
-    stacked,
-    restrictIndicator,
-    onInteraction,
-    iconIndicator,
-    foundationRef,
-    focusOnActivate,
-    ...rest
-  } = props;
+  const { children, label, icon, stacked, restrictIndicator, onInteraction, iconIndicator, foundationRef, focusOnActivate, ...rest } = props;
 
   const { rootEl, contentEl, setTabIndicatorApi } = useTabFoundation(props);
 
   const contextApi = React.useContext(TabBarContext);
 
-  const tabIndicator = (
-    <TabIndicator
-      apiRef={setTabIndicatorApi}
-      transition={contextApi.indicatorTransition}
-      icon={iconIndicator}
-    />
-  );
+  const tabIndicator = <TabIndicator apiRef={setTabIndicatorApi} transition={contextApi.indicatorTransition} icon={iconIndicator} />;
 
   return (
     <TabRoot element={rootEl} stacked={stacked} {...rest} ref={ref}>
