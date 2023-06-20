@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render } from '@testing-library/react';
 import {
   Card,
   CardPrimaryAction,
@@ -14,7 +14,7 @@ import {
 
 describe('Card', () => {
   it('renders', () => {
-    mount(
+    const { asFragment } = render(
       <Card style={{ width: '21rem' }}>
         <CardPrimaryAction>
           <CardMedia sixteenByNine />
@@ -39,13 +39,14 @@ describe('Card', () => {
         </CardActions>
       </Card>
     );
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('can have custom classes', () => {
     [Card, CardMedia, CardMediaContent, CardActionButtons, CardActionIcons, CardActions, CardActionButton, CardActionIcon, CardPrimaryAction].forEach(
       (Component: any) => {
-        const el = mount(<Component className={'my-custom-classname'} />);
-        expect(!!~el.html().search('my-custom-classname')).toEqual(true);
+        const { container } = render(<Component className={'my-custom-classname'} />);
+        expect(container.firstChild).toHaveClass('my-custom-classname');
       }
     );
   });

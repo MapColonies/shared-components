@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import { RippleProps } from './';
-import { useFoundation, emptyClientRect } from '../base';
-import { matches, applyPassive } from '../base';
+import { useFoundation, emptyClientRect } from '@rmwc/base';
+import { matches } from '@rmwc/base';
 import { EventType, SpecificEventListener } from '@material/base/types';
 
 import { MDCRippleFoundation, util } from '@material/ripple';
@@ -38,9 +38,11 @@ export const useRippleFoundation = (props: RippleProps & React.HTMLProps<any> & 
         registerInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {},
         deregisterInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void => {},
         registerDocumentInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>): void =>
-          document.documentElement.addEventListener(evtType, handler, applyPassive()),
+          document.documentElement.addEventListener(evtType, handler, {
+            passive: true,
+          }),
         deregisterDocumentInteractionHandler: <K extends EventType>(evtType: K, handler: SpecificEventListener<K>) =>
-          document.documentElement.removeEventListener(evtType, handler, applyPassive() as any),
+          document.documentElement.removeEventListener(evtType, handler),
         registerResizeHandler: (handler: SpecificEventListener<'resize'>): void => window.addEventListener('resize', handler),
         deregisterResizeHandler: (handler: SpecificEventListener<'resize'>): void => window.removeEventListener('resize', handler),
         updateCssVariable: (varName: string, value: string) => surfaceEl.setStyle(varName, value),
@@ -73,73 +75,81 @@ export const useRippleFoundation = (props: RippleProps & React.HTMLProps<any> & 
     [foundation]
   );
 
+  const { onFocus } = props;
   const handleFocus = useCallback(
     (evt: React.FocusEvent<HTMLElement>) => {
-      props.onFocus?.(evt);
+      onFocus?.(evt);
       foundation.handleFocus();
     },
-    [foundation, props.onFocus]
+    [foundation, onFocus]
   );
 
+  const { onBlur } = props;
   const handleBlur = useCallback(
     (evt: React.FocusEvent<HTMLElement>) => {
-      props.onBlur?.(evt);
+      onBlur?.(evt);
       foundation.handleBlur();
     },
-    [foundation, props.onBlur]
+    [foundation, onBlur]
   );
 
+  const { onMouseDown } = props;
   const handleMouseDown = useCallback(
     (evt: React.MouseEvent<HTMLElement> & MouseEvent) => {
-      props.onMouseDown?.(evt);
+      onMouseDown?.(evt);
       if (!isTouched.current) {
         activateRipple(evt);
       }
 
       isTouched.current = false;
     },
-    [props.onMouseDown, activateRipple]
+    [onMouseDown, activateRipple]
   );
 
+  const { onMouseUp } = props;
   const handleMouseUp = useCallback(
     (evt: React.MouseEvent<HTMLElement>) => {
-      props.onMouseUp?.(evt);
+      onMouseUp?.(evt);
       deactivateRipple(evt);
     },
-    [props.onMouseUp, deactivateRipple]
+    [onMouseUp, deactivateRipple]
   );
 
+  const { onTouchStart } = props;
   const handleTouchStart = useCallback(
     (evt: React.TouchEvent<HTMLElement> & TouchEvent) => {
       isTouched.current = true;
-      props.onTouchStart?.(evt);
+      onTouchStart?.(evt);
       activateRipple(evt);
     },
-    [props.onTouchStart, activateRipple]
+    [onTouchStart, activateRipple]
   );
 
+  const { onTouchEnd } = props;
   const handleTouchEnd = useCallback(
     (evt: React.TouchEvent<HTMLElement>) => {
-      props.onTouchEnd?.(evt);
+      onTouchEnd?.(evt);
       deactivateRipple(evt);
     },
-    [props.onTouchEnd, deactivateRipple]
+    [onTouchEnd, deactivateRipple]
   );
 
+  const { onKeyDown } = props;
   const handleKeyDown = useCallback(
     (evt: React.KeyboardEvent<HTMLElement> & KeyboardEvent) => {
-      props.onKeyDown?.(evt);
+      onKeyDown?.(evt);
       activateRipple(evt);
     },
-    [props.onKeyDown, activateRipple]
+    [onKeyDown, activateRipple]
   );
 
+  const { onKeyUp } = props;
   const handleKeyUp = useCallback(
     (evt: React.KeyboardEvent<HTMLElement>) => {
-      props.onKeyUp?.(evt);
+      onKeyUp?.(evt);
       deactivateRipple(evt);
     },
-    [props.onKeyUp, deactivateRipple]
+    [onKeyUp, deactivateRipple]
   );
 
   rootEl.setProp('onFocus', handleFocus, true);

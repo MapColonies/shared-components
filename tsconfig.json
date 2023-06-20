@@ -25,6 +25,6 @@
   "filesGlob": [
     "**/*.ts"
   ],
-  "include": ["packages", "vite.config.ts"],
+  "include": ["packages/react-components", "packages/react-ui-components", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

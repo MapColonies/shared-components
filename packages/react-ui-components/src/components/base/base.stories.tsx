@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem, ListItemGraphic } from '../list';
+import { ListItem, ListItemGraphic } from '@rmwc/list';
 
 export default {
   title: 'Base',

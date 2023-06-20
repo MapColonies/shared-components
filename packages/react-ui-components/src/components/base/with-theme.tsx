@@ -1,4 +1,4 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
 import classNames from 'classnames';

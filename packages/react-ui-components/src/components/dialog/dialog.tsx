@@ -1,10 +1,10 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
 import { MDCDialogFoundation } from '@material/dialog';
 
-import { useClassNames, Tag, createComponent, PortalPropT, PortalChild } from '../base';
-import { Button, ButtonProps } from '../button';
+import { useClassNames, Tag, createComponent, PortalPropT, PortalChild } from '@rmwc/base';
+import { Button, ButtonProps } from '@rmwc/button';
 import { useDialogFoundation } from './foundation';
 
 /*********************************************************************

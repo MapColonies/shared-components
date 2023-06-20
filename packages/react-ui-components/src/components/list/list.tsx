@@ -1,7 +1,7 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { MDCListFoundation } from '@material/list';
-import { Tag, useClassNames, createComponent } from '../base';
+import { Tag, useClassNames, createComponent } from '@rmwc/base';
 import { useListFoundation } from './foundation';
 
 export type ListOnActionEventT = RMWC.CustomEventT<{ index: number }>;
@@ -39,11 +39,16 @@ export interface ListApi {
   setAttributeForElementIndex: (index: number, attr: string, value: any) => void;
   getListItemCount: () => number;
   focusItemAtIndex: (index: number) => void;
+  selectedIndex: number | number[];
+  setSelectedIndex: (index: number) => void;
 }
 
 export const List = createComponent<ListProps>(function List(props, ref) {
-  const { dense, twoLine, avatarList, apiRef, nonInteractive, onAction, foundationRef, ...rest } = props;
-  const { rootEl } = useListFoundation(props);
+  const { dense, twoLine, avatarList, apiRef, nonInteractive, onAction, foundationRef, wrapFocus, ...rest } = props;
+  const { rootEl } = useListFoundation({
+    ...props,
+    wrapFocus,
+  });
   const className = useClassNames(props, [
     'mdc-list',
     {

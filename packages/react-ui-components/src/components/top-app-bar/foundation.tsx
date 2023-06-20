@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { TopAppBarProps } from '.';
-import { useFoundation } from '../base';
+import { useFoundation } from '@rmwc/base';
 
 import { MDCTopAppBarFoundation, MDCFixedTopAppBarFoundation, MDCShortTopAppBarFoundation, MDCTopAppBarAdapter } from '@material/top-app-bar';
 
@@ -72,9 +72,9 @@ export const useTopAppBarFoundation = (props: TopAppBarProps & React.HTMLProps<a
   // Reinit them after mount
   useEffect(() => {
     // @ts-ignore
-    foundation.lastScrollPosition_ = foundation.adapter_.getViewportScrollY();
+    foundation.lastScrollPosition_ = foundation.adapter.getViewportScrollY();
     // @ts-ignore
-    foundation.topAppBarHeight_ = foundation.adapter_.getTopAppBarHeight();
+    foundation.topAppBarHeight_ = foundation.adapter.getTopAppBarHeight();
   }, [foundation]);
 
   return { foundation, ...elements };

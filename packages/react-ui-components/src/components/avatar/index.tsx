@@ -1,8 +1,8 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { Icon, IconProps } from '../icon';
-import { withRipple } from '../ripple';
-import { useClassNames, Tag, createComponent, createMemoComponent } from '../base';
+import { Icon, IconProps } from '@rmwc/icon';
+import { withRipple } from '@rmwc/ripple';
+import { useClassNames, Tag, createComponent, createMemoComponent } from '@rmwc/base';
 
 /** An Avatar component for displaying users in a system. */
 export interface AvatarProps extends RMWC.WithRippleProps {

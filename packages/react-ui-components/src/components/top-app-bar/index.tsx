@@ -1,8 +1,8 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { MDCTopAppBarFoundation } from '@material/top-app-bar';
-import { useClassNames, Tag, createComponent } from '../base';
-import { IconButton, IconButtonProps } from '../icon-button';
+import { useClassNames, Tag, createComponent } from '@rmwc/base';
+import { IconButton, IconButtonProps } from '@rmwc/icon-button';
 import { useTopAppBarFoundation } from './foundation';
 
 /*********************************************************************

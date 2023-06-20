@@ -1,3 +1,3 @@
 import '@material/card/dist/mdc.card.css';
-import '../button/styles';
-import '../icon-button/styles';
+import '@rmwc/button/styles';
+import '@rmwc/icon-button/styles';

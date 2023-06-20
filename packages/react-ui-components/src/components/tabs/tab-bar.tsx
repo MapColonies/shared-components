@@ -1,7 +1,7 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React, { useRef } from 'react';
 
-import { Tag, useClassNames, createComponent } from '../base';
+import { Tag, useClassNames, createComponent } from '@rmwc/base';
 
 import { MDCTabBarFoundation } from '@material/tab-bar';
 import { MDCTabInteractionEvent } from '@material/tab';

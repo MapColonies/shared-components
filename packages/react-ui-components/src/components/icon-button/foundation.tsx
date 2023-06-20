@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useFoundation } from '../base';
+import { useFoundation } from '@rmwc/base';
 import { MDCIconButtonToggleFoundation } from '@material/icon-button';
 import { IconButtonProps } from '.';
 

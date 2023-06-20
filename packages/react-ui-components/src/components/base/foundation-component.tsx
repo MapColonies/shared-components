@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
-// import { SpecificEventListener } from '@material/base/types';
+import * as RMWC from '@rmwc/types';
+import { SpecificEventListener } from '@material/base/types';
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import { eventsMap } from './utils/events-map';
@@ -146,7 +146,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
   /**************************************************
    * Events
    **************************************************/
-  addEventListener(evtName: string, callback: any /*SpecificEventListener<any>*/) {
+  addEventListener(evtName: string, callback: SpecificEventListener<any>) {
     const propName = reactPropFromEventName(evtName);
     if (this._events[propName] !== callback) {
       this._events[propName] = callback;
@@ -154,7 +154,7 @@ export class FoundationElement<Props extends {}, ElementType = HTMLElement> {
     }
   }
 
-  removeEventListener(evtName: string, callback: any /*SpecificEventListener<any>*/) {
+  removeEventListener(evtName: string, callback: SpecificEventListener<any>) {
     const propName = reactPropFromEventName(evtName);
     if (this._events[propName]) {
       delete this._events[propName];

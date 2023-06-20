@@ -72,7 +72,9 @@ body .mdc-list-divider {
  * Select
  ****************************************************************/
 /** Correct color of focused label */
-body .mdc-select:not(.mdc-select--disabled):not(.mdc-select--invalid).mdc-select--focused .mdc-floating-label {
+body
+  .mdc-select:not(.mdc-select--disabled):not(.mdc-select--invalid).mdc-select--focused
+  .mdc-floating-label {
   color: var(--mdc-theme-primary);
 }
 
@@ -80,7 +82,9 @@ body .mdc-select:not(.mdc-select--disabled):not(.mdc-select--invalid).mdc-select
  * Textfield
  ****************************************************************/
 /** Correct color of focused label */
-body .mdc-text-field:not(.mdc-text-field--disabled):not(.mdc-text-field--invalid).mdc-text-field--focused .mdc-floating-label {
+body
+  .mdc-text-field:not(.mdc-text-field--disabled):not(.mdc-text-field--invalid).mdc-text-field--focused
+  .mdc-floating-label {
   color: var(--mdc-theme-primary);
 }
 

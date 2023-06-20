@@ -1,5 +1,5 @@
 import { MDCDialogFoundation } from '@material/dialog';
-import { closest, matches, useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '../base';
+import { closest, matches, useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '@rmwc/base';
 import { DialogProps } from '.';
 import React, { useRef, useEffect, useMemo } from 'react';
 
@@ -76,7 +76,7 @@ export const useDialogFoundation = (props: DialogProps & React.HTMLProps<any>) =
     // Wrap the callback in a function that can
     // short circuit the escape key if we are preventing outside dismiss
     return (evt: KeyboardEvent) => {
-      if (evt.which === 27 && props.preventOutsideDismiss) return;
+      if (evt.key === 'Escape' && props.preventOutsideDismiss) return;
       return bound(evt);
     };
   }, [foundation, props.preventOutsideDismiss]);
@@ -118,6 +118,9 @@ export const useDialogFoundation = (props: DialogProps & React.HTMLProps<any>) =
         foundation.close();
       }
     }
+    return () => {
+      document.removeEventListener('keydown', handleDocumentKeydown);
+    };
   }, [props.open, foundation, handleDocumentKeydown]);
 
   const handleClick = (evt: React.MouseEvent & MouseEvent) => {

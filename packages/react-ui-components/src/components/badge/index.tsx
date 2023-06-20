@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { useClassNames, Tag, createComponent } from '../base';
+import { useClassNames, Tag, createComponent } from '@rmwc/base';
 
 /** A Badge component for indicating alerts or counts. */
 export interface BadgeProps {

@@ -1,17 +1,18 @@
-import * as RMWC from '../../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { MDCSelectFoundation } from '@material/select';
-import { useClassNames, useId, Tag, createComponent } from '../../base';
-import { FloatingLabel } from '../../floating-label';
-import { LineRipple } from '../../line-ripple';
+import { useClassNames, useId, Tag, createComponent } from '@rmwc/base';
+import { FloatingLabel } from '@rmwc/floating-label';
+import { LineRipple } from '@rmwc/line-ripple';
 
-import { NotchedOutline } from '../../notched-outline';
-import { Menu, MenuItem, MenuItems, MenuProps, MenuApi, MenuOnSelectEventT } from '../../menu';
-import { ListGroup, ListGroupSubheader, ListDivider } from '../../list';
-import { withRipple } from '../../ripple';
+import { NotchedOutline } from '@rmwc/notched-outline';
+import { Menu, MenuItem, MenuItems, MenuProps, MenuApi, MenuOnSelectEventT } from '@rmwc/menu';
+import { ListGroup, ListGroupSubheader, ListDivider } from '@rmwc/list';
+import { withRipple } from '@rmwc/ripple';
 
 import { useSelectFoundation } from './foundation';
 import { SelectIcon } from '../select-icon';
+import { Icon } from '@rmwc/icon';
 
 export interface FormattedOption extends Omit<React.AllHTMLAttributes<any>, 'label'> {
   label: React.ReactNode;
@@ -40,7 +41,7 @@ export interface SelectProps {
   /** Makes the Select required.  */
   required?: boolean;
   /** Renders a non native / enhanced dropdown */
-  enhanced?: boolean | MenuProps;
+  enhanced?: boolean | (MenuProps & { ref?: React.Ref<HTMLElement> });
   /** Props for the root element. By default, additional props spread to the native select element.  */
   rootProps?: Object;
   /** A reference to the native select element. Not applicable when `enhanced` is true. */
@@ -84,9 +85,14 @@ const createSelectOptions = (options: any): FormattedOption[] => {
   return options;
 };
 
-const SelectDropdownArrow = React.memo(function SelectDropdownArrow() {
-  return <i className="mdc-select__dropdown-icon" />;
-});
+const SelectDropdownArrow = () => {
+  return (
+    <span className="mdc-select__dropdown-icon">
+      <Icon className="mdc-select__dropdown-icon-inactive" icon="arrow_drop_down" />
+      <Icon className="mdc-select__dropdown-icon-active" icon="arrow_drop_up" />
+    </span>
+  );
+};
 
 function NativeMenu(
   props: {
@@ -98,7 +104,7 @@ function NativeMenu(
     defaultValue?: any;
   } & React.HTMLProps<HTMLSelectElement>
 ) {
-  const { selectOptions, placeholder = '', children, elementRef, ...rest } = props;
+  const { selectOptions, placeholder = '', children, elementRef, open, ...rest } = props;
 
   const renderOption = ({ label, option, index }: { label: React.ReactNode; option: FormattedOption; index: number }) => {
     return (
@@ -144,7 +150,7 @@ function NativeMenu(
   );
 }
 
-const SelectedTextEl = withRipple({ surface: false })(function (props: any) {
+const AnchorEl = withRipple({ surface: false })(function (props: any) {
   return <Tag {...props} />;
 });
 
@@ -158,10 +164,12 @@ interface EnhancedMenuProps extends MenuProps {
   children?: React.ReactNode;
 }
 
-function EnhancedMenu(props: EnhancedMenuProps & SelectHTMLProps) {
+const EnhancedMenu = React.forwardRef((props: EnhancedMenuProps & SelectHTMLProps, ref: React.Ref<HTMLElement>) => {
   const { selectOptions, menuApiRef, value, placeholder, children, selectedIndex, ...rest } = props;
 
   let currentIndex = 0;
+
+  const className = useClassNames(props, ['mdc-select__menu']);
 
   const renderOption = ({ label, option }: { label: React.ReactNode; option: FormattedOption }) => {
     currentIndex += 1;
@@ -170,19 +178,19 @@ function EnhancedMenu(props: EnhancedMenuProps & SelectHTMLProps) {
       <MenuItem
         key={`${label}-${option.value}`}
         activated={value !== undefined ? option.value === value : currentIndex - 1 === selectedIndex}
-        // {...option}
+        {...option}
         data-value={option.value}
       >
-        {label}
+        <span className="mdc-list-item__text">{label}</span>
       </MenuItem>
     );
   };
 
   return (
-    <Menu {...rest} apiRef={menuApiRef} className="mdc-select__menu" focusOnOpen>
+    <Menu {...rest} ref={ref} apiRef={menuApiRef} className={className} focusOnOpen>
       {!!props.placeholder && (
         <MenuItem selected={currentIndex - 1 === selectedIndex} data-value="" theme="textDisabledOnBackground">
-          {placeholder}
+          <span className="mdc-list-item__text">{placeholder}</span>
         </MenuItem>
       )}
 
@@ -202,7 +210,7 @@ function EnhancedMenu(props: EnhancedMenuProps & SelectHTMLProps) {
       {children}
     </Menu>
   );
-}
+});
 
 export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> = createComponent<SelectProps, SelectHTMLProps>(function Select(
   props,
@@ -232,7 +240,7 @@ export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> 
   const selectOptions = createSelectOptions(options);
   const {
     rootEl,
-    selectedTextEl,
+    anchorEl,
     notchWidth,
     menuOpen,
     selectedTextContent,
@@ -247,6 +255,7 @@ export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> 
     handleFocus,
     handleBlur,
     handleClick,
+    handleChange,
     handleKeydown,
     handleMenuClosed,
     handleMenuOpened,
@@ -259,6 +268,7 @@ export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> 
     'mdc-select',
     {
       'mdc-select--outlined': !!outlined,
+      'mdc-select--filled': !outlined,
       'mdc-select--required': !!props.required,
       'mdc-select--invalid': !!invalid,
       'mdc-select--with-leading-icon': !!icon,
@@ -290,32 +300,33 @@ export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> 
 
   return (
     <>
-      <Tag role="listbox" {...rootProps} element={rootEl} ref={ref} className={className}>
-        <div className="mdc-select__anchor">
+      <Tag {...rootProps} element={rootEl} ref={ref} className={className}>
+        <AnchorEl
+          className="mdc-select__anchor"
+          role="button"
+          aria-haspopup="listbox"
+          element={anchorEl}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onClick={handleClick}
+          onKeyDown={handleKeydown}
+          onChange={handleChange}
+          /** In the case of native selects, we don't want this to be be focusable */
+          tabIndex={enhanced ? undefined : -1}
+        >
           {!!icon && <SelectIcon apiRef={setLeadingIcon} icon={icon} />}
-          <SelectDropdownArrow />
-          <SelectedTextEl
-            className="mdc-select__selected-text"
-            role="button"
-            aria-haspopup="listbox"
-            element={selectedTextEl}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onClick={handleClick}
-            onKeyDown={handleKeydown}
-            /** In the case of native selects, we don't want this to be be focusable */
-            tabIndex={enhanced ? undefined : -1}
-          >
-            {selectedTextContent || <>&nbsp;</>}
-          </SelectedTextEl>
           {outlined ? (
             <NotchedOutline notch={notchWidth}>{renderedLabel}</NotchedOutline>
           ) : (
             <>
-              {renderedLabel}
               <LineRipple active={lineRippleActive} center={lineRippleCenter} />
+              {renderedLabel}
             </>
           )}
+          <span className="mdc-select__selected-text-container">
+            <span className="mdc-select__selected-text">{selectedTextContent}</span>
+          </span>
+          <SelectDropdownArrow />
           {!enhanced && (
             <NativeMenu
               {...rest}
@@ -326,16 +337,25 @@ export const Select: RMWC.ComponentType<SelectProps, SelectHTMLProps, 'select'> 
               selectOptions={selectOptions}
               elementRef={setNativeControl}
               onFocus={handleFocus}
-              onBlur={handleBlur}
-              onChange={(evt: React.ChangeEvent<HTMLSelectElement>) => handleMenuSelected(evt.currentTarget.selectedIndex)}
+              onBlur={(evt) => {
+                handleBlur(evt);
+                // As of material 7, there is a bug where classnames mdc-select--activated and mdc-select--focused
+                // isn't being removed on blur. Therefore we need to manually call handleMenuClosed onBlur, which
+                // takes care of removing the classnames.
+                handleMenuClosed();
+              }}
+              onChange={(evt: React.ChangeEvent<HTMLSelectElement>) => {
+                handleMenuSelected(evt.currentTarget.selectedIndex);
+              }}
             />
           )}
-        </div>
+        </AnchorEl>
 
         {enhanced && (
           <EnhancedMenu
             {...rest}
             {...enhancedMenuProps}
+            ref={ref}
             anchorCorner="bottomStart"
             defaultValue={defaultValue}
             placeholder={placeholder}

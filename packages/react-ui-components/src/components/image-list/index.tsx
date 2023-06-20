@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { Tag, useClassNames, createComponent } from '../base';
+import { Tag, useClassNames, createComponent } from '@rmwc/base';
 
 /** The root of the Image List. */
 export interface ImageListProps {

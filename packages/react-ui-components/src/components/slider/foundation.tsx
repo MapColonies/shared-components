@@ -1,9 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { SliderProps } from '.';
-import { useFoundation, emptyClientRect } from '../base';
+import { useFoundation, emptyClientRect } from '@rmwc/base';
 
 import { EventType, SpecificEventListener } from '@material/base/types';
-import { debounce } from '../base';
+import { debounce } from '@rmwc/base';
 
 import { MDCSliderFoundation } from '@material/slider';
 

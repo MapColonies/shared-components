@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { useFoundation } from '../base';
+import { useFoundation } from '@rmwc/base';
 import { EventType, SpecificEventListener } from '@material/base/types';
 import { MDCTextFieldFoundation } from '@material/textfield';
-import { TextFieldProps, TextFieldCharacterCountApi, TextFieldIconApi } from '.';
-import { FloatingLabelApi } from '../floating-label';
+import { TextFieldProps, TextFieldIconApi } from '.';
+import { FloatingLabelApi } from '@rmwc/floating-label';
+import { useTextFieldCharacterCountFoundation, TextFieldCharacterCountApi } from './textfield-character-count-foundation';
 
 export const useTextFieldFoundation = (props: TextFieldProps) => {
   const [lineRippleActive, setLineRippleActive] = useState(false);
@@ -13,7 +14,9 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
   const [floatLabel, setFloatlabel] = useState(false);
 
   const characterCounter = useRef<TextFieldCharacterCountApi | null>();
-  const setCharacterCounter = (api: TextFieldCharacterCountApi | null) => (characterCounter.current = api);
+  const setCharacterCounter = (api: TextFieldCharacterCountApi | null) => {
+    characterCounter.current = api;
+  };
 
   const leadingIcon = useRef<TextFieldIconApi | null>();
   const setLeadingIcon = (api: TextFieldIconApi | null) => (leadingIcon.current = api);
@@ -23,6 +26,10 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
 
   const floatingLabel = useRef<FloatingLabelApi | null>();
   const setFloatingLabel = (api: FloatingLabelApi | null) => (floatingLabel.current = api);
+
+  const { content: characterCountContent } = useTextFieldCharacterCountFoundation({
+    apiRef: props.characterCount ? setCharacterCounter : undefined,
+  });
 
   const { foundation, ...elements } = useFoundation({
     props,
@@ -142,7 +149,7 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
     if (props.floatLabel !== undefined) {
       foundation.notchOutline(props.floatLabel);
       // @ts-ignore unsafe adapter access
-      foundation.adapter_.floatLabel(props.floatLabel);
+      foundation.adapter.floatLabel(props.floatLabel);
     }
   }, [foundation, props.floatLabel]);
 
@@ -156,6 +163,7 @@ export const useTextFieldFoundation = (props: TextFieldProps) => {
     setLeadingIcon,
     setTrailingIcon,
     setFloatingLabel,
+    characterCountContent,
     ...elements,
   };
 };

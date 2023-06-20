@@ -1,8 +1,8 @@
-import * as RMWC from '../../types';
+import * as RMWC from '@rmwc/types';
 import React, { useEffect, useState } from 'react';
 import { MDCMenuFoundation } from '@material/menu';
-import { List, ListItem, ListItemProps, ListProps, ListApi } from '../../list';
-import { getDisplayName, classNames, useClassNames, createComponent } from '../../base';
+import { List, ListItem, ListItemProps, ListProps, ListApi } from '@rmwc/list';
+import { getDisplayName, classNames, useClassNames, createComponent } from '@rmwc/base';
 
 import { MenuSurface, MenuSurfaceAnchor, MenuSurfaceProps, MenuSurfaceOnCloseEventT, MenuSurfaceApi } from '../menu-surface';
 

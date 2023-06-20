@@ -81,7 +81,7 @@ export interface IconOptions {
   /** A base className for the icon namespace, i.e. material-icons. */
   basename?: string;
   /** A render function to use when using the 'custom' strategy. */
-  render?: (props: { content: IconElementT; className: string }) => React.ReactNode;
+  render?: (props: { content: IconElementT; className: string; ref?: React.Ref<any> }) => Exclude<React.ReactNode, React.ReactText>; // Don't allow string | number, those would be rendered as {null} anyway
   /** A size to render the icon  */
   size?: IconSizeT;
   /** Additional props */
@@ -106,7 +106,7 @@ export type ComponentProps<Props extends {}, ElementProps extends {}, Tag extend
       })
   );
 
-export type ComponentType<Props, ElementProps, Element extends React.ElementType<any>> = {
+export type ComponentType<Props extends {}, ElementProps extends {}, Element extends React.ElementType<any>> = {
   <Tag extends React.ElementType<any> = Element>(props: ComponentProps<Props, ElementProps, Tag>, ref: any): JSX.Element;
   displayName?: string;
 };

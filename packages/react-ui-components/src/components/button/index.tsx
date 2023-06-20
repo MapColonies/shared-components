@@ -1,9 +1,9 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
-import { withRipple } from '../ripple';
-import { Icon, IconProps } from '../icon';
-import { Tag, useClassNames, createComponent, createMemoComponent } from '../base';
+import { withRipple } from '@rmwc/ripple';
+import { Icon, IconProps } from '@rmwc/icon';
+import { Tag, useClassNames, createComponent, createMemoComponent } from '@rmwc/base';
 
 /*********************************************************************
  * Button

@@ -3,7 +3,7 @@ export type DeprecateT = {
 };
 
 export const deprecationWarning = (message: string) => {
-  if (process && process.env && process.env.NODE_ENV !== 'production') {
+  if (process && process.env && import.meta.env.NODE_ENV !== 'production') {
     console.warn(`RMWC Deprecation Warning: ${message}`);
   }
 };

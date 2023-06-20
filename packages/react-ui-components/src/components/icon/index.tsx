@@ -1,7 +1,7 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { useProviderContext } from '../provider';
-import { classNames, Tag, createComponent, getDisplayName } from '../base';
+import { useProviderContext } from '@rmwc/provider';
+import { classNames, Tag, createComponent, getDisplayName } from '@rmwc/base';
 
 /** An Icon component. Most of these options can be set once globally, read the documentation on Provider for more info. */
 export interface IconProps {
@@ -70,7 +70,7 @@ const renderComponent = ({ content, ...rest }: { content: React.ReactElement<any
 };
 
 const iconRenderMap: {
-  [key: string]: ((content: any, ...rest: any) => React.ReactNode) | undefined;
+  [key: string]: ((content: any, ...rest: any) => Exclude<React.ReactNode, 'ReactText'>) | undefined;
 } = {
   ligature: renderLigature,
   className: renderClassName,
@@ -126,8 +126,11 @@ export const Icon = createComponent<IconProps, IconHTMLProps>(function ({ icon, 
 
   const rendererFromMap = !!strategyToUse && iconRenderMap[strategyToUse];
 
-  // For some reason TS thinks the render method will return undefined...
-  const renderToUse: any = strategyToUse === 'custom' ? render || providerRender : rendererFromMap || null;
+  let renderToUse = rendererFromMap || null;
+
+  if (strategyToUse === 'custom') {
+    renderToUse = render || providerRender;
+  }
 
   if (!renderToUse) {
     console.error(`Icon: rendering not implemented for ${String(strategyToUse)}.`);
@@ -143,6 +146,10 @@ export const Icon = createComponent<IconProps, IconHTMLProps>(function ({ icon, 
       [`rmwc-icon--size-${size || ''}`]: !!size,
     }),
   });
+
+  if (!React.isValidElement<any>(rendered)) {
+    return null;
+  }
 
   const childDisplayName = getDisplayName(rendered.props.children);
 

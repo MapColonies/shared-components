@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { wrapChild, createComponent } from '../base';
-import { Tag, useClassNames } from '../base';
+import { wrapChild, createComponent } from '@rmwc/base';
+import { Tag, useClassNames } from '@rmwc/base';
 
 /** The Elevation Component */
 export interface ElevationProps {

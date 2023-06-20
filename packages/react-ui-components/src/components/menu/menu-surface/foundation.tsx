@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { useFoundation, closest, emptyClientRect, FoundationElement, raf } from '../../base';
+import { useFoundation, closest, emptyClientRect, FoundationElement, raf } from '@rmwc/base';
 import { MDCMenuSurfaceFoundation, util, MDCMenuDimensions, Corner, MDCMenuDistance } from '@material/menu-surface';
 import { MenuSurfaceProps, MenuSurfaceApi } from '.';
 
@@ -18,7 +18,10 @@ const ANCHOR_CORNER_MAP: {
 
 const getAnchorCornerFromProp = (anchorCorner: keyof typeof ANCHOR_CORNER_MAP) => MDCMenuSurfaceFoundation.Corner[ANCHOR_CORNER_MAP[anchorCorner]];
 
-export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLProps<any>) => {
+export const useMenuSurfaceFoundation = (
+  props: MenuSurfaceProps & React.HTMLProps<any>,
+  menuSurfaceWrapperRef: React.MutableRefObject<HTMLDivElement | null>
+) => {
   const [open, setOpen] = useState(props.open);
   const firstFocusableElementRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -30,9 +33,6 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
     elements: { rootEl: true },
     api: ({ foundation, rootEl }: { foundation: MDCMenuSurfaceFoundation; rootEl: FoundationElement<any, any> }): MenuSurfaceApi => {
       return {
-        hoistMenuToBody: () => {
-          // this is controlled by the renderToPortal prop
-        },
         setAnchorCorner: (corner: Corner) => foundation.setAnchorCorner(corner),
         setAnchorElement: (element: HTMLElement) => (anchorElementRef.current = element),
         setOpen: (open: boolean) => setOpen(open),
@@ -172,12 +172,13 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
 
   const { rootEl } = elements;
 
+  const { onKeyDown } = props;
   const handleKeydown = useCallback(
     (evt: React.KeyboardEvent & KeyboardEvent) => {
-      props.onKeyDown?.(evt);
+      onKeyDown?.(evt);
       foundation.handleKeydown(evt);
     },
-    [props.onKeyDown, foundation]
+    [onKeyDown, foundation]
   );
 
   rootEl.setProp('onKeyDown', handleKeydown, true);
@@ -189,13 +190,13 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
 
   // on mount
   useEffect(() => {
-    const el = rootEl.ref;
+    const el = menuSurfaceWrapperRef?.current || rootEl.ref;
 
     if (el) {
       const anchor = closest(el, `.${MDCMenuSurfaceFoundation.cssClasses.ANCHOR}`);
       anchor && (anchorElementRef.current = anchor);
     }
-  }, [rootEl.ref]);
+  }, [menuSurfaceWrapperRef, rootEl.ref]);
 
   // renderToPortal
   useEffect(() => {
@@ -205,7 +206,7 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
       try {
         // silence this, it blows up loudly occasionally
         // @ts-ignore unsafe private variable access
-        foundation.autoPosition_();
+        foundation.autoposition();
       } catch (err) {}
     };
 
@@ -214,7 +215,7 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
     const handler = props.renderToPortal ? autoPosition : () => {};
 
     raf(() => {
-      foundation.isOpen() && autoPosition();
+      foundation.isOpen();
     });
 
     // fix positioning on window resize when renderToPortal is true
@@ -231,9 +232,12 @@ export const useMenuSurfaceFoundation = (props: MenuSurfaceProps & React.HTMLPro
     if (anchorCorner !== undefined) {
       foundation.setAnchorCorner(anchorCorner);
       // @ts-ignore unsafe private variable reference
-      foundation.dimensions_ = foundation.adapter_.getInnerDimensions();
-      // @ts-ignore unsafe private variable reference
-      foundation.autoPosition_();
+      foundation.dimensions = foundation.adapter.getInnerDimensions();
+      try {
+        // silence this, it blows up loudly occasionally
+        // @ts-ignore unsafe private variable access
+        foundation.autoposition();
+      } catch (err) {}
     }
   }, [props.anchorCorner, foundation]);
 

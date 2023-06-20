@@ -1,7 +1,7 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { MDCModalDrawerFoundation, MDCDismissibleDrawerFoundation } from '@material/drawer';
-import { mergeRefs, Tag, useClassNames, createComponent } from '../base';
+import { mergeRefs, Tag, useClassNames, createComponent } from '@rmwc/base';
 import { useDismissableDrawerFoundation, useModalDrawerFoundation } from './foundation';
 
 /***************************************************************************************

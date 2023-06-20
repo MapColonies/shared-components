@@ -1,9 +1,9 @@
-import * as RMWC from '../../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { Corner, MDCMenuSurfaceFoundation } from '@material/menu-surface';
-import { useClassNames, Tag, createComponent } from '../../base';
+import { useClassNames, Tag, createComponent } from '@rmwc/base';
 import { useMenuSurfaceFoundation } from './foundation';
-import { PortalChild, PortalPropT } from '../../base';
+import { PortalChild, PortalPropT } from '@rmwc/base';
 
 export type AnchorT = 'bottomEnd' | 'bottomLeft' | 'bottomRight' | 'bottomStart' | 'topEnd' | 'topLeft' | 'topRight' | 'topStart';
 
@@ -11,7 +11,6 @@ export type MenuSurfaceOnOpenEventT = RMWC.CustomEventT<{}>;
 export type MenuSurfaceOnCloseEventT = RMWC.CustomEventT<{}>;
 
 export interface MenuSurfaceApi {
-  hoistMenuToBody: () => void;
   setAnchorCorner: (corner: Corner) => void;
   setAnchorElement: (element: HTMLElement) => void;
   setOpen: (open: boolean) => void;
@@ -47,7 +46,13 @@ export interface MenuSurfaceProps {
 export const MenuSurface = createComponent<MenuSurfaceProps>(function MenuSurface(props, ref) {
   const { children, open, anchorCorner, onOpen, onClose, renderToPortal, fixed, apiRef, foundationRef, ...rest } = props;
 
-  const { rootEl } = useMenuSurfaceFoundation(props);
+  // menuSurfaceDomPositionRef is used to position the menu when it's rendered
+  // into a portal. MenuSurfaceFoundation needs to crawl the dom parents
+  // of 'children' to find the MenuSurfaceAnchor, and when children is rendered
+  // in a portal it removes it from the dom hierarchy.
+  const menuSurfaceDomPositionRef = React.useRef<HTMLDivElement | null>(null);
+
+  const { rootEl } = useMenuSurfaceFoundation(props, menuSurfaceDomPositionRef);
 
   const className = useClassNames(props, [
     'mdc-menu-surface',
@@ -57,11 +62,13 @@ export const MenuSurface = createComponent<MenuSurfaceProps>(function MenuSurfac
   ]);
 
   return (
-    <PortalChild renderTo={renderToPortal}>
-      <Tag {...rest} element={rootEl} className={className} ref={ref}>
-        {children}
-      </Tag>
-    </PortalChild>
+    <>
+      <PortalChild renderTo={renderToPortal} menuSurfaceDomPositionRef={menuSurfaceDomPositionRef}>
+        <Tag {...rest} element={rootEl} className={className} ref={ref}>
+          {children}
+        </Tag>
+      </PortalChild>
+    </>
   );
 });
 

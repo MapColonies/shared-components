@@ -1,11 +1,11 @@
 import path from 'path';
-import { defineConfig } from 'vite';
+import { PluginOption, defineConfig, UserConfigExport } from 'vite';
 import pluginReact from '@vitejs/plugin-react';
 import eslintPlugin from 'vite-plugin-eslint';
 
 const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
-export const getBaseConfig = ({ plugins = [], lib }) =>
+export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalConfig = {} as UserConfigExport }) =>
   defineConfig({
     plugins: [
       pluginReact(),
@@ -27,4 +27,5 @@ export const getBaseConfig = ({ plugins = [], lib }) =>
         },
       },
     },
+    ...additionalConfig
   });

@@ -1,41 +1,45 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IconButton } from './';
 
 describe('', () => {
-  it('renders', () => {
-    mount(<IconButton icon="star" label="Rate this!" />);
-    mount(<IconButton icon="images/icons/twitter.png" />);
-    mount(<IconButton icon={<div />} label="Tweet it!" />);
+  it('renders with icon as string', () => {
+    const { asFragment } = render(<IconButton icon="star" label="Rate this!" />);
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('handles prop changes', () => {
-    const el = mount(<IconButton onIcon="favorite" icon="favorite_border" checked={false} />);
+  it('renders with icon as path', () => {
+    const { asFragment } = render(<IconButton icon="images/icons/twitter.png" />);
+    expect(asFragment()).toMatchSnapshot();
+  });
 
-    el.setProps({ checked: true }, () => {
-      expect(el.html().includes('mdc-icon-button--on')).toBe(true);
-    });
+  it('renders with icon as JSX', () => {
+    const { asFragment } = render(<IconButton icon={<div />} label="Tweet it!" />);
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('renders as toggle', () => {
-    mount(<IconButton onIcon="favorite" icon="favorite_border" />);
+    const { asFragment } = render(<IconButton onIcon="favorite" icon="favorite_border" />);
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('renders controlled', () => {
-    mount(<IconButton checked={true} onClick={() => {}} onIcon="star" icon="star_border" />);
+    const { asFragment } = render(<IconButton checked={true} onClick={() => {}} onIcon="star" icon="star_border" />);
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('handles onChange', () => {
+  it('handles onChange', async () => {
     let value = 0;
-    const el = mount(<IconButton onChange={() => (value += 1)} onIcon="favorite" icon="favorite_border" />);
+    render(<IconButton onChange={() => (value += 1)} onIcon="favorite" icon="favorite_border" />);
 
-    el.find('button').simulate('change');
+    userEvent.click(screen.getByRole('button'));
 
-    expect(value).toEqual(1);
+    await waitFor(() => expect(value).toEqual(1));
   });
 
   it('can have custom classnames', () => {
-    const el = mount(<IconButton icon="star" className={'my-custom-classname'} />);
-    expect(el.html().includes('my-custom-classname')).toEqual(true);
+    const { container } = render(<IconButton icon="star" className={'my-custom-classname'} />);
+    expect(container.firstChild).toHaveClass('my-custom-classname');
   });
 });

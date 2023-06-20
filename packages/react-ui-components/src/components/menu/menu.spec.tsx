@@ -1,10 +1,11 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MenuSurfaceAnchor, Menu, MenuSurface, MenuItem, SimpleMenu, SimpleMenuSurface } from './';
 
 describe('Menu', () => {
   it('renders', () => {
-    const el = mount(
+    const { asFragment } = render(
       <Menu open onClose={() => {}}>
         <MenuItem>Cookies</MenuItem>
         <MenuItem>Pizza</MenuItem>
@@ -12,14 +13,12 @@ describe('Menu', () => {
       </Menu>
     );
 
-    el.setProps({ open: false, anchorCorner: 'bottomRight' });
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('can be fixed', () => {
-    const el = mount(
+  it('can be fixed', async () => {
+    render(
       <MenuSurfaceAnchor>
-        <button>Test</button>
-
         <Menu open fixed>
           <MenuItem>Cookies</MenuItem>
           <MenuItem>Pizza</MenuItem>
@@ -28,21 +27,47 @@ describe('Menu', () => {
       </MenuSurfaceAnchor>
     );
 
-    expect(el.html().includes('mdc-menu-surface--fixed')).toBe(true);
+    expect(screen.getByRole('menu').parentElement).toHaveClass('mdc-menu-surface--fixed');
+  });
+
+  it('does not trigger action when disabled', async () => {
+    const onSelect = jest.fn();
+
+    render(
+      <MenuSurfaceAnchor>
+        <Menu open={true} onSelect={onSelect} onClose={jest.fn()}>
+          <MenuItem>Cookies</MenuItem>
+          <MenuItem disabled={true}>Pizza</MenuItem>
+          <MenuItem>Icecream</MenuItem>
+        </Menu>
+      </MenuSurfaceAnchor>
+    );
+
+    userEvent.click(screen.getByText('Cookies'));
+
+    await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(1));
+
+    userEvent.click(screen.getByText('Pizza'));
+
+    await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(1));
+
+    userEvent.click(screen.getByText('Icecream'));
+
+    await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(2));
   });
 
   it('dynamically updates aria-hidden based on whether or not the menu is open', () => {
-    let el = mount(<Menu open />);
+    const { container, rerender } = render(<Menu open />);
 
-    expect(el.find(MenuSurface).prop('aria-hidden')).toBe(false);
+    expect(container.firstChild).toHaveAttribute('aria-hidden', 'false');
 
-    el = mount(<Menu />);
+    rerender(<Menu />);
 
-    expect(el.find(MenuSurface).prop('aria-hidden')).toBe(true);
+    expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('MenuSurface renders', () => {
-    mount(
+    const { asFragment } = render(
       <MenuSurfaceAnchor>
         <button>Test</button>
 
@@ -53,12 +78,14 @@ describe('Menu', () => {
         </MenuSurface>
       </MenuSurfaceAnchor>
     );
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('SimpleMenu renders', (done) => {
+  it('SimpleMenu renders', async () => {
     let val = 0;
 
-    const el = mount(
+    const { asFragment } = render(
       <SimpleMenu handle={<button>Test</button>} open onClose={() => val++}>
         <MenuItem>Cookies</MenuItem>
         <MenuItem>Pizza</MenuItem>
@@ -66,18 +93,19 @@ describe('Menu', () => {
       </SimpleMenu>
     );
 
-    const item = el.find(MenuItem).first();
-    item.simulate('click');
-    setTimeout(() => {
+    userEvent.click(screen.getByText('Test'));
+
+    await waitFor(() => {
       expect(val).toBe(1);
-      done();
-    }, 300);
+    });
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('Menu Item can be nested', () => {
     let val = null;
 
-    const el = mount(
+    const { asFragment } = render(
       <SimpleMenu handle={<button>Test</button>} open onSelect={(evt) => (val = evt.detail.index)}>
         <MenuItem>
           <span>Cookies</span>
@@ -91,17 +119,18 @@ describe('Menu', () => {
       </SimpleMenu>
     );
 
-    const item = el.find(MenuItem).first();
-    item.simulate('click');
-    expect(val).toBe(val);
+    userEvent.click(screen.getByText('Test'));
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('SimpleMenuSurface renders', (done) => {
+  it('SimpleMenuSurface renders', async () => {
     let val = 0;
 
-    const el = mount(
+    const { asFragment } = render(
       <SimpleMenuSurface
         handle={<button onClick={() => {}}>Test</button>}
+        open
         onClose={() => {
           val++;
         }}
@@ -110,24 +139,17 @@ describe('Menu', () => {
       </SimpleMenuSurface>
     );
 
-    const button = el.find('button').first();
-    button.simulate('click');
+    userEvent.click(screen.getByText('Test'));
 
-    setTimeout(() => {
-      el.setProps({ anchorCorner: 'bottomRight' });
-      button.simulate('click');
+    await waitFor(() => expect(val).toBe(1));
 
-      setTimeout(() => {
-        expect(val).toBe(1);
-      }, 200);
-      done();
-    }, 200);
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('can have custom classnames', () => {
     [MenuSurfaceAnchor, Menu, MenuItem].forEach((Component: React.ComponentType<any>) => {
-      const el = mount(<Component className={'my-custom-classname'} />);
-      expect(!!~el.html().search('my-custom-classname')).toEqual(true);
+      const { container } = render(<Component className={'my-custom-classname'} />);
+      expect(container.firstChild).toHaveClass('my-custom-classname');
     });
   });
 });

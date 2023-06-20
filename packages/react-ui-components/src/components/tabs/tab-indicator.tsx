@@ -1,8 +1,8 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
-import { classNames, Tag } from '../base';
-import { Icon } from '../icon';
+import { classNames, Tag } from '@rmwc/base';
+import { Icon } from '@rmwc/icon';
 import { useTabIndicatorFoundation } from './tab-indicator-foundation';
 
 export interface TabIndicatorProps {

@@ -22,11 +22,16 @@
     "declaration": true,
     "declarationMap": true,
     "rootDir": "src/components",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "paths": {
+      "@doc-utils": ["./src/components/doc-utils"],
+      "@rmwc/*": ["./src/components/*"]
+    }
   },
   "include": [
     "src/components"
   ],
   "exclude": [
+    "node_modules", "dist", "storybook-static", "vite.config.ts"
   ]
 }

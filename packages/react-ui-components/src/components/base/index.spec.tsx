@@ -1,9 +1,12 @@
-import * as RMWC from '../types';
-import React from 'react';
-import { mount } from 'enzyme';
-import { withTheme, randomId, wrapChild, debounce, toCamel, toDashCase, closest } from './';
+import React, { useState } from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { withTheme, randomId, wrapChild, debounce, toCamel, toDashCase, closest, Portal } from './';
 import { FoundationElement } from './foundation-component';
 import { wait } from './utils/test-utils';
+import { Dialog, DialogContent } from '@rmwc/dialog';
+import userEvent from '@testing-library/user-event';
+import { Button } from '@rmwc/button';
+import { PortalContext, portalContextDefaultValues, PortalProvider } from './PortalContext';
 
 jest.spyOn(console, 'warn');
 
@@ -33,7 +36,7 @@ describe('FoundationElement', () => {
       root: new FoundationElement(() => {}),
     };
 
-    mount(<div ref={inst.root.setRef} />);
+    render(<div ref={inst.root.setRef} />);
 
     expect(inst.root.ref instanceof HTMLDivElement).toBe(true);
   });
@@ -96,7 +99,8 @@ describe('FoundationElement', () => {
   it('FoundationElement: handles prop merging', async () => {
     let blueChangeCalled = false;
     let redChangeCalled = false;
-    const el = mount(<div className="blue" style={{ background: 'blue' }} onChange={() => (blueChangeCalled = true)} />);
+    const el = <div className="blue" style={{ background: 'blue' }} onChange={() => (blueChangeCalled = true)} />;
+
     const inst = {
       root: new FoundationElement<any, any>(() => {}),
     };
@@ -104,11 +108,11 @@ describe('FoundationElement', () => {
     inst.root.addClass('red');
     inst.root.setStyle('color', 'red');
     inst.root.addEventListener('change', () => (redChangeCalled = true));
-    el.update();
 
     await wait(100);
-    const mergedProps = inst.root.props(el.props());
+    const mergedProps = inst.root.props(el.props);
     mergedProps.onChange();
+
     expect(mergedProps.className).toBe('blue red');
     expect(mergedProps.style).toEqual({ color: 'red', background: 'blue' });
     expect(blueChangeCalled).toBe(true);
@@ -119,10 +123,10 @@ describe('FoundationElement', () => {
 describe('Utils', () => {
   it('randomId', () => {
     // @ts-ignore
-    process.env.NODE_ENV = 'production';
+    import.meta.env.NODE_ENV = 'production';
     randomId();
     // @ts-ignore
-    process.env.NODE_ENV = 'test';
+    import.meta.env.NODE_ENV = 'test';
   });
 
   it('debounce', (done) => {
@@ -152,13 +156,24 @@ describe('Utils', () => {
       return wrapChild({ ...props, className: 'foo' });
     };
 
-    const el = mount(
+    const { container } = render(
       <Foo>
         <div className="child" />
       </Foo>
     );
 
-    expect(el.html().includes('foo child')).toBe(true);
+    expect(container).toMatchInlineSnapshot(`
+      <div>
+        <div
+          class="foo child"
+        >
+          <div
+            class="child"
+          />
+        </div>
+      </div>
+    `);
+    expect(container.firstChild).toHaveClass('foo child');
   });
 
   it('toCamel', () => {
@@ -173,23 +188,275 @@ describe('Utils', () => {
 describe('withTheme', () => {
   it('works with and without classnames', () => {
     const Component = withTheme(({ ...rest }) => <div {...rest} />);
-    const el = mount(<Component className="test" theme="primary" />);
-    expect(el.html().includes('test'));
+    const { container, rerender } = render(<Component className="test" theme="primary" />);
+    expect(container.firstChild).toHaveClass('test');
 
-    mount(<Component className="test" />);
-    expect(el.html().includes('test'));
+    rerender(<Component className="test" />);
+    expect(container.firstChild).toHaveClass('test');
   });
 
   it('works with arrays', () => {
     const Component = withTheme(({ ...rest }) => <div {...rest} />);
-    const el = mount(<Component theme={['primary']} />);
-    expect(el.html().includes('mdc-theme-primary'));
+    const { container } = render(<Component theme={['primary']} />);
+
+    expect(container.firstChild).toHaveClass('mdc-theme--primary');
   });
 
   it('handles deprecations', () => {
     const Component = withTheme(({ ...rest }) => <div {...rest} />);
-    // @ts-ignore
-    mount(<Component theme="primary foo" />);
-    mount(<Component theme="on-primary" />);
+
+    const { container: container1 } = render(<Component theme="primary foo" />);
+    const { container: container2 } = render(<Component theme="on-primary" />);
+    expect(container1).toMatchSnapshot();
+    expect(container1.firstChild).toHaveClass('mdc-theme--primary foo');
+
+    expect(container2).toMatchSnapshot();
+    expect(container2.firstChild).toHaveClass('mdc-theme--on-primary');
+  });
+});
+
+describe('Portal', () => {
+  it('renders', () => {
+    const { asFragment } = render(<Portal />);
+    expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('does not mount twice', async () => {
+    const Content = ({ value, inc }: { value: number; inc: () => void }) => {
+      React.useEffect(() => {
+        inc();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+
+      return <span>{`Opened ${value} times`}</span>;
+    };
+    const MyComp = () => {
+      const [open, setOpen] = React.useState(false);
+      const [counter, setCounter] = React.useState(0);
+
+      return (
+        <>
+          <Portal />
+          <Button onClick={() => setOpen(true)}>Open</Button>
+          <Dialog renderToPortal open={open} onClosed={() => setOpen(false)}>
+            <DialogContent>
+              <Content value={counter} inc={() => setCounter((c) => c + 1)} />
+            </DialogContent>
+          </Dialog>
+          )
+        </>
+      );
+    };
+    render(<MyComp />);
+    userEvent.click(screen.getByRole('button', { name: /open/i }));
+    expect(await screen.findByText('Opened 1 times')).toBeInTheDocument();
+  });
+
+  it('renders to portal when using PortalProvider and renderToPortal is true', () => {
+    const MyComp = () => {
+      const [open, setOpen] = useState(false);
+
+      return (
+        <PortalProvider>
+          <div data-testid="portal-sibling">
+            <Button data-testid="trigger-button" onClick={() => setOpen(true)}>
+              Open
+            </Button>
+            <Dialog renderToPortal={true} open={open} onClosed={() => setOpen(false)}>
+              <DialogContent>
+                <Button data-testid="dialog-content-button" />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Portal data-testid="rmwc-portal" />
+        </PortalProvider>
+      );
+    };
+
+    render(<MyComp />);
+    const portalSibling = screen.getByTestId('portal-sibling');
+    const portalElement = screen.getByTestId('rmwc-portal');
+    const dialogContentButton = screen.getByTestId('dialog-content-button');
+
+    expect(portalSibling).not.toContainElement(dialogContentButton);
+    expect(portalElement).toContainElement(dialogContentButton);
+  });
+
+  it('does not render to portal when using PortalProvider and renderToPortal is false', () => {
+    const MyComp = () => {
+      const [open, setOpen] = useState(false);
+
+      return (
+        <PortalProvider>
+          <div data-testid="portal-sibling">
+            <Button data-testid="trigger-button" onClick={() => setOpen(true)}>
+              Open
+            </Button>
+            <Dialog renderToPortal={false} open={open} onClosed={() => setOpen(false)}>
+              <DialogContent>
+                <Button data-testid="dialog-content-button" />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Portal data-testid="rmwc-portal" />
+        </PortalProvider>
+      );
+    };
+
+    render(<MyComp />);
+    const portalSibling = screen.getByTestId('portal-sibling');
+    const portalElement = screen.getByTestId('rmwc-portal');
+    const dialogContentButton = screen.getByTestId('dialog-content-button');
+
+    expect(portalSibling).toContainElement(dialogContentButton);
+    expect(portalElement).not.toContainElement(dialogContentButton);
+  });
+
+  it('renders to portal when not using PortalProvider and renderToPortal is true', () => {
+    const MyComp = () => {
+      const [open, setOpen] = useState(false);
+
+      return (
+        <>
+          <div data-testid="portal-sibling">
+            <Button data-testid="trigger-button" onClick={() => setOpen(true)}>
+              Open
+            </Button>
+            <Dialog renderToPortal={true} open={open} onClosed={() => setOpen(false)}>
+              <DialogContent>
+                <Button data-testid="dialog-content-button" />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Portal data-testid="rmwc-portal" />
+        </>
+      );
+    };
+
+    render(<MyComp />);
+    const portalSibling = screen.getByTestId('portal-sibling');
+    const portalElement = screen.getByTestId('rmwc-portal');
+    const dialogContentButton = screen.getByTestId('dialog-content-button');
+
+    expect(portalSibling).not.toContainElement(dialogContentButton);
+    expect(portalElement).toContainElement(dialogContentButton);
+  });
+
+  it('does not render to portal when not using PortalProvider and renderToPortal is false', () => {
+    const MyComp = () => {
+      const [open, setOpen] = useState(false);
+
+      return (
+        <>
+          <div data-testid="portal-sibling">
+            <Button data-testid="trigger-button" onClick={() => setOpen(true)}>
+              Open
+            </Button>
+            <Dialog renderToPortal={false} open={open} onClosed={() => setOpen(false)}>
+              <DialogContent>
+                <Button data-testid="dialog-content-button" />
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Portal data-testid="rmwc-portal" />
+        </>
+      );
+    };
+
+    render(<MyComp />);
+    const portalSibling = screen.getByTestId('portal-sibling');
+    const portalElement = screen.getByTestId('rmwc-portal');
+    const dialogContentButton = screen.getByTestId('dialog-content-button');
+
+    expect(portalSibling).toContainElement(dialogContentButton);
+    expect(portalElement).not.toContainElement(dialogContentButton);
+  });
+});
+
+describe('PortalProvider', () => {
+  it('renders without crashing', () => {
+    render(
+      <PortalProvider>
+        <div>Child element</div>
+      </PortalProvider>
+    );
+  });
+
+  it('renders its children', () => {
+    const { getByText } = render(
+      <PortalProvider>
+        <div>Child element</div>
+      </PortalProvider>
+    );
+
+    expect(getByText(/Child element/i)).toBeInTheDocument();
+  });
+
+  it('provides a default context value', () => {
+    const { container } = render(
+      <PortalProvider>
+        <PortalContext.Consumer>
+          {({ portalElement, setPortalElement }) => (
+            <div>
+              portalElement: {String(portalElement)}
+              setPortalElement: {String(setPortalElement)}
+            </div>
+          )}
+        </PortalContext.Consumer>
+      </PortalProvider>
+    );
+
+    expect(container.firstChild).toBeTruthy();
+    expect(container.firstChild).toHaveTextContent(`portalElement: ${String(portalContextDefaultValues.portalElement)}`);
+  });
+
+  it('sets the portalElement value correctly', () => {
+    const div = document.createElement('div');
+    const { getByText, container } = render(
+      <PortalProvider>
+        <PortalContext.Consumer>
+          {({ portalElement, setPortalElement }) => (
+            <div>
+              <button onClick={() => setPortalElement && setPortalElement(div)}>setPortalElement</button>
+              <div>portalElement: {JSON.stringify(portalElement)}</div>
+            </div>
+          )}
+        </PortalContext.Consumer>
+      </PortalProvider>
+    );
+
+    const button = getByText(/setPortalElement/i);
+    fireEvent.click(button);
+
+    expect(container).toHaveTextContent(JSON.stringify(div));
+  });
+
+  it('updates portalElement correctly when setPortalElement is called multiple times', () => {
+    const div1 = document.createElement('div');
+    const div2 = document.createElement('div');
+
+    const { getByText, container } = render(
+      <PortalProvider>
+        <PortalContext.Consumer>
+          {({ portalElement, setPortalElement }) => (
+            <div>
+              <button onClick={() => setPortalElement && setPortalElement(div1)}>setPortalElement 1</button>
+              <button onClick={() => setPortalElement && setPortalElement(div2)}>setPortalElement 2</button>
+              <div>portalElement: {JSON.stringify(portalElement)}</div>
+            </div>
+          )}
+        </PortalContext.Consumer>
+      </PortalProvider>
+    );
+
+    const button1 = getByText(/setPortalElement 1/i);
+    fireEvent.click(button1);
+
+    expect(container).toHaveTextContent(JSON.stringify(div1));
+
+    const button2 = getByText(/setPortalElement 2/i);
+    fireEvent.click(button2);
+
+    expect(container).toHaveTextContent(JSON.stringify(div2));
   });
 });

@@ -1,6 +1,6 @@
 import { MDCModalDrawerFoundation, MDCDismissibleDrawerFoundation } from '@material/drawer';
 import { DrawerProps } from '.';
-import { useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '../base';
+import { useFoundation, FocusTrap, focusTrapFactory, triggerWindowResize } from '@rmwc/base';
 import React, { useRef, useEffect, useCallback } from 'react';
 
 const useDrawerFoundationFactory = (MDCConstructor: typeof MDCModalDrawerFoundation | typeof MDCDismissibleDrawerFoundation) =>
@@ -87,21 +87,23 @@ const useDrawerFoundationFactory = (MDCConstructor: typeof MDCModalDrawerFoundat
       (foundation as MDCModalDrawerFoundation).handleScrimClick?.();
     }, [foundation]);
 
+    const { onKeyDown } = props;
     const handleKeyDown = useCallback(
       (evt: React.KeyboardEvent & KeyboardEvent) => {
-        props.onKeyDown?.(evt);
+        onKeyDown?.(evt);
         foundation.handleKeydown(evt);
       },
-      [foundation, props.onKeyDown]
+      [foundation, onKeyDown]
     );
 
+    const { onTransitionEnd } = props;
     const handleTransitionEnd = useCallback(
       (evt: React.TransitionEvent & TransitionEvent) => {
-        props.onTransitionEnd?.(evt);
+        onTransitionEnd?.(evt);
         foundation.handleTransitionEnd(evt);
         triggerWindowResize();
       },
-      [foundation, props.onTransitionEnd]
+      [foundation, onTransitionEnd]
     );
 
     rootEl.setProp('onKeyDown', handleKeyDown, true);
@@ -111,6 +113,8 @@ const useDrawerFoundationFactory = (MDCConstructor: typeof MDCModalDrawerFoundat
     return { foundation, ...elements };
   };
 
+//eslint-disable-next-line react-hooks/rules-of-hooks
 export const useDismissableDrawerFoundation = useDrawerFoundationFactory(MDCDismissibleDrawerFoundation);
 
+//eslint-disable-next-line react-hooks/rules-of-hooks
 export const useModalDrawerFoundation = useDrawerFoundationFactory(MDCModalDrawerFoundation);

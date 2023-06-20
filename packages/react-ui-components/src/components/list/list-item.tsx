@@ -1,9 +1,9 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
-import { classNames, useClassNames, Tag, createComponent } from '../base';
-import { withRipple } from '../ripple';
-import { Icon, IconProps } from '../icon';
+import { classNames, useClassNames, Tag, createComponent } from '@rmwc/base';
+import { withRipple, RippleSurface } from '@rmwc/ripple';
+import { Icon, IconProps } from '@rmwc/icon';
 
 /** A ListItem component. */
 export interface ListItemProps extends RMWC.WithRippleProps {
@@ -25,9 +25,15 @@ export const ListItem = withRipple({ surface: false })(
         'mdc-list-item--selected': props.selected,
         'mdc-list-item--activated': props.activated,
         'mdc-list-item--disabled': props.disabled,
+        'rmwc-list-item__disabled': props.disabled,
       },
     ]);
-    return <Tag tag="li" tabIndex={0} {...rest} className={className} ref={ref} />;
+    return (
+      <Tag tag="li" tabIndex={0} {...rest} className={className} ref={ref}>
+        <RippleSurface className="mdc-list-item__ripple" />
+        {rest.children}
+      </Tag>
+    );
   })
 );
 
@@ -141,6 +147,7 @@ export const SimpleListItem = createComponent<SimpleListItemProps>(({ text, seco
 
   return (
     <ListItem {...rest} ref={ref}>
+      <RippleSurface className="mdc-list-item__ripple" />
       {graphic !== undefined && <ListItemGraphic icon={graphic} />}
       {secondaryTextToRender !== null ? (
         <ListItemText>

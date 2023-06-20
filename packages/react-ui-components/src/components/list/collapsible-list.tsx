@@ -1,6 +1,6 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { classNames, Tag } from '../base';
+import { classNames, Tag } from '@rmwc/base';
 
 /** A collapsible list component. */
 export interface CollapsibleListProps {

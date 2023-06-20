@@ -5,7 +5,6 @@ const preview: Preview = {
     actions: { argTypesRegex: '^on[A-Z].*' },
     options: {
       storySort: (a, b) => {
-        console.log('HERE?!?!?@#?!@#');
         return a.title === b.title ? 0 : a.id.localeCompare(b.id, { numeric: true });
       },
     },

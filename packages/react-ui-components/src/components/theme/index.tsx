@@ -53,7 +53,7 @@ export const ThemeContext = React.createContext(Themes.lightTheme as IOptions);
 export function useTheme() {
   const theme = React.useContext(ThemeContext);
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (import.meta.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     React.useDebugValue(theme);
   }

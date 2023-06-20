@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React, { useContext } from 'react';
-import { Icon } from '../icon';
-import { useClassNames, Tag, createComponent, DataTableHeadContext, DataTableContext } from '../base';
+import { Icon } from '@rmwc/icon';
+import { useClassNames, Tag, createComponent, DataTableHeadContext, DataTableContext } from '@rmwc/base';
 
 interface SharedDataTableCellProps {
   /** Changes alignment for numeric columns */
@@ -39,7 +39,9 @@ export const DataTable = createComponent<DataTableProps>(function DataTable(prop
   ]);
   return (
     <DataTableContext.Provider value={true}>
-      <Tag {...rest} ref={ref} className={className} />
+      <Tag {...rest} ref={ref} className={className}>
+        <div className="mdc-data-table__table-container">{rest.children}</div>
+      </Tag>
     </DataTableContext.Provider>
   );
 });

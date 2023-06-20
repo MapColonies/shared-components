@@ -1,4 +1,4 @@
-import { useFoundation } from '../base';
+import { useFoundation } from '@rmwc/base';
 
 import { FloatingLabelProps, FloatingLabelApi } from '.';
 import { MDCFloatingLabelFoundation, MDCFloatingLabelAdapter } from '@material/floating-label';
@@ -15,6 +15,9 @@ export const useFloatingLabelFoundation = (props: FloatingLabelProps & React.HTM
       return {
         getWidth() {
           return foundation.getWidth();
+        },
+        setRequired(isRequired: boolean) {
+          return foundation.setRequired(isRequired);
         },
       };
     },

@@ -1,3 +1,3 @@
-import '../icon/styles';
-import '../ripple/styles';
-import '../avatar/avatar.css';
+import '@rmwc/icon/styles';
+import '@rmwc/ripple/styles';
+import '@rmwc/avatar/avatar.css';

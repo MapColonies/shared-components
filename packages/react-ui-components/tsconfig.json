@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "outDir": "dist",
+      "rootDir": "src",
+      "baseUrl": "./",
+      "noEmitOnError": false,
+      "paths": {
+        "@doc-utils": ["src/components/doc-utils"],
+        "@rmwc/*": ["src/components/*"]
+      }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "storybook-static", "*.config.ts"],
+}

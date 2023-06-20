@@ -1,11 +1,11 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { MDCSnackbarFoundation } from '@material/snackbar';
-import { Button, ButtonProps } from '../button';
-import { useClassNames, Tag, createComponent } from '../base';
+import { Button, ButtonProps } from '@rmwc/button';
+import { useClassNames, Tag, createComponent } from '@rmwc/base';
 import { useSnackbarFoundation } from './foundation';
-import { IconButton, IconButtonProps } from '../icon-button';
-import { Icon } from '../icon';
+import { IconButton, IconButtonProps } from '@rmwc/icon-button';
+import { Icon } from '@rmwc/icon';
 
 /*********************************************************************
  * Events
@@ -37,7 +37,7 @@ export interface SnackbarProps {
   /* Aligns the Snackbar to the start of the screen. */
   leading?: boolean;
   /* Shows a dismiss icon, */
-  dismissIcon?: boolean | string;
+  dismissIcon?: boolean | RMWC.IconPropT;
   /** Whether or not your want clicking an action to close the Snackbar. */
   dismissesOnAction?: boolean;
   /** An icon for the snackbar */

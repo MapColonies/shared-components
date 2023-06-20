@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 
-import { withRipple } from '../ripple';
-import { Button, ButtonProps } from '../button';
-import { IconButton, IconButtonProps } from '../icon-button';
-import { useClassNames, Tag, createComponent } from '../base';
+import { withRipple } from '@rmwc/ripple';
+import { Button, ButtonProps } from '@rmwc/button';
+import { IconButton, IconButtonProps } from '@rmwc/icon-button';
+import { useClassNames, Tag, createComponent } from '@rmwc/base';
 
 /** A Card Component */
 export interface CardProps {

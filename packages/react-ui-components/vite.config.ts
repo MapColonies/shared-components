@@ -7,4 +7,12 @@ export default getBaseConfig({
     name: 'reactUiComponents',
     fileName: '@map-colonies/react-core',
   },
+  additionalConfig: {
+    resolve: {
+      alias: {
+        '@doc-utils': path.resolve(__dirname, 'src/components/doc-utils'),
+        '@rmwc': path.resolve(__dirname, 'src/components'),
+      },
+    },
+  },
 });

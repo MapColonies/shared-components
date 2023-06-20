@@ -1,7 +1,7 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
-import { useId } from '../base';
-import { FormField } from '../formfield';
+import { useId } from '@rmwc/base';
+import { FormField } from '@rmwc/formfield';
 
 export interface ToggleableProps<Foundation> {
   /** A DOM ID for the toggle. */

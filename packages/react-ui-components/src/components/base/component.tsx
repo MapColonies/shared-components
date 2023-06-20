@@ -1,4 +1,4 @@
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import classNamesFunc from 'classnames';
 import { parseThemeOptions } from './with-theme';

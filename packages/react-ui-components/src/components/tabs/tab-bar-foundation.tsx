@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { TabBarProps } from './tab-bar';
-import { useFoundation } from '../base';
+import { useFoundation } from '@rmwc/base';
 import { MDCTabBarFoundation } from '@material/tab-bar';
 import { TabScrollerApi } from './tab-scroller';
 import { MDCTabInteractionEvent } from '@material/tab';
@@ -35,7 +35,7 @@ export const useTabBarFoundation = (props: TabBarProps & React.HTMLProps<any>) =
             // ignore clicks when using controlled tabs, but we still need to notify
             // to trigger the callback
             // @ts-ignore ignoring unsafe protected access
-            foundation.adapter_.notifyTabActivated(index);
+            foundation.adapter.notifyTabActivated(index);
           }
         },
         activateTabAtIndex: (index: number, clientRect: ClientRect) => {
@@ -108,7 +108,7 @@ export const useTabBarFoundation = (props: TabBarProps & React.HTMLProps<any>) =
     const index = activeTabIndex;
 
     // @ts-ignore ignoring unsafe protected access
-    const adapter = foundation.adapter_;
+    const adapter = foundation.adapter;
     const previousActiveIndex = adapter.getPreviousActiveTabIndex();
 
     // @ts-ignore private method access

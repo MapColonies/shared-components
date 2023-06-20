@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import { CheckboxProps, CheckboxHTMLProps } from '.';
-import { useToggleFoundation } from '../toggleable';
-import { useFoundation } from '../base';
+import { useToggleFoundation } from '@rmwc/toggleable';
+import { useFoundation } from '@rmwc/base';
 import { MDCCheckboxFoundation } from '@material/checkbox';
 import React, { useEffect, useCallback } from 'react';
 

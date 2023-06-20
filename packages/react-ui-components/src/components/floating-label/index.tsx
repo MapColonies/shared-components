@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as RMWC from '../types';
+import * as RMWC from '@rmwc/types';
 import React from 'react';
 import { useFloatingLabelFoundation } from './foundation';
-import { createComponent, mergeRefs } from '../base';
+import { createComponent, mergeRefs } from '@rmwc/base';
 
 export interface FloatingLabelProps {
   shake?: boolean;
@@ -11,6 +11,7 @@ export interface FloatingLabelProps {
 
 export interface FloatingLabelApi {
   getWidth: () => number;
+  setRequired: (isRequired: boolean) => void;
 }
 
 export const FloatingLabel = createComponent<FloatingLabelProps & { apiRef?: (api: FloatingLabelApi | null) => void }>(function FloatingLabel(
