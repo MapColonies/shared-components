@@ -60,7 +60,7 @@ export const Tooltip = function Tooltip({ children, content, className, open, ..
       })}
       destroyTooltipOnHide
     >
-      {children}
+      <>{children}</>
     </ReactTooltip>
   );
 };

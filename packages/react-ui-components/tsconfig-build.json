@@ -6,32 +6,33 @@
       "dom.iterable",
       "esnext"
     ],
+    "noImplicitAny": false,
+    "module": "es2020",
+    "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "outDir": "dist",
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
     "rootDir": "src/components",
     "downlevelIteration": true,
     "paths": {
       "@doc-utils": ["./src/components/doc-utils"],
       "@rmwc/*": ["./src/components/*"]
-    }
+    },
+    "types": ["node", "vite/client", "@types/jest"]
   },
   "include": [
     "src/components"
   ],
   "exclude": [
-    "node_modules", "dist", "storybook-static", "vite.config.ts"
+    "**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*"
   ]
 }

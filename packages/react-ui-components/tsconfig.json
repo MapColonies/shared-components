@@ -1,6 +1,8 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+      "module": "es2020",
+      "moduleResolution": "Node",
       "resolveJsonModule": true,
       "esModuleInterop": true,
       "outDir": "dist",
@@ -13,5 +15,5 @@
       }
     },
     "include": ["src/**/*"],
-    "exclude": ["node_modules", "dist", "storybook-static", "*.config.ts"],
+    "exclude": ["**/node_modules/**", "node_modules", "dist", "storybook-static", "*.config.ts"],
 }

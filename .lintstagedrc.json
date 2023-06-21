@@ -1,6 +1,6 @@
 {
     "packages/**/*.{js,jsx,ts,tsx}": [
-      "prettier --write",
+      "prettier --check",
       "eslint"
     ]
   }

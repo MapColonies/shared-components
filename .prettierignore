@@ -3,6 +3,7 @@
 **/loader/**
 **/node_modules/**
 **/storybook-static/**
+packages/react-ui-components/*/**
 
 *.md
 *.d.ts

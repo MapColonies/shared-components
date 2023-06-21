@@ -50,7 +50,6 @@
     "react-dom": "^18.2.0",
     "storybook": "^7.0.22",
     "storybook-addon-mock": "^4.0.0",
-    "typescript": "^5.0.2",
     "vite": "^4.3.9",
     "vite-plugin-eslint": "^1.8.1"
   },
