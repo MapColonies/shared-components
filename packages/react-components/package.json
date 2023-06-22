@@ -2,14 +2,27 @@
   "name": "@map-colonies/react-components",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "main": "./dist/@map-colonies/react-components.umd.js",
+  "module": "./dist/@map-colonies/react-components.es.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "clean": "rimraf dist",
+    "transpileTS": "tsc --project ./tsconfig-build.json",
+    "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build",
+    "printTSVersion": "echo TS $(tsc -v)",
+    "postbuild": "copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "storybook": "storybook dev -p 9010",
-    "build-storybook": "storybook build",
-    "gettscver": "tsc -v"
+    "copyassets:all": "yarn run copyassets:md-font",
+    "copyassets:md-font": "copyfiles -u 5 \"../../node_modules/material-design-icons/iconfont/*\" \"storybook-static/fonts/material-icons\"",
+    "storybook": "yarn run copyassets:all && storybook dev -p 9010",
+    "build-storybook": "storybook build && yarn run copyassets:md-font"
+  },
+  "dependencies": {
+    "@map-colonies/react-core": "0.0.0"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.1"
   }
 }

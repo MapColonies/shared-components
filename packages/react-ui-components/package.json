@@ -2,9 +2,9 @@
   "name": "@map-colonies/react-core",
   "private": true,
   "version": "0.0.0",
-  "module": "dist/index.js",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/@map-colonies/react-core.umd.js",
+  "module": "./dist/@map-colonies/react-core.es.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
@@ -20,60 +20,11 @@
     "build-storybook": "storybook build && yarn run copyassets:md-font"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
-    "classnames": "^2.3.2",
-    "material-components-web": "^7.0.0",
+    "@rmwc/button": "^8.0.8",
     "material-design-icons": "^3.0.1",
-    "rc-tooltip": "^6.0.1",
-    "react": "^17.0.2",
-    "react-app-rewired": "^2.2.1",
-    "react-dom": "^17.0.2",
-    "react-ga": "^3.3.0",
-    "react-live": "^3.1.0",
-    "react-markdown": "^6.0.2",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "^5.0.1",
     "storybook-dark-mode": "^3.0.0"
   },
   "devDependencies": {
-    "@types/enzyme": "^3.10.13",
-    "@types/jest": "^27.4.1",
-    "@types/react": "^17.0.44",
-    "@types/react-dom": "^17.0.15",
-    "@types/react-router": "^5.1.18",
-    "@types/react-router-dom": "^5.1.7",
-    "rimraf": "^5.0.1",
-    "typescript": "4.3.5",
-    "vite-tsconfig-paths": "^4.2.0"
-  },
-  "resolutions": {
-    "typescript": "4.3.5",
-    "react-dom": "^17.0.2",
-    "react-ga": "^3.3.0",
-    "react-live": "^3.1.0",
-    "react-markdown": "^6.0.2",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "^5.0.1",
-    "@types/react": "^17.0.44",
-    "@types/react-dom": "^17.0.15",
-    "@types/react-router": "^5.1.18",
-    "@types/react-router-dom": "^5.1.7",
-    "material-components-web": "^7.0.0"
-  },
-  "workspaces": {
-    "nohoist": [
-      "material-components-web",
-      "@material",
-      "**/@material/**",
-      "typescript",
-      "**/react/**",
-      "react",
-      "@types/react",
-      "@types/react-dom",
-      "@types/react-router",
-      "@types/react-router-dom"
-    ]
+    "rimraf": "^5.0.1"
   }
 }
