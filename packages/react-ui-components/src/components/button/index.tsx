@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { ButtonProps as RMWCButtonProps,Button as RMWCButton} from '@rmwc/button';
-import '@material/button/dist/mdc.button.css';
+import { ButtonProps as RMWCButtonProps,Button as RMWCButton, ButtonHTMLProps as RMWCButtonHTMLProps} from '@rmwc/button';
 
-export interface ButtonProps extends RMWCButtonProps {};
+import '@rmwc/button/styles';
 
-export const Button: React.FC<ButtonProps> = React.forwardRef<any, ButtonProps>((props, ref) => {
-  
-  return <RMWCButton ref={ref} {...props} />
+type BtnProps =  RMWCButtonProps & RMWCButtonHTMLProps;
 
-});
+export interface ButtonProps extends BtnProps{};
+
+export const Button: React.FC<ButtonProps> = (props) => {
+  return <RMWCButton {...props} />
+};
 

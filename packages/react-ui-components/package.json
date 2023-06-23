@@ -20,11 +20,29 @@
     "build-storybook": "storybook build && yarn run copyassets:md-font"
   },
   "dependencies": {
+    "@rmwc/avatar": "^8.0.8",
     "@rmwc/button": "^8.0.8",
+    "@rmwc/checkbox": "^8.0.8",
+    "@rmwc/circular-progress": "^8.0.8",
+    "@rmwc/dialog": "^8.0.8",
+    "@rmwc/drawer": "^8.0.8",
+    "@rmwc/fab": "^8.0.8",
+    "@rmwc/icon": "^8.0.8",
+    "@rmwc/linear-progress": "^8.0.8",
+    "@rmwc/menu": "^8.0.8",
+    "@rmwc/select": "^8.0.8",
+    "@rmwc/snackbar": "^8.0.8",
+    "@rmwc/switch": "^8.0.8",
+    "@rmwc/tabs": "^8.0.8",
+    "@rmwc/textfield": "^8.0.8",
+    "@rmwc/theme": "^8.0.8",
+    "@rmwc/tooltip": "^8.0.8",
+    "@rmwc/typography": "^8.0.8",
     "material-design-icons": "^3.0.1",
     "storybook-dark-mode": "^3.0.0"
   },
   "devDependencies": {
+    "@rmwc/types": "^8.0.8",
     "rimraf": "^5.0.1"
   }
 }
