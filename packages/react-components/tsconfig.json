@@ -9,10 +9,6 @@
       "rootDir": "src/components",
       "baseUrl": "./",
       "noEmitOnError": false,
-      // "paths": {
-      //   "@doc-utils": ["src/components/doc-utils"],
-      //   "@rmwc/*": ["src/components/*"]
-      // }
     },
     "include": ["src/components/**/*"],
     "exclude": ["**/node_modules/**", "node_modules", "dist", "storybook-static", "*.config.ts"],

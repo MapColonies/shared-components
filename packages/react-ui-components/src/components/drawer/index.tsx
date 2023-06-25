@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import {
-  DrawerProps as RMWCDrawerProps,
   Drawer as RMWCDrawer,
   DrawerHeader as RMWCDrawerHeader,
   DrawerTitle as RMWCDrawerTitle,
   DrawerSubtitle as RMWCDrawerSubtitle,
-  DrawerContent as RMWCDrawerContent,
-  DrawerHeaderProps as RMWCDrawerHeaderProps,
-  DrawerTitleProps as RMWCDrawerTitleProps,
-  DrawerSubtitleProps as RMWCDrawerSubtitleProps,
-  DrawerContentProps as RMWCDrawerContentProps,
+  DrawerContent as RMWCDrawerContent
 } from '@rmwc/drawer';
 import '@rmwc/drawer/styles';
 

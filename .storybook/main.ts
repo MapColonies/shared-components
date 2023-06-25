@@ -11,7 +11,15 @@ const config = {
     name: '@storybook/react-vite',
     options: {},
   },
-  staticDirs: ['../../../public']
-} as StorybookConfig;
+  staticDirs: ['../../../public', '../storybook-static'],
+  viteFinal: async (config) => {
+    const configAdditions = {
+      ...config,
+      CESIUM_BASE_URL: 'http://localhost:9010/'
+    }
+
+    return configAdditions;
+  }
+};
 
 export default config;

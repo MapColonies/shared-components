@@ -37,7 +37,8 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
         },
       },
       define: {
-        'process.env': env
+        'process.env': env,
+        'CESIUM_BASE_URL': JSON.stringify(env.CESIUM_BASE_URL)
       },
       ...additionalConfig
     }
