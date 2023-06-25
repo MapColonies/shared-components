@@ -4,7 +4,7 @@ import { SwitchProps as RMWCSwitchProps, Switch as RMWCSwitch} from '@rmwc/switc
 import "@rmwc/switch/styles";
 
 
-export interface SwitchProps extends RMWCSwitchProps {};
+export interface SwitchProps extends React.ComponentProps<typeof RMWCSwitch> {};
 
 export const Switch: React.FC<SwitchProps> = React.forwardRef<any, SwitchProps>((props, ref) => {
 

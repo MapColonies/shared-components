@@ -3,7 +3,7 @@ import React from 'react';
 import { SelectProps as RMWCSelectProps, Select as RMWCSelect} from '@rmwc/select';
 import "@rmwc/select/styles";
 
-export interface SelectProps extends RMWCSelectProps {};
+export interface SelectProps extends React.ComponentProps<typeof RMWCSelect> {};
 
 export const Select: React.FC<SelectProps> = React.forwardRef<any, SelectProps>((props, ref) => {
 

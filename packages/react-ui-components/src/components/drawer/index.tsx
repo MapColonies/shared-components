@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import {
   DrawerProps as RMWCDrawerProps,
   Drawer as RMWCDrawer,
@@ -14,11 +14,11 @@ import {
 } from '@rmwc/drawer';
 import '@rmwc/drawer/styles';
 
-export interface DrawerProps extends RMWCDrawerProps {}
-export interface DrawerHeaderProps extends RMWCDrawerHeaderProps {}
-export interface DrawerTitleProps extends RMWCDrawerTitleProps {}
-export interface DrawerSubtitleProps extends RMWCDrawerSubtitleProps {}
-export interface DrawerContentProps extends RMWCDrawerContentProps {}
+export interface DrawerProps extends React.ComponentProps<typeof RMWCDrawer> {}
+export interface DrawerHeaderProps extends React.ComponentProps<typeof RMWCDrawerHeader> {}
+export interface DrawerTitleProps extends React.ComponentProps<typeof RMWCDrawerTitle>{}
+export interface DrawerSubtitleProps extends React.ComponentProps<typeof RMWCDrawerSubtitle> {}
+export interface DrawerContentProps extends React.ComponentProps<typeof RMWCDrawerContent> {}
 
 export const Drawer: React.FC<DrawerProps> = React.forwardRef<any, DrawerProps>((props, ref) => {
   return <RMWCDrawer ref={ref} {...props} />;

@@ -13,9 +13,9 @@ import {HTMLProps} from '@rmwc/types';
 
 import "@rmwc/snackbar/styles";
 
-export interface SnackbarProps extends RMWCSnackbarProps {}
-export interface SnackbarActionProps extends RMWCSnackbarActionProps {}
-export interface SnackbarQueueProps extends RMWCSnackbarQueueProps {}
+export interface SnackbarProps extends React.ComponentProps<typeof RMWCSnackbar> {};
+export interface SnackbarActionProps extends React.ComponentProps<typeof RMWCSnackbarAction> {}
+export interface SnackbarQueueProps extends React.ComponentProps<typeof RMWCSnackbarQueue> {}
 
 export const Snackbar: React.FC<SnackbarProps> = React.forwardRef<any, SnackbarProps>((props, ref) => {
   return <RMWCSnackbar ref={ref} {...props} />;

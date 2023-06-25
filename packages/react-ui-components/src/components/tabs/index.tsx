@@ -3,10 +3,10 @@ import React from 'react';
 import { TabProps as RMWCTabProps, Tab as RMWCTab, TabBarProps as RMWCTabBarProps, TabBar as RMWCTabBar} from '@rmwc/tabs';
 import "@rmwc/tabs/styles";
 
-export interface TabProps extends RMWCTabProps {};
-export interface TabBarProps extends RMWCTabBarProps {};
+export interface TabProps extends React.ComponentProps<typeof RMWCTab> {};
+export interface TabBarProps extends React.ComponentProps<typeof RMWCTabBar> {};
 
-export const Tabs: React.FC<TabProps> = React.forwardRef<any, TabProps>((props, ref) => {
+export const Tab: React.FC<TabProps> = React.forwardRef<any, TabProps>((props, ref) => {
 
 return <RMWCTab ref={ref} {...props} />
 

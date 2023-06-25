@@ -10,9 +10,9 @@ import {
 } from "@rmwc/menu";
 import "@rmwc/menu/styles";
 
-export interface MenuProps extends RMWCMenuProps {}
-export interface MenuItemProps extends RMWCMenuItemProps {}
-export interface MenuSurfaceAnchorProps extends RMWCMenuSurfaceAnchorProps {}
+export interface MenuProps extends React.ComponentProps<typeof RMWCMenu> {}
+export interface MenuItemProps extends React.ComponentProps<typeof RMWCMenuItem> {}
+export interface MenuSurfaceAnchorProps extends React.ComponentProps<typeof RMWCMenuSurfaceAnchor> {}
 
 export const Menu: React.FC<MenuProps> = React.forwardRef<any, MenuProps>((props, ref) => {
     return <RMWCMenu ref={ref} {...props} />;

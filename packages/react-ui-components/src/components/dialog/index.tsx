@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import {
   DialogProps as RMWCDialogProps,
   Dialog as RMWCDialog,
@@ -16,11 +16,11 @@ import {
 
 import '@rmwc/dialog/styles';
 
-export interface DialogProps extends RMWCDialogProps {}
-export interface DialogContentProps extends RMWCDialogContentProps {}
-export interface DialogTitleProps extends RMWCDialogTitleProps {}
-export interface DialogActionsProps extends RMWCDialogActionsProps {}
-export interface DialogQueueProps extends RMWCDialogQueueProps {}
+export interface DialogProps extends React.ComponentProps<typeof RMWCDialog> {}
+export interface DialogContentProps extends React.ComponentProps<typeof RMWCDialogContent> {}
+export interface DialogTitleProps extends React.ComponentProps<typeof RMWCDialogTitle> {}
+export interface DialogActionsProps extends React.ComponentProps<typeof RMWCDialogActions> {}
+export interface DialogQueueProps extends React.ComponentProps<typeof RMWCDialogQueue> {}
 
 export const Dialog: React.FC<DialogProps> = React.forwardRef<any, DialogProps>((props, ref) => {
   return <RMWCDialog ref={ref} {...props} />;

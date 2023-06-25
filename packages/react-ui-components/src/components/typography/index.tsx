@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { TypographyProps as RMWCTypographyProps, Typography as RMWCTypography} from '@rmwc/typography';
+import {Typography as RMWCTypography, TypographyProps as RMWCTypographyProps} from '@rmwc/typography';
 import '@rmwc/typography/styles'
 
-export interface TypographyProps extends RMWCTypographyProps {};
+export interface TypographyProps extends React.ComponentProps<typeof RMWCTypography> {};
 
-export const Typography: React.FC<TypographyProps> = React.forwardRef<any, TypographyProps>((props, ref) => {
+export const Typography: React.FC<TypographyProps & RMWCTypographyProps> = React.forwardRef<any, TypographyProps & RMWCTypographyProps>((props, ref) => {
 
 return <RMWCTypography ref={ref} {...props} />
 

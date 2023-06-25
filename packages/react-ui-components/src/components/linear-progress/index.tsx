@@ -3,7 +3,7 @@ import React from 'react';
 import { LinearProgressProps as RMWCLinearProgressProps, LinearProgress as RMWCLinearProgress} from '@rmwc/linear-progress';
 import '@rmwc/linear-progress/styles';
 
-export interface LinearProgressProps extends RMWCLinearProgressProps {};
+export interface LinearProgressProps extends  React.ComponentProps<typeof RMWCLinearProgress> {};
 
 export const LinearProgress: React.FC<LinearProgressProps> = React.forwardRef<any, LinearProgressProps>((props, ref) => {
 
