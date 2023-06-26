@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { SwitchProps as RMWCSwitchProps, Switch as RMWCSwitch} from '@rmwc/switch';
+import { Switch as RMWCSwitch } from '@rmwc/switch';
 import "@rmwc/switch/styles";
 
 

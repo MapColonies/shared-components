@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArcGISTiledElevationTerrainProvider } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import { Story, Meta } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { CesiumMap } from '../map';
 import { LayerType } from '../layers-manager';
@@ -51,7 +51,7 @@ const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
     'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
 });
 
-export const Cesium3DTilesetLayer: Story = (args: unknown) => (
+export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset

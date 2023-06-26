@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import {
-  SnackbarProps as RMWCSnackbarProps,
   Snackbar as RMWCSnackbar,
-  SnackbarActionProps as RMWCSnackbarActionProps,
   SnackbarAction as RMWCSnackbarAction,
-  SnackbarQueueProps as RMWCSnackbarQueueProps,
   SnackbarQueue as RMWCSnackbarQueue,
 } from '@rmwc/snackbar';
 

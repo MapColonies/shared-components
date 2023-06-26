@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import { Story, Meta } from '@storybook/react';
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { CesiumMap, IContextMenuData, useCesiumMap } from './map';

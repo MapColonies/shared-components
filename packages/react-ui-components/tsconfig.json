@@ -9,6 +9,7 @@
       "rootDir": "src/components",
       "baseUrl": "./",
       "noEmitOnError": false,
+      "types": ["node"]
       // "paths": {
       //   "@doc-utils": ["src/components/doc-utils"],
       //   "@rmwc/*": ["src/components/*"]

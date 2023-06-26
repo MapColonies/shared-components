@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import {
-  DialogProps as RMWCDialogProps,
   Dialog as RMWCDialog,
-  DialogTitleProps as RMWCDialogTitleProps,
   DialogTitle as RMWCDialogTitle,
-  DialogContentProps as RMWCDialogContentProps,
   DialogContent as RMWCDialogContent,
-  DialogActionsProps as RMWCDialogActionsProps,
   DialogActions as RMWCDialogActions,
   DialogQueueProps as RMWCDialogQueueProps,
   DialogQueue as RMWCDialogQueue,

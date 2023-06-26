@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { CircularProgressProps as RMWCCircularProgressProps, CircularProgress as RMWCCircularProgress} from '@rmwc/circular-progress';
+import { CircularProgress as RMWCCircularProgress} from '@rmwc/circular-progress';
 import '@rmwc/circular-progress/styles';
 
 export interface CircularProgressProps extends React.ComponentProps<typeof RMWCCircularProgress> {};

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { TextFieldProps as RMWCTextfieldProps, TextField as RMWCTextfield} from '@rmwc/textfield';
+import { TextField as RMWCTextfield } from '@rmwc/textfield';
 import '@rmwc/textfield/styles'
 
 export interface TextfieldProps extends React.ComponentProps<typeof RMWCTextfield> {};

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { TabProps as RMWCTabProps, Tab as RMWCTab, TabBarProps as RMWCTabBarProps, TabBar as RMWCTabBar} from '@rmwc/tabs';
+import { Tab as RMWCTab, TabBar as RMWCTabBar} from '@rmwc/tabs';
 import "@rmwc/tabs/styles";
 
 export interface TabProps extends React.ComponentProps<typeof RMWCTab> {};

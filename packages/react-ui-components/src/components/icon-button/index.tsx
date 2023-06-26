@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import {IconButton as RMWCIconButton} from '@rmwc/icon-button';
 import '@rmwc/icon-button/styles'

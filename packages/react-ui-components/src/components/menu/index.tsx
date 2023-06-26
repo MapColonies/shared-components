@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
-    MenuProps as RMWCMenuProps,
     Menu as RMWCMenu,
-    MenuItemProps as RMWCMenuItemProps,
     MenuItem as RMWCMenuItem,
-    MenuSurfaceAnchorProps as RMWCMenuSurfaceAnchorProps,
     MenuSurfaceAnchor as RMWCMenuSurfaceAnchor
 } from "@rmwc/menu";
 import "@rmwc/menu/styles";

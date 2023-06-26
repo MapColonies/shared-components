@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import bbox from '@turf/bbox';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import { Story, Meta } from '@storybook/react';
 import { Rectangle } from 'cesium';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../map.types';
@@ -130,7 +130,6 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
       removeMoveEnd();
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -222,7 +222,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
-  }, [ref, props.imageryContextMenu]);
+  }, [ref.current, props.imageryContextMenu]);
 
   useEffect(() => {
     if (mapViewRef) {
@@ -239,7 +239,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         }
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewRef]);
 
   useEffect(() => {

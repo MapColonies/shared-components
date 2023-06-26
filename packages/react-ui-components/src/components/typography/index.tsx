@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import {Typography as RMWCTypography, TypographyProps as RMWCTypographyProps} from '@rmwc/typography';
 import '@rmwc/typography/styles'

@@ -16,8 +16,8 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
         pluginReact(),
         eslintPlugin({
           cache: false,
-          include: ['./src/components/**/*'],
-          exclude: [],
+          include: ['./src/components/**/*.ts|tsx'],
+          exclude: ["/virtual:/", "/node_modules/"],
         }),
         dts({
           insertTypesEntry: true,

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { FabProps as RMWCFabProps, Fab as RMWCFab} from '@rmwc/fab';
+import { Fab as RMWCFab} from '@rmwc/fab';
 import '@rmwc/fab/styles';
 
 

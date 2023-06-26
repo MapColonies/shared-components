@@ -53,14 +53,12 @@
     "textarea-caret": "^3.1.0"
   },
   "devDependencies": {
+    "@types/ol":"^6.3.1",
     "@types/enzyme": "^3.10.5",
-    "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/geojson": "^7946.0.10",
     "@types/lodash": "^4.14.165",
-    "@types/react-test-renderer": "^16.9.2",
     "@types/textarea-caret": "^3.0.1",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "jest-enzyme": "^7.1.2"
   }
 }

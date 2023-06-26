@@ -3,6 +3,7 @@
     "extends": ["@map-colonies/eslint-config/ts-base"],
     "ignorePatterns": ["vite.config.*", "commitlint.config.js"],
     "rules": {
-        "import/exports-last": 0
+        "import/exports-last": 0,
+        "no-lonely-if": 0
     }
 }
