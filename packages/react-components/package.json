@@ -15,10 +15,10 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "copyassets:all": "yarn run copyassets:md-font && yarn run copyassets:cesium",
-    "copyassets:cesium": "copyfiles -u 5 \"../../node_modules/cesium/Build/Cesium/**/*\" \"storybook-static\"",
-    "copyassets:md-font": "copyfiles -u 5 \"../../node_modules/material-design-icons/iconfont/*\" \"storybook-static/fonts/material-icons\"",
-    "storybook": "yarn run copyassets:all && storybook dev -p 9010",
-    "build-storybook": "storybook build && yarn run copyassets:md-font"
+    "copyassets:cesium": "copyfiles -u 5 \"../../node_modules/cesium/Build/Cesium/**/*\" \"../../public\"",
+    "copyassets:md-font": "copyfiles -u 5 \"../../node_modules/material-design-icons/iconfont/*\" \"../../public/fonts/material-icons\"",
+    "storybook": "yarn clean && yarn run copyassets:all && start-storybook -p 9010",
+    "build-storybook": "build-storybook && yarn run copyassets:md-font"
   },
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
@@ -27,16 +27,11 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
     "@turf/bbox": "^6.0.1",
     "@turf/bbox-polygon": "^6.0.1",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.1.4",
     "@turf/rewind": "^5.1.5",
-    "@types/geojson": "^7946.0.10",
-    "@types/ol": "6.3.1",
     "cesium": "1.103.0",
     "chonky": "^2.3.2",
     "chonky-icon-fontawesome": "^2.3.2",
@@ -59,6 +54,16 @@
     "@types/lodash": "^4.14.165",
     "@types/textarea-caret": "^3.0.1",
     "enzyme": "^3.11.0",
-    "jest-enzyme": "^7.1.2"
+    "jest-enzyme": "^7.1.2",
+    "vite-plugin-cesium": "1.2.22",
+    "typescript": "4.9.5",
+    "@storybook/addon-storysource": "6.5.16",
+    "@storybook/addons": "6.5.16",
+    "@storybook/builder-vite": "0.4.2",
+    "@storybook/react": "6.5.16",
+    "@storybook/theming": "6.5.16",
+    "@storybook/addon-essentials": "6.5.16",
+    "storybook": "6.5.16"
+
   }
 }

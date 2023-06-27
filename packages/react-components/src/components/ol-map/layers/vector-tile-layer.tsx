@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react';
 import VectorTile from 'ol/layer/VectorTile';
 import { Options } from 'ol/layer/Base';
 import { useMap } from '../map';
@@ -24,7 +24,7 @@ export const useVectorTileLayer = (): VectorTile => {
   return layer;
 };
 
-export const VectorTileLayer: React.FC<VectorTileLayerProps> = ({
+export const VectorTileLayer: React.FC<PropsWithChildren<VectorTileLayerProps>> = ({
   children,
   options,
   style,

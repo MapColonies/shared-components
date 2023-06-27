@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react';
 
 import { Vector } from 'ol/source';
 import { useVectorLayer } from '../layers/vector-layer';
@@ -16,7 +16,7 @@ export const useVectorSource = (): Vector => {
   return source;
 };
 
-export const VectorSource: React.FC = ({ children }) => {
+export const VectorSource: React.FC<PropsWithChildren> = ({ children }) => {
   const vectorLayer = useVectorLayer();
   const [vectorSource] = useState(new Vector());
 

@@ -122,6 +122,10 @@ class LayerManager {
     }
   }
 
+  public get layerList(): ICesiumImageryLayer[] {
+    return this.layers;
+  }
+
   /* eslint-disable */
   public addMetaToLayer(
     meta: any,
@@ -369,11 +373,16 @@ class LayerManager {
         | Polygon
         | undefined;
       if (layerFootprint !== undefined) {
+
+        /* eslint-disable */
         const isInLayer = booleanPointInPolygon(position.geometry, {
           type: 'Feature',
           properties: {},
           geometry: layerFootprint,
         });
+       /* eslint-enable */
+
+
         return isInLayer && layer.show;
       } else {
         console.warn('CesiumImageryLayer has no defined footprint', layer.meta);
@@ -456,8 +465,7 @@ class LayerManager {
         layer.meta?.relevantToExtent !== layer.show &&
         layer.imageryProvider.ready
       ) {
-        //@ts-ignore
-        layer.show = layer.meta?.relevantToExtent ?? true;
+        layer.show = layer.meta?.relevantToExtent as boolean | undefined?? true;
       }
     }
   }
@@ -548,10 +556,6 @@ class LayerManager {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  public get layerList(): ICesiumImageryLayer[] {
-    return this.layers;
   }
 }
 

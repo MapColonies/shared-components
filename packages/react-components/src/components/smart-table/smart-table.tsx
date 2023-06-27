@@ -107,8 +107,8 @@ export function SmartTable<T>(props: SmartTableProps<T>) {
         component="div"
         count={count}
         page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </TableContainer>
   );

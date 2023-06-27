@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { Geometry } from 'geojson';
 import rewind from '@turf/rewind';
 import { Polygon } from 'geojson';
@@ -18,7 +18,7 @@ interface ContainerMapProps {
   onPolygonSelection: (polygon: Polygon) => void;
 }
 
-export const ContainerMap: React.FC<ContainerMapProps> = (props) => {
+export const ContainerMap: React.FC<PropsWithChildren<ContainerMapProps>> = (props) => {
   const handlePolygonSelected = (geometry: Geometry): void => {
     const rewindedPolygon = rewind(geometry as Polygon);
     props.onPolygonSelection(rewindedPolygon);

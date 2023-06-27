@@ -29,6 +29,6 @@
     "src/components"
   ],
   "exclude": [
-    "**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*"
+    "**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*", "src/**/*.stories.tsx"
   ]
 }

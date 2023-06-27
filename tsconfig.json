@@ -9,12 +9,11 @@
 
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
@@ -26,6 +25,6 @@
     "**/*.ts"
   ],
   "include": ["packages/react-components", "packages/react-ui-components", "vite.config.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", ".storybook"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

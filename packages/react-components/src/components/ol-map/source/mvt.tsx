@@ -1,4 +1,4 @@
-import React, { useEffect, createContext, useContext } from 'react';
+import React, { useEffect, createContext, useContext, PropsWithChildren } from 'react';
 import VectorTileSource, { Options } from 'ol/source/VectorTile';
 import { MVT } from 'ol/format';
 import { useVectorTileLayer } from '../layers/vector-tile-layer';
@@ -35,7 +35,7 @@ export const getMVTOptions = (optionParams: MVTOptionParams): Options => {
   return mvtOptions;
 };
 
-export const MVTSource: React.FC<MVTSourceProps> = ({ children, options }) => {
+export const MVTSource: React.FC<PropsWithChildren<MVTSourceProps>> = ({ children, options }) => {
   const vectorTileLayer = useVectorTileLayer();
 
   useEffect((): void => {

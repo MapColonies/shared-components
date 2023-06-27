@@ -1,6 +1,6 @@
 {
     "parserOptions": { "project": ["./tsconfig.json"] },
-    "extends": ["@map-colonies/eslint-config/ts-base"],
+    "extends": ["@map-colonies/eslint-config/ts-base", "react-app"],
     "ignorePatterns": ["vite.config.*", "commitlint.config.js"],
     "rules": {
         "import/exports-last": 0,

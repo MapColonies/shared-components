@@ -27,7 +27,7 @@ interface DatePickerProps extends KeyboardDatePickerProps {
 }
 
 export const DateTimePicker: React.FC<DatePickerProps> = (props) => {
-  const theme: { [key: string]: string } = useTheme();
+  const theme = useTheme();
   const themeMui = useMappedMuiTheme(theme);
 
   const [value, setValue] = useState<ParsableDate>(props.value);

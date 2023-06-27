@@ -1,8 +1,18 @@
-import commonConfigs from '../../../.storybook/main';
+import type { StorybookViteConfig } from "@storybook/builder-vite";
+import commonConfig from '../../../.storybook/main';
 
-const config = {
-  ...commonConfigs,
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)']
+const config: StorybookViteConfig = {
+  ...commonConfig,
+  core: {
+    builder: "@storybook/builder-vite"
+  },
+  stories: ["../src/**/*.stories.@(js|ts|tsx|mdx)"],
+  addons: [{
+    name: "@storybook/addon-essentials",
+    options: {
+      backgrounds: false
+    }
+  }, "@storybook/addon-storysource"],
+  framework: "@storybook/react"
 };
-
-export default config;
+module.exports = config;

@@ -1,29 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import {
-    Menu as RMWCMenu,
-    MenuItem as RMWCMenuItem,
-    MenuSurfaceAnchor as RMWCMenuSurfaceAnchor
-} from "@rmwc/menu";
-import "@rmwc/menu/styles";
+import React from 'react';
+import { Menu as RMWCMenu, MenuItem as RMWCMenuItem, MenuSurfaceAnchor as RMWCMenuSurfaceAnchor, MenuSurface as RMWCMenuSurface } from '@rmwc/menu';
+import '@rmwc/menu/styles';
 
 export interface MenuProps extends React.ComponentProps<typeof RMWCMenu> {}
 export interface MenuItemProps extends React.ComponentProps<typeof RMWCMenuItem> {}
+export interface MenuSurfaceProps extends React.ComponentProps<typeof RMWCMenuSurface> {}
 export interface MenuSurfaceAnchorProps extends React.ComponentProps<typeof RMWCMenuSurfaceAnchor> {}
 
 export const Menu: React.FC<MenuProps> = React.forwardRef<any, MenuProps>((props, ref) => {
-    return <RMWCMenu ref={ref} {...props} />;
+  return <RMWCMenu ref={ref} {...props} />;
 });
 
-export const MenuItem: React.FC<MenuItemProps> = React.forwardRef<any, MenuItemProps>(
-    (props, ref) => {
-        return <RMWCMenuItem ref={ref} {...props} />;
-    }
-);
+export const MenuItem: React.FC<MenuItemProps> = React.forwardRef<any, MenuItemProps>((props, ref) => {
+  return <RMWCMenuItem ref={ref} {...props} />;
+});
 
-export const MenuSurfaceAnchor: React.FC<MenuSurfaceAnchorProps> = React.forwardRef<
-    any,
-    MenuSurfaceAnchorProps
->((props, ref) => {
-    return <RMWCMenuSurfaceAnchor ref={ref} {...props} />;
+export const MenuSurface: React.FC<MenuSurfaceProps> = React.forwardRef<any, MenuSurfaceProps>((props, ref) => {
+  return <RMWCMenuSurface ref={ref} {...props} />;
+});
+export const MenuSurfaceAnchor: React.FC<MenuSurfaceAnchorProps> = React.forwardRef<any, MenuSurfaceAnchorProps>((props, ref) => {
+  return <RMWCMenuSurfaceAnchor ref={ref} {...props} />;
 });

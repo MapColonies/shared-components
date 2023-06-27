@@ -4,6 +4,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  PropsWithChildren,
 } from 'react';
 import { Map as OlMap, View } from 'ol';
 import './map.css';
@@ -72,7 +73,7 @@ export const useMap = (): OlMap => {
   return map;
 };
 
-export const Map: React.FC<MapProps> = (props) => {
+export const Map: React.FC<PropsWithChildren<MapProps>> = (props) => {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const { allowFullScreen, showMousePosition, projection } = props;
 

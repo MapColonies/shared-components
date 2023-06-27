@@ -16,7 +16,7 @@ const detectZoomLevel = (distance: number, viewer: CesiumViewer) => {
   const tileProvider = get(viewer.scene.globe, '_surface.tileProvider') as any;
   const quadtree = tileProvider._quadtree;
   const drawingBufferHeight = viewer.canvas.height;
-  const sseDenominator = get(viewer.camera.frustum, 'sseDenominator') ?? 1;
+  const sseDenominator = get(viewer.camera.frustum, 'sseDenominator') as number | undefined ?? 1;
 
   for (let level = 0; level <= MAX_ZOOM_LEVEL; level++) {
     const maxGeometricError = tileProvider.getLevelMaximumGeometricError(level);
@@ -33,7 +33,7 @@ const detectZoomLevel = (distance: number, viewer: CesiumViewer) => {
 const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
   precision = precision || 10;
 
-  const result = [];
+  const result: {level: number, height: number}[] = [];
   let step = 100000.0;
   let currentZoomLevel = 0;
   for (let height = 100000000.0; height > step; height = height - step) {

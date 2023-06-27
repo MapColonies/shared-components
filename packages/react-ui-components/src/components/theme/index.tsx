@@ -14,11 +14,15 @@ export interface ThemeProviderProps extends React.ComponentProps<typeof RMWCThem
 
 export * from './themes';
 export * from './theme-options';
+export interface IOptions {
+  [key: string]: any; // string
+  custom?: { [key: string]: any };
+}
 
 export const themeContext = React.createContext(Themes.lightTheme);
 
-export function useTheme(): Record<string, unknown> & { custom?: Record<string, unknown> } {
-  const theme = React.useContext(themeContext) as Record<string, unknown> & { custom?: Record<string, unknown> };
+export function useTheme(): IOptions {
+  const theme = React.useContext(themeContext) as IOptions;
 
   if (process.env.NODE_ENV !== 'production') {
     React.useDebugValue(theme);

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { WMTS } from 'ol/source';
-import { Options } from 'ol/source/WMTS';
+import { Options, RequestEncoding } from 'ol/source/WMTS';
 import WMTSRequestEncoding from 'ol/source/WMTSRequestEncoding';
-import { get as getProjection } from 'ol/proj';
+import { Projection, get as getProjection } from 'ol/proj';
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import { getTopLeft, getWidth } from 'ol/extent';
 import { useTileLayer } from '../layers/tile-layer';
@@ -31,7 +31,7 @@ export interface WMTSOptionParams {
 }
 
 export const getWMTSOptions = (params: WMTSOptionParams): Options => {
-  const projection = getProjection(params.projection);
+  const projection = getProjection(params.projection) as Projection;
   const projectionExtent = projection.getExtent();
   const resolutions = new Array<number>(RESOLUTIONS);
   const matrixIds = new Array<string>(RESOLUTIONS);
@@ -64,7 +64,7 @@ export const getWMTSOptions = (params: WMTSOptionParams): Options => {
       matrixIds: matrixIds,
     }),
     style: params.style,
-    requestEncoding: requestEncoding,
+    requestEncoding: requestEncoding as RequestEncoding,
     wrapX: params.wrapX !== undefined ? params.wrapX : true,
   };
 

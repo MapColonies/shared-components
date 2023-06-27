@@ -57,7 +57,7 @@ export function SmartTableRow<T>(props: SmartTableRowProps<T>) {
             align={cell.numeric ? 'right' : 'left'}
             padding={cell.disablePadding ? 'none' : 'default'}
           >
-            {cell.transform ? cell.transform(item[cell.id]) : item[cell.id]}
+            {(cell.transform ? cell.transform(item[cell.id]) : item[cell.id]) as React.ReactNode}
           </TableCell>
         ))}
       </TableRow>

@@ -13,6 +13,6 @@ export const CesiumEntityDescription: React.FC<RCesiumEntityDescriptionProps> = 
   return <ResiumEntityDescription {...props} />;
 };
 
-export const CesiumEntityStaticDescription: React.FC = (props) => {
+export const CesiumEntityStaticDescription: React.FC<RCesiumEntityDescriptionProps> = (props) => {
   return <ResiumEntityDescription {...props} />;
 };

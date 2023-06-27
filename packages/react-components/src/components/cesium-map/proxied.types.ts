@@ -14,7 +14,6 @@ import {
   Rectangle,
   Resource,
   VerticalOrigin,
-  Math,
 } from 'cesium';
 
 // PROXIED CLASSES

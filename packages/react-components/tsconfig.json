@@ -10,6 +10,11 @@
       "baseUrl": "./",
       "noEmitOnError": false,
     },
+    "ts-node": {
+      "compilerOptions": {
+        "module": "commonjs"
+      }
+    },
     "include": ["src/components/**/*"],
-    "exclude": ["**/node_modules/**", "node_modules", "dist", "storybook-static", "*.config.ts"],
+    "exclude": ["**/node_modules/**", "node_modules", "dist", "storybook-static", "*.config.ts", ".storybook"],
 }

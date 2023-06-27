@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { Paper } from '@material-ui/core';
 import { Polygon } from 'geojson';
@@ -42,7 +42,7 @@ export interface MapFilterContainerProps {
   filters?: React.ReactNode[];
 }
 
-export const MapFilterContainer: React.FC<MapFilterContainerProps> = (
+export const MapFilterContainer: React.FC<PropsWithChildren<MapFilterContainerProps>> = (
   props
 ) => {
   const [drawType, setDrawType] = useState<DrawType>();

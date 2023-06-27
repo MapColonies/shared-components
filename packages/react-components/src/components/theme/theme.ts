@@ -1,8 +1,8 @@
 import React from 'react';
-import { createMuiTheme } from '@material-ui/core';
+import { Theme, createTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-const useMappedMuiTheme = (theme: { [key: string]: string }) => {
+const useMappedMuiTheme = (theme: { [key: string]: string }): Theme => {
   const prefersDarkMode = theme.type === 'dark';
 
   return React.useMemo(() => mapMcToMuiTheme(theme, prefersDarkMode), [
@@ -14,8 +14,8 @@ const useMappedMuiTheme = (theme: { [key: string]: string }) => {
 const mapMcToMuiTheme = (
   mcTheme: { [key: string]: string },
   prefersDarkMode = false
-) => {
-  return createMuiTheme({
+): Theme => {
+  return createTheme({
     palette: {
       type: prefersDarkMode ? 'dark' : 'light',
       primary: {

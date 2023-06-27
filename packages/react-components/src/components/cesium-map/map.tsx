@@ -202,7 +202,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     if (ref.current !== null) {
-      const viewer = ref.current.cesiumElement as CesiumViewer;
+      const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
 
       if (props.imageryContextMenu) {
         viewer.screenSpaceEventHandler.setInputAction(
@@ -222,7 +222,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
-  }, [ref.current, props.imageryContextMenu]);
+  }, [ref, props.imageryContextMenu]);
 
   useEffect(() => {
     if (mapViewRef) {
@@ -377,9 +377,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     }
     return (): void => {
       if (mapViewRef) {
-        mapViewRef.scene.morphComplete.removeEventListener(
-          morphCompleteHandler
-        );
+        try{
+          mapViewRef.scene.morphComplete.removeEventListener(
+            morphCompleteHandler
+          );
+        } catch(e){
+          console.error('morphCompleteHandler event not cleaned');
+        }
       }
     };
   }, [mapViewRef, cameraState]);

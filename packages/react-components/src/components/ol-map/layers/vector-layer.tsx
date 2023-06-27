@@ -1,11 +1,11 @@
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react';
 import { Vector } from 'ol/layer';
 import { useMap } from '../map';
 
-const vectorLayerContext = createContext<Vector | null>(null);
+const vectorLayerContext = createContext<Vector<any> | null>(null);
 const VectorLayerProvider = vectorLayerContext.Provider;
 
-export const useVectorLayer = (): Vector => {
+export const useVectorLayer = (): Vector<any> => {
   const layer = useContext(vectorLayerContext);
 
   if (layer === null) {
@@ -15,7 +15,7 @@ export const useVectorLayer = (): Vector => {
   return layer;
 };
 
-export const VectorLayer: React.FC = ({ children }) => {
+export const VectorLayer: React.FC<PropsWithChildren> = ({ children }) => {
   const map = useMap();
   const [vectorLayer] = useState(new Vector());
 

@@ -1,4 +1,5 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookViteConfig } from "@storybook/builder-vite";
+
 const config = {
   addons: [
     '@storybook/addon-links',
@@ -11,8 +12,8 @@ const config = {
     name: '@storybook/react-vite',
     options: {},
   },
-  staticDirs: ['../../../public', '../storybook-static'],
-  viteFinal: async (config) => {
+  staticDirs: ['../../../public'],
+  viteFinal: async (config: Record<string, unknown>) => {
     const configAdditions = {
       ...config,
       CESIUM_BASE_URL: 'http://localhost:9010/'
@@ -20,6 +21,6 @@ const config = {
 
     return configAdditions;
   }
-};
+} as unknown as StorybookViteConfig;
 
 export default config;

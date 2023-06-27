@@ -5,6 +5,7 @@ import { Box } from '../box';
 import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
 import { CesiumSceneMode } from './map.types';
 import { IRasterLayer } from './layers-manager';
+import { IBaseMaps } from './settings/settings';
 
 export default {
   title: 'Cesium Map',
@@ -432,7 +433,7 @@ export const MapWithContextMenu: Story = () => {
         zoom={14}
         imageryProvider={false}
         sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
-        baseMaps={BASE_MAPS}
+        baseMaps={BASE_MAPS as IBaseMaps}
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}

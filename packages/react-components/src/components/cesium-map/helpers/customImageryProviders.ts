@@ -7,7 +7,7 @@ import {
   ImageryLayer,
   ImageryTypes,
 } from 'cesium';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import { ICesiumImageryLayer } from '../layers-manager';
 import { CesiumViewer } from '../map';
 import { imageHasTransparency } from './utils';
@@ -36,8 +36,8 @@ function customCommonRequestImage(
       /* eslint-disable */
       (layer: ImageryLayer): boolean => {
         return (
-          (layer as any)._imageryProvider._resource._url ===
-          (this as any)._resource._url
+          (layer as any)._imageryProvider._resource?._url ===
+          (this as any)._resource?._url
         );
       }
       /* eslint-enable */

@@ -22,8 +22,8 @@ export const CesiumImageryLayer: React.FC<RCesiumImageryLayerProps> = (
         ((layer: ImageryLayer, idx: number): boolean => {
           if (meta !== undefined) {
             return (
-              (layer as any)._imageryProvider._resource._url ===
-              meta.options.url
+              (layer as any)._imageryProvider._resource?._url ===
+              meta.options?.url
             );
           }
           return false;

@@ -6,6 +6,10 @@ export default getBaseConfig({
   lib: {
     entry: path.resolve(__dirname, 'src/index.ts'),
     name: 'reactComponents',
-    fileName: '@map-colonies/react-components',
-  } as LibraryOptions,
+    formats: ['es', 'umd'],
+
+    // fileName: '@map-colonies/react-components',
+    fileName: (format: string) => `@map-colonies/components.${format}.js`,
+
+  } as LibraryOptions
 });

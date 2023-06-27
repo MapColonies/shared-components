@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
       "module": "es2020",
-      "moduleResolution": "Node",
+      "moduleResolution": "node",
       "resolveJsonModule": true,
       "esModuleInterop": true,
       "outDir": "dist",

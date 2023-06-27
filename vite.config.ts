@@ -21,7 +21,8 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
         }),
         dts({
           insertTypesEntry: true,
-          include: ['src/components']
+          include: ['src/components'],
+          tsConfigFilePath: 'tsconfig-build.json'
         }),
         ...plugins,
       ],
@@ -31,7 +32,9 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
           external: isExternal,
           output: {
             globals: {
+              cesium: "Cesium",
               react: 'React',
+              "react-dom": "ReactDOM",
             },
           },
         },
