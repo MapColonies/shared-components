@@ -5,15 +5,17 @@ import {
   DrawerHeader as RMWCDrawerHeader,
   DrawerTitle as RMWCDrawerTitle,
   DrawerSubtitle as RMWCDrawerSubtitle,
-  DrawerContent as RMWCDrawerContent
+  DrawerContent as RMWCDrawerContent,
 } from '@rmwc/drawer';
 import '@rmwc/drawer/styles';
 
-export interface DrawerProps extends React.ComponentProps<typeof RMWCDrawer> {}
-export interface DrawerHeaderProps extends React.ComponentProps<typeof RMWCDrawerHeader> {}
-export interface DrawerTitleProps extends React.ComponentProps<typeof RMWCDrawerTitle>{}
-export interface DrawerSubtitleProps extends React.ComponentProps<typeof RMWCDrawerSubtitle> {}
-export interface DrawerContentProps extends React.ComponentProps<typeof RMWCDrawerContent> {}
+import { ExtractProps } from '../typeHelpers';
+
+export interface DrawerProps extends ExtractProps<typeof RMWCDrawer> {}
+export interface DrawerHeaderProps extends ExtractProps<typeof RMWCDrawerHeader> {}
+export interface DrawerTitleProps extends ExtractProps<typeof RMWCDrawerTitle> {}
+export interface DrawerSubtitleProps extends ExtractProps<typeof RMWCDrawerSubtitle> {}
+export interface DrawerContentProps extends ExtractProps<typeof RMWCDrawerContent> {}
 
 export const Drawer: React.FC<DrawerProps> = React.forwardRef<any, DrawerProps>((props, ref) => {
   return <RMWCDrawer ref={ref} {...props} />;

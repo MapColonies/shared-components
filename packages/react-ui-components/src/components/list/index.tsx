@@ -11,29 +11,33 @@ import {
   ListItemMeta as RMWCListItemMeta,
   CollapsibleList as RMWCCollapsibleList,
   CollapsibleListProps as RMWCCollapsibleListProps,
-  SimpleListItem as RMWCSimpleListItem
+  SimpleListItem as RMWCSimpleListItem,
 } from '@rmwc/list';
 
 import '@rmwc/list/styles';
 
-export interface ListProps extends React.ComponentProps<typeof RMWCList> {}
-export interface CollapsibleListProps extends React.ComponentProps<typeof RMWCCollapsibleList> {}
-export interface ListDividerProps extends React.ComponentProps<typeof RMWCListDivider> {}
-export interface ListItemProps extends React.ComponentProps<typeof RMWCListItem> {}
-export interface SimpleListItemProps extends React.ComponentProps<typeof RMWCSimpleListItem> {}
-export interface ListItemGraphicProps extends React.ComponentProps<typeof RMWCListItemGraphic> {}
-export interface ListItemPrimaryTextProps extends React.ComponentProps<typeof RMWCListItemPrimaryText> {}
-export interface ListItemTextProps extends React.ComponentProps<typeof RMWCListItemText> {}
-export interface ListItemSecondaryTextProps extends React.ComponentProps<typeof RMWCListItemSecondaryText> {}
-export interface ListItemMetaProps extends React.ComponentProps<typeof RMWCListItemMeta> {}
+import { ExtractProps } from '../typeHelpers';
+
+export interface ListProps extends ExtractProps<typeof RMWCList> {}
+export interface CollapsibleListProps extends ExtractProps<typeof RMWCCollapsibleList> {}
+export interface ListDividerProps extends ExtractProps<typeof RMWCListDivider> {}
+export interface ListItemProps extends ExtractProps<typeof RMWCListItem> {}
+export interface SimpleListItemProps extends ExtractProps<typeof RMWCSimpleListItem> {}
+export interface ListItemGraphicProps extends ExtractProps<typeof RMWCListItemGraphic> {}
+export interface ListItemPrimaryTextProps extends ExtractProps<typeof RMWCListItemPrimaryText> {}
+export interface ListItemTextProps extends ExtractProps<typeof RMWCListItemText> {}
+export interface ListItemSecondaryTextProps extends ExtractProps<typeof RMWCListItemSecondaryText> {}
+export interface ListItemMetaProps extends ExtractProps<typeof RMWCListItemMeta> {}
 
 export const List: React.FC<ListProps> = React.forwardRef<any, ListProps>((props, ref) => {
   return <RMWCList ref={ref} {...props} />;
 });
 
-export const CollapsibleList: React.FC<ListProps & RMWCCollapsibleListProps> = React.forwardRef<any, ListProps & RMWCCollapsibleListProps>((props, ref) => {
-  return <RMWCCollapsibleList ref={ref} {...props} />;
-});
+export const CollapsibleList: React.FC<ListProps & RMWCCollapsibleListProps> = React.forwardRef<any, ListProps & RMWCCollapsibleListProps>(
+  (props, ref) => {
+    return <RMWCCollapsibleList ref={ref} {...props} />;
+  }
+);
 
 export const ListDivider: React.FC<ListDividerProps> = React.forwardRef<any, ListDividerProps>((props, ref) => {
   return <RMWCListDivider ref={ref} {...props} />;

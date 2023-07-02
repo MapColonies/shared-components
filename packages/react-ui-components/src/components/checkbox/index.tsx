@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox';
-import '@rmwc/checkbox/styles'
+import { CheckboxHTMLProps, CheckboxProps as RMWCCheckboxProps, Checkbox as RMWCCheckbox } from '@rmwc/checkbox';
+import '@rmwc/checkbox/styles';
+import { ExtractProps } from '../typeHelpers';
 
-export interface CheckboxProps extends  React.ComponentProps<typeof RMWCCheckbox>{};
+type CheckboxPropsWithHtml = CheckboxHTMLProps & RMWCCheckboxProps;
 
-export const Checkbox: React.FC<CheckboxProps> = React.forwardRef<any, CheckboxProps>((props, ref) => {
+export interface CheckboxProps extends ExtractProps<typeof RMWCCheckbox> {}
 
-return <RMWCCheckbox ref={ref} {...props} />
-
-});
+export const Checkbox: React.FC<CheckboxProps & CheckboxPropsWithHtml> = (props) => {
+  return <RMWCCheckbox ref={props.ref} {...props} />;
+};

@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Switch as RMWCSwitch } from '@rmwc/switch';
-import "@rmwc/switch/styles";
+import { SwitchHTMLProps, SwitchProps as RMWCSwitchProps, Switch as RMWCSwitch } from '@rmwc/switch';
+import '@rmwc/switch/styles';
 
+import { ExtractProps } from '../typeHelpers';
 
-export interface SwitchProps extends React.ComponentProps<typeof RMWCSwitch> {};
+type SwitchPropsWithHtml = SwitchHTMLProps & RMWCSwitchProps;
 
-export const Switch: React.FC<SwitchProps> = React.forwardRef<any, SwitchProps>((props, ref) => {
+export interface SwitchProps extends ExtractProps<typeof RMWCSwitch> {}
 
-return <RMWCSwitch ref={ref} {...props} />
-
-});
+export const Switch: React.FC<SwitchProps & SwitchPropsWithHtml> = (props) => {
+  return <RMWCSwitch ref={props.ref} {...props} />;
+};

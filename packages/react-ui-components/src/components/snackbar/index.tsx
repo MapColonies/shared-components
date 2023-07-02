@@ -4,16 +4,18 @@ import {
   Snackbar as RMWCSnackbar,
   SnackbarAction as RMWCSnackbarAction,
   SnackbarQueue as RMWCSnackbarQueue,
-  createSnackbarQueue as RMWCCreateSnamebarQueue
+  createSnackbarQueue as RMWCCreateSnamebarQueue,
 } from '@rmwc/snackbar';
 
-import {HTMLProps} from '@rmwc/types';
+import { HTMLProps } from '@rmwc/types';
 
-import "@rmwc/snackbar/styles";
+import '@rmwc/snackbar/styles';
 
-export interface SnackbarProps extends React.ComponentProps<typeof RMWCSnackbar> {};
-export interface SnackbarActionProps extends React.ComponentProps<typeof RMWCSnackbarAction> {}
-export interface SnackbarQueueProps extends React.ComponentProps<typeof RMWCSnackbarQueue> {}
+import { ExtractProps } from '../typeHelpers';
+
+export interface SnackbarProps extends ExtractProps<typeof RMWCSnackbar> {}
+export interface SnackbarActionProps extends ExtractProps<typeof RMWCSnackbarAction> {}
+export interface SnackbarQueueProps extends ExtractProps<typeof RMWCSnackbarQueue> {}
 
 export const createSnackbarQueue = RMWCCreateSnamebarQueue;
 

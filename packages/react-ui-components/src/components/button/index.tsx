@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Button as RMWCButton} from '@rmwc/button';
-
+import { ButtonHTMLProps, ButtonProps as RMWCButtonProps, Button as RMWCButton } from '@rmwc/button';
 import '@rmwc/button/styles';
+import { ExtractProps } from '../typeHelpers';
 
-type BtnProps =  React.ComponentProps<typeof RMWCButton>;
+type ButtonPropsWithHtml = ButtonHTMLProps & RMWCButtonProps;
 
-export interface ButtonProps extends BtnProps{};
+export interface ButtonProps extends ExtractProps<typeof RMWCButton> {}
 
-export const Button: React.FC<ButtonProps> = (props) => {
-  return <RMWCButton {...props} />
+export const Button: React.FC<ButtonProps & ButtonPropsWithHtml> = (props) => {
+  return <RMWCButton ref={props.ref} {...props} />;
 };
-

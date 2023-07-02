@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Fab as RMWCFab} from '@rmwc/fab';
+import { Fab as RMWCFab } from '@rmwc/fab';
 import '@rmwc/fab/styles';
+import { ExtractProps } from '../typeHelpers';
 
-
-export interface FabProps extends React.ComponentProps<typeof RMWCFab>{};
+export interface FabProps extends ExtractProps<typeof RMWCFab> {}
 
 export const Fab: React.FC<FabProps> = React.forwardRef<any, FabProps>((props, ref) => {
-
-return <RMWCFab ref={ref} {...props} />
-
+  return <RMWCFab ref={ref} {...props} />;
 });

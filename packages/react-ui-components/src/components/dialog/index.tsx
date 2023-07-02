@@ -9,14 +9,15 @@ import {
   DialogQueue as RMWCDialogQueue,
   createDialogQueue as RMWCCreateDialogQueue,
 } from '@rmwc/dialog';
+import { ExtractProps } from '../typeHelpers';
 
 import '@rmwc/dialog/styles';
 
-export interface DialogProps extends React.ComponentProps<typeof RMWCDialog> {}
-export interface DialogContentProps extends React.ComponentProps<typeof RMWCDialogContent> {}
-export interface DialogTitleProps extends React.ComponentProps<typeof RMWCDialogTitle> {}
-export interface DialogActionsProps extends React.ComponentProps<typeof RMWCDialogActions> {}
-export interface DialogQueueProps extends React.ComponentProps<typeof RMWCDialogQueue> {}
+export interface DialogProps extends ExtractProps<typeof RMWCDialog> {}
+export interface DialogContentProps extends ExtractProps<typeof RMWCDialogContent> {}
+export interface DialogTitleProps extends ExtractProps<typeof RMWCDialogTitle> {}
+export interface DialogActionsProps extends ExtractProps<typeof RMWCDialogActions> {}
+export interface DialogQueueProps extends ExtractProps<typeof RMWCDialogQueue> {}
 
 export const Dialog: React.FC<DialogProps> = React.forwardRef<any, DialogProps>((props, ref) => {
   return <RMWCDialog ref={ref} {...props} />;

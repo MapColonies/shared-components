@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import {IconButton as RMWCIconButton} from '@rmwc/icon-button';
-import '@rmwc/icon-button/styles'
+import { IconButtonHTMLProps, IconButton as RMWCIconButton, IconButtonProps as RMWCIconButtonProps } from '@rmwc/icon-button';
+import '@rmwc/icon-button/styles';
+import { ExtractProps } from '../typeHelpers';
 
-export interface IconButtonProps extends React.ComponentProps<typeof RMWCIconButton> {};
+type IconButtonPropsWithHtml = IconButtonHTMLProps & RMWCIconButtonProps;
+export interface IconButtonProps extends ExtractProps<typeof RMWCIconButton> {}
 
-export const IconButton: React.FC<IconButtonProps> = React.forwardRef<any, IconButtonProps>((props, ref) => {
-
-return <RMWCIconButton ref={ref} {...props} />
-
-});
+export const IconButton: React.FC<IconButtonProps & IconButtonPropsWithHtml> = (props) => {
+  return <RMWCIconButton ref={props.ref} {...props} />;
+};

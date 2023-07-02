@@ -55,7 +55,11 @@
   "workspaces": {
     "nohoist": [
       "tslib",
-      "@rmwc/*"
+      "@rmwc/*",
+      "react",
+      "react-dom",
+      "@types/react",
+      "@types/react-dom"
     ]
   }
 }

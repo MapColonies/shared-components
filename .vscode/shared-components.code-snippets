@@ -20,16 +20,18 @@
     "prefix": "rmwcWrapper",
     "body": [
       "import React from 'react';",
-      "import {${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}} from '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}';",
+      "import {${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}HTMLProps, ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props, ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}} from '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}';",
       "import '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}/styles'",
+      "",
+      "type ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}PropsWithHtml = ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}HTMLProps & RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props;",
       "",
       "export interface ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props extends React.ComponentProps<typeof RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}> {};",
       "",
-      "export const ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}: React.FC<${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props> = React.forwardRef<any, ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props>((props, ref) => {",
+      "export const ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}: React.FC<${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props & ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}PropsWithHtml> = props => {",
       "",
-      "return <RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} ref={ref} {...props} />",
+      "return <RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} ref={props.ref} {...props} />",
       "",
-      "});"
+      "};"
     ]
   }
 }

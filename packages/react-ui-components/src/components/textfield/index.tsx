@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { TextField as RMWCTextfield } from '@rmwc/textfield';
-import '@rmwc/textfield/styles'
+import { TextFieldHTMLProps, TextFieldProps as RMWCTextFieldProps, TextField as RMWCTextField } from '@rmwc/textfield';
+import '@rmwc/textfield/styles';
+import { ExtractProps } from '../typeHelpers';
 
-export interface TextfieldProps extends React.ComponentProps<typeof RMWCTextfield> {};
+type TextFieldPropsWithHtml = TextFieldHTMLProps & RMWCTextFieldProps;
 
-export const TextField: React.FC<TextfieldProps> = React.forwardRef<any, TextfieldProps>((props, ref) => {
+export interface TextFieldProps extends ExtractProps<typeof RMWCTextField> {}
 
-return <RMWCTextfield ref={ref} {...props} />
-
-});
+export const TextField: React.FC<TextFieldProps & TextFieldPropsWithHtml> = (props) => {
+  return <RMWCTextField ref={props.ref} {...props} />;
+};

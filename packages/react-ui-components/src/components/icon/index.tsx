@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Icon as RMWCIcon } from '@rmwc/icon';
-import '@rmwc/icon/styles'
+import { IconHTMLProps, Icon as RMWCIcon, IconProps as RMWCIconProps } from '@rmwc/icon';
+import '@rmwc/icon/styles';
+import { ExtractProps } from '../typeHelpers';
 
-export interface IconProps extends React.ComponentProps<typeof RMWCIcon> {};
+type IconPropsWithHtml = IconHTMLProps & RMWCIconProps;
 
-export const Icon: React.FC<IconProps> = React.forwardRef<any, IconProps>((props, ref) => {
+export interface IconProps extends ExtractProps<typeof RMWCIcon> {}
 
-return <RMWCIcon ref={ref} {...props} />
-
-});
-
+export const Icon: React.FC<IconProps & IconPropsWithHtml> = (props) => {
+  return <RMWCIcon ref={props.ref} {...props} />;
+};

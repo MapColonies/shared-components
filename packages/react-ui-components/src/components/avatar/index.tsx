@@ -6,11 +6,14 @@ import {
   AvatarCountProps as RMWCAvatarCountProps,
   AvatarCount as RMWCAvatarCount,
 } from '@rmwc/avatar';
+
 import '@rmwc/avatar/styles';
 
-export interface AvatarProps extends React.ComponentProps<typeof RMWCAvatar> {}
-export interface AvatarGroupProps extends React.ComponentProps<typeof RMWCAvatarGroup> {}
-export interface AvatarCountProps extends React.ComponentProps<typeof RMWCAvatarCount> {}
+import { ExtractProps } from '../typeHelpers';
+
+export interface AvatarProps extends ExtractProps<typeof RMWCAvatar> {}
+export interface AvatarGroupProps extends ExtractProps<typeof RMWCAvatarGroup> {}
+export interface AvatarCountProps extends ExtractProps<typeof RMWCAvatarCount> {}
 
 export const Avatar: React.FC<AvatarProps> = React.forwardRef<any, AvatarProps>((props, ref) => {
   return <RMWCAvatar ref={ref} {...props} />;
