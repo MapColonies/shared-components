@@ -15,7 +15,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "copyassets:all": "yarn run copyassets:md-font",
-    "copyassets:md-font": "copyfiles -u 5 \"../../node_modules/material-design-icons/iconfont/*\" \"storybook-static/fonts/material-icons\"",
+    "copyassets:md-font": "copyfiles -u 5 \"../../node_modules/material-design-icons/iconfont/*\" \"./public/fonts/material-icons\"",
     "storybook": "yarn run copyassets:all && storybook dev -p 9011",
     "build-storybook": "storybook build && yarn run copyassets:md-font"
   },

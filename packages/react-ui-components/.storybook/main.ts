@@ -1,7 +1,8 @@
-import commonConfigs from '../../../.storybook/main';
+import commonConfig from '../../../.storybook/main';
 
 const config = {
-  ...commonConfigs,
+  ...commonConfig,
+  staticDirs: [...(commonConfig.staticDirs as string[]), '../public'],
   stories: ['../src/components/**/*.stories.@(js|jsx|ts|tsx)'],
 };
 
