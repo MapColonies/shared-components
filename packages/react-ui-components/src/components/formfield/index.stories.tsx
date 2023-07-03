@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { FormField } from './';
+import './styles.js';
 
 const meta: Meta<typeof FormField> = {
   component: FormField,

@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { List, ListItem, ListItemGraphic, ListItemMeta, ListItemPrimaryText, ListItemSecondaryText, ListItemText } from '../list';
+import './styles.js';
 
 const meta: Meta<typeof List> = {
   component: List,

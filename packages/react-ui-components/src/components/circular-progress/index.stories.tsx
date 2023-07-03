@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { CircularProgress } from './';
+import './styles.js';
 
 const meta: Meta<typeof CircularProgress> = {
   component: CircularProgress,

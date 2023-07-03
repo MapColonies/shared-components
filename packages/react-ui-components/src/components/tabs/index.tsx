@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { Tab as RMWCTab, TabBar as RMWCTabBar, TabBarOnActivateEventT as RMWCTabBarOnActivateEventT } from '@rmwc/tabs';
-import '@rmwc/tabs/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

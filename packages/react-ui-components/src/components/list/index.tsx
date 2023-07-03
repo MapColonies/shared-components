@@ -14,7 +14,6 @@ import {
   SimpleListItem as RMWCSimpleListItem,
 } from '@rmwc/list';
 
-import '@rmwc/list/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

@@ -3,6 +3,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconButton } from '../icon-button';
 import { Tooltip } from './';
+import './styles.js';
 
 const meta: Meta<typeof Tooltip> = {
   component: Tooltip,

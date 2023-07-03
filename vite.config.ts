@@ -13,7 +13,8 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
     
     return {
       plugins: [
-        pluginReact(),
+        // Important if using react <18.
+        pluginReact({ jsxRuntime: 'classic' }),
         eslintPlugin({
           cache: false,
           include: ['./src/components/**/*.ts|tsx'],

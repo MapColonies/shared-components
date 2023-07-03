@@ -9,7 +9,6 @@ import {
 
 import { HTMLProps } from '@rmwc/types';
 
-import '@rmwc/snackbar/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

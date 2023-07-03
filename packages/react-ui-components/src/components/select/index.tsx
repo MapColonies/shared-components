@@ -1,6 +1,5 @@
 import React from 'react';
 import { SelectHTMLProps, SelectProps as RMWCSelectProps, Select as RMWCSelect, FormattedOption as RMWCFormattedOption } from '@rmwc/select';
-import '@rmwc/select/styles';
 import { ExtractProps } from '../typeHelpers';
 
 type SelectPropsWithHtml = SelectHTMLProps & RMWCSelectProps;

@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { DialogButton } from '@rmwc/dialog';
 import { Button } from '../button';
 import { Dialog, DialogActions, DialogContent, DialogQueue, DialogTitle, createDialogQueue } from './';
+import './styles.js';
 
 const meta: Meta<typeof Dialog> = {
   component: Dialog,

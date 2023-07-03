@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { CheckboxHTMLProps, CheckboxProps as RMWCCheckboxProps, Checkbox as RMWCCheckbox } from '@rmwc/checkbox';
-import '@rmwc/checkbox/styles';
 import { ExtractProps } from '../typeHelpers';
 
 type CheckboxPropsWithHtml = CheckboxHTMLProps & RMWCCheckboxProps;

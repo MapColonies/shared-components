@@ -7,7 +7,6 @@ import {
   DrawerSubtitle as RMWCDrawerSubtitle,
   DrawerContent as RMWCDrawerContent,
 } from '@rmwc/drawer';
-import '@rmwc/drawer/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

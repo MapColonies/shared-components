@@ -1,0 +1,1 @@
+import '@rmwc/theme/styles';

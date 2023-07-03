@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { LinearProgress as RMWCLinearProgress } from '@rmwc/linear-progress';
-import '@rmwc/linear-progress/styles';
 import { ExtractProps } from '../typeHelpers';
 
 export interface LinearProgressProps extends ExtractProps<typeof RMWCLinearProgress> {}

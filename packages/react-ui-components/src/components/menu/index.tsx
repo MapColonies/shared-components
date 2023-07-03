@@ -8,7 +8,6 @@ import {
   MenuSurfaceProps as RMWCMenuSurfaceProps,
   MenuHTMLProps,
 } from '@rmwc/menu';
-import '@rmwc/menu/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

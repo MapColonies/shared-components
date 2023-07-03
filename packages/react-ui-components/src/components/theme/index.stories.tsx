@@ -3,6 +3,7 @@ import React from 'react';
 import { ThemePropT } from '@rmwc/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Theme, themeOptions } from './';
+import './styles.js';
 
 const meta: Meta<typeof Theme> = {
   component: Theme,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { SwitchHTMLProps, SwitchProps as RMWCSwitchProps, Switch as RMWCSwitch } from '@rmwc/switch';
-import '@rmwc/switch/styles';
 
 import { ExtractProps } from '../typeHelpers';
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { LinearProgress } from './';
+import './styles.js';
 
 const meta: Meta<typeof LinearProgress> = {
   component: LinearProgress,

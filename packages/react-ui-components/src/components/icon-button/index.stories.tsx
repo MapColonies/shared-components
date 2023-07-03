@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconButton } from './';
+import './styles.js';
 
 const meta: Meta<typeof IconButton> = {
   component: IconButton,

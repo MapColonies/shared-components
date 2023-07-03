@@ -3,6 +3,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { List, ListItem } from '../list';
 import { Drawer, DrawerContent, DrawerHeader, DrawerSubtitle, DrawerTitle } from './';
+import './styles.js';
 
 const meta: Meta<typeof Drawer> = {
   component: Drawer,

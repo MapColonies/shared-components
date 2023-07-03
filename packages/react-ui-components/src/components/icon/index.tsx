@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { IconHTMLProps, Icon as RMWCIcon, IconProps as RMWCIconProps } from '@rmwc/icon';
-import '@rmwc/icon/styles';
 import { ExtractProps } from '../typeHelpers';
 
 type IconPropsWithHtml = IconHTMLProps & RMWCIconProps;

@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ListDivider } from '../list';
 import { Button } from '../button';
 import { Menu, MenuItem, MenuSurfaceAnchor } from './';
+import './styles.js';
 
 const meta: Meta<typeof Menu> = {
   component: Menu,

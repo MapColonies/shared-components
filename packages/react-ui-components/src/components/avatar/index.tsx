@@ -7,8 +7,6 @@ import {
   AvatarCount as RMWCAvatarCount,
 } from '@rmwc/avatar';
 
-import '@rmwc/avatar/styles';
-
 import { ExtractProps } from '../typeHelpers';
 
 export interface AvatarProps extends ExtractProps<typeof RMWCAvatar> {}
