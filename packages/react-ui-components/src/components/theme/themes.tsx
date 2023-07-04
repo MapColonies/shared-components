@@ -26,6 +26,7 @@ export const Themes = {
     textHintOnDark: 'rgba(255, 255, 255, 0.5)',
     textDisabledOnDark: 'rgba(255, 255, 255, 0.5)',
     textIconOnDark: 'rgba(255, 255, 255, 0.5)',
+    checkboxCheckedColor: '#2979ff',
   },
   darkTheme: {
     type: 'dark',
@@ -53,5 +54,6 @@ export const Themes = {
     textHintOnDark: '#AFBFDA',
     textDisabledOnDark: '#AFBFDA',
     textIconOnDark: '#AFBFDA',
+    checkboxCheckedColor: '#24aee9',
   },
 };

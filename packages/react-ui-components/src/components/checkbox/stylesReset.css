@@ -1,0 +1,3 @@
+.mdc-checkbox {
+  --mdc-checkbox-checked-color: var(--mdc-theme-checkbox-checked-color);
+}
