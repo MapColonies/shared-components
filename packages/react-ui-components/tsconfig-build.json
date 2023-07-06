@@ -7,7 +7,7 @@
       "esnext"
     ],
     "noImplicitAny": false,
-    "module": "es2020",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
