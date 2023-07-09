@@ -9,10 +9,10 @@ export interface TabBarProps extends ExtractProps<typeof RMWCTabBar> {}
 
 export type TabBarOnActivateEventT = RMWCTabBarOnActivateEventT;
 
-export const Tab: React.FC<TabProps> = React.forwardRef<any, TabProps>((props, ref) => {
+export const Tab = React.forwardRef<any, TabProps>((props, ref) => {
   return <RMWCTab ref={ref} {...props} />;
 });
 
-export const TabBar: React.FC<TabBarProps> = React.forwardRef<any, TabBarProps>((props, ref) => {
+export const TabBar = React.forwardRef<any, TabBarProps>((props, ref) => {
   return <RMWCTabBar ref={ref} {...props} />;
 });

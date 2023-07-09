@@ -33,11 +33,11 @@ export function useTheme(): IOptions {
   return theme;
 }
 
-export const Theme: React.FC<ThemeProps & RMWCThemeProps> = React.forwardRef<any, ThemeProps & RMWCThemeProps>((props, ref) => {
+export const Theme = React.forwardRef<any, ThemeProps & RMWCThemeProps>((props, ref) => {
   return <RMWCTheme ref={ref} {...props} />;
 });
 
-export const ThemeProvider: React.FC<ThemeProviderProps & RMWCThemeProviderProps> = React.forwardRef<
+export const ThemeProvider = React.forwardRef<
   any,
   ThemeProviderProps & RMWCThemeProviderProps
 >((props, ref) => {

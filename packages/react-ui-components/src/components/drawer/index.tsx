@@ -16,22 +16,22 @@ export interface DrawerTitleProps extends ExtractProps<typeof RMWCDrawerTitle> {
 export interface DrawerSubtitleProps extends ExtractProps<typeof RMWCDrawerSubtitle> {}
 export interface DrawerContentProps extends ExtractProps<typeof RMWCDrawerContent> {}
 
-export const Drawer: React.FC<DrawerProps> = React.forwardRef<any, DrawerProps>((props, ref) => {
+export const Drawer = React.forwardRef<any, DrawerProps>((props, ref) => {
   return <RMWCDrawer ref={ref} {...props} />;
 });
 
-export const DrawerHeader: React.FC<DrawerHeaderProps> = React.forwardRef<any, DrawerHeaderProps>((props, ref) => {
+export const DrawerHeader = React.forwardRef<any, DrawerHeaderProps>((props, ref) => {
   return <RMWCDrawerHeader ref={ref} {...props} />;
 });
 
-export const DrawerTitle: React.FC<DrawerTitleProps> = React.forwardRef<any, DrawerTitleProps>((props, ref) => {
+export const DrawerTitle = React.forwardRef<any, DrawerTitleProps>((props, ref) => {
   return <RMWCDrawerTitle ref={ref} {...props} />;
 });
 
-export const DrawerSubtitle: React.FC<DrawerSubtitleProps> = React.forwardRef<any, DrawerSubtitleProps>((props, ref) => {
+export const DrawerSubtitle = React.forwardRef<any, DrawerSubtitleProps>((props, ref) => {
   return <RMWCDrawerSubtitle ref={ref} {...props} />;
 });
 
-export const DrawerContent: React.FC<DrawerContentProps> = React.forwardRef<any, DrawerContentProps>((props, ref) => {
+export const DrawerContent = React.forwardRef<any, DrawerContentProps>((props, ref) => {
   return <RMWCDrawerContent ref={ref} {...props} />;
 });

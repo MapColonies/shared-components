@@ -18,19 +18,19 @@ export interface DialogTitleProps extends ExtractProps<typeof RMWCDialogTitle> {
 export interface DialogActionsProps extends ExtractProps<typeof RMWCDialogActions> {}
 export interface DialogQueueProps extends ExtractProps<typeof RMWCDialogQueue> {}
 
-export const Dialog: React.FC<DialogProps> = React.forwardRef<any, DialogProps>((props, ref) => {
+export const Dialog = React.forwardRef<any, DialogProps>((props, ref) => {
   return <RMWCDialog ref={ref} {...props} />;
 });
 
-export const DialogTitle: React.FC<DialogTitleProps> = React.forwardRef<any, DialogTitleProps>((props, ref) => {
+export const DialogTitle = React.forwardRef<any, DialogTitleProps>((props, ref) => {
   return <RMWCDialogTitle ref={ref} {...props} />;
 });
 
-export const DialogContent: React.FC<DialogContentProps> = React.forwardRef<any, DialogContentProps>((props, ref) => {
+export const DialogContent = React.forwardRef<any, DialogContentProps>((props, ref) => {
   return <RMWCDialogContent ref={ref} {...props} />;
 });
 
-export const DialogActions: React.FC<DialogActionsProps> = React.forwardRef<any, DialogActionsProps>((props, ref) => {
+export const DialogActions = React.forwardRef<any, DialogActionsProps>((props, ref) => {
   return <RMWCDialogActions ref={ref} {...props} />;
 });
 

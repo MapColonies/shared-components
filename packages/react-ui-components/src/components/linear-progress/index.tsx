@@ -5,6 +5,6 @@ import { ExtractProps } from '../typeHelpers';
 
 export interface LinearProgressProps extends ExtractProps<typeof RMWCLinearProgress> {}
 
-export const LinearProgress: React.FC<LinearProgressProps> = React.forwardRef<any, LinearProgressProps>((props, ref) => {
+export const LinearProgress = React.forwardRef<any, LinearProgressProps>((props, ref) => {
   return <RMWCLinearProgress ref={ref} {...props} />;
 });

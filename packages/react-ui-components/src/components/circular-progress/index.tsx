@@ -5,6 +5,6 @@ import { ExtractProps } from '../typeHelpers';
 
 export interface CircularProgressProps extends ExtractProps<typeof RMWCCircularProgress> {}
 
-export const CircularProgress: React.FC<CircularProgressProps> = React.forwardRef<any, CircularProgressProps>((props, ref) => {
+export const CircularProgress = React.forwardRef<any, CircularProgressProps>((props, ref) => {
   return <RMWCCircularProgress ref={ref} {...props} />;
 });

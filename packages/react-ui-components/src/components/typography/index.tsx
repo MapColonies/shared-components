@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Typography as RMWCTypography, TypographyProps as RMWCTypographyProps, TypographyHTMLProps, TypographyT } from '@rmwc/typography';
 
 import { ExtractProps } from '../typeHelpers';
@@ -12,6 +12,6 @@ interface CustomTypographyProps extends Omit<TypographyPropsWithHtml, 'tag' | 'u
 }
 export interface TypographyProps extends ExtractProps<typeof RMWCTypography> {}
 
-export const Typography: React.FC<TypographyProps & CustomTypographyProps> = (props) => {
-  return <RMWCTypography {...props} tag={props.tag ?? 'span'} use={props.use ?? ''} />;
-};
+export const Typography = forwardRef<any, TypographyProps & CustomTypographyProps>((props, ref) => {
+  return <RMWCTypography ref={ref} {...props} tag={props.tag ?? 'span'} use={props.use ?? ''} />;
+});
