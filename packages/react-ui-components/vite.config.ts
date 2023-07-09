@@ -3,6 +3,8 @@ import { getBaseConfig } from '../../vite.config';
 
 export default getBaseConfig({
   lib: {
+    // Important if using react <18.
+    // pluginReact({ jsxRuntime: 'classic' }),
     entry: path.resolve(__dirname, 'src/index.ts'),
     name: 'reactUiComponents',
     formats: ['es', 'umd'],

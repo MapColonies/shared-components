@@ -1,5 +1,6 @@
 import path from 'path';
 import { PluginOption, defineConfig, UserConfigExport, loadEnv } from 'vite';
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import pluginReact from '@vitejs/plugin-react';
 import eslintPlugin from 'vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
@@ -26,6 +27,7 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
           include: ['src/components'],
           tsConfigFilePath: 'tsconfig-build.json'
         }),
+        cssInjectedByJsPlugin(),
         ...plugins,
       ],
       build: {
