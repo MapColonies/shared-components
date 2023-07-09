@@ -23,7 +23,7 @@
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@here/quantized-mesh-decoder": "^1.2.8",
-    "@map-colonies/react-core": "0.0.0",
+    "@map-colonies/react-core": "/home/asafch1/Documents/Projects/Mapcolonies/mc-shared-components/packages/react-ui-components",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",

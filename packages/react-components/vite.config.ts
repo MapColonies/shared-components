@@ -9,7 +9,7 @@ export default getBaseConfig({
     formats: ['es', 'umd'],
 
     // fileName: '@map-colonies/react-components',
-    fileName: (format: string) => `@map-colonies/components.${format}.js`,
+    fileName: (format: string) => `@map-colonies/react-components.${format}.js`,
 
   } as LibraryOptions
 });
