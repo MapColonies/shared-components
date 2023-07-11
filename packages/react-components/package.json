@@ -72,5 +72,8 @@
       "cesium",
       "resium"
     ]
-  }
+  },
+  "files": [
+    "dist"
+  ],
 }
