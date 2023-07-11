@@ -1,5 +1,6 @@
 {
   "name": "@map-colonies/react-components",
+  "private": true,
   "version": "0.0.0",
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",

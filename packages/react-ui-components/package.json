@@ -1,5 +1,6 @@
 {
   "name": "@map-colonies/react-core",
+  "private": true,
   "version": "0.0.0",
   "main": "./dist/@map-colonies/react-core.umd.js",
   "module": "./dist/@map-colonies/react-core.es.js",

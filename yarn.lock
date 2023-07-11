@@ -2747,32 +2747,6 @@
   resolved "https://registry.yarnpkg.com/@map-colonies/prettier-config/-/prettier-config-0.0.1.tgz#dda069bb4ca9dc7ab2e27fa3d784dca245ea26c4"
   integrity sha512-7LqtlfqkqHMeowhed4TcM4LLk5JipdBILxtmhRg6t96Tsoh8QOw3FTgroGb81XvZHfkvQlYetxGno2Eiu2o1RA==
 
-"@map-colonies/react-core@file:packages/react-ui-components":
-  version "0.0.0"
-  dependencies:
-    "@rmwc/avatar" "^8.0.8"
-    "@rmwc/button" "^8.0.8"
-    "@rmwc/checkbox" "^8.0.8"
-    "@rmwc/circular-progress" "^8.0.8"
-    "@rmwc/dialog" "^8.0.8"
-    "@rmwc/drawer" "^8.0.8"
-    "@rmwc/fab" "^8.0.8"
-    "@rmwc/icon" "^8.0.8"
-    "@rmwc/icon-button" "^8.0.8"
-    "@rmwc/linear-progress" "^8.0.8"
-    "@rmwc/menu" "^8.0.8"
-    "@rmwc/select" "^8.0.8"
-    "@rmwc/snackbar" "^8.0.8"
-    "@rmwc/switch" "^8.0.8"
-    "@rmwc/tabs" "^8.0.8"
-    "@rmwc/textfield" "^8.0.8"
-    "@rmwc/theme" "^8.0.8"
-    "@rmwc/tooltip" "^8.0.8"
-    "@rmwc/typography" "^8.0.8"
-    material-design-icons "^3.0.1"
-    storybook-dark-mode "^3.0.0"
-    tslib "^2.5.3"
-
 "@mapbox/jsonlint-lines-primitives@~2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@mapbox/jsonlint-lines-primitives/-/jsonlint-lines-primitives-2.0.2.tgz#ce56e539f83552b58d10d672ea4d6fc9adc7b234"
