@@ -1,7 +1,6 @@
 {
   "name": "@map-colonies/react-core",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "./dist/@map-colonies/react-core.umd.js",
   "module": "./dist/@map-colonies/react-core.es.js",
   "types": "./dist/index.d.ts",
@@ -12,6 +11,7 @@
     "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build",
     "printTSVersion": "echo TS $(tsc -v)",
     "postbuild": "copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
+    "prepack": "yarn build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "copyassets:all": "yarn run copyassets:md-font",
@@ -48,6 +48,9 @@
     "@types/node": "^20.3.1",
     "rimraf": "^5.0.1"
   },
+  "files": [
+    "dist"
+  ],
   "resolutions": {
     "@rmwc/menu": "^8.0.8",
     "tslib": "^2.5.3"

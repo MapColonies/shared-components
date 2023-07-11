@@ -66,6 +66,7 @@
     "test:core": "lerna run --scope @map-colonies/react-core test --stream",
     "storybook:all": "npx lerna run storybook --parallel",
     "build": "lerna run build --stream",
+    "pack:all": "lerna pack",
     "test": "NODE_ENV=test jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
     "prepare": "husky install"
