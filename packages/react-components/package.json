@@ -1,7 +1,7 @@
 {
   "name": "@map-colonies/react-components",
   "private": true,
-  "version": "0.0.0",
+  "version": "4.0.0",
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@here/quantized-mesh-decoder": "^1.2.8",
-    "@map-colonies/react-core": "^0.0.0",
+    "@map-colonies/react-core": "^4.0.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
@@ -49,22 +49,22 @@
     "textarea-caret": "^3.1.0"
   },
   "devDependencies": {
-    "@types/ol":"^6.3.1",
-    "@types/enzyme": "^3.10.5",
-    "@types/geojson": "^7946.0.10",
-    "@types/lodash": "^4.14.165",
-    "@types/textarea-caret": "^3.0.1",
-    "enzyme": "^3.11.0",
-    "jest-enzyme": "^7.1.2",
-    "vite-plugin-cesium": "1.2.22",
-    "typescript": "4.9.5",
+    "@storybook/addon-essentials": "6.5.16",
     "@storybook/addon-storysource": "6.5.16",
     "@storybook/addons": "6.5.16",
     "@storybook/builder-vite": "0.4.2",
     "@storybook/react": "6.5.16",
     "@storybook/theming": "6.5.16",
-    "@storybook/addon-essentials": "6.5.16",
-    "storybook": "6.5.16"
+    "@types/enzyme": "^3.10.5",
+    "@types/geojson": "^7946.0.10",
+    "@types/lodash": "^4.14.165",
+    "@types/ol": "^6.3.1",
+    "@types/textarea-caret": "^3.0.1",
+    "enzyme": "^3.11.0",
+    "jest-enzyme": "^7.1.2",
+    "storybook": "6.5.16",
+    "typescript": "4.9.5",
+    "vite-plugin-cesium": "1.2.22"
   },
   "workspaces": {
     "nohoist": [
