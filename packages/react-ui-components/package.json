@@ -1,10 +1,10 @@
 {
   "name": "@map-colonies/react-core",
-  "private": true,
   "version": "4.0.0",
   "main": "./dist/@map-colonies/react-core.umd.js",
   "module": "./dist/@map-colonies/react-core.es.js",
   "types": "./dist/index.d.ts",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
@@ -51,19 +51,5 @@
   },
   "files": [
     "dist"
-  ],
-  "resolutions": {
-    "@rmwc/menu": "^8.0.8",
-    "tslib": "^2.5.3"
-  },
-  "workspaces": {
-    "nohoist": [
-      "tslib",
-      "@rmwc/*",
-      "react",
-      "react-dom",
-      "@types/react",
-      "@types/react-dom"
-    ]
-  }
+  ]
 }
