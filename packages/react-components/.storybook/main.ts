@@ -13,7 +13,7 @@ const config = {
   async viteFinal(config: Record<string, string>) {
     return mergeConfig(config, {
       base: '',
-      plugins: [cesium()],
+      plugins: [cesium({ cesiumBuildPath: '../../node_modules/cesium/Build/Cesium' })],
     });
   },
 };
