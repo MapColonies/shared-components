@@ -3,10 +3,8 @@
 import { CellMetadata, ElementFunction } from './smart-table-types';
 import React, { useState } from 'react';
 import { TableRow, TableCell, IconButton, Collapse } from '@material-ui/core';
-import {
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
-} from '@material-ui/icons';
+import KeyboardArrowDownIcon from './icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from './icons/KeyboardArrowUp';
 
 interface SmartTableRowProps<T> {
   item: T;
