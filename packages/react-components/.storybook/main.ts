@@ -10,8 +10,11 @@ const config = {
   },
   stories: ['../src/**/*.stories.@(js|ts|tsx|mdx)'],
   addons: ['@storybook/addon-storysource'],
-  async viteFinal(config: Record<string, string>) {
+  viteFinal: async (config: Record<string, unknown>) => {
+    const conf = await (commonConfig as any).viteFinal(config);
+
     return mergeConfig(config, {
+      ...conf,
       base: '',
       plugins: [cesium({ cesiumBuildPath: '../../node_modules/cesium/Build/Cesium' })],
     });
