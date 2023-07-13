@@ -5,3 +5,4 @@ tsconfig*
 storybook-static
 src
 public
+**/Cesium/**
