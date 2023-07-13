@@ -17,38 +17,8 @@ interface IScaleData {
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 const distances = [
-  1,
-  2,
-  3,
-  5,
-  10,
-  20,
-  30,
-  50,
-  100,
-  200,
-  300,
-  500,
-  1000,
-  2000,
-  3000,
-  5000,
-  10000,
-  20000,
-  30000,
-  50000,
-  100000,
-  200000,
-  300000,
-  500000,
-  1000000,
-  2000000,
-  3000000,
-  5000000,
-  10000000,
-  20000000,
-  30000000,
-  50000000,
+  1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 3000, 5000, 10000, 20000, 30000, 50000, 100000, 200000, 300000, 500000, 1000000,
+  2000000, 3000000, 5000000, 10000000, 20000000, 30000000, 50000000,
 ];
 
 const updateDistanceLegendCesium = (
@@ -77,12 +47,8 @@ const updateDistanceLegendCesium = (
   const width = mapViewer.scene.canvas.clientWidth;
   const height = mapViewer.scene.canvas.clientHeight;
 
-  const left = mapViewer.scene.camera.getPickRay(
-    new Cartesian2((width / 2) | 0, height - 1)
-  );
-  const right = mapViewer.scene.camera.getPickRay(
-    new Cartesian2((1 + width / 2) | 0, height - 1)
-  );
+  const left = mapViewer.scene.camera.getPickRay(new Cartesian2((width / 2) | 0, height - 1));
+  const right = mapViewer.scene.camera.getPickRay(new Cartesian2((1 + width / 2) | 0, height - 1));
 
   const globe = mapViewer.scene.globe;
   const leftPosition = globe.pick(left as Ray, mapViewer.scene);
@@ -92,12 +58,8 @@ const updateDistanceLegendCesium = (
     return;
   }
 
-  const leftCartographic = globe.ellipsoid.cartesianToCartographic(
-    leftPosition
-  );
-  const rightCartographic = globe.ellipsoid.cartesianToCartographic(
-    rightPosition
-  );
+  const leftCartographic = globe.ellipsoid.cartesianToCartographic(leftPosition);
+  const rightCartographic = globe.ellipsoid.cartesianToCartographic(rightPosition);
 
   geodesic.setEndPoints(leftCartographic, rightCartographic);
   const pixelDistance = geodesic.surfaceDistance;
@@ -137,12 +99,7 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
 
   useEffect(() => {
     const setFromEvent = (e: MouseEvent): void => {
-      updateDistanceLegendCesium(
-        mapViewer,
-        scaleData,
-        setScaleData,
-        props.locale
-      );
+      updateDistanceLegendCesium(mapViewer, scaleData, setScaleData, props.locale);
     };
 
     const helper = new EventHelper();

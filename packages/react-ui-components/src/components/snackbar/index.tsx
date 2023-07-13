@@ -9,7 +9,6 @@ import {
 
 import { HTMLProps } from '@rmwc/types';
 
-
 import { ExtractProps } from '../typeHelpers';
 
 export interface SnackbarProps extends ExtractProps<typeof RMWCSnackbar> {}

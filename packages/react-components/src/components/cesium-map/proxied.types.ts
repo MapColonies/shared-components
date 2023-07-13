@@ -51,7 +51,4 @@ export const CesiumVerticalOrigin = VerticalOrigin;
 export const CesiumLabelStyle = LabelStyle;
 
 // PROXIED FUNCTIONS
-export {
-  sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed,
-  Math as CesiumMath,
-} from 'cesium';
+export { sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed, Math as CesiumMath } from 'cesium';

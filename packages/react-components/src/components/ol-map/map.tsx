@@ -1,11 +1,4 @@
-import React, {
-  useRef,
-  useEffect,
-  createContext,
-  useContext,
-  useState,
-  PropsWithChildren,
-} from 'react';
+import React, { useRef, useEffect, createContext, useContext, useState, PropsWithChildren } from 'react';
 import { Map as OlMap, View } from 'ol';
 import './map.css';
 import 'ol/ol.css';
@@ -15,11 +8,7 @@ import MousePosition from 'ol/control/MousePosition';
 import Collection from 'ol/Collection';
 import Control from 'ol/control/Control';
 import { transform } from 'ol/proj';
-import {
-  Proj,
-  COORDINATES_WGS_FRACTION_DIGITS,
-  COORDINATES_MERCATOR_FRACTION_DIGITS,
-} from '../utils/projections';
+import { Proj, COORDINATES_WGS_FRACTION_DIGITS, COORDINATES_MERCATOR_FRACTION_DIGITS } from '../utils/projections';
 
 export interface MapProps {
   allowFullScreen?: boolean;
@@ -45,19 +34,9 @@ const getDefaultCenter = (projection: string | undefined): Coordinate => {
 const getCoordinateFormatString = (projection?: Proj): CoordinateFormat => {
   switch (projection) {
     case Proj.WEB_MERCATOR:
-      return (coord?: Coordinate): string =>
-        format(
-          coord as Coordinate,
-          'Mercator: {y}m, {x}m',
-          COORDINATES_MERCATOR_FRACTION_DIGITS
-        );
+      return (coord?: Coordinate): string => format(coord as Coordinate, 'Mercator: {y}m, {x}m', COORDINATES_MERCATOR_FRACTION_DIGITS);
     case Proj.WGS84:
-      return (coord?: Coordinate): string =>
-        format(
-          coord as Coordinate,
-          'WGS84: {y}°N {x}°E',
-          COORDINATES_WGS_FRACTION_DIGITS
-        );
+      return (coord?: Coordinate): string => format(coord as Coordinate, 'WGS84: {y}°N {x}°E', COORDINATES_WGS_FRACTION_DIGITS);
     default:
       return (coord?: Coordinate): string => '';
   }

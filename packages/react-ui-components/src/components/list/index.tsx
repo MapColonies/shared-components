@@ -14,7 +14,6 @@ import {
   SimpleListItem as RMWCSimpleListItem,
 } from '@rmwc/list';
 
-
 import { ExtractProps } from '../typeHelpers';
 
 export interface ListProps extends ExtractProps<typeof RMWCList> {}
@@ -32,11 +31,9 @@ export const List = React.forwardRef<any, ListProps>((props, ref) => {
   return <RMWCList ref={ref} {...props} />;
 });
 
-export const CollapsibleList = React.forwardRef<any, ListProps & RMWCCollapsibleListProps>(
-  (props, ref) => {
-    return <RMWCCollapsibleList ref={ref} {...props} />;
-  }
-);
+export const CollapsibleList = React.forwardRef<any, ListProps & RMWCCollapsibleListProps>((props, ref) => {
+  return <RMWCCollapsibleList ref={ref} {...props} />;
+});
 
 export const ListDivider = React.forwardRef<any, ListDividerProps>((props, ref) => {
   return <RMWCListDivider ref={ref} {...props} />;

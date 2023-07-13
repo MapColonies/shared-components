@@ -35,9 +35,9 @@ export class FileHelper extends ChonkyFileHelper {}
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const FilePickerActions = ChonkyActions;
 
-export type FilePickerView = typeof FilePickerView[keyof typeof FilePickerView];
+export type FilePickerView = (typeof FilePickerViewObj)[keyof typeof FilePickerViewObj];
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const FilePickerView = {
+export const FilePickerViewObj = {
   listView: ChonkyActions.EnableListView.id,
   gridView: ChonkyActions.EnableGridView.id,
 } as const;
@@ -68,7 +68,7 @@ export const FilePicker = React.memo(
       {
         theme,
         styles = { height: '100%', minWidth: '600px' },
-        defaultView = FilePickerView.listView,
+        defaultView = FilePickerViewObj.listView,
         readOnlyMode = false,
         locale,
         files,
@@ -103,29 +103,20 @@ export const FilePicker = React.memo(
 
       const themeObject = useMemo((): Record<string, string> => {
         if (theme !== undefined) {
-          const processedColors = Object.keys(theme).reduce(
-            (acc: Record<string, string>, key) => {
-              const val = ((theme as unknown) as Record<string, string>)[key];
-              key = key.startsWith('--')
-                ? key
-                : `--fp-theme-${toDashCase(key)}`;
-              acc[key] = val;
-              return acc;
-            },
-            {}
-          );
+          const processedColors = Object.keys(theme).reduce((acc: Record<string, string>, key) => {
+            const val = (theme as unknown as Record<string, string>)[key];
+            key = key.startsWith('--') ? key : `--fp-theme-${toDashCase(key)}`;
+            acc[key] = val;
+            return acc;
+          }, {});
           return processedColors;
         }
         return {};
       }, [theme]);
 
       const [darkMode, setDarkMode] = useState<boolean>(false);
-      const [defaultFileViewActionId, setDefaultFileViewActionId] = useState<
-        FilePickerView
-      >();
-      const [disableDragAndDrop, setDisableDragAndDrop] = useState<boolean>(
-        false
-      );
+      const [defaultFileViewActionId, setDefaultFileViewActionId] = useState<FilePickerView>();
+      const [disableDragAndDrop, setDisableDragAndDrop] = useState<boolean>(false);
       const [fileActions, setFileActions] = useState<FilePickerAction[]>();
       const [i18n, setI18n] = useState<I18nConfig>();
       useEffect(() => {
@@ -138,10 +129,7 @@ export const FilePicker = React.memo(
         if (readOnlyMode) {
           setDisableDragAndDrop(true);
         } else {
-          setFileActions([
-            ChonkyActions.CreateFolder,
-            ChonkyActions.DeleteFiles,
-          ]);
+          setFileActions([ChonkyActions.CreateFolder, ChonkyActions.DeleteFiles]);
         }
 
         if (locale !== undefined) {

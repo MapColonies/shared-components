@@ -1,15 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Paper,
-  TablePagination,
-  Typography,
-} from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, TablePagination, Typography } from '@material-ui/core';
 import { CellMetadata, ElementFunction, Order } from './smart-table-types';
 import { SmartEnhancedTableHead } from './smart-table-head';
 import { SmartTableRow } from './smart-table-row';
@@ -47,10 +38,7 @@ export function SmartTable<T>(props: SmartTableProps<T>) {
     handleChangeRowsPerPage,
   } = props;
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof T
-  ): void => {
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -86,16 +74,8 @@ export function SmartTable<T>(props: SmartTableProps<T>) {
                 height: (isDense ? 33 : 53) * (rowsPerPage - items.length),
               }}
             >
-              <TableCell
-                colSpan={
-                  isCollapseable
-                    ? cellsMetadata.length + 1
-                    : cellsMetadata.length
-                }
-              >
-                {items.length === 0 && (
-                  <Typography align="center">No results :(</Typography>
-                )}
+              <TableCell colSpan={isCollapseable ? cellsMetadata.length + 1 : cellsMetadata.length}>
+                {items.length === 0 && <Typography align="center">No results :(</Typography>}
               </TableCell>
             </TableRow>
           )}

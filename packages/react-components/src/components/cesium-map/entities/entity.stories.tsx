@@ -3,10 +3,7 @@ import { Cartesian3, Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { CesiumEntity, RCesiumEntityProps } from './entity';
-import {
-  CesiumEntityDescription,
-  CesiumEntityStaticDescription,
-} from './entity.description';
+import { CesiumEntityDescription, CesiumEntityStaticDescription } from './entity.description';
 
 export default {
   title: 'Cesium Map/Entity',
@@ -32,19 +29,12 @@ const initCanvas = (): HTMLCanvasElement => {
 const renderCanvas = (can: HTMLCanvasElement, p: number): void => {
   const c = can.getContext('2d');
   if (!c) {
-return;
-}
+    return;
+  }
   c.clearRect(0, 0, can.width, can.height);
   c.fillStyle = 'rgba(100,0,0,0.8)';
   c.beginPath();
-  c.arc(
-    can.width / 2,
-    can.height / 2,
-    (p * can.width) / 2,
-    0,
-    Math.PI * 2,
-    false
-  );
+  c.arc(can.width / 2, can.height / 2, (p * can.width) / 2, 0, Math.PI * 2, false);
   c.fill();
 };
 
@@ -98,39 +88,22 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
         point={{ pixelSize: 15, color: Color.YELLOW }}
         description="Normal Description"
       />
-      <CesiumEntity
-        {...args}
-        name="test2"
-        position={Cartesian3.fromDegrees(-74, 30, 100)}
-        point={{ pixelSize: 15, color: Color.BLUE }}
-      >
+      <CesiumEntity {...args} name="test2" position={Cartesian3.fromDegrees(-74, 30, 100)} point={{ pixelSize: 15, color: Color.BLUE }}>
         <CesiumEntityStaticDescription>
           <h1>Hello!</h1>
           <p>This is description. It can be described with static JSX!</p>
         </CesiumEntityStaticDescription>
       </CesiumEntity>
-      <CesiumEntity
-        {...args}
-        name="test3"
-        position={Cartesian3.fromDegrees(-74, 20, 100)}
-        point={{ pixelSize: 15, color: Color.RED }}
-      >
+      <CesiumEntity {...args} name="test3" position={Cartesian3.fromDegrees(-74, 20, 100)} point={{ pixelSize: 15, color: Color.RED }}>
         <CesiumEntityDescription>
           <h1>Hello!</h1>
         </CesiumEntityDescription>
       </CesiumEntity>
-      <CesiumEntity
-        {...args}
-        name="test4"
-        position={Cartesian3.fromDegrees(-74, 10, 100)}
-        point={{ pixelSize: 15, color: Color.ORANGE }}
-      >
+      <CesiumEntity {...args} name="test4" position={Cartesian3.fromDegrees(-74, 10, 100)} point={{ pixelSize: 15, color: Color.ORANGE }}>
         <CesiumEntityDescription>
           <h1>Hello!</h1>
           <p>This is description. It can be described with React!</p>
-          <button onClick={(): void => setCount((i) => i + 1)}>
-            counter: {count}
-          </button>
+          <button onClick={(): void => setCount((i) => i + 1)}>counter: {count}</button>
         </CesiumEntityDescription>
       </CesiumEntity>
     </CesiumMap>
@@ -139,10 +112,6 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
 
 export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
   <CesiumMap>
-    <CanvasEntity
-      name="test"
-      description="test"
-      position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)}
-    />
+    <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>
 );

@@ -34,8 +34,7 @@ const BASE_MAPS = {
       id: '3rd',
       title: '3rd Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
       baseRasteLayers: [
         {
           id: 'Opaque Base world wide layer',
@@ -43,8 +42,7 @@ const BASE_MAPS = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url:
-              'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
             layers: '',
             credit: 'thunderforest',
           },
@@ -89,9 +87,7 @@ interface LayerRelevancy {
   isRelevant?: boolean;
 }
 
-const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
-  useOptimizedTileRequests,
-}) => {
+const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({ useOptimizedTileRequests }) => {
   const viewer = useCesiumMap();
   const [layersRelevancy, setLayersRelevancy] = useState<LayerRelevancy[]>([]);
 
@@ -99,9 +95,7 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
     if (viewer.layersManager?.layerList) {
       setLayersRelevancy(
         viewer.layersManager.layerList
-          .filter(
-            (layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER'
-          )
+          .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
           .map(
             (layer): LayerRelevancy => ({
               layerId: layer.meta?.id as string | undefined,
@@ -113,14 +107,12 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
   };
 
   useEffect(() => {
-    const removeTileLoad = viewer.scene.globe.tileLoadProgressEvent.addEventListener(
-      (tilesLoadingCount) => {
-        if (tilesLoadingCount === 0) {
-          updateLayerRelevancy();
-          removeTileLoad();
-        }
+    const removeTileLoad = viewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
+      if (tilesLoadingCount === 0) {
+        updateLayerRelevancy();
+        removeTileLoad();
       }
-    );
+    });
 
     const removeMoveEnd = viewer.camera.moveEnd.addEventListener(() => {
       updateLayerRelevancy();
@@ -129,7 +121,6 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
     return (): void => {
       removeMoveEnd();
     };
-
   }, []);
 
   return (
@@ -147,11 +138,7 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({
           minHeight: '200px',
         }}
       >
-        <h3>
-          {`Optimized Tile Requesting: ${
-            useOptimizedTileRequests ? 'enabled' : 'disabled'
-          }`}
-        </h3>
+        <h3>{`Optimized Tile Requesting: ${useOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
         {layersRelevancy.map((layer) => {
           return (
             <div>
@@ -176,8 +163,7 @@ const LayersContainer: React.FC = () => {
   } as React.CSSProperties;
 
   const optionsXYZTransparency = {
-    url:
-      'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
+    url: 'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
     footprint: {
       coordinates: [
         [
@@ -210,10 +196,7 @@ const LayersContainer: React.FC = () => {
 
   return (
     <>
-      <div
-        className="buttonsContainer"
-        style={{ display: 'flex', gap: '10px', ...btnStyle }}
-      >
+      <div className="buttonsContainer" style={{ display: 'flex', gap: '10px', ...btnStyle }}>
         <button
           onClick={(): void =>
             setLayer(
@@ -223,9 +206,7 @@ const LayersContainer: React.FC = () => {
                   id: 'Transparent Layer',
                   options: { ...optionsXYZTransparency },
                 }}
-                rectangle={Rectangle.fromDegrees(
-                  ...bbox(optionsXYZTransparency.footprint)
-                )}
+                rectangle={Rectangle.fromDegrees(...bbox(optionsXYZTransparency.footprint))}
                 options={optionsXYZTransparency}
               />
             )
@@ -240,9 +221,7 @@ const LayersContainer: React.FC = () => {
               <CesiumXYZLayer
                 key="Opaque"
                 meta={{ id: 'Opaque Layer', options: { ...optionsXYZOpaque } }}
-                rectangle={Rectangle.fromDegrees(
-                  ...bbox(optionsXYZOpaque.footprint)
-                )}
+                rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
               />
             )
@@ -256,9 +235,7 @@ const LayersContainer: React.FC = () => {
   );
 };
 
-export const OptimizedTileRequestingMap: Story<OptimizedTileRequestingMapStoryProps> = (
-  args
-) => {
+export const OptimizedTileRequestingMap: Story<OptimizedTileRequestingMapStoryProps> = (args) => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap
@@ -267,9 +244,7 @@ export const OptimizedTileRequestingMap: Story<OptimizedTileRequestingMapStoryPr
         key={args.useOptimizedTileRequests ? 'OPTIMIZED_MAP' : 'REGULAR_MAP'}
       >
         <LayersContainer />
-        <RelevancyPresentor
-          useOptimizedTileRequests={args.useOptimizedTileRequests}
-        />
+        <RelevancyPresentor useOptimizedTileRequests={args.useOptimizedTileRequests} />
       </CesiumMap>
     </div>
   );

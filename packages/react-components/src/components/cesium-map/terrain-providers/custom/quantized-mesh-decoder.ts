@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import {
-  IDecodedTile,
-  IDecodedTileHeader,
-  IExtensions,
-} from './quantized-mesh-terrain-provider';
+import { IDecodedTile, IDecodedTileHeader, IExtensions } from './quantized-mesh-terrain-provider';
 
 const LITTLE_ENDIAN = true;
 const MAX_VERTEX_COUNT = 65536;
@@ -72,9 +68,7 @@ const decodeIndex = (
   return indices;
 };
 
-const convertFromTypedArrayToNumbersArray = (
-  array: Uint16Array | Uint32Array
-): number[] => {
+const convertFromTypedArrayToNumbersArray = (array: Uint16Array | Uint32Array): number[] => {
   const numbersArray: number[] = [];
   for (let i = 0; i < array.length; ++i) {
     numbersArray.push(array[i]);
@@ -90,17 +84,12 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
 
   // Decode Header
 
-  Object.keys(QUANTIZED_MESH_HEADER).forEach(
-    (key: string, bytesCount: number) => {
-      // @ts-ignore
-      // eslint-disable-next-line
-      header[key] =
-        bytesCount === 8
-          ? view.getFloat64(position, LITTLE_ENDIAN)
-          : view.getFloat32(position, LITTLE_ENDIAN);
-      position += bytesCount;
-    }
-  );
+  Object.keys(QUANTIZED_MESH_HEADER).forEach((key: string, bytesCount: number) => {
+    // @ts-ignore
+    // eslint-disable-next-line
+    header[key] = bytesCount === 8 ? view.getFloat64(position, LITTLE_ENDIAN) : view.getFloat32(position, LITTLE_ENDIAN);
+    position += bytesCount;
+  });
 
   const headerEndPosition = position;
 
@@ -129,24 +118,9 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
   let height = 0;
 
   for (let i = 0; i < vertexCount; i++) {
-    u += decodeZigZag(
-      view.getUint16(
-        uArrayStartPosition + bytesPerArrayElement * i,
-        LITTLE_ENDIAN
-      )
-    );
-    v += decodeZigZag(
-      view.getUint16(
-        vArrayStartPosition + bytesPerArrayElement * i,
-        LITTLE_ENDIAN
-      )
-    );
-    height += decodeZigZag(
-      view.getUint16(
-        heightArrayStartPosition + bytesPerArrayElement * i,
-        LITTLE_ENDIAN
-      )
-    );
+    u += decodeZigZag(view.getUint16(uArrayStartPosition + bytesPerArrayElement * i, LITTLE_ENDIAN));
+    v += decodeZigZag(view.getUint16(vArrayStartPosition + bytesPerArrayElement * i, LITTLE_ENDIAN));
+    height += decodeZigZag(view.getUint16(heightArrayStartPosition + bytesPerArrayElement * i, LITTLE_ENDIAN));
 
     vertexData[i] = u;
     vertexData[i + vertexCount] = v;
@@ -167,10 +141,7 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
 
   vertexCount = vertexData.length / 3;
 
-  const bytesPerIndex =
-    vertexCount > MAX_VERTEX_COUNT
-      ? Uint32Array.BYTES_PER_ELEMENT
-      : Uint16Array.BYTES_PER_ELEMENT;
+  const bytesPerIndex = vertexCount > MAX_VERTEX_COUNT ? Uint32Array.BYTES_PER_ELEMENT : Uint16Array.BYTES_PER_ELEMENT;
 
   if (position % bytesPerIndex !== 0) {
     position += bytesPerIndex - (position % bytesPerIndex);
@@ -180,13 +151,7 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
   position += Uint32Array.BYTES_PER_ELEMENT;
 
   const triangleIndicesCount = triangleCount * 3;
-  const triangleIndices = decodeIndex(
-    view.buffer,
-    position,
-    triangleIndicesCount,
-    bytesPerIndex,
-    true
-  );
+  const triangleIndices = decodeIndex(view.buffer, position, triangleIndicesCount, bytesPerIndex, true);
   position += triangleIndicesCount * bytesPerIndex;
 
   const triangleIndicesEndPosition = position;
@@ -208,33 +173,25 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
   const westVertexCount = view.getUint32(position, LITTLE_ENDIAN);
   position += Uint32Array.BYTES_PER_ELEMENT;
 
-  const westIndices = convertFromTypedArrayToNumbersArray(
-    decodeIndex(view.buffer, position, westVertexCount, bytesPerIndex, false)
-  );
+  const westIndices = convertFromTypedArrayToNumbersArray(decodeIndex(view.buffer, position, westVertexCount, bytesPerIndex, false));
   position += westVertexCount * bytesPerIndex;
 
   const southVertexCount = view.getUint32(position, LITTLE_ENDIAN);
   position += Uint32Array.BYTES_PER_ELEMENT;
 
-  const southIndices = convertFromTypedArrayToNumbersArray(
-    decodeIndex(view.buffer, position, southVertexCount, bytesPerIndex, false)
-  );
+  const southIndices = convertFromTypedArrayToNumbersArray(decodeIndex(view.buffer, position, southVertexCount, bytesPerIndex, false));
   position += southVertexCount * bytesPerIndex;
 
   const eastVertexCount = view.getUint32(position, LITTLE_ENDIAN);
   position += Uint32Array.BYTES_PER_ELEMENT;
 
-  const eastIndices = convertFromTypedArrayToNumbersArray(
-    decodeIndex(view.buffer, position, eastVertexCount, bytesPerIndex, false)
-  );
+  const eastIndices = convertFromTypedArrayToNumbersArray(decodeIndex(view.buffer, position, eastVertexCount, bytesPerIndex, false));
   position += eastVertexCount * bytesPerIndex;
 
   const northVertexCount = view.getUint32(position, LITTLE_ENDIAN);
   position += Uint32Array.BYTES_PER_ELEMENT;
 
-  const northIndices = convertFromTypedArrayToNumbersArray(
-    decodeIndex(view.buffer, position, northVertexCount, bytesPerIndex, false)
-  );
+  const northIndices = convertFromTypedArrayToNumbersArray(decodeIndex(view.buffer, position, northVertexCount, bytesPerIndex, false));
   position += northVertexCount * bytesPerIndex;
 
   const edgeIndicesEndPosition = position;
@@ -265,35 +222,22 @@ export const decode = (data: ArrayBufferLike): IDecodedTile => {
       const extensionLength = view.getUint32(position, true);
       position += Uint32Array.BYTES_PER_ELEMENT;
 
-      const extensionView = new DataView(
-        view.buffer,
-        position,
-        extensionLength
-      );
+      const extensionView = new DataView(view.buffer, position, extensionLength);
 
       switch (extensionId) {
         case 1: {
-          extensions.vertexNormals = new Uint8Array(
-            extensionView.buffer,
-            extensionView.byteOffset,
-            extensionView.byteLength
-          );
+          extensions.vertexNormals = new Uint8Array(extensionView.buffer, extensionView.byteOffset, extensionView.byteLength);
           break;
         }
         case 2: {
-          extensions.waterMask = extensionView.buffer.slice(
-            extensionView.byteOffset,
-            extensionView.byteOffset + extensionView.byteLength
-          );
+          extensions.waterMask = extensionView.buffer.slice(extensionView.byteOffset, extensionView.byteOffset + extensionView.byteLength);
           break;
         }
         case 4: {
           const jsonLength = extensionView.getUint32(0, LITTLE_ENDIAN);
           let jsonString = '';
           for (let i = 0; i < jsonLength; ++i) {
-            jsonString += String.fromCharCode(
-              extensionView.getUint8(Uint32Array.BYTES_PER_ELEMENT + i)
-            );
+            jsonString += String.fromCharCode(extensionView.getUint8(Uint32Array.BYTES_PER_ELEMENT + i));
           }
           // eslint-disable-next-line
           extensions.metadata = JSON.parse(jsonString);

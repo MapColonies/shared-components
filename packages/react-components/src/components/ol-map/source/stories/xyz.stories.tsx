@@ -1,4 +1,3 @@
-import React from 'react';
 import { Proj } from '../../../utils/projections';
 import { CSFStory } from '../../../utils/story';
 import { Map } from '../../map';
@@ -6,9 +5,7 @@ import { TileLayer } from '../../layers/tile-layer';
 import { getXYZOptions, TileXYZ } from '../xyz';
 
 const xyzOptions = getXYZOptions({
-  url:
-    'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' +
-    '?apikey=0e6fc415256d4fbb9b5166a718591d71',
+  url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' + '?apikey=0e6fc415256d4fbb9b5166a718591d71',
 });
 
 const mapDivStyle = {
@@ -17,18 +14,16 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export default {
+const story = {
   title: 'Map/Map Tiles/XYZ',
   component: TileXYZ,
 };
 
+export default story;
+
 export const Basic: CSFStory<JSX.Element> = () => (
   <div style={mapDivStyle}>
-    <Map
-      allowFullScreen={true}
-      showMousePosition={true}
-      projection={Proj.WEB_MERCATOR}
-    >
+    <Map allowFullScreen={true} showMousePosition={true} projection={Proj.WEB_MERCATOR}>
       <TileLayer>
         <TileXYZ options={xyzOptions} />
       </TileLayer>
@@ -42,8 +37,7 @@ Basic.argTypes = {
     table: {
       type: {
         summary: 'OpenLayers type',
-        detail:
-          'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_XYZ-XYZ.html"',
+        detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_XYZ-XYZ.html"',
       },
     },
     control: {

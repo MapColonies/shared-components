@@ -27,9 +27,7 @@ it('set the values of to and from to the props of the date pickers when changed'
 
 it('calls on change when button is clicked', () => {
   const onChangeMock = jest.fn();
-  const wrapper = mount(
-    <DateTimeRangePicker from={date} to={date} onChange={onChangeMock} />
-  );
+  const wrapper = mount(<DateTimeRangePicker from={date} to={date} onChange={onChangeMock} />);
 
   // eslint-disable-next-line
   wrapper.find(Button).props().onClick?.();

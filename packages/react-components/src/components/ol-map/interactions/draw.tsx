@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
 import { Draw } from 'ol/interaction';
 import { Geometry as OlGeom } from 'ol/geom';
-import {
-  createBox,
-  DrawEvent,
-  Options as DrawOptions,
-} from 'ol/interaction/Draw';
+import { createBox, DrawEvent, Options as DrawOptions } from 'ol/interaction/Draw';
 // import GeometryType from 'ol/geom/GeometryType';
 import { GeoJSON } from 'ol/format';
 import { Geometry } from 'geojson';
@@ -29,10 +25,7 @@ export interface DrawProps {
   onPolygonSelected?: (geometry: Geometry) => void;
 }
 
-export const DrawInteraction: React.FC<DrawProps> = ({
-  drawType,
-  onPolygonSelected,
-}) => {
+export const DrawInteraction: React.FC<DrawProps> = ({ drawType, onPolygonSelected }) => {
   const map = useMap();
 
   useEffect(() => {

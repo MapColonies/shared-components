@@ -1,11 +1,5 @@
 /* eslint-disable */
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  ChangeEvent,
-  KeyboardEvent,
-} from 'react';
+import React, { useState, useRef, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import getCaretCoordinates from 'textarea-caret';
 import getInputSelection, { setCaretPosition } from 'get-input-selection';
 
@@ -100,11 +94,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     // }
   }, [props]);
 
-  const getMatch = (
-    str: string,
-    caret: number,
-    providedOptions: string[]
-  ): Record<string, unknown> => {
+  const getMatch = (str: string, caret: number, providedOptions: string[]): Record<string, unknown> => {
     const { trigger, matchAny, regex } = props;
     const re = new RegExp(regex);
 
@@ -124,14 +114,8 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     const triggersMatch = arrayTriggerMatch(triggers, re);
     let slugData: Record<string, unknown> = {};
 
-    for (
-      let triggersIndex = 0;
-      triggersIndex < triggersMatch.length;
-      triggersIndex++
-    ) {
-      const { triggerStr, triggerMatch, triggerLength } = triggersMatch[
-        triggersIndex
-      ];
+    for (let triggersIndex = 0; triggersIndex < triggersMatch.length; triggersIndex++) {
+      const { triggerStr, triggerMatch, triggerLength } = triggersMatch[triggersIndex];
 
       for (let i = caret - 1; i >= 0; --i) {
         const substr = str.substring(i, caret);
@@ -182,14 +166,13 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
           const currTrigger = triggerStr;
           const matchLength = matchedSlug.length;
 
-            slugData = {
-              ...slugData,
-              trigger: currTrigger,
-              matchStart,
-              matchLength,
-              options,
-            };
-          
+          slugData = {
+            ...slugData,
+            trigger: currTrigger,
+            matchStart,
+            matchLength,
+            options,
+          };
         }
       }
     }
@@ -225,10 +208,12 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     const old = recentValue;
     const str = e.target.value;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const caret = (getInputSelection(getInputElement(e.target)) as {
-      start: number;
-      end: number;
-    }).end;
+    const caret = (
+      getInputSelection(getInputElement(e.target)) as {
+        start: number;
+        end: number;
+      }
+    ).end;
 
     if (!str.length) {
       updateState({
@@ -250,12 +235,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     }
 
     // '@wonderjenny ,|' -> '@wonderjenny, |'
-    if (
-      enableSpaceRemovers &&
-      spaceRemovers.length &&
-      str.length > 2 &&
-      spacer.length
-    ) {
+    if (enableSpaceRemovers && spaceRemovers.length && str.length > 2 && spacer.length) {
       for (let i = 0; i < Math.max(old.length, str.length); ++i) {
         if (old[i] !== str[i]) {
           if (
@@ -265,18 +245,12 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
             spaceRemovers.indexOf(str[i]) !== -1 &&
             !isEmpty(getMatch(str.substring(0, i - 2), caret - 3, options))
           ) {
-            const newValue = `${str.slice(0, i - 1)}${str.slice(
-              i,
-              i + 1
-            )}${str.slice(i - 1, i)}${str.slice(i + 1)}`;
+            const newValue = `${str.slice(0, i - 1)}${str.slice(i, i + 1)}${str.slice(i - 1, i)}${str.slice(i + 1)}`;
 
             updateCaretPosition(i + 1);
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (refInput.current !== null) {
-              ((refInput.current as unknown) as Record<
-                string,
-                unknown
-              >).value = newValue;
+              (refInput.current as unknown as Record<string, unknown>).value = newValue;
             }
 
             if (!value) {
@@ -308,9 +282,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     return onChange(e.target.value);
   };
 
-  const getInputElement = (
-    parent: HTMLElement | undefined
-  ): HTMLElement | undefined => {
+  const getInputElement = (parent: HTMLElement | undefined): HTMLElement | undefined => {
     if (parent !== undefined) {
       if (parent.children.length > 0) {
         const innerTextAreas = parent.getElementsByTagName('textarea');
@@ -394,10 +366,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (event.target !== null) {
-      ((event.target as unknown) as Record<
-        string,
-        unknown
-      >).value = `${part1}${changedStr}${spacer}${part2}`;
+      (event.target as unknown as Record<string, unknown>).value = `${part1}${changedStr}${spacer}${part2}`;
     }
     handleChange(event as any);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -419,7 +388,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
       caret,
     });
 
-    const input = getInputElement((refInput.current as unknown) as HTMLElement);
+    const input = getInputElement(refInput.current as unknown as HTMLElement);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     setCaretPosition(input, caret);
   };
@@ -433,7 +402,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
   };
 
   const updateHelper = (str: string, caret: number, options: string[]) => {
-    const parent = (refInput.current as unknown) as HTMLElement;
+    const parent = refInput.current as unknown as HTMLElement;
     if (refInput.current === null) {
       return;
     }
@@ -449,26 +418,15 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
     if (Object.keys(slug).length > 0 && input !== null) {
       const caretPos = getCaretCoordinates(input, caret);
       const rect = input.getBoundingClientRect();
-      const {
-        minChars,
-        onRequestOptions,
-        requestOnlyIfNoOptions,
-        mode,
-      } = props;
+      const { minChars, onRequestOptions, requestOnlyIfNoOptions, mode } = props;
 
       let top,
         left,
         right,
         width = 'unset';
       if (mode === 'assist') {
-        top =
-          parent === input
-            ? caretPos.top + input.offsetTop
-            : caretPos.top + parentRect.top;
-        left = Math.min(
-          caretPos.left + input.offsetLeft - OPTION_LIST_Y_OFFSET,
-          input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH
-        );
+        top = parent === input ? caretPos.top + input.offsetTop : caretPos.top + parentRect.top;
+        left = Math.min(caretPos.left + input.offsetLeft - OPTION_LIST_Y_OFFSET, input.offsetLeft + rect.width - OPTION_LIST_MIN_WIDTH);
       } else {
         top = parentRect.top + parent.offsetHeight;
         left = parent.offsetLeft;
@@ -476,12 +434,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
         width = `${parentRect.width}px`;
       }
 
-      if (
-        slug.matchLength >= minChars &&
-        (slug.options.length > 1 ||
-          (slug.options.length === 1 &&
-            slug.options[0].length !== slug.matchLength))
-      ) {
+      if (slug.matchLength >= minChars && (slug.options.length > 1 || (slug.options.length === 1 && slug.options[0].length !== slug.matchLength))) {
         updateState({
           ...state,
           value: str,
@@ -516,18 +469,7 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
   };
 
   const renderAutocompleteList = () => {
-    const {
-      helperVisible,
-      left,
-      right,
-      matchStart,
-      matchLength,
-      options,
-      selection,
-      top,
-      value,
-      width,
-    } = state;
+    const { helperVisible, left, right, matchStart, matchLength, options, selection, top, value, width } = state;
 
     if (!helperVisible) {
       return null;
@@ -550,57 +492,39 @@ const Autocomplete: React.FC<IAutocompleteProps> = (props) => {
 
     const optionNumber = maxOptions === 0 ? options.length : maxOptions;
 
-    const helperOptions = options
-      .slice(0, optionNumber)
-      .map((val: string, idx) => {
-        const highlightStart = val
-          .toLowerCase()
-          .indexOf(value.substr(matchStart, matchLength).toLowerCase());
+    const helperOptions = options.slice(0, optionNumber).map((val: string, idx) => {
+      const highlightStart = val.toLowerCase().indexOf(value.substr(matchStart, matchLength).toLowerCase());
 
-        return (
-          <li
-            className={idx === selection ? 'active' : undefined}
-            key={val}
-            onClick={() => {
-              handleSelection(idx);
-            }}
-            onMouseEnter={() => {
-              updateState({
-                ...state,
-                selection: idx,
-              });
-            }}
-          >
-            {val.slice(0, highlightStart)}
-            <strong>{val.substr(highlightStart, matchLength)}</strong>
-            {val.slice(highlightStart + matchLength)}
-          </li>
-        );
-      });
+      return (
+        <li
+          className={idx === selection ? 'active' : undefined}
+          key={val}
+          onClick={() => {
+            handleSelection(idx);
+          }}
+          onMouseEnter={() => {
+            updateState({
+              ...state,
+              selection: idx,
+            });
+          }}
+        >
+          {val.slice(0, highlightStart)}
+          <strong>{val.substr(highlightStart, matchLength)}</strong>
+          {val.slice(highlightStart + matchLength)}
+        </li>
+      );
+    });
 
-    const horizontalPosition =
-      direction === 'ltr'
-        ? { left: left + offsetX }
-        : { right: right + offsetX };
+    const horizontalPosition = direction === 'ltr' ? { left: left + offsetX } : { right: right + offsetX };
     return (
-      <ul
-        className="react-autocomplete-input"
-        style={{ ...horizontalPosition, top: top + offsetY, width }}
-      >
+      <ul className="react-autocomplete-input" style={{ ...horizontalPosition, top: top + offsetY, width }}>
         {helperOptions}
       </ul>
     );
   };
 
-  const {
-    Component,
-    ComponentProps,
-    defaultValue,
-    disabled,
-    onBlur,
-    value,
-    ...rest
-  } = props;
+  const { Component, ComponentProps, defaultValue, disabled, onBlur, value, ...rest } = props;
 
   const propagated: any = Object.assign({}, rest);
   Object.keys(props).forEach((k) => {
@@ -635,8 +559,7 @@ const defaultProps: IAutocompleteProps = {
   onKeyDown: (evt: any) => {},
   onRequestOptions: (val: string) => {},
   onSelect: (val: string) => {},
-  changeOnSelect: (trigger: string, slug: string): string =>
-    `${trigger}${slug}`,
+  changeOnSelect: (trigger: string, slug: string): string => `${trigger}${slug}`,
   options: [],
   regex: '^[A-Za-z0-9\\-_]+$',
   matchAny: false,
@@ -654,9 +577,7 @@ const defaultProps: IAutocompleteProps = {
 };
 
 interface IAutocompleteOptionalProps extends Partial<IAutocompleteProps> {}
-export const AutocompleteWithDefauls: React.FC<IAutocompleteOptionalProps> = (
-  props
-) => {
+export const AutocompleteWithDefauls: React.FC<IAutocompleteOptionalProps> = (props) => {
   let compProps = {
     ...defaultProps,
     ...props,

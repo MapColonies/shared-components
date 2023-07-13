@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Checkbox } from './';
 import './styles.js';
 
-
 const meta: Meta<typeof Checkbox> = {
   component: Checkbox,
 };
@@ -17,7 +16,7 @@ export const checkboxStory: Story = {
       <Checkbox label="un-controlled" />
       <Checkbox label="Always On" checked />
       <Checkbox label="Always Off" checked={false} />
-      <Checkbox label="Disabled" checked={false} disabled/>
+      <Checkbox label="Disabled" checked={false} disabled />
     </>
   ),
 };

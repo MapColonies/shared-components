@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { he, enUS } from 'date-fns/locale';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDateTimePicker,
-  KeyboardDatePicker,
-  KeyboardDatePickerProps,
-} from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDateTimePicker, KeyboardDatePicker, KeyboardDatePickerProps } from '@material-ui/pickers';
 import { ParsableDate } from '@material-ui/pickers/constants/prop-types';
 import { WrapperVariant } from '@material-ui/pickers/wrappers/Wrapper';
 import DateFnsUtils from '@date-io/date-fns';
@@ -43,10 +38,7 @@ export const DateTimePicker: React.FC<DatePickerProps> = (props) => {
     ...resProps
   } = props;
 
-  const {
-    placeHolderText = DEFAULTS.DATE_PICKER.local.placeHolderText,
-    calendarLocale,
-  } = local ?? {
+  const { placeHolderText = DEFAULTS.DATE_PICKER.local.placeHolderText, calendarLocale } = local ?? {
     placeHolderText: DEFAULTS.DATE_PICKER.local.placeHolderText,
     calendarLocale: SupportedLocales.EN,
   };

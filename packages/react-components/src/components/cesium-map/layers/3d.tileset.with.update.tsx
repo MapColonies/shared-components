@@ -7,15 +7,7 @@
 */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Cesium3DTileset,
-  Cesium3DTile,
-  Cartographic,
-  Cartesian3,
-  defined,
-  sampleTerrainMostDetailed,
-  Cesium3DTileContent,
-} from 'cesium';
+import { Cesium3DTileset, Cesium3DTile, Cartographic, Cartesian3, defined, sampleTerrainMostDetailed, Cesium3DTileContent } from 'cesium';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface Cesium3DTilesetWithUpdateProps {
@@ -23,10 +15,7 @@ export interface Cesium3DTilesetWithUpdateProps {
   withUpdate?: boolean;
 }
 
-export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({
-  url,
-  withUpdate,
-}) => {
+export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({ url, withUpdate }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const scene = mapViewer.scene;
   const [cesium3DTileset] = useState<Cesium3DTileset>(
@@ -34,9 +23,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
       url: url,
     })
   );
-  const [tileset] = useState<Cesium3DTileset>(
-    scene.primitives.add(cesium3DTileset)
-  );
+  const [tileset] = useState<Cesium3DTileset>(scene.primitives.add(cesium3DTileset));
 
   useEffect(() => {
     scene.globe.depthTestAgainstTerrain = true;
@@ -47,24 +34,12 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateContent = (
-    model: Cesium3DTileContent,
-    boundingVolume: any
-  ): void => {
-    const height = boundingVolume.minimumHeight
-      ? boundingVolume.minimumHeight
-      : boundingVolume.center.z - boundingVolume.radius;
+  const updateContent = (model: Cesium3DTileContent, boundingVolume: any): void => {
+    const height = boundingVolume.minimumHeight ? boundingVolume.minimumHeight : boundingVolume.center.z - boundingVolume.radius;
     // @ts-ignore
     const center = model._rtcCenter ?? boundingVolume.center;
-    const normal = scene.globe.ellipsoid.geodeticSurfaceNormal(
-      center,
-      new Cartesian3()
-    );
-    const offset = Cartesian3.multiplyByScalar(
-      normal,
-      height,
-      new Cartesian3()
-    );
+    const normal = scene.globe.ellipsoid.geodeticSurfaceNormal(center, new Cartesian3());
+    const offset = Cartesian3.multiplyByScalar(normal, height, new Cartesian3());
     const carto = Cartographic.fromCartesian(center);
     void new Promise((resolve, reject) => {
       // @ts-ignore
@@ -73,23 +48,17 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
         result.height = 0;
         resolve(result);
       } else {
-        void sampleTerrainMostDetailed(scene.terrainProvider, [carto]).then(
-          (results) => {
-            const result = results[0];
-            if (!defined(result)) {
-              resolve(carto);
-            }
-            resolve(result);
+        void sampleTerrainMostDetailed(scene.terrainProvider, [carto]).then((results) => {
+          const result = results[0];
+          if (!defined(result)) {
+            resolve(carto);
           }
-        );
+          resolve(result);
+        });
       }
     }).then((result) => {
       const resultCartesian = Cartographic.toCartesian(result as Cartographic);
-      const position = Cartesian3.subtract(
-        resultCartesian,
-        offset,
-        new Cartesian3()
-      );
+      const position = Cartesian3.subtract(resultCartesian, offset, new Cartesian3());
       // @ts-ignore
       model._rtcCenter = Cartesian3.clone(position, model._rtcCenter);
     });

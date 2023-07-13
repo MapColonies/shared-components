@@ -17,12 +17,14 @@ export default {
     (story) => {
       const prefersDarkMode = useDarkMode();
       const theme = prefersDarkMode ? Themes.darkTheme : Themes.lightTheme;
-      
-      return <ThemeProvider options={theme}>
-        <div className="mdc-typography" style={{ padding: '24px', height: '100%', background: 'var(--mdc-theme-background)'}}>
-          {story()}
-        </div>
-      </ThemeProvider>
+
+      return (
+        <ThemeProvider options={theme}>
+          <div className="mdc-typography" style={{ padding: '24px', height: '100%', background: 'var(--mdc-theme-background)' }}>
+            {story()}
+          </div>
+        </ThemeProvider>
+      );
     },
   ],
 } as Preview;

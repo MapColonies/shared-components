@@ -22,8 +22,7 @@ const optionsXYZ = {
 };
 
 const optionsXYZ2 = {
-  url:
-    'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=0e6fc415256d4fbb9b5166a718591d71',
+  url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=0e6fc415256d4fbb9b5166a718591d71',
 };
 
 export const MapWithXYZLayers: Story = () => (

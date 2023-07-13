@@ -79,8 +79,7 @@ export const AutocpmleteInComplitionModeEN: Story = (args: Record<string, unknow
     </>
   );
 };
-AutocpmleteInComplitionModeEN.storyName =
-  'Autocpmlete in autocomplete MODE RTL';
+AutocpmleteInComplitionModeEN.storyName = 'Autocpmlete in autocomplete MODE RTL';
 
 export const AutocpmleteInComplitionModeHEB: Story = (args: Record<string, unknown>) => {
   return (
@@ -97,5 +96,4 @@ export const AutocpmleteInComplitionModeHEB: Story = (args: Record<string, unkno
     </div>
   );
 };
-AutocpmleteInComplitionModeHEB.storyName =
-  'Autocpmlete in autocomplete MODE LTR';
+AutocpmleteInComplitionModeHEB.storyName = 'Autocpmlete in autocomplete MODE LTR';

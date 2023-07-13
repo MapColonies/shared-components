@@ -26,7 +26,5 @@ export const VectorLayer: React.FC<PropsWithChildren> = ({ children }) => {
     };
   }, [map, vectorLayer]);
 
-  return (
-    <VectorLayerProvider value={vectorLayer}>{children}</VectorLayerProvider>
-  );
+  return <VectorLayerProvider value={vectorLayer}>{children}</VectorLayerProvider>;
 };

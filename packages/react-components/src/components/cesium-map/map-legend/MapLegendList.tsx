@@ -13,11 +13,7 @@ interface MapLegendListProps {
   noLegendsText: string;
 }
 
-export const MapLegendList: React.FC<MapLegendListProps> = ({
-  legends,
-  actionsTexts: { docText, imgText },
-  noLegendsText,
-}) => {
+export const MapLegendList: React.FC<MapLegendListProps> = ({ legends, actionsTexts: { docText, imgText }, noLegendsText }) => {
   const handleNoLegends = useCallback(() => {
     return (
       <Box className="noLegendsContainer">
@@ -32,14 +28,7 @@ export const MapLegendList: React.FC<MapLegendListProps> = ({
     }
 
     return legends.map((legend, i) => {
-      return (
-        <MapLegend
-          key={`${legend.layer as string}_${i}`}
-          legend={legend}
-          docText={docText}
-          imgText={imgText}
-        />
-      );
+      return <MapLegend key={`${legend.layer as string}_${i}`} legend={legend} docText={docText} imgText={imgText} />;
     });
   }, [legends]);
 

@@ -12,7 +12,7 @@ type Story = StoryObj<typeof TabBar>;
 
 export const tabBarStory: Story = {
   render: () => (
-    <div style={{ display: 'flex',flexDirection: 'column', gap: 20 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <TabBar>
         <Tab>Cookies</Tab>
         <Tab>Pizza</Tab>

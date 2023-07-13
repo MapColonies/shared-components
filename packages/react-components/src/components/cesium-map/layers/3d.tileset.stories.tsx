@@ -26,8 +26,7 @@ const BASE_MAPS = {
       id: '1st',
       title: '1st Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -47,8 +46,7 @@ const BASE_MAPS = {
 };
 
 const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
-  url:
-    'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+  url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
 });
 
 export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
@@ -87,9 +85,7 @@ Cesium3DTilesetLayer.argTypes = {
 
 Cesium3DTilesetLayer.storyName = '3D Layer';
 
-export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (
-  args: unknown
-) => (
+export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: unknown) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset
@@ -127,16 +123,12 @@ Cesium3DTilesetWithHeightCorrectionLayer.argTypes = {
   },
 };
 
-Cesium3DTilesetWithHeightCorrectionLayer.storyName =
-  '3D with Height Correction Layer';
+Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction Layer';
 
 export const CesiumSolar3DTilesetLayer: Story = (args: unknown) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <Cesium3DTileset
-        isZoomTo={true}
-        url="/mock/tileset_2/L16_31023/L16_31023.json"
-      />
+      <Cesium3DTileset isZoomTo={true} url="/mock/tileset_2/L16_31023/L16_31023.json" />
     </CesiumMap>
   </div>
 );

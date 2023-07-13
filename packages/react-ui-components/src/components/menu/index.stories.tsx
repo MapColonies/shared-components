@@ -12,28 +12,25 @@ const meta: Meta<typeof Menu> = {
 
 type Story = StoryObj<typeof Menu>;
 
-const MenuExample: React.FC  = () => {
-    const [open, setOpen] = React.useState(false);
+const MenuExample: React.FC = () => {
+  const [open, setOpen] = React.useState(false);
 
-    return (
-      <MenuSurfaceAnchor>
-        <Menu
-          open={open}
-          onClose={(): void => setOpen(false)}
-        >
-          <MenuItem>Cookies</MenuItem>
-          <MenuItem>Pizza</MenuItem>
-          {/** MenuItem is just a ListItem, so you can intermingle other List components */}
-          <ListDivider />
-          <MenuItem>Icecream</MenuItem>
-        </Menu>
-  
-        <Button raised onClick={(): void => setOpen(!open)}>
-          Menu
-        </Button>
-      </MenuSurfaceAnchor>
-    );
-}
+  return (
+    <MenuSurfaceAnchor>
+      <Menu open={open} onClose={(): void => setOpen(false)}>
+        <MenuItem>Cookies</MenuItem>
+        <MenuItem>Pizza</MenuItem>
+        {/** MenuItem is just a ListItem, so you can intermingle other List components */}
+        <ListDivider />
+        <MenuItem>Icecream</MenuItem>
+      </Menu>
+
+      <Button raised onClick={(): void => setOpen(!open)}>
+        Menu
+      </Button>
+    </MenuSurfaceAnchor>
+  );
+};
 
 export const menuStory: Story = {
   render: () => (

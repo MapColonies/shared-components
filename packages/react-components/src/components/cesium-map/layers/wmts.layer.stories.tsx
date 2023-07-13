@@ -19,8 +19,7 @@ const mapDivStyle = {
 };
 
 const optionsWMTS = {
-  url:
-    'http://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS',
+  url: 'http://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS',
   layer: 'USGSShadedReliefOnly',
   style: 'default',
   format: 'image/jpeg',
@@ -31,8 +30,7 @@ const optionsWMTS = {
 };
 
 const optionsWMTS2 = {
-  url:
-    'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+  url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
   layer: 'USGSShadedReliefOnly',
   style: 'default',
   format: 'image/jpeg',

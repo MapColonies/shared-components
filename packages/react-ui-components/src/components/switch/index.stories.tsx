@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Switch>;
 
 export const switchStory: Story = {
   render: () => (
-    <div style={{display: 'flex', gap: 20}}>
+    <div style={{ display: 'flex', gap: 20 }}>
       <Switch label="Basic" />
       <Switch defaultChecked label="Default checked" />
       <Switch disabled label="Disabled" />

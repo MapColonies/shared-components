@@ -1,4 +1,3 @@
-import React from 'react';
 import { CSFStory } from '../../../utils/story';
 import { Map } from '../../map';
 import { TileLayer } from '../../layers/tile-layer';
@@ -19,10 +18,11 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export default {
+const story = {
   title: 'Map/Map Tiles/WMS',
   component: TileWMS,
 };
+export default story;
 
 export const Basic: CSFStory<JSX.Element> = () => (
   <div style={mapDivStyle}>
@@ -40,8 +40,7 @@ Basic.argTypes = {
     table: {
       type: {
         summary: 'OpenLayers type',
-        detail:
-          'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_TileWMS-TileWMS.html"',
+        detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_TileWMS-TileWMS.html"',
       },
     },
     control: {

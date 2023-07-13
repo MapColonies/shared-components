@@ -27,30 +27,20 @@ interface DateRangePickerProps {
     calendarLocale?: SupportedLocales;
   };
 }
-export const DateTimeRangePickerFormControl: React.FC<DateRangePickerProps> = (
-  props
-) => {
+export const DateTimeRangePickerFormControl: React.FC<DateRangePickerProps> = (props) => {
   const [from, setFrom] = useState<Date | null>(null);
   const [to, setTo] = useState<Date | null>(null);
-  const [dateFormat, setDateFormat] = useState<string>(
-    DEFAULTS.DATE_RANGE_PICKER.dateFormat
-  );
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
-    null
-  );
+  const [dateFormat, setDateFormat] = useState<string>(DEFAULTS.DATE_RANGE_PICKER.dateFormat);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClickInput = (
-    event: React.MouseEvent<HTMLInputElement>
-  ): void => {
+  const handleClickInput = (event: React.MouseEvent<HTMLInputElement>): void => {
     if (event.currentTarget.tagName === 'I') {
-setAnchorEl(
-        event.currentTarget.previousElementSibling as HTMLButtonElement
-      );
-} else {
-setAnchorEl(event.currentTarget as HTMLButtonElement);
-}
+      setAnchorEl(event.currentTarget.previousElementSibling as HTMLButtonElement);
+    } else {
+      setAnchorEl(event.currentTarget as HTMLButtonElement);
+    }
   };
   const handleClose = (): void => {
     setAnchorEl(null);
@@ -70,40 +60,20 @@ setAnchorEl(event.currentTarget as HTMLButtonElement);
     setDateFormat(props.dateFormat ?? DEFAULTS.DATE_RANGE_PICKER.dateFormat);
   }, [props.dateFormat]);
 
-  const startPlaceHolderText =
-    props.local?.startPlaceHolderText ??
-    DEFAULTS.DATE_RANGE_PICKER.local.startPlaceHolderText;
-  const endPlaceHolderText =
-    props.local?.endPlaceHolderText ??
-    DEFAULTS.DATE_RANGE_PICKER.local.endPlaceHolderText;
-  const renderAsButton =
-    props.renderAsButton === undefined
-      ? DEFAULTS.DATE_RANGE_PICKER.renderAsButton
-      : props.renderAsButton;
-  const offset =
-    props.offset === undefined
-      ? DEFAULTS.DATE_RANGE_PICKER.offset
-      : props.offset;
-  const disableFuture =
-    props.disableFuture === undefined
-      ? DEFAULTS.DATE_RANGE_PICKER.disableFuture
-      : props.disableFuture;
+  const startPlaceHolderText = props.local?.startPlaceHolderText ?? DEFAULTS.DATE_RANGE_PICKER.local.startPlaceHolderText;
+  const endPlaceHolderText = props.local?.endPlaceHolderText ?? DEFAULTS.DATE_RANGE_PICKER.local.endPlaceHolderText;
+  const renderAsButton = props.renderAsButton === undefined ? DEFAULTS.DATE_RANGE_PICKER.renderAsButton : props.renderAsButton;
+  const offset = props.offset === undefined ? DEFAULTS.DATE_RANGE_PICKER.offset : props.offset;
+  const disableFuture = props.disableFuture === undefined ? DEFAULTS.DATE_RANGE_PICKER.disableFuture : props.disableFuture;
 
   const controlText = useMemo(() => {
-    return `${
-      from ? formatDateFns(from, dateFormat) : startPlaceHolderText
-    } - ${to ? formatDateFns(to, dateFormat) : endPlaceHolderText}`;
+    return `${from ? formatDateFns(from, dateFormat) : startPlaceHolderText} - ${to ? formatDateFns(to, dateFormat) : endPlaceHolderText}`;
   }, [from, to, dateFormat, startPlaceHolderText, endPlaceHolderText]);
 
   return (
     <>
       {renderAsButton ? (
-        <Button
-          style={{ width: props.width }}
-          raised
-          onClick={handleClick}
-          className="drpOpener"
-        >
+        <Button style={{ width: props.width }} raised onClick={handleClick} className="drpOpener">
           {controlText}
         </Button>
       ) : (
@@ -121,13 +91,7 @@ setAnchorEl(event.currentTarget as HTMLButtonElement);
         />
       )}
 
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        keepMounted
-      >
+      <Popover open={open} anchorEl={anchorEl} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} keepMounted>
         <DateTimeRangePicker
           controlsLayout={controlsLayout}
           contentWidth={(anchorEl?.clientWidth ?? 0) - offset}

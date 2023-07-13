@@ -1,4 +1,4 @@
-import {ThemeOptionT} from '@rmwc/types';
+import { ThemeOptionT } from '@rmwc/types';
 
 export const themeOptions: ThemeOptionT[] = [
   'primary',

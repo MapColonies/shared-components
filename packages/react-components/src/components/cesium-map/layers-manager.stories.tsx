@@ -23,8 +23,7 @@ const BASE_MAPS = {
     {
       id: '1st',
       title: '1st Map Title',
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/3456d1802ab2ef330ae2732387726771.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/3456d1802ab2ef330ae2732387726771.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -43,8 +42,7 @@ const BASE_MAPS = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url:
-              'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
             layers: 'goes_conus_ir',
             credit: 'Infrared data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -60,8 +58,7 @@ const BASE_MAPS = {
       id: '2nd',
       title: '2nd Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
           id: 'RADAR_RASTER',
@@ -69,8 +66,7 @@ const BASE_MAPS = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url:
-              'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
             layers: 'nexrad-n0r',
             credit: 'Radar data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -107,8 +103,7 @@ const BASE_MAPS = {
     {
       id: '3rd',
       title: '3rd Map Title',
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
       baseRasteLayers: [
         {
           id: 'VECTOR_TILES',
@@ -116,8 +111,7 @@ const BASE_MAPS = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url:
-              'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
             layers: '',
             credit: 'thunderforest',
           },
@@ -139,8 +133,7 @@ const BASE_MAPS = {
           opacity: 0.4,
           zIndex: 2,
           options: {
-            url:
-              'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+            url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
             layer: 'USGSShadedReliefOnly',
             style: 'default',
             format: 'image/jpeg',
@@ -163,8 +156,7 @@ const layers = [
     zIndex: 0,
     show: false,
     options: {
-      url:
-        'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
+      url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
     },
   },
   {
@@ -174,8 +166,7 @@ const layers = [
     zIndex: 1,
     show: false,
     options: {
-      url:
-        'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
+      url: 'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
     },
   },
   {
@@ -185,8 +176,7 @@ const layers = [
     zIndex: 2,
     show: false,
     options: {
-      url:
-        'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
+      url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
     },
   },
 ];
@@ -220,9 +210,7 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
   const [allShow, setAllShow] = useState<boolean>(false);
 
   useLayoutEffect(() => {
-    const sortedLayers = layers.sort(
-      (layer1, layer2) => layer1.zIndex - layer2.zIndex
-    );
+    const sortedLayers = layers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedLayers.forEach((layer, idx) => {
       mapViewer.layersManager?.addRasterLayer(layer, idx, '');
     });

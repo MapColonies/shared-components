@@ -20,7 +20,7 @@ export const Menu = forwardRef<any, MenuProps & MenuHTMLProps & RMWCMenuSurfaceP
   return <RMWCMenu ref={ref} {...props} />;
 });
 
-export const MenuItem= forwardRef<any, MenuItemProps & MenuHTMLProps>((props, ref) => {
+export const MenuItem = forwardRef<any, MenuItemProps & MenuHTMLProps>((props, ref) => {
   return <RMWCMenuItem ref={ref} {...props} />;
 });
 

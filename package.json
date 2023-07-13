@@ -71,6 +71,8 @@
     "release": "cross-env HUSKY=0 lerna publish",
     "test": "NODE_ENV=test jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prettier:check": "prettier --check packages/**/*.{js,jsx,ts,tsx}",
+    "prettier:fix": "prettier --write packages/**/*.{js,jsx,ts,tsx}"
   }
 }

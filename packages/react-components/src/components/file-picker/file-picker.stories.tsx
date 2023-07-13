@@ -2,38 +2,20 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import React, {
-  useCallback,
-  useState,
-  useMemo,
-  useRef,
-  useEffect,
-} from 'react';
+import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { Story } from '@storybook/react/types-6-0';
-import {
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-} from '@material-ui/core';
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core';
 import { Box } from '../box';
 import { SupportedLocales } from '../models';
-import {
-  FileActionData,
-  FilePicker,
-  FileArray,
-  FileData,
-  FileHelper,
-  FilePickerActions,
-  FilePickerHandle,
-} from './file-picker';
+import { FileActionData, FilePicker, FileArray, FileData, FileHelper, FilePickerActions, FilePickerHandle } from './file-picker';
 import FsMap from './fs-map.json';
 
-export default {
+const story = {
   title: 'File Picker',
   component: FilePicker,
 };
+
+export default story;
 
 interface CustomFileData extends FileData {
   parentId?: string;
@@ -44,7 +26,7 @@ interface CustomFileMap {
 }
 
 const prepareCustomFileMap = (): Record<string, unknown> => {
-  const baseFileMap = (FsMap.fileMap as unknown) as CustomFileMap;
+  const baseFileMap = FsMap.fileMap as unknown as CustomFileMap;
   const rootFolderId = FsMap.rootFolderId;
   return { baseFileMap, rootFolderId };
 };
@@ -54,9 +36,7 @@ const prepareCustomFileMap = (): Record<string, unknown> => {
 const useCustomFileMap = () => {
   const { baseFileMap, rootFolderId } = useMemo(prepareCustomFileMap, []);
 
-  const [fileMap, setFileMap] = useState<CustomFileMap>(
-    baseFileMap as CustomFileMap
-  );
+  const [fileMap, setFileMap] = useState<CustomFileMap>(baseFileMap as CustomFileMap);
   const [currentFolderId, setCurrentFolderId] = useState(rootFolderId);
 
   const resetFileMap = useCallback(() => {
@@ -79,9 +59,7 @@ const useCustomFileMap = () => {
 
         if (file.parentId) {
           const parent = newFileMap[file.parentId];
-          const newChildrenIds = parent.childrenIds?.filter(
-            (id) => id !== file.id
-          );
+          const newChildrenIds = parent.childrenIds?.filter((id) => id !== file.id);
           newFileMap[file.parentId] = {
             ...parent,
             childrenIds: newChildrenIds,
@@ -94,51 +72,39 @@ const useCustomFileMap = () => {
     });
   }, []);
 
-  const moveFiles = useCallback(
-    (
-      files: CustomFileData[],
-      source: CustomFileData,
-      destination: CustomFileData
-    ) => {
-      setFileMap((currentFileMap) => {
-        const newFileMap = { ...currentFileMap };
-        const moveFileIds = new Set(files.map((f) => f.id));
+  const moveFiles = useCallback((files: CustomFileData[], source: CustomFileData, destination: CustomFileData) => {
+    setFileMap((currentFileMap) => {
+      const newFileMap = { ...currentFileMap };
+      const moveFileIds = new Set(files.map((f) => f.id));
 
-        // Delete files from their source folder.
-        const newSourceChildrenIds = source.childrenIds?.filter(
-          (id) => !moveFileIds.has(id)
-        );
-        newFileMap[source.id] = {
-          ...source,
-          childrenIds: newSourceChildrenIds,
-          childrenCount: newSourceChildrenIds?.length,
+      // Delete files from their source folder.
+      const newSourceChildrenIds = source.childrenIds?.filter((id) => !moveFileIds.has(id));
+      newFileMap[source.id] = {
+        ...source,
+        childrenIds: newSourceChildrenIds,
+        childrenCount: newSourceChildrenIds?.length,
+      };
+
+      // Add the files to their destination folder.
+      const newDestinationChildrenIds = [...(destination.childrenIds as string[]), ...files.map((f) => f.id)];
+      newFileMap[destination.id] = {
+        ...destination,
+        childrenIds: newDestinationChildrenIds,
+        childrenCount: newDestinationChildrenIds.length,
+      };
+
+      // Finally, update the parent folder ID on the files - from source folder
+      // ID to the destination folder ID.
+      files.forEach((file) => {
+        newFileMap[file.id] = {
+          ...file,
+          parentId: destination.id,
         };
-
-        // Add the files to their destination folder.
-        const newDestinationChildrenIds = [
-          ...(destination.childrenIds as string[]),
-          ...files.map((f) => f.id),
-        ];
-        newFileMap[destination.id] = {
-          ...destination,
-          childrenIds: newDestinationChildrenIds,
-          childrenCount: newDestinationChildrenIds.length,
-        };
-
-        // Finally, update the parent folder ID on the files - from source folder
-        // ID to the destination folder ID.
-        files.forEach((file) => {
-          newFileMap[file.id] = {
-            ...file,
-            parentId: destination.id,
-          };
-        });
-
-        return newFileMap;
       });
-    },
-    []
-  );
+
+      return newFileMap;
+    });
+  }, []);
 
   // TODO: in production we should use UUIDs or MD5 hashes for file paths
   const idCounter = useRef(0);
@@ -181,23 +147,15 @@ const useCustomFileMap = () => {
   };
 };
 
-const useFiles = (
-  fileMap: CustomFileMap,
-  currentFolderId: string
-): FileArray => {
+const useFiles = (fileMap: CustomFileMap, currentFolderId: string): FileArray => {
   return useMemo(() => {
     const currentFolder = fileMap[currentFolderId];
-    const files = currentFolder.childrenIds
-      ? currentFolder.childrenIds.map((fileId: string) => fileMap[fileId])
-      : [];
+    const files = currentFolder.childrenIds ? currentFolder.childrenIds.map((fileId: string) => fileMap[fileId]) : [];
     return files;
   }, [currentFolderId, fileMap]);
 };
 
-const useFolderChain = (
-  fileMap: CustomFileMap,
-  currentFolderId: string
-): FileArray => {
+const useFolderChain = (fileMap: CustomFileMap, currentFolderId: string): FileArray => {
   return useMemo(() => {
     const currentFolder = fileMap[currentFolderId];
     const folderChain = [currentFolder];
@@ -220,11 +178,7 @@ const useFolderChain = (
 const useFileActionHandler = (
   setCurrentFolderId: (folderId: string) => void,
   deleteFiles: (files: CustomFileData[]) => void,
-  moveFiles: (
-    files: FileData[],
-    source: FileData,
-    destination: FileData
-  ) => void,
+  moveFiles: (files: FileData[], source: FileData, destination: FileData) => void,
   createFolder: (folderName: string) => void
 ): ((data: FileActionData) => void) => {
   return useCallback(
@@ -240,17 +194,13 @@ const useFileActionHandler = (
       } else if (data.id === FilePickerActions.DeleteFiles.id) {
         deleteFiles(data.state.selectedFilesForAction);
       } else if (data.id === FilePickerActions.MoveFiles.id) {
-        moveFiles(
-          data.payload.files,
-          data.payload.source as FileData,
-          data.payload.destination
-        );
+        moveFiles(data.payload.files, data.payload.source as FileData, data.payload.destination);
       } else if (data.id === FilePickerActions.CreateFolder.id) {
         const folderName = prompt('Provide the name for your new folder:');
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (folderName) {
-createFolder(folderName);
-}
+          createFolder(folderName);
+        }
       }
     },
     [createFolder, deleteFiles, moveFiles, setCurrentFolderId]
@@ -269,20 +219,10 @@ export const ReadOnlyMode: Story = () => {
   } = useCustomFileMap();
   const files = useFiles(fileMap, currentFolderId as string);
   const folderChain = useFolderChain(fileMap, currentFolderId as string);
-  const handleFileAction = useFileActionHandler(
-    setCurrentFolderId,
-    deleteFiles,
-    moveFiles,
-    createFolder
-  );
+  const handleFileAction = useFileActionHandler(setCurrentFolderId, deleteFiles, moveFiles, createFolder);
   return (
     <Box style={{ height: '600px' }}>
-      <FilePicker
-        files={files}
-        folderChain={folderChain}
-        onFileAction={handleFileAction}
-        readOnlyMode={true}
-      />
+      <FilePicker files={files} folderChain={folderChain} onFileAction={handleFileAction} readOnlyMode={true} />
     </Box>
   );
 };
@@ -299,12 +239,7 @@ export const DarkTheme: Story = () => {
   } = useCustomFileMap();
   const files = useFiles(fileMap, currentFolderId as string);
   const folderChain = useFolderChain(fileMap, currentFolderId as string);
-  const handleFileAction = useFileActionHandler(
-    setCurrentFolderId,
-    deleteFiles,
-    moveFiles,
-    createFolder
-  );
+  const handleFileAction = useFileActionHandler(setCurrentFolderId, deleteFiles, moveFiles, createFolder);
   return (
     <Box style={{ height: '600px' }}>
       <FilePicker
@@ -335,52 +270,22 @@ export const Localized: Story = () => {
   } = useCustomFileMap();
   const files = useFiles(fileMap, currentFolderId as string);
   const folderChain = useFolderChain(fileMap, currentFolderId as string);
-  const handleFileAction = useFileActionHandler(
-    setCurrentFolderId,
-    deleteFiles,
-    moveFiles,
-    createFolder
-  );
+  const handleFileAction = useFileActionHandler(setCurrentFolderId, deleteFiles, moveFiles, createFolder);
   const [locale, setLocale] = useState<SupportedLocales>(SupportedLocales.HE);
-  const handleLocaleChange = useCallback(
-    (event) => setLocale(event.target.value),
-    []
-  );
+  const handleLocaleChange = useCallback((event) => setLocale(event.target.value), []);
   return (
     <>
       <FormControl component="fieldset" style={{ marginBottom: 15 }}>
         <FormLabel component="legend">Pick a language:</FormLabel>
-        <RadioGroup
-          aria-label="locale"
-          name="locale"
-          value={locale}
-          onChange={handleLocaleChange}
-        >
-          <FormControlLabel
-            value={SupportedLocales.HE}
-            control={<Radio />}
-            label="עברית"
-          />
-          <FormControlLabel
-            value={SupportedLocales.RU}
-            control={<Radio />}
-            label="Русский"
-          />
-          <FormControlLabel
-            value={SupportedLocales.EN}
-            control={<Radio />}
-            label="English"
-          />
+        <RadioGroup aria-label="locale" name="locale" value={locale} onChange={handleLocaleChange}>
+          <FormControlLabel value={SupportedLocales.HE} control={<Radio />} label="עברית" />
+          <FormControlLabel value={SupportedLocales.RU} control={<Radio />} label="Русский" />
+          <FormControlLabel value={SupportedLocales.EN} control={<Radio />} label="English" />
         </RadioGroup>
       </FormControl>
       <br />
       <Box style={{ height: '600px' }}>
-        <FilePicker
-          files={files}
-          folderChain={folderChain}
-          onFileAction={handleFileAction}
-          locale={locale}
-        />
+        <FilePicker files={files} folderChain={folderChain} onFileAction={handleFileAction} locale={locale} />
       </Box>
     </>
   );
@@ -398,12 +303,7 @@ export const FilesSelection: Story = () => {
   } = useCustomFileMap();
   const files = useFiles(fileMap, currentFolderId as string);
   const folderChain = useFolderChain(fileMap, currentFolderId as string);
-  const handleFileAction = useFileActionHandler(
-    setCurrentFolderId,
-    deleteFiles,
-    moveFiles,
-    createFolder
-  );
+  const handleFileAction = useFileActionHandler(setCurrentFolderId, deleteFiles, moveFiles, createFolder);
   const fileBrowserRef = useRef<FilePickerHandle>(null);
 
   const logSelection = useCallback(
@@ -411,8 +311,8 @@ export const FilesSelection: Story = () => {
       event.preventDefault();
       event.stopPropagation();
       if (!fileBrowserRef.current) {
-return;
-}
+        return;
+      }
       console.log(fileBrowserRef.current.getFileSelection());
     },
     [fileBrowserRef]
@@ -423,13 +323,13 @@ return;
       event.preventDefault();
       event.stopPropagation();
       if (!fileBrowserRef.current) {
-return;
-}
+        return;
+      }
       const randomFileIds = new Set<string>();
       for (const file of files) {
         if (file && Math.random() > 0.5) {
-randomFileIds.add(file.id);
-}
+          randomFileIds.add(file.id);
+        }
       }
       fileBrowserRef.current.setFileSelection(randomFileIds);
     },
@@ -444,12 +344,7 @@ randomFileIds.add(file.id);
       <button type="button" onClick={logSelection}>
         Log selection
       </button>
-      <FilePicker
-        ref={fileBrowserRef}
-        files={files}
-        folderChain={folderChain}
-        onFileAction={handleFileAction}
-      />
+      <FilePicker ref={fileBrowserRef} files={files} folderChain={folderChain} onFileAction={handleFileAction} />
     </Box>
   );
 };

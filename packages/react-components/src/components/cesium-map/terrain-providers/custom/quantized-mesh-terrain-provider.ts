@@ -63,11 +63,7 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
   private readonly getUrl: (x: number, y: number, level: number) => string;
   private readonly credits: Credit[] | undefined;
 
-  public constructor(options: {
-    getUrl?: (x: number, y: number, level: number) => string;
-    credit?: string;
-    tilingScheme?: TilingScheme;
-  }) {
+  public constructor(options: { getUrl?: (x: number, y: number, level: number) => string; credit?: string; tilingScheme?: TilingScheme }) {
     // super();
     this.ready = false;
     this.dummyTile = decode(dummyTileBuffer);
@@ -87,11 +83,7 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
     this.ready = true;
   }
 
-  public requestTileGeometry(
-    x: number,
-    y: number,
-    level: number
-  ): Promise<void | QuantizedMeshTerrainData> | undefined {
+  public requestTileGeometry(x: number, y: number, level: number): Promise<void | QuantizedMeshTerrainData> | undefined {
     const url = this.getUrl(x, y, level);
 
     return window
@@ -124,21 +116,11 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
     return levelZeroMaximumGeometricError / (1 << level);
   }
 
-  private generateDummyTileHeader(
-    x: number,
-    y: number,
-    level: number
-  ): IDecodedTileHeader {
+  private generateDummyTileHeader(x: number, y: number, level: number): IDecodedTileHeader {
     const tileRect = this.tilingScheme.tileXYToRectangle(x, y, level);
-    const tileNativeRect = this.tilingScheme.tileXYToNativeRectangle(
-      x,
-      y,
-      level
-    );
+    const tileNativeRect = this.tilingScheme.tileXYToNativeRectangle(x, y, level);
     const tileCenter = Cartographic.toCartesian(Rectangle.center(tileRect));
-    const horizonOcclusionPoint = Ellipsoid.WGS84.transformPositionToScaledSpace(
-      tileCenter
-    );
+    const horizonOcclusionPoint = Ellipsoid.WGS84.transformPositionToScaledSpace(tileCenter);
 
     return {
       centerX: tileCenter.x,
@@ -156,22 +138,14 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
     };
   }
 
-  private createQuantizedMeshData(
-    decodedTile: IDecodedTile,
-    x: number,
-    y: number,
-    level: number
-  ): QuantizedMeshTerrainData {
+  private createQuantizedMeshData(decodedTile: IDecodedTile, x: number, y: number, level: number): QuantizedMeshTerrainData {
     const tileRect = this.tilingScheme.tileXYToRectangle(x, y, level);
     const boundingSphereCenter = new Cartesian3(
       decodedTile.header.boundingSphereCenterX,
       decodedTile.header.boundingSphereCenterY,
       decodedTile.header.boundingSphereCenterZ
     );
-    const boundingSphere = new BoundingSphere(
-      boundingSphereCenter,
-      decodedTile.header.boundingSphereRadius
-    );
+    const boundingSphere = new BoundingSphere(boundingSphereCenter, decodedTile.header.boundingSphereRadius);
     const horizonOcclusionPoint = new Cartesian3(
       decodedTile.header.horizonOcclusionPointX,
       decodedTile.header.horizonOcclusionPointY,
@@ -181,11 +155,7 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
     let orientedBoundingBox;
 
     if (tileRect.width < Math.PI_OVER_TWO + Math.EPSILON5) {
-      orientedBoundingBox = OrientedBoundingBox.fromRectangle(
-        tileRect,
-        decodedTile.header.minHeight,
-        decodedTile.header.maxHeight
-      );
+      orientedBoundingBox = OrientedBoundingBox.fromRectangle(tileRect, decodedTile.header.minHeight, decodedTile.header.maxHeight);
     }
 
     return new QuantizedMeshTerrainData({
@@ -216,12 +186,7 @@ export default class QuantizedMeshTerrainProvider /*extends TerrainProvider*/ {
     };
   }
 
-  private decodeResponse(
-    res: any,
-    x: number,
-    y: number,
-    level: number
-  ): IDecodedTile {
+  private decodeResponse(res: any, x: number, y: number, level: number): IDecodedTile {
     return res
       .arrayBuffer()
       .then((buffer: ArrayBufferLike) => {

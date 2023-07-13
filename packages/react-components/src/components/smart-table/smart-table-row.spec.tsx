@@ -32,15 +32,7 @@ it('adds an IconButton and Collapse area if collapse is enabled and renders the 
 });
 
 it('opens the collapseable panel when the button is pressed', () => {
-  const wrapper = shallow(
-    <SmartTableRow
-      cellsMetadata={headCells}
-      isCollapseable={true}
-      isRowSelected={false}
-      item={item}
-      rowIndex={0}
-    />
-  );
+  const wrapper = shallow(<SmartTableRow cellsMetadata={headCells} isCollapseable={true} isRowSelected={false} item={item} rowIndex={0} />);
 
   expect(wrapper.find(Collapse).props()).toHaveProperty('in', false);
 
@@ -51,32 +43,12 @@ it('opens the collapseable panel when the button is pressed', () => {
 
 it('generates tablecells with the correct properties and runs transform', () => {
   const rowIndex = 0;
-  const wrapper = shallow(
-    <SmartTableRow
-      cellsMetadata={headCells}
-      isCollapseable={false}
-      isRowSelected={false}
-      item={item}
-      rowIndex={rowIndex}
-    />
-  );
+  const wrapper = shallow(<SmartTableRow cellsMetadata={headCells} isCollapseable={false} isRowSelected={false} item={item} rowIndex={rowIndex} />);
 
   /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-  const firstTableCellProps = wrapper
-    .findWhere(
-      (n) =>
-        n.type() === TableCell &&
-        n.key() === headCells[0].id + rowIndex.toString()
-    )
-    .props();
+  const firstTableCellProps = wrapper.findWhere((n) => n.type() === TableCell && n.key() === headCells[0].id + rowIndex.toString()).props();
   /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-  const secondTableCellProps = wrapper
-    .findWhere(
-      (n) =>
-        n.type() === TableCell &&
-        n.key() === headCells[1].id + rowIndex.toString()
-    )
-    .props();
+  const secondTableCellProps = wrapper.findWhere((n) => n.type() === TableCell && n.key() === headCells[1].id + rowIndex.toString()).props();
 
   expect(firstTableCellProps).toHaveProperty('align', 'left');
   expect(secondTableCellProps).toHaveProperty('align', 'right');
@@ -93,14 +65,7 @@ it('calls onRowSelected with the correct index', () => {
   const onRowSelected = jest.fn();
 
   const wrapper = shallow(
-    <SmartTableRow
-      cellsMetadata={headCells}
-      isCollapseable={false}
-      isRowSelected={false}
-      item={item}
-      rowIndex={0}
-      onRowSelected={onRowSelected}
-    />
+    <SmartTableRow cellsMetadata={headCells} isCollapseable={false} isRowSelected={false} item={item} rowIndex={0} onRowSelected={onRowSelected} />
   );
 
   wrapper.find(TableRow).simulate('click');

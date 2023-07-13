@@ -11,7 +11,6 @@ import {
 } from '@rmwc/dialog';
 import { ExtractProps } from '../typeHelpers';
 
-
 export interface DialogProps extends ExtractProps<typeof RMWCDialog> {}
 export interface DialogContentProps extends ExtractProps<typeof RMWCDialogContent> {}
 export interface DialogTitleProps extends ExtractProps<typeof RMWCDialogTitle> {}

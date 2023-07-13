@@ -31,14 +31,7 @@ export const Polygon: Story = (args) => (
         <CesiumPolygonGraphics
           hierarchy={
             // eslint-disable-next-line
-            Cartesian3.fromDegreesArray([
-              -108.0,
-              42.0,
-              -100.0,
-              42.0,
-              -104.0,
-              40.0,
-            ]) as any
+            Cartesian3.fromDegreesArray([-108.0, 42.0, -100.0, 42.0, -104.0, 40.0]) as any
           } // WORKAROUND
           material={Color.GREEN}
         />

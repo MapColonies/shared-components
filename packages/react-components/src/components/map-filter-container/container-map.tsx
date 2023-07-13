@@ -37,12 +37,7 @@ export const ContainerMap: React.FC<PropsWithChildren<ContainerMapProps>> = (pro
         </VectorLayer>
       )}
       {props.children}
-      {props.drawType !== undefined && (
-        <DrawInteraction
-          drawType={props.drawType}
-          onPolygonSelected={handlePolygonSelected}
-        />
-      )}
+      {props.drawType !== undefined && <DrawInteraction drawType={props.drawType} onPolygonSelected={handlePolygonSelected} />}
     </Map>
   );
 };

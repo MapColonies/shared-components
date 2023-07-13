@@ -31,10 +31,7 @@ const imageDataHasTransparency = (image: ImageData | undefined): boolean => {
  * the `tileTransparencyCheckedCounter`. Sets to `maxTilesForTransparencyCheck` when layer detected as transparent.
  * @returns
  */
-export const imageHasTransparency = async (
-  image: string | HTMLImageElement | ImageBitmap,
-  context?: CustomImageryProvider
-): Promise<boolean> => {
+export const imageHasTransparency = async (image: string | HTMLImageElement | ImageBitmap, context?: CustomImageryProvider): Promise<boolean> => {
   if (context) {
     context.tileTransparencyCheckedCounter++;
   }
@@ -52,17 +49,11 @@ export const imageHasTransparency = async (
         canvasElem.height = image.height;
         canvasCtx?.drawImage(image, 0, 0);
 
-        const canvasImg = canvasCtx?.getImageData(
-          0,
-          0,
-          canvasElem.width,
-          canvasElem.height
-        );
+        const canvasImg = canvasCtx?.getImageData(0, 0, canvasElem.width, canvasElem.height);
         const hasTransparency = imageDataHasTransparency(canvasImg);
         if (hasTransparency) {
           if (context) {
-            context.tileTransparencyCheckedCounter =
-              context.maxTilesForTransparencyCheck;
+            context.tileTransparencyCheckedCounter = context.maxTilesForTransparencyCheck;
           }
         }
 
@@ -81,19 +72,13 @@ export const imageHasTransparency = async (
 
         canvasCtx?.drawImage(imageElement, 0, 0);
 
-        const canvasImg = canvasCtx?.getImageData(
-          0,
-          0,
-          canvasElem.width,
-          canvasElem.height
-        );
+        const canvasImg = canvasCtx?.getImageData(0, 0, canvasElem.width, canvasElem.height);
 
         const hasTransparency = imageDataHasTransparency(canvasImg);
 
         if (hasTransparency) {
           if (context) {
-            context.tileTransparencyCheckedCounter =
-              context.maxTilesForTransparencyCheck;
+            context.tileTransparencyCheckedCounter = context.maxTilesForTransparencyCheck;
           }
 
           resolve(true);
@@ -113,23 +98,11 @@ export const imageHasTransparency = async (
  * @param rect
  * @param anotherRect
  */
-export const cesiumRectangleContained = (
-  rect: Rectangle,
-  anotherRect: Rectangle
-): boolean => {
+export const cesiumRectangleContained = (rect: Rectangle, anotherRect: Rectangle): boolean => {
   const { west, east, north, south } = rect;
-  const {
-    west: anotherWest,
-    east: anotherEast,
-    north: anotherNorth,
-    south: anotherSouth,
-  } = anotherRect;
+  const { west: anotherWest, east: anotherEast, north: anotherNorth, south: anotherSouth } = anotherRect;
 
-  const isRectInsideAnother =
-    west >= anotherWest &&
-    east <= anotherEast &&
-    north <= anotherNorth &&
-    south >= anotherSouth;
+  const isRectInsideAnother = west >= anotherWest && east <= anotherEast && north <= anotherNorth && south >= anotherSouth;
 
   return isRectInsideAnother;
 };

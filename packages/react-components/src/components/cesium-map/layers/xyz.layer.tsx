@@ -5,11 +5,9 @@ import { CustomUrlTemplateImageryProvider } from '../helpers/customImageryProvid
 import { useCesiumMap } from '../map';
 import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
-export interface RCesiumXYZLayerOptions
-  extends UrlTemplateImageryProvider.ConstructorOptions {}
+export interface RCesiumXYZLayerOptions extends UrlTemplateImageryProvider.ConstructorOptions {}
 
-export interface RCesiumXYZLayerProps
-  extends Partial<RCesiumImageryLayerProps> {
+export interface RCesiumXYZLayerProps extends Partial<RCesiumImageryLayerProps> {
   options: UrlTemplateImageryProvider.ConstructorOptions;
 }
 
@@ -21,7 +19,5 @@ export const CesiumXYZLayer: React.FC<RCesiumXYZLayerProps> = (props) => {
     ? new CustomUrlTemplateImageryProvider(options, mapViewer)
     : new UrlTemplateImageryProvider(options);
 
-  return (
-    <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />
-  );
+  return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;
 };

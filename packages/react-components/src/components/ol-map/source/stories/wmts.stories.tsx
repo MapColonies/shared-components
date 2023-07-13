@@ -1,4 +1,3 @@
-import React from 'react';
 import { CSFStory } from '../../../utils/story';
 import { Map } from '../../map';
 import { TileLayer } from '../../layers/tile-layer';
@@ -7,8 +6,7 @@ import { TileOsm } from '../osm';
 
 const wmtsOptions = getWMTSOptions({
   attributions: 'Tiles © ArcGIS',
-  url:
-    'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+  url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
   layer: '0',
   projection: 'EPSG:3857',
   format: 'image/png',
@@ -19,8 +17,7 @@ const wmtsOptions = getWMTSOptions({
 });
 
 const wmtsOptions1 = getWMTSOptions({
-  url:
-    'http://10.28.11.95:8080/wmts/{Layer}/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
+  url: 'http://10.28.11.95:8080/wmts/{Layer}/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
   layer: 'combined_layers',
   matrixSet: 'gridname',
   format: 'png',
@@ -34,10 +31,12 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export default {
+const story = {
   title: 'Map/Map Tiles/WMTS',
   component: TileWMTS,
 };
+
+export default story;
 
 export const Basic: CSFStory<JSX.Element> = () => (
   <div style={mapDivStyle}>
@@ -61,8 +60,7 @@ Basic.argTypes = {
     table: {
       type: {
         summary: 'OpenLayers type',
-        detail:
-          'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_WMTS-WMTS.html"',
+        detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_WMTS-WMTS.html"',
       },
     },
     control: {

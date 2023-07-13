@@ -1,4 +1,3 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import { TableRow } from '@material-ui/core';
 import { SmartTable } from './smart-table';
@@ -12,42 +11,38 @@ afterEach(() => {
   requestSort.mockClear();
 });
 
-it(
-  'generates an empty table row if the ' +
-    'items array is empty or if the rows per page is bigger',
-  () => {
-    const wrapper = shallow(
-      <SmartTable
-        cellsMetadata={headCells}
-        count={10}
-        handleChangePage={() => {
-          // do nothing for eslint
-        }}
-        handleChangeRowsPerPage={() => {
-          // do nothing for eslint
-        }}
-        isCollapseable={false}
-        items={[]}
-        onRowSelected={() => {
-          // do nothing for eslint
-        }}
-        onRequestSort={requestSort}
-        page={0}
-        rowsPerPage={10}
-      />
-    );
+it('generates an empty table row if the items array is empty or if the rows per page is bigger', () => {
+  const wrapper = shallow(
+    <SmartTable
+      cellsMetadata={headCells}
+      count={10}
+      handleChangePage={() => {
+        // do nothing for eslint
+      }}
+      handleChangeRowsPerPage={() => {
+        // do nothing for eslint
+      }}
+      isCollapseable={false}
+      items={[]}
+      onRowSelected={() => {
+        // do nothing for eslint
+      }}
+      onRequestSort={requestSort}
+      page={0}
+      rowsPerPage={10}
+    />
+  );
 
-    expect(wrapper.exists(TableRow)).toBe(true);
+  expect(wrapper.exists(TableRow)).toBe(true);
 
-    wrapper.setProps({ items: new Array(10).map(() => items[0]) });
+  wrapper.setProps({ items: new Array(10).map(() => items[0]) });
 
-    expect(wrapper.exists(TableRow)).toBe(false);
+  expect(wrapper.exists(TableRow)).toBe(false);
 
-    wrapper.setProps({ items: items });
+  wrapper.setProps({ items: items });
 
-    expect(wrapper.exists(TableRow)).toBe(true);
-  }
-);
+  expect(wrapper.exists(TableRow)).toBe(true);
+});
 
 it('Generates a row for each of the items', () => {
   const wrapper = shallow(
@@ -101,16 +96,12 @@ it('calls on request sort with the correct order and property when sort is reque
     />
   );
 
-  wrapper
-    .find(SmartEnhancedTableHead)
-    .simulate('requestSort', {}, headCells[0].id);
+  wrapper.find(SmartEnhancedTableHead).simulate('requestSort', {}, headCells[0].id);
 
   expect(requestSort).toHaveBeenCalledWith(headCells[0].id, 'asc');
   wrapper.update();
 
-  wrapper
-    .find(SmartEnhancedTableHead)
-    .simulate('requestSort', {}, headCells[0].id);
+  wrapper.find(SmartEnhancedTableHead).simulate('requestSort', {}, headCells[0].id);
 
   expect(requestSort).toHaveBeenCalledWith(headCells[0].id, 'desc');
 });

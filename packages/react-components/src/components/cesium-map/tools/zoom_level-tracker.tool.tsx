@@ -16,12 +16,11 @@ const detectZoomLevel = (distance: number, viewer: CesiumViewer) => {
   const tileProvider = get(viewer.scene.globe, '_surface.tileProvider') as any;
   const quadtree = tileProvider._quadtree;
   const drawingBufferHeight = viewer.canvas.height;
-  const sseDenominator = get(viewer.camera.frustum, 'sseDenominator') as number | undefined ?? 1;
+  const sseDenominator = (get(viewer.camera.frustum, 'sseDenominator') as number | undefined) ?? 1;
 
   for (let level = 0; level <= MAX_ZOOM_LEVEL; level++) {
     const maxGeometricError = tileProvider.getLevelMaximumGeometricError(level);
-    const error =
-      (maxGeometricError * drawingBufferHeight) / (distance * sseDenominator);
+    const error = (maxGeometricError * drawingBufferHeight) / (distance * sseDenominator);
     if (error < quadtree.maximumScreenSpaceError) {
       return level;
     }
@@ -33,7 +32,7 @@ const detectZoomLevel = (distance: number, viewer: CesiumViewer) => {
 const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
   precision = precision || 10;
 
-  const result: {level: number, height: number}[] = [];
+  const result: { level: number; height: number }[] = [];
   let step = 100000.0;
   let currentZoomLevel = 0;
   for (let height = 100000000.0; height > step; height = height - step) {
@@ -71,9 +70,7 @@ const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
 };
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (
-  props
-) => {
+export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (props) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const [zoomLevel, setZoomLevel] = useState(1);
   const zoomLevelHeights = getZoomLevelHeights(1, mapViewer);
@@ -86,14 +83,11 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (
 
       switch (mapViewer.scene.mode) {
         case CesiumSceneMode.SCENE3D:
-          cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(
-            camera.positionWC
-          ).height;
+          cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(camera.positionWC).height;
           break;
         case CesiumSceneMode.SCENE2D:
           cameraHeight =
-            ((camera.frustum as PerspectiveOffCenterFrustum).right -
-              (camera.frustum as PerspectiveOffCenterFrustum).left) *
+            ((camera.frustum as PerspectiveOffCenterFrustum).right - (camera.frustum as PerspectiveOffCenterFrustum).left) *
             ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
           break;
         case CesiumSceneMode.COLUMBUS_VIEW:
@@ -106,10 +100,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (
 
       if (zoomLevelHeights.length > 0) {
         const closestZoom = zoomLevelHeights.reduce((a, b) => {
-          return Math.abs(b.height - cameraHeight) <
-            Math.abs(a.height - cameraHeight)
-            ? b
-            : a;
+          return Math.abs(b.height - cameraHeight) < Math.abs(a.height - cameraHeight) ? b : a;
         });
 
         setZoomLevel(closestZoom.level);
@@ -125,10 +116,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (
           mapViewer.camera.moveEnd.removeEventListener(calculateZoomLevel);
         }
       } catch (e) {
-        console.log(
-          'CESIUM camera "moveEnd"(from zoom tracker) remove listener failed',
-          e
-        );
+        console.log('CESIUM camera "moveEnd"(from zoom tracker) remove listener failed', e);
       }
     };
   }, [mapViewer, zoomLevelHeights.length]);
@@ -136,9 +124,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (
   return (
     <div className="zoomLevel">
       <div className="zoomLevelValue">{zoomLevel}</div>
-      <div className="zoomLevelLabel">
-        {get(props.locale, 'ZOOM_LABEL') ?? 'zoom'}
-      </div>
+      <div className="zoomLevelLabel">{get(props.locale, 'ZOOM_LABEL') ?? 'zoom'}</div>
     </div>
   );
 };

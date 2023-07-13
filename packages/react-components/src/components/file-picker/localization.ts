@@ -1,20 +1,11 @@
 /* eslint-disable */
-import {
-  ChonkyActions,
-  ChonkyFormatters,
-  FileData,
-  FileHelper,
-  I18nConfig,
-} from 'chonky';
+import { ChonkyActions, ChonkyFormatters, FileData, FileHelper, I18nConfig } from 'chonky';
 import { IntlShape } from 'react-intl';
 import filesize from 'filesize';
 import { SupportedLocales } from '../models';
 
 export interface FilePickerFormatters extends ChonkyFormatters {
-  formatFileSize: (
-    intl: IntlShape | null,
-    file: FileData | null
-  ) => string | null;
+  formatFileSize: (intl: IntlShape | null, file: FileData | null) => string | null;
 }
 
 interface IFileSize {
@@ -25,10 +16,7 @@ interface IFileSize {
 }
 
 export const defaultFormatters: FilePickerFormatters = {
-  formatFileModDate: (
-    intl: IntlShape,
-    file: FileData | null
-  ): string | null => {
+  formatFileModDate: (intl: IntlShape, file: FileData | null): string | null => {
     const safeModDate = FileHelper.getModDate(file);
     if (safeModDate) {
       return intl.formatDate(safeModDate, {
@@ -39,17 +27,14 @@ export const defaultFormatters: FilePickerFormatters = {
       return null;
     }
   },
-  formatFileSize: (
-    _intl: IntlShape | null,
-    file: FileData | null
-  ): string | null => {
+  formatFileSize: (_intl: IntlShape | null, file: FileData | null): string | null => {
     if (!file || typeof file.size !== 'number') return null;
 
     const size = file.size;
-    const sizeData = (filesize(size, {
+    const sizeData = filesize(size, {
       bits: false,
       output: 'object',
-    }) as unknown) as IFileSize;
+    }) as unknown as IFileSize;
     if (sizeData.symbol === 'B') {
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       return `${Math.round(sizeData.value / 10) / 100.0} KB`;

@@ -9,9 +9,7 @@ export const useVectorTileSource = (): VectorTileSource => {
   const source = useContext(vectorTileSourceContext);
 
   if (source === null) {
-    throw new Error(
-      'vector tile source context is null, please check the provider'
-    );
+    throw new Error('vector tile source context is null, please check the provider');
   }
 
   return source;

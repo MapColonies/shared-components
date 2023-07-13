@@ -16,11 +16,7 @@ interface MapLegendProps {
   imgText?: string;
 }
 
-export const MapLegend: React.FC<MapLegendProps> = ({
-  legend: { legendImg, legendDoc, layer },
-  docText,
-  imgText,
-}) => {
+export const MapLegend: React.FC<MapLegendProps> = ({ legend: { legendImg, legendDoc, layer }, docText, imgText }) => {
   const handleLegendImgOpen = useCallback(() => {
     // Open image in a new tab.
     window.open(legendImg, '_blank');
@@ -36,10 +32,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
 
     const layerNameContainer = (
       <Box className="layerNameContainer">
-        <h3
-          style={{ maxWidth: `${MAX_LAYER_NAME_LENGTH}ch` }}
-          className="layerName"
-        >
+        <h3 style={{ maxWidth: `${MAX_LAYER_NAME_LENGTH}ch` }} className="layerName">
           {layer}
         </h3>
       </Box>
@@ -55,22 +48,12 @@ export const MapLegend: React.FC<MapLegendProps> = ({
   const renderLinks = useCallback(() => {
     return [
       typeof legendImg === 'string' && (
-        <a
-          className="legendAction"
-          href={legendImg}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a className="legendAction" href={legendImg} target="_blank" rel="noreferrer">
           {imgText}
         </a>
       ),
       typeof legendDoc === 'string' && (
-        <a
-          className="legendAction"
-          href={legendDoc}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a className="legendAction" href={legendDoc} target="_blank" rel="noreferrer">
           {docText}
         </a>
       ),
@@ -80,12 +63,7 @@ export const MapLegend: React.FC<MapLegendProps> = ({
   return (
     <Box className="mapLegend">
       {renderLayerName()}
-      <img
-        alt="Map Legend"
-        className="legendImg"
-        src={legendImg}
-        onClick={handleLegendImgOpen}
-      />
+      <img alt="Map Legend" className="legendImg" src={legendImg} onClick={handleLegendImgOpen} />
       <Box className="legendActionsContainer">{renderLinks()}</Box>
     </Box>
   );

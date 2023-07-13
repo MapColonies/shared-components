@@ -29,14 +29,7 @@ afterEach(() => {
 // });
 
 it('opens the menu with drawing options on open menu button click', () => {
-  const wrapper = shallow(
-    <PolygonSelectionUi
-      onStartDraw={startDraw}
-      onCancelDraw={cancelDraw}
-      onReset={resetDraw}
-      isSelectionEnabled={false}
-    />
-  );
+  const wrapper = shallow(<PolygonSelectionUi onStartDraw={startDraw} onCancelDraw={cancelDraw} onReset={resetDraw} isSelectionEnabled={false} />);
 
   expect(wrapper.find(Menu).prop('open')).toBe(false);
 
@@ -46,21 +39,12 @@ it('opens the menu with drawing options on open menu button click', () => {
 });
 
 it('Polygon/box drawing menu items call start draw with correct params on click and closes the menu', () => {
-  const wrapper = shallow(
-    <PolygonSelectionUi
-      onStartDraw={startDraw}
-      onCancelDraw={cancelDraw}
-      onReset={resetDraw}
-      isSelectionEnabled={false}
-    />
-  );
+  const wrapper = shallow(<PolygonSelectionUi onStartDraw={startDraw} onCancelDraw={cancelDraw} onReset={resetDraw} isSelectionEnabled={false} />);
 
   const openMenuButton = wrapper.find(Button);
   openMenuButton.simulate('click', { currentTarget: {} });
 
-  wrapper
-    .findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Polygon')
-    .simulate('click');
+  wrapper.findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Polygon').simulate('click');
 
   expect(wrapper.find(Menu).prop('open')).toBe(false);
   expect(startDraw).toHaveBeenCalledWith(DrawType.POLYGON);
@@ -69,9 +53,7 @@ it('Polygon/box drawing menu items call start draw with correct params on click 
   startDraw.mockClear();
 
   openMenuButton.simulate('click', { currentTarget: {} });
-  wrapper
-    .findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Box')
-    .simulate('click');
+  wrapper.findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Box').simulate('click');
 
   expect(wrapper.find(Menu).prop('open')).toBe(false);
   expect(startDraw).toHaveBeenCalledWith(DrawType.BOX);
@@ -79,35 +61,19 @@ it('Polygon/box drawing menu items call start draw with correct params on click 
 });
 
 it('clicking the clear menu item calls onreset and closes the menu', () => {
-  const wrapper = shallow(
-    <PolygonSelectionUi
-      onStartDraw={startDraw}
-      onCancelDraw={cancelDraw}
-      onReset={resetDraw}
-      isSelectionEnabled={false}
-    />
-  );
+  const wrapper = shallow(<PolygonSelectionUi onStartDraw={startDraw} onCancelDraw={cancelDraw} onReset={resetDraw} isSelectionEnabled={false} />);
 
   const openMenuButton = wrapper.find(Button);
   openMenuButton.simulate('click', { currentTarget: {} });
 
-  wrapper
-    .findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Clear')
-    .simulate('click');
+  wrapper.findWhere((n) => n.type() === MenuItem && n.prop('children') === 'Clear').simulate('click');
 
   expect(wrapper.find(Menu).prop('open')).toBe(false);
   expect(resetDraw).toHaveBeenCalledTimes(1);
 });
 
 it('Cancel draw is shown when IsSelectionEnabled is true, and clicking on the button calls onCancelDraw', () => {
-  const wrapper = shallow(
-    <PolygonSelectionUi
-      onStartDraw={startDraw}
-      onCancelDraw={cancelDraw}
-      onReset={resetDraw}
-      isSelectionEnabled={true}
-    />
-  );
+  const wrapper = shallow(<PolygonSelectionUi onStartDraw={startDraw} onCancelDraw={cancelDraw} onReset={resetDraw} isSelectionEnabled={true} />);
 
   const button = wrapper.find(Button);
 

@@ -26,8 +26,7 @@ const BASE_MAPS = {
       id: '1st',
       title: '1st Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',

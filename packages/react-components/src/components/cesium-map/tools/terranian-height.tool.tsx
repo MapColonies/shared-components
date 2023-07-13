@@ -20,9 +20,7 @@ const FIRST_DATA_ROW_IDX = 2;
 
 export interface TerrainianHeightProps {}
 
-export const TerrainianHeightTool: React.FC<TerrainianHeightProps> = (
-  props
-) => {
+export const TerrainianHeightTool: React.FC<TerrainianHeightProps> = (props) => {
   const mapViewer: CesiumViewer = useCesiumMap();
 
   const csvToArray = (str: string, delimiter = ','): IParsedData[] => {
@@ -31,10 +29,7 @@ export const TerrainianHeightTool: React.FC<TerrainianHeightProps> = (
 
     const arr = rows.map((row) => {
       const values = row.split(delimiter);
-      const el = Cartographic.fromDegrees(
-        parseFloat(values[0]),
-        parseFloat(values[1])
-      );
+      const el = Cartographic.fromDegrees(parseFloat(values[0]), parseFloat(values[1]));
       // const el = headers.reduce((object: Record<string, number>, header, index) => {
       //   const trimmedHeader = header.trim();
       //   object[trimmedHeader] = parseFloat(values[index]);
@@ -69,10 +64,7 @@ export const TerrainianHeightTool: React.FC<TerrainianHeightProps> = (
       ).then(
         (updatedPositions) => {
           console.log(updatedPositions);
-          updatedPositions = updatedPositions.slice(
-            0,
-            updatedPositions.length - 1
-          ); // UNIX brake line
+          updatedPositions = updatedPositions.slice(0, updatedPositions.length - 1); // UNIX brake line
 
           mapViewer.scene.globe.depthTestAgainstTerrain = true;
           mapViewer.entities.suspendEvents();
@@ -108,17 +100,11 @@ export const TerrainianHeightTool: React.FC<TerrainianHeightProps> = (
           mapViewer.entities.resumeEvents();
 
           if (evt.target.files !== null) {
-            exportToCsv(
-              `terranian_heights_${evt.target.files[0].name}`,
-              parsed
-            );
+            exportToCsv(`terranian_heights_${evt.target.files[0].name}`, parsed);
             evt.target.value = '';
           }
 
-          console.log(
-            'Pinned point count is ',
-            mapViewer.entities.values.length
-          );
+          console.log('Pinned point count is ', mapViewer.entities.values.length);
         },
         (err) => {
           console.error('ERROR while sampleTerrainMostDetailed:', err);

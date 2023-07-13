@@ -46,17 +46,8 @@ export interface RCesiumDrawingDataSourceProps extends RCesiumCustomDataSourcePr
   outlineWidth?: number;
 }
 
-export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> = (
-  props
-) => {
-  const {
-    drawState,
-    drawingMaterial,
-    drawingVertexColor,
-    material,
-    hollow,
-    outlineWidth,
-  } = props;
+export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> = (props) => {
+  const { drawState, drawingMaterial, drawingVertexColor, material, hollow, outlineWidth } = props;
   const mapViewer: CesiumViewer = useCesiumMap();
 
   const [drawHelper, setDrawHelper] = useState<typeof DrawHelper>();
@@ -128,9 +119,7 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
             });
             break;
           default:
-            throw new Error(
-              `[CESIUM DRAW]: ${drawState.type} unrecognized primitive to draw.`
-            );
+            throw new Error(`[CESIUM DRAW]: ${drawState.type} unrecognized primitive to draw.`);
             break;
         }
       } else {
@@ -143,32 +132,15 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
     }
   }, [drawState, drawHelper]);
 
-  const renderGraphicsComponent = (
-    drawEntity: IDrawing
-  ): React.ReactElement => {
+  const renderGraphicsComponent = (drawEntity: IDrawing): React.ReactElement => {
     let coordinates: Rectangle | Cartesian3[] | undefined =
-      drawEntity.coordinates !== undefined
-        ? drawEntity.coordinates
-        : geoJSONToPrimitive(
-            drawEntity.type,
-            drawEntity.geojson as FeatureCollection
-          );
+      drawEntity.coordinates !== undefined ? drawEntity.coordinates : geoJSONToPrimitive(drawEntity.type, drawEntity.geojson as FeatureCollection);
     if (hollow !== true) {
       switch (drawEntity.type) {
         case DrawType.BOX:
-          return (
-            <CesiumRectangleGraphics
-              coordinates={coordinates as Rectangle}
-              material={material ?? drawingMaterial}
-            />
-          );
+          return <CesiumRectangleGraphics coordinates={coordinates as Rectangle} material={material ?? drawingMaterial} />;
         case DrawType.POLYGON:
-          return (
-            <CesiumPolygonGraphics
-              hierarchy={new PolygonHierarchy(coordinates as Cartesian3[])}
-              material={material ?? drawingMaterial}
-            />
-          );
+          return <CesiumPolygonGraphics hierarchy={new PolygonHierarchy(coordinates as Cartesian3[])} material={material ?? drawingMaterial} />;
         default:
           return <></>;
       }
@@ -178,21 +150,12 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
           coordinates = rectangleToPositions(coordinates as Rectangle);
           break;
         case DrawType.POLYGON:
-          coordinates = [
-            ...(coordinates as Cartesian3[]),
-            (coordinates as Cartesian3[])[0],
-          ];
+          coordinates = [...(coordinates as Cartesian3[]), (coordinates as Cartesian3[])[0]];
           break;
         default:
           return <></>;
       }
-      return (
-        <CesiumPolylineGraphics
-          positions={coordinates}
-          width={outlineWidth ?? 1}
-          material={material ?? drawingMaterial}
-        />
-      );
+      return <CesiumPolylineGraphics positions={coordinates} width={outlineWidth ?? 1} material={material ?? drawingMaterial} />;
     }
   };
 

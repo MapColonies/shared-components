@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Icon,
-  Drawer,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerContent,
-} from '@map-colonies/react-core';
+import { Icon, Drawer, DrawerHeader, DrawerTitle, DrawerContent } from '@map-colonies/react-core';
 import { IMapLegend } from './MapLegend';
 import { MapLegendList } from './MapLegendList';
 
@@ -29,26 +23,13 @@ export const MapLegendSidebar: React.FC<MapLegendSidebarProps> = ({
   legends = [],
 }) => {
   return isOpen ? (
-    <Drawer
-      className="mapLegendSidebarContainer"
-      modal={false}
-      dismissible={true}
-      open={isOpen}
-    >
+    <Drawer className="mapLegendSidebarContainer" modal={false} dismissible={true} open={isOpen}>
       <DrawerHeader className="sidebarHeaderContainer">
         <DrawerTitle className="sidebarTitle">{title}</DrawerTitle>
       </DrawerHeader>
       <DrawerContent className="sidebarContent">
-        <Icon
-          onClick={toggleSidebar}
-          className="mapLegendCloseBtn"
-          icon={{ icon: 'close', size: 'small' }}
-        />
-        <MapLegendList
-          noLegendsText={noLegendsText}
-          legends={legends}
-          actionsTexts={actionsTexts}
-        />
+        <Icon onClick={toggleSidebar} className="mapLegendCloseBtn" icon={{ icon: 'close', size: 'small' }} />
+        <MapLegendList noLegendsText={noLegendsText} legends={legends} actionsTexts={actionsTexts} />
       </DrawerContent>
     </Drawer>
   ) : null;

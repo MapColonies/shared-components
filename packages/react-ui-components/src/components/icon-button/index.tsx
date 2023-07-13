@@ -6,6 +6,6 @@ import { ExtractProps } from '../typeHelpers';
 type IconButtonPropsWithHtml = IconButtonHTMLProps & RMWCIconButtonProps;
 export interface IconButtonProps extends ExtractProps<typeof RMWCIconButton> {}
 
-export const IconButton = forwardRef<any ,IconButtonProps & IconButtonPropsWithHtml>((props, ref) => {
+export const IconButton = forwardRef<any, IconButtonProps & IconButtonPropsWithHtml>((props, ref) => {
   return <RMWCIconButton ref={ref} {...props} />;
 });

@@ -12,13 +12,13 @@ const meta: Meta<typeof Theme> = {
 type Story = StoryObj<typeof Theme>;
 
 const themeStyle = {
-    padding: '16px',
-    margin: '16px',
-    display: 'inline-block',
-    width: '96px',
-    height: '96px',
-    verticalAlign: 'top'
-  };
+  padding: '16px',
+  margin: '16px',
+  display: 'inline-block',
+  width: '96px',
+  height: '96px',
+  verticalAlign: 'top',
+};
 
 export const themeStory: Story = {
   render: () => (

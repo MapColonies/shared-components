@@ -1,12 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  ComponentProps,
-} from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 
@@ -38,7 +30,7 @@ import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 import './map.css';
 import { pointToLonLat } from './tools/geojson/point.geojson';
 
-interface ViewerProps extends ComponentProps<typeof Viewer>{};
+interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
@@ -56,19 +48,13 @@ interface ICameraState {
   up?: Cartesian3;
   right?: Cartesian3;
   transform?: Matrix4;
-  frustum?:
-    | PerspectiveFrustum
-    | PerspectiveOffCenterFrustum
-    | OrthographicFrustum;
+  frustum?: PerspectiveFrustum | PerspectiveOffCenterFrustum | OrthographicFrustum;
 }
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
   private useOptimizedTileRequests?: boolean;
 
-  public constructor(
-    container: string | Element,
-    options?: CesiumViewerCls.ConstructorOptions
-  ) {
+  public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
   }
 
@@ -148,18 +134,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showScale, setShowScale] = useState<boolean>();
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const [cameraState, setCameraState] = useState<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<
-    CesiumSceneModeEnum[] | undefined
-  >();
+  const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
-  const [imageryMenuPosition, setImageryMenuPosition] = useState<
-    Record<string, unknown> | undefined
-  >(undefined);
-  const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(
-    false
-  );
+  const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
+  const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(false);
   const [rightClickCoordinates, setRightClickCoordinates] = useState<{
     longitude: number;
     latitude: number;
@@ -189,14 +169,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     const mapHeight = container.clientHeight;
     const calculatedHeight = menuHeight + menuDynamicHeightIncrement;
     return {
-      left: `${
-        mapWidth - x < menuWidth ? x - (menuWidth - (mapWidth - x)) : x
-      }px`,
-      top: `${
-        mapHeight - y < calculatedHeight
-          ? y - (calculatedHeight - (mapHeight - y))
-          : y
-      }px`,
+      left: `${mapWidth - x < menuWidth ? x - (menuWidth - (mapWidth - x)) : x}px`,
+      top: `${mapHeight - y < calculatedHeight ? y - (calculatedHeight - (mapHeight - y)) : y}px`,
     };
   };
 
@@ -205,20 +179,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
 
       if (props.imageryContextMenu) {
-        viewer.screenSpaceEventHandler.setInputAction(
-          (evt: Record<string, unknown>) => {
-            // console.log('RIGHT click', evt.position);
-            const pos = evt.position as Record<string, unknown>;
+        viewer.screenSpaceEventHandler.setInputAction((evt: Record<string, unknown>) => {
+          // console.log('RIGHT click', evt.position);
+          const pos = evt.position as Record<string, unknown>;
 
-            setShowImageryMenu(false);
-            setImageryMenuPosition(pos);
-            setRightClickCoordinates(
-              pointToLonLat(viewer, pos.x as number, pos.y as number)
-            );
-            setShowImageryMenu(true);
-          },
-          ScreenSpaceEventType.RIGHT_CLICK
-        );
+          setShowImageryMenu(false);
+          setImageryMenuPosition(pos);
+          setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
+          setShowImageryMenu(true);
+        }, ScreenSpaceEventType.RIGHT_CLICK);
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
@@ -226,44 +195,28 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests =
-        props.useOptimizedTileRequests ?? false;
+      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
 
-      mapViewRef.layersManager = new LayerManager(
-        mapViewRef,
-        props.legends?.mapLegendsExtractor,
-        () => {
-          setLegendsList(
-            mapViewRef.layersManager?.legendsList as IMapLegend[]
-          );
-        }
-      );
+      mapViewRef.layersManager = new LayerManager(mapViewRef, props.legends?.mapLegendsExtractor, () => {
+        setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+      });
     }
   }, [mapViewRef]);
 
   useEffect(() => {
     if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests =
-        props.useOptimizedTileRequests ?? false;
+      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
     }
   }, [props.useOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
-    setSceneModes(
-      props.sceneModes ?? [
-        CesiumSceneMode.SCENE2D,
-        CesiumSceneMode.SCENE3D,
-        CesiumSceneMode.COLUMBUS_VIEW,
-      ]
-    );
+    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]);
   }, [props.sceneModes]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
 
-    const currentMap = props.baseMaps?.maps.find(
-      (map: IBaseMap) => map.isCurrent
-    );
+    const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
@@ -317,13 +270,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           mapViewRef.container.clientHeight / 2
         );
         const pickRay = mapViewRef.scene.camera.getPickRay(windowPosition);
-        const pickPosition = mapViewRef.scene.globe.pick(
-          pickRay as Ray,
-          mapViewRef.scene
-        );
-        const pickPositionCartographic = mapViewRef.scene.globe.ellipsoid.cartesianToCartographic(
-          pickPosition as Cartesian3
-        );
+        const pickPosition = mapViewRef.scene.globe.pick(pickRay as Ray, mapViewRef.scene);
+        const pickPositionCartographic = mapViewRef.scene.globe.ellipsoid.cartesianToCartographic(pickPosition as Cartesian3);
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return pickPositionCartographic !== undefined
@@ -363,11 +311,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     const morphCompleteHandler = (): void => {
       if (mapViewRef && cameraState) {
         void mapViewRef.camera.flyTo({
-          destination: Cartesian3.fromDegrees(
-            cameraState.position.longitude,
-            cameraState.position.latitude,
-            cameraState.position.height
-          ),
+          destination: Cartesian3.fromDegrees(cameraState.position.longitude, cameraState.position.latitude, cameraState.position.height),
           duration: 0,
         });
       }
@@ -377,11 +321,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     }
     return (): void => {
       if (mapViewRef) {
-        try{
-          mapViewRef.scene.morphComplete.removeEventListener(
-            morphCompleteHandler
-          );
-        } catch(e){
+        try {
+          mapViewRef.scene.morphComplete.removeEventListener(morphCompleteHandler);
+        } catch (e) {
           console.error('morphCompleteHandler event not cleaned');
         }
       }
@@ -393,11 +335,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     const center = props.center;
     if (mapViewRef && isNumber(zoom) && isArray(center)) {
       void mapViewRef.camera.flyTo({
-        destination: Cartesian3.fromDegrees(
-          center[0],
-          center[1],
-          getAltitude(zoom)
-        ),
+        destination: Cartesian3.fromDegrees(center[0], center[1], getAltitude(zoom)),
         duration: 0,
       });
     }
@@ -409,44 +347,19 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           <Box className="sideToolsContainer">
-            <CesiumSettings
-              sceneModes={sceneModes as CesiumSceneModeEnum[]}
-              baseMaps={baseMaps}
-              locale={locale}
-            />
-            <MapLegendToggle
-              onClick={(): void =>
-                setIsLegendsSidebarOpen(!isLegendsSidebarOpen)
-              }
-            />
+            <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
+            <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
-            {showMousePosition === true ? (
-              <CoordinatesTrackerTool projection={projection} />
-            ) : (
-              <></>
-            )}
-            {showZoomLevel === true ? (
-              <ZoomLevelTrackerTool locale={locale} />
-            ) : (
-              <></>
-            )}
+            {showMousePosition === true ? <CoordinatesTrackerTool projection={projection} /> : <></>}
+            {showZoomLevel === true ? <ZoomLevelTrackerTool locale={locale} /> : <></>}
             {showScale === true ? <ScaleTrackerTool locale={locale} /> : <></>}
           </Box>
         </>,
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [
-    baseMaps,
-    locale,
-    mapViewRef,
-    projection,
-    sceneModes,
-    showMousePosition,
-    showScale,
-    isLegendsSidebarOpen,
-  ]);
+  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen]);
 
   return (
     <Viewer className="viewer" full ref={ref} {...viewerProps}>
@@ -454,9 +367,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <MapLegendSidebar
           title={props.legends?.title}
           isOpen={isLegendsSidebarOpen}
-          toggleSidebar={(): void =>
-            setIsLegendsSidebarOpen(!isLegendsSidebarOpen)
-          }
+          toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)}
           noLegendsText={props.legends?.emptyText}
           legends={props.legends?.legendsList ?? legendsList}
           actionsTexts={props.legends?.actionsTexts}
@@ -468,10 +379,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           imageryMenuPosition &&
           rightClickCoordinates &&
           React.cloneElement(props.imageryContextMenu, {
-            data: (mapViewRef?.layersManager?.findLayerByPOI(
-              imageryMenuPosition.x as number,
-              imageryMenuPosition.y as number
-            ) as unknown) as Record<string, unknown>[],
+            data: mapViewRef?.layersManager?.findLayerByPOI(imageryMenuPosition.x as number, imageryMenuPosition.y as number) as unknown as Record<
+              string,
+              unknown
+            >[],
             position: {
               x: imageryMenuPosition.x as number,
               y: imageryMenuPosition.y as number,
@@ -482,8 +393,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               imageryMenuPosition.y as number,
               props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
               props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
-              props.imageryContextMenuSize?.dynamicHeightIncrement ??
-                DEFAULT_DYNAMIC_HEIGHT_INCREMENT
+              props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
             ),
             size: props.imageryContextMenuSize ?? {
               height: DEFAULT_HEIGHT,

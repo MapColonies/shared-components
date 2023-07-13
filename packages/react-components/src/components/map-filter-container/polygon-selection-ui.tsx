@@ -26,9 +26,7 @@ export interface PolygonSelectionUiProps {
   onReset: () => void;
 }
 
-export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
-  props
-) => {
+export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => {
   const classes = useStyle();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { isSelectionEnabled, onCancelDraw, onStartDraw, onReset } = props;
@@ -52,15 +50,8 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
   } else {
     return (
       <Box position="relative">
-        <Tooltip
-          content="draw an Area of interest to limit the search"
-          align={'bottomLeft'}
-        >
-          <Button
-            className={classes.drawingButton}
-            raised
-            onClick={handleClick}
-          >
+        <Tooltip content="draw an Area of interest to limit the search" align={'bottomLeft'}>
+          <Button className={classes.drawingButton} raised onClick={handleClick}>
             Draw AOI
           </Button>
         </Tooltip>

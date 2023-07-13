@@ -16,19 +16,13 @@ export const useVectorTileLayer = (): VectorTile => {
   const layer = useContext(vectorTileLayerContext);
 
   if (layer === null) {
-    throw new Error(
-      'vector tile layer context is null, please check the provider'
-    );
+    throw new Error('vector tile layer context is null, please check the provider');
   }
 
   return layer;
 };
 
-export const VectorTileLayer: React.FC<PropsWithChildren<VectorTileLayerProps>> = ({
-  children,
-  options,
-  style,
-}) => {
+export const VectorTileLayer: React.FC<PropsWithChildren<VectorTileLayerProps>> = ({ children, options, style }) => {
   const map = useMap();
   const [vectorTileLayer] = useState(
     new VectorTile({
@@ -48,9 +42,5 @@ export const VectorTileLayer: React.FC<PropsWithChildren<VectorTileLayerProps>> 
     vectorTileLayer.setStyle(style ? style : defaultStyle);
   }, [vectorTileLayer, style]);
 
-  return (
-    <VectorTileLayerProvider value={vectorTileLayer}>
-      {children}
-    </VectorTileLayerProvider>
-  );
+  return <VectorTileLayerProvider value={vectorTileLayer}>{children}</VectorTileLayerProvider>;
 };

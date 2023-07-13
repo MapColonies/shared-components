@@ -1,18 +1,8 @@
-import {
-  Math as CesiumMath,
-  Cartesian3,
-  Cartographic,
-  SceneMode,
-  Cartesian2,
-} from 'cesium';
+import { Math as CesiumMath, Cartesian3, Cartographic, SceneMode, Cartesian2 } from 'cesium';
 import { GeoJSON } from 'geojson';
 import { CesiumViewer } from '../../map';
 
-const pointToCartographic = (
-  mapViewer: CesiumViewer,
-  x: number,
-  y: number
-): Cartographic => {
+const pointToCartographic = (mapViewer: CesiumViewer, x: number, y: number): Cartographic => {
   let cartesian;
 
   if (mapViewer.scene.mode !== SceneMode.SCENE2D) {
@@ -25,11 +15,7 @@ const pointToCartographic = (
   return Cartographic.fromCartesian(cartesian as Cartesian3);
 };
 
-export const pointToGeoJSON = (
-  mapViewer: CesiumViewer,
-  x: number,
-  y: number
-): GeoJSON => {
+export const pointToGeoJSON = (mapViewer: CesiumViewer, x: number, y: number): GeoJSON => {
   const cartographic = pointToCartographic(mapViewer, x, y);
 
   return {
@@ -37,19 +23,12 @@ export const pointToGeoJSON = (
     properties: {},
     geometry: {
       type: 'Point',
-      coordinates: [
-        CesiumMath.toDegrees(cartographic.longitude),
-        CesiumMath.toDegrees(cartographic.latitude),
-      ],
+      coordinates: [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude)],
     },
   };
 };
 
-export const pointToLonLat = (
-  mapViewer: CesiumViewer,
-  x: number,
-  y: number
-): { longitude: number; latitude: number } | undefined => {
+export const pointToLonLat = (mapViewer: CesiumViewer, x: number, y: number): { longitude: number; latitude: number } | undefined => {
   try {
     const cartographic = pointToCartographic(mapViewer, x, y);
 

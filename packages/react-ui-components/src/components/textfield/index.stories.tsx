@@ -23,7 +23,7 @@ export const textFieldStory: Story = {
           onClick: () => console.log('Clear'),
         }}
       />
-      <TextField invalid label="Invalid..." value="#@!$"  />
+      <TextField invalid label="Invalid..." value="#@!$" />
       <TextField label="Validate Pattern" pattern="[A-Za-z]{3}" />
     </div>
   ),

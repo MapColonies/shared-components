@@ -4,10 +4,7 @@ import { GeoJSON } from 'geojson';
 export const polygonToGeoJSON = (positions: Cartesian3[]): GeoJSON => {
   const coords = positions.map((vertex: Cartesian3) => {
     const posRadians = Cartographic.fromCartesian(vertex);
-    return [
-      CesiumMath.toDegrees(posRadians.longitude),
-      CesiumMath.toDegrees(posRadians.latitude),
-    ];
+    return [CesiumMath.toDegrees(posRadians.longitude), CesiumMath.toDegrees(posRadians.latitude)];
   });
 
   // close polygon

@@ -36,18 +36,11 @@ export const getWMTSOptions = (params: WMTSOptionParams): Options => {
   const resolutions = new Array<number>(RESOLUTIONS);
   const matrixIds = new Array<string>(RESOLUTIONS);
   const size = getWidth(projectionExtent) / TILE_GRANULARITY;
-  const heightWidthRatio =
-    params.heightWidthRatio !== undefined
-      ? params.heightWidthRatio
-      : LAYER_HEIGHT_WIDHT_RATIO;
-  const requestEncoding =
-    params.requestEncoding !== undefined
-      ? params.requestEncoding
-      : REQUEST_ENCODING;
+  const heightWidthRatio = params.heightWidthRatio !== undefined ? params.heightWidthRatio : LAYER_HEIGHT_WIDHT_RATIO;
+  const requestEncoding = params.requestEncoding !== undefined ? params.requestEncoding : REQUEST_ENCODING;
   for (let z = 0; z < RESOLUTIONS; ++z) {
     // generate resolutions and matrixIds arrays for this WMTS
-    resolutions[z] =
-      size / Math.pow(WMTS_RESOLUTION_BASIS, z) / heightWidthRatio;
+    resolutions[z] = size / Math.pow(WMTS_RESOLUTION_BASIS, z) / heightWidthRatio;
     matrixIds[z] = z.toString();
   }
 

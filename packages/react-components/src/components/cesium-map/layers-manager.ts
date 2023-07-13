@@ -11,12 +11,7 @@ import {
 import { get, isEmpty } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import {
-  RCesiumOSMLayerOptions,
-  RCesiumWMSLayerOptions,
-  RCesiumWMTSLayerOptions,
-  RCesiumXYZLayerOptions,
-} from './layers';
+import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import { CesiumViewer } from './map';
 import { IBaseMap } from './settings/settings';
 import { pointToGeoJSON } from './tools/geojson/point.geojson';
@@ -44,11 +39,7 @@ export interface IRasterLayer {
   opacity: number;
   zIndex: number;
   show?: boolean;
-  options:
-    | RCesiumOSMLayerOptions
-    | RCesiumWMSLayerOptions
-    | RCesiumWMTSLayerOptions
-    | RCesiumXYZLayerOptions;
+  options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
   details?: Record<string, unknown>;
 }
 
@@ -71,11 +62,7 @@ class LayerManager {
   private readonly layers: ICesiumImageryLayer[];
   private readonly legendsExtractor?: LegendExtractor;
 
-  public constructor(
-    mapViewer: CesiumViewer,
-    legendsExtractor?: LegendExtractor,
-    onLayersUpdate?: () => void
-  ) {
+  public constructor(mapViewer: CesiumViewer, legendsExtractor?: LegendExtractor, onLayersUpdate?: () => void) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
@@ -90,9 +77,7 @@ class LayerManager {
     if (this.mapViewer.shouldOptimizedTileRequests) {
       this.layerUpdated.addEventListener((meta: Record<string, unknown>) => {
         const newMetaKeys = Object.keys(meta);
-        const shouldTriggerRelevancyCheck =
-          newMetaKeys.length === 1 &&
-          newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
+        const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
         if (shouldTriggerRelevancyCheck) {
           this.markRelevantLayersForExtent();
           this.hideNonRelevantLayers();
@@ -127,10 +112,7 @@ class LayerManager {
   }
 
   /* eslint-disable */
-  public addMetaToLayer(
-    meta: any,
-    layerPredicate: (layer: ImageryLayer, idx: number) => boolean
-  ): void {
+  public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
     const layer = this.layers.find(layerPredicate);
     if (layer) {
       layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -141,9 +123,7 @@ class LayerManager {
   /* eslint-enable */
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
-    const sortedBaseMapLayers = baseMap.baseRasteLayers.sort(
-      (layer1, layer2) => layer1.zIndex - layer2.zIndex
-    );
+    const sortedBaseMapLayers = baseMap.baseRasteLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });
@@ -167,11 +147,7 @@ class LayerManager {
     }
   }
 
-  public addRasterLayer(
-    layer: IRasterLayer,
-    index: number,
-    parentId: string
-  ): void {
+  public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
     let cesiumLayer: ICesiumImageryLayer | undefined;
     switch (layer.type) {
       case 'XYZ_LAYER': {
@@ -181,10 +157,7 @@ class LayerManager {
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
           : new UrlTemplateImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(
-          providerInstance,
-          index
-        );
+        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
 
         break;
       }
@@ -195,10 +168,7 @@ class LayerManager {
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
           : new WebMapServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(
-          providerInstance,
-          index
-        );
+        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
         break;
       }
       case 'WMTS_LAYER': {
@@ -208,10 +178,7 @@ class LayerManager {
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)
           : new WebMapTileServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(
-          providerInstance,
-          index
-        );
+        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
 
         break;
       }
@@ -278,9 +245,7 @@ class LayerManager {
     const layer = this.findLayerById(layerId);
     const order = (layer?.meta as Record<string, unknown>).zIndex as number;
     const lowerLimit = this.getBaseLayersCount();
-    const layerIdx = this.mapViewer.imageryLayers.indexOf(
-      layer as ImageryLayer
-    );
+    const layerIdx = this.mapViewer.imageryLayers.indexOf(layer as ImageryLayer);
 
     if (layerIdx - positions <= lowerLimit) {
       positions = layerIdx - lowerLimit;
@@ -303,20 +268,14 @@ class LayerManager {
       this.mapViewer.imageryLayers.raiseToTop(layer);
     }
 
-    this.updateLayersOrder(
-      layerId,
-      order,
-      this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1
-    );
+    this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
   }
 
   public lowerToBottom(layerId: string): void {
     const layer = this.findLayerById(layerId);
     // const order = (layer?.meta as Record<string, unknown>).zIndex as number;
     const lowerLimit = this.getBaseLayersCount();
-    const layerIdx = this.mapViewer.imageryLayers.indexOf(
-      layer as ImageryLayer
-    );
+    const layerIdx = this.mapViewer.imageryLayers.indexOf(layer as ImageryLayer);
 
     this.lower(layerId, layerIdx - lowerLimit);
     // if (layer) {
@@ -350,17 +309,12 @@ class LayerManager {
   public get(layerId: string): ICesiumImageryLayer | undefined {
     const layerInt = this.findLayerById(layerId);
 
-    const layerIdx = this.mapViewer.imageryLayers.indexOf(
-      layerInt as ImageryLayer
-    );
+    const layerIdx = this.mapViewer.imageryLayers.indexOf(layerInt as ImageryLayer);
 
     return layerIdx ? this.mapViewer.imageryLayers.get(layerIdx) : undefined;
   }
 
-  public findLayerByPOI(
-    x: number,
-    y: number
-  ): ICesiumImageryLayer[] | undefined {
+  public findLayerByPOI(x: number, y: number): ICesiumImageryLayer[] | undefined {
     const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
 
     const nonBaseLayers = this.layers.filter((layer) => {
@@ -369,19 +323,15 @@ class LayerManager {
     });
 
     const selectedVisibleLayers = nonBaseLayers.filter((layer) => {
-      const layerFootprint = get(layer.meta, 'details.footprint') as
-        | Polygon
-        | undefined;
+      const layerFootprint = get(layer.meta, 'details.footprint') as Polygon | undefined;
       if (layerFootprint !== undefined) {
-
         /* eslint-disable */
         const isInLayer = booleanPointInPolygon(position.geometry, {
           type: 'Feature',
           properties: {},
           geometry: layerFootprint,
         });
-       /* eslint-enable */
-
+        /* eslint-enable */
 
         return isInLayer && layer.show;
       } else {
@@ -402,12 +352,7 @@ class LayerManager {
       new SingleTileImageryProvider({
         url: './assets/img/transparent-tile.png',
         /* eslint-disable @typescript-eslint/no-magic-numbers */
-        rectangle: new Rectangle(
-          -3.141592653589793,
-          -1.5707963267948966,
-          3.141592653589793,
-          1.5707963267948966
-        ),
+        rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
         /* eslint-enable @typescript-eslint/no-magic-numbers */
       }),
       0
@@ -450,22 +395,15 @@ class LayerManager {
       if (!parentId) {
         const layerOrder = layer.meta?.zIndex as number;
         (layer.meta as Record<string, unknown>).zIndex =
-          layerOrder >= min && layerOrder <= max && layerOrder !== from
-            ? layerOrder + move
-            : layerOrder === from
-            ? to
-            : layerOrder;
+          layerOrder >= min && layerOrder <= max && layerOrder !== from ? layerOrder + move : layerOrder === from ? to : layerOrder;
       }
     });
   }
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
-      if (
-        layer.meta?.relevantToExtent !== layer.show &&
-        layer.imageryProvider.ready
-      ) {
-        layer.show = layer.meta?.relevantToExtent as boolean | undefined?? true;
+      if (layer.meta?.relevantToExtent !== layer.show && layer.imageryProvider.ready) {
+        layer.show = (layer.meta?.relevantToExtent as boolean | undefined) ?? true;
       }
     }
   }
@@ -477,10 +415,7 @@ class LayerManager {
       // Iterating in reverse order so that top layer is first.
       for (let i = this.layers.length - 1; i >= 0; i--) {
         const layer = this.layers[i];
-        const intersectsExtent =
-          !isEmpty(extent) &&
-          !isEmpty(layer.rectangle) &&
-          Rectangle.intersection(extent, layer.rectangle);
+        const intersectsExtent = !isEmpty(extent) && !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle);
 
         // Iterating from top layer until the current. (inclusive)
         for (let j = this.layers.length - 1; j >= i; j--) {
@@ -490,18 +425,14 @@ class LayerManager {
           }
 
           const layerAbove = this.layers[j];
-          const layerAboveHasTransparency =
-            layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === true;
+          const layerAboveHasTransparency = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === true;
 
           if (layer !== layerAbove) {
             // Layer is relevant if in extent and there is no layer above it which is opaque and contains it.
             if (intersectsExtent instanceof Rectangle) {
               if (cesiumRectangleContained(extent, layer.rectangle)) {
                 // Layer contains the extent.
-                if (
-                  cesiumRectangleContained(extent, layerAbove.rectangle) &&
-                  !layerAboveHasTransparency
-                ) {
+                if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
                   layer.meta = {
                     ...(layer.meta ?? {}),
                     relevantToExtent: false,
@@ -515,17 +446,12 @@ class LayerManager {
                 }
               }
 
-              if (
-                cesiumRectangleContained(extent, layerAbove.rectangle) &&
-                !layerAboveHasTransparency
-              ) {
+              if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
                 layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
                 break;
               }
 
-              if (
-                cesiumRectangleContained(layer.rectangle, layerAbove.rectangle)
-              ) {
+              if (cesiumRectangleContained(layer.rectangle, layerAbove.rectangle)) {
                 layer.meta = {
                   ...(layer.meta ?? {}),
                   relevantToExtent: layerAboveHasTransparency,

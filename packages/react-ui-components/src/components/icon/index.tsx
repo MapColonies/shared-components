@@ -7,6 +7,6 @@ type IconPropsWithHtml = IconHTMLProps & RMWCIconProps;
 
 export interface IconProps extends ExtractProps<typeof RMWCIcon> {}
 
-export const Icon= forwardRef<any, IconProps & IconPropsWithHtml>((props, ref) => {
+export const Icon = forwardRef<any, IconProps & IconPropsWithHtml>((props, ref) => {
   return <RMWCIcon ref={ref} {...props} />;
 });

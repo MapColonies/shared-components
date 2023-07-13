@@ -9,7 +9,5 @@ export const rectangleToPositions = (positions: Rectangle): Cartesian3[] => {
     [positions.east, positions.north],
   ]);
   const polygon = bboxPolygon(bbox(line));
-  return polygon.geometry.coordinates[0].map(
-    (coord) => Cartesian3.fromRadiansArray(coord)[0]
-  );
+  return polygon.geometry.coordinates[0].map((coord) => Cartesian3.fromRadiansArray(coord)[0]);
 };

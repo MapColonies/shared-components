@@ -24,7 +24,5 @@ export const VectorSource: React.FC<PropsWithChildren> = ({ children }) => {
     vectorLayer.setSource(vectorSource);
   }, [vectorSource, vectorLayer]);
 
-  return (
-    <VectorSourceProvider value={vectorSource}>{children}</VectorSourceProvider>
-  );
+  return <VectorSourceProvider value={vectorSource}>{children}</VectorSourceProvider>;
 };

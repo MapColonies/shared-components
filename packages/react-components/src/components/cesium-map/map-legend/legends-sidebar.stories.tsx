@@ -19,8 +19,7 @@ const mapDivStyle = {
 };
 
 const optionsXYZSanDiego = {
-  url:
-    'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
+  url: 'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
 };
 
 const BASE_MAPS = {
@@ -29,8 +28,7 @@ const BASE_MAPS = {
       id: '1st',
       title: '1st Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/3456d1802ab2ef330ae2732387726771.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/3456d1802ab2ef330ae2732387726771.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -49,8 +47,7 @@ const BASE_MAPS = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url:
-              'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
             layers: 'goes_conus_ir',
             credit: 'Infrared data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -65,8 +62,7 @@ const BASE_MAPS = {
     {
       id: '2nd',
       title: '2nd Map Title',
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
           id: 'RADAR_RASTER',
@@ -74,8 +70,7 @@ const BASE_MAPS = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url:
-              'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
             layers: 'nexrad-n0r',
             credit: 'Radar data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -112,8 +107,7 @@ const BASE_MAPS = {
     {
       id: '3rd',
       title: '3rd Map Title',
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
       baseRasteLayers: [
         {
           id: 'VECTOR_TILES',
@@ -121,8 +115,7 @@ const BASE_MAPS = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url:
-              'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
             layers: '',
             credit: 'thunderforest',
           },
@@ -144,8 +137,7 @@ const BASE_MAPS = {
           opacity: 0.4,
           zIndex: 2,
           options: {
-            url:
-              'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+            url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
             layer: 'USGSShadedReliefOnly',
             style: 'default',
             format: 'image/jpeg',
@@ -161,10 +153,7 @@ const BASE_MAPS = {
 };
 
 export const MapWithLegends: Story = () => {
-  const [center] = useState<[number, number]>([
-    -117.30644008676421,
-    33.117098433617564,
-  ]); //Sandiego Poinsettia Park
+  const [center] = useState<[number, number]>([-117.30644008676421, 33.117098433617564]); //Sandiego Poinsettia Park
   return (
     <div style={mapDivStyle}>
       <CesiumMap
@@ -178,14 +167,12 @@ export const MapWithLegends: Story = () => {
           legendsList: [
             {
               layer: 'bluemarble',
-              legendImg:
-                'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
+              legendImg: 'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
               legendDoc: 'http://www.africau.edu/images/default/sample.pdf',
             },
             {
               layer: 'bluemarble2',
-              legendImg:
-                'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
+              legendImg: 'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
               legendDoc: 'http://www.africau.edu/images/default/sample.pdf',
             },
           ],

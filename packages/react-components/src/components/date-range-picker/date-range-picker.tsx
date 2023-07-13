@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { isValid, isBefore } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDateTimePicker,
-} from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core';
@@ -59,25 +56,14 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
   const themeMui = useMappedMuiTheme(theme);
   const [from, setFrom] = useState<Date | null>(null);
   const [to, setTo] = useState<Date | null>(null);
-  const [dateFormat, setDateFormat] = useState<string>(
-    DEFAULTS.DATE_RANGE_PICKER.dateFormat
-  );
+  const [dateFormat, setDateFormat] = useState<string>(DEFAULTS.DATE_RANGE_PICKER.dateFormat);
 
-  const flexDirection =
-    props.controlsLayout ?? DEFAULTS.DATE_RANGE_PICKER.controlsLayout;
-  const disableFuture =
-    props.disableFuture ?? DEFAULTS.DATE_RANGE_PICKER.disableFuture;
-  const startPlaceHolderText =
-    props.local?.startPlaceHolderText ??
-    DEFAULTS.DATE_RANGE_PICKER.local.startPlaceHolderText;
-  const endPlaceHolderText =
-    props.local?.endPlaceHolderText ??
-    DEFAULTS.DATE_RANGE_PICKER.local.endPlaceHolderText;
-  const setText =
-    props.local?.setText ?? DEFAULTS.DATE_RANGE_PICKER.local.setText;
-  const calendarLocale =
-    props.local?.calendarLocale ??
-    DEFAULTS.DATE_RANGE_PICKER.local.calendarLocale;
+  const flexDirection = props.controlsLayout ?? DEFAULTS.DATE_RANGE_PICKER.controlsLayout;
+  const disableFuture = props.disableFuture ?? DEFAULTS.DATE_RANGE_PICKER.disableFuture;
+  const startPlaceHolderText = props.local?.startPlaceHolderText ?? DEFAULTS.DATE_RANGE_PICKER.local.startPlaceHolderText;
+  const endPlaceHolderText = props.local?.endPlaceHolderText ?? DEFAULTS.DATE_RANGE_PICKER.local.endPlaceHolderText;
+  const setText = props.local?.setText ?? DEFAULTS.DATE_RANGE_PICKER.local.setText;
+  const calendarLocale = props.local?.calendarLocale ?? DEFAULTS.DATE_RANGE_PICKER.local.calendarLocale;
 
   const locale = calendarLocale === SupportedLocales.HE ? he : enUS;
 
@@ -94,9 +80,7 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
   }, [props.dateFormat]);
 
   const isRangeValid = Boolean(
-    (isValid(from) && !to) ||
-      (isValid(to) && !from) ||
-      (from && to && isValid(from) && isValid(to) && isBefore(from, to))
+    (isValid(from) && !to) || (isValid(to) && !from) || (from && to && isValid(from) && isValid(to) && isBefore(from, to))
   );
 
   const onChange = (): void => {

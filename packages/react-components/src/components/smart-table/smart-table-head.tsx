@@ -15,9 +15,7 @@ interface SmartTableHeadProps<T> {
 
 export function SmartEnhancedTableHead<T>(props: SmartTableHeadProps<T>) {
   const { headCells, order, orderBy, onRequestSort, isCollapseable } = props;
-  const createSortHandler = (property: keyof T) => (
-    event: React.MouseEvent<unknown>
-  ) => {
+  const createSortHandler = (property: keyof T) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
 

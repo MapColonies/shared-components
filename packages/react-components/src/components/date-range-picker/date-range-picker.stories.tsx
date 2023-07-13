@@ -1,4 +1,3 @@
-import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Story } from '@storybook/react/types-6-0';
 import { CSFStory } from '../utils/story';
@@ -6,25 +5,20 @@ import { SupportedLocales } from '../models/enums';
 import { DateTimeRangePicker } from './date-range-picker';
 import { DateTimeRangePickerFormControl } from './date-range-picker.form-control';
 
-export default {
+const story = {
   title: 'Date Range Picker',
   component: DateTimeRangePicker,
 };
 
-export const DateTime: CSFStory<JSX.Element> = () => (
-  <DateTimeRangePicker onChange={action('date changed')} />
-);
+export default story;
+
+export const DateTime: CSFStory<JSX.Element> = () => <DateTimeRangePicker onChange={action('date changed')} />;
 
 DateTime.story = {
   name: 'Date time range',
 };
 
-export const DateNoFutureLimitTime: CSFStory<JSX.Element> = () => (
-  <DateTimeRangePicker
-    disableFuture={false}
-    onChange={action('date changed')}
-  />
-);
+export const DateNoFutureLimitTime: CSFStory<JSX.Element> = () => <DateTimeRangePicker disableFuture={false} onChange={action('date changed')} />;
 
 DateNoFutureLimitTime.story = {
   name: 'Date time range no future limit',
@@ -36,14 +30,7 @@ export const DateMinMaxLimitTime: CSFStory<JSX.Element> = () => {
   const deltaInDays = 6;
   minDate.setDate(maxDate.getDate() - deltaInDays);
   maxDate.setDate(maxDate.getDate() + deltaInDays);
-  return (
-    <DateTimeRangePicker
-      onChange={action('date changed')}
-      disableFuture={false}
-      minDate={minDate}
-      maxDate={maxDate}
-    />
-  );
+  return <DateTimeRangePicker onChange={action('date changed')} disableFuture={false} minDate={minDate} maxDate={maxDate} />;
 };
 
 DateMinMaxLimitTime.story = {
@@ -51,12 +38,7 @@ DateMinMaxLimitTime.story = {
 };
 
 export const DateTimeFormControl: Story = (args: unknown) => {
-  return (
-    <DateTimeRangePickerFormControl
-      {...args}
-      onChange={action('date changed')}
-    />
-  );
+  return <DateTimeRangePickerFormControl {...args} onChange={action('date changed')} />;
 };
 
 DateTimeFormControl.storyName = 'Date time range form control';
@@ -82,7 +64,7 @@ DateTimeFormControl.argTypes = {
   },
 };
 
-export const DateTimeLocalizedFormControl: Story = (args: unknown) => {
+export const DateTimeLocalizedFormControl: Story = (args: Record<string, unknown>) => {
   const local = {
     setText: 'MySet',
     startPlaceHolderText: 'MyStart',
@@ -100,8 +82,7 @@ export const DateTimeLocalizedFormControl: Story = (args: unknown) => {
   );
 };
 
-DateTimeLocalizedFormControl.storyName =
-  'Date time range localized form control';
+DateTimeLocalizedFormControl.storyName = 'Date time range localized form control';
 
 DateTimeLocalizedFormControl.argTypes = {
   controlsLayout: {
@@ -130,15 +111,7 @@ export const DateTimeLocalizedAsFormControl: Story = (args: unknown) => {
     startPlaceHolderText: 'MyStart',
     endPlaceHolderText: 'MyEnd',
   };
-  return (
-    <DateTimeRangePickerFormControl
-      local={local}
-      renderAsButton={false}
-      width={360}
-      {...args}
-      onChange={action('date changed')}
-    />
-  );
+  return <DateTimeRangePickerFormControl local={local} renderAsButton={false} width={360} {...args} onChange={action('date changed')} />;
 };
 
 DateTimeLocalizedAsFormControl.storyName = 'Date time range looks like input';
@@ -171,19 +144,10 @@ export const DateTimeHebrewLocalizedAsFormControl: Story = (args: unknown) => {
     endPlaceHolderText: 'MyEnd',
     calendarLocale: SupportedLocales.HE,
   };
-  return (
-    <DateTimeRangePickerFormControl
-      local={local}
-      renderAsButton={false}
-      width={360}
-      {...args}
-      onChange={action('date changed')}
-    />
-  );
+  return <DateTimeRangePickerFormControl local={local} renderAsButton={false} width={360} {...args} onChange={action('date changed')} />;
 };
 
-DateTimeHebrewLocalizedAsFormControl.storyName =
-  'Date time range looks like input with Hebrew calendar';
+DateTimeHebrewLocalizedAsFormControl.storyName = 'Date time range looks like input with Hebrew calendar';
 
 DateTimeHebrewLocalizedAsFormControl.argTypes = {
   controlsLayout: {

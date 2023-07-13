@@ -42,9 +42,7 @@ export interface MapFilterContainerProps {
   filters?: React.ReactNode[];
 }
 
-export const MapFilterContainer: React.FC<PropsWithChildren<MapFilterContainerProps>> = (
-  props
-) => {
+export const MapFilterContainer: React.FC<PropsWithChildren<MapFilterContainerProps>> = (props) => {
   const [drawType, setDrawType] = useState<DrawType>();
   const [selectionPolygon, setSelectionPolygon] = useState<Polygon>();
   const classes = useStyle();
@@ -80,12 +78,7 @@ export const MapFilterContainer: React.FC<PropsWithChildren<MapFilterContainerPr
           {props.children}
         </Paper>
       </div>
-      <ContainerMap
-        children={props.mapContent}
-        onPolygonSelection={onPolygonSelection}
-        drawType={drawType}
-        selectionPolygon={selectionPolygon}
-      />
+      <ContainerMap children={props.mapContent} onPolygonSelection={onPolygonSelection} drawType={drawType} selectionPolygon={selectionPolygon} />
     </div>
   );
 };

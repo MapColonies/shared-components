@@ -23,9 +23,7 @@ export const CesiumBaseMaps: React.FC<RCesiumBaseMapsProps> = (props) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const { baseMaps } = props;
   const [currentMap, setCurrentMap] = useState<string>(' ');
-  const [selectedBaseMap, setSelectedBaseMap] = useState<
-    IBaseMap | undefined
-  >();
+  const [selectedBaseMap, setSelectedBaseMap] = useState<IBaseMap | undefined>();
   const classes = useStyle();
 
   useEffect(() => {
@@ -42,9 +40,7 @@ export const CesiumBaseMaps: React.FC<RCesiumBaseMapsProps> = (props) => {
       mapViewer.layersManager?.removeBaseMapLayers();
 
       // Change base-map: add base-map layers by zIndex order
-      const selectedBaseMap = baseMaps.maps.find(
-        (map: IBaseMap) => map.id === id
-      );
+      const selectedBaseMap = baseMaps.maps.find((map: IBaseMap) => map.id === id);
       if (selectedBaseMap) {
         mapViewer.layersManager?.setBaseMapLayers(selectedBaseMap);
 
@@ -62,12 +58,7 @@ export const CesiumBaseMaps: React.FC<RCesiumBaseMapsProps> = (props) => {
       <label className="mapLabel">{currentMap}</label>
       <ul className="mapSelector">
         {baseMaps?.maps.map((map: IBaseMap) => (
-          <li
-            className={`mapContainer ${classes.mapContainer} ${
-              map === selectedBaseMap ? 'mapContainerSelected' : ''
-            }`}
-            key={map.id}
-          >
+          <li className={`mapContainer ${classes.mapContainer} ${map === selectedBaseMap ? 'mapContainerSelected' : ''}`} key={map.id}>
             <img
               alt={''}
               className="mapContainerImg"
@@ -76,11 +67,7 @@ export const CesiumBaseMaps: React.FC<RCesiumBaseMapsProps> = (props) => {
                 setCurrentMap(map.title as string);
               }}
               onMouseOut={(): void => {
-                setCurrentMap(
-                  selectedBaseMap?.title !== undefined
-                    ? selectedBaseMap.title
-                    : ' '
-                );
+                setCurrentMap(selectedBaseMap?.title !== undefined ? selectedBaseMap.title : ' ');
               }}
               onClick={(): void => {
                 handleMapSection(map.id);

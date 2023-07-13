@@ -1,20 +1,14 @@
 import React from 'react';
-import { Theme, createTheme } from '@material-ui/core/styles'
+import { Theme, createTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useMappedMuiTheme = (theme: { [key: string]: string }): Theme => {
   const prefersDarkMode = theme.type === 'dark';
 
-  return React.useMemo(() => mapMcToMuiTheme(theme, prefersDarkMode), [
-    prefersDarkMode,
-    theme,
-  ]);
+  return React.useMemo(() => mapMcToMuiTheme(theme, prefersDarkMode), [prefersDarkMode, theme]);
 };
 
-const mapMcToMuiTheme = (
-  mcTheme: { [key: string]: string },
-  prefersDarkMode = false
-): Theme => {
+const mapMcToMuiTheme = (mcTheme: { [key: string]: string }, prefersDarkMode = false): Theme => {
   return createTheme({
     palette: {
       type: prefersDarkMode ? 'dark' : 'light',
@@ -32,12 +26,8 @@ const mapMcToMuiTheme = (
         paper: mcTheme.background,
       },
       text: {
-        primary: prefersDarkMode
-          ? mcTheme.textPrimaryOnDark
-          : mcTheme.textPrimaryOnLight,
-        secondary: prefersDarkMode
-          ? mcTheme.textSecondaryOnDark
-          : mcTheme.textSecondaryOnLight,
+        primary: prefersDarkMode ? mcTheme.textPrimaryOnDark : mcTheme.textPrimaryOnLight,
+        secondary: prefersDarkMode ? mcTheme.textSecondaryOnDark : mcTheme.textSecondaryOnLight,
       },
     },
   });

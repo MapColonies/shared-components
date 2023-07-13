@@ -6,11 +6,9 @@ import { useCesiumMap } from '../map';
 import { ICesiumImageryLayer } from '../layers-manager';
 import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
-export interface RCesiumWMSLayerOptions
-  extends WebMapServiceImageryProvider.ConstructorOptions {}
+export interface RCesiumWMSLayerOptions extends WebMapServiceImageryProvider.ConstructorOptions {}
 
-export interface RCesiumWMSLayerProps
-  extends Partial<RCesiumImageryLayerProps> {
+export interface RCesiumWMSLayerProps extends Partial<RCesiumImageryLayerProps> {
   options: RCesiumWMSLayerOptions;
 }
 
@@ -22,7 +20,5 @@ export const CesiumWMSLayer: React.FC<RCesiumWMSLayerProps> = (props) => {
     ? new CustomWebMapServiceImageryProvider(options, mapViewer)
     : new WebMapServiceImageryProvider(options);
 
-  return (
-    <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />
-  );
+  return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;
 };

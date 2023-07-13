@@ -71,8 +71,7 @@ const persons: Person[] = [
   },
 ];
 
-const getRandomPerson = (): Person =>
-  persons[Math.floor(Math.random() * persons.length)];
+const getRandomPerson = (): Person => persons[Math.floor(Math.random() * persons.length)];
 
 interface TableStroyProps {
   numberOfItems: number;
@@ -81,9 +80,7 @@ interface TableStroyProps {
 const TableStory: React.FC<TableStroyProps> = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
-  const [items, setItems] = useState(
-    [...new Array<undefined>(props.numberOfItems)].map(getRandomPerson)
-  );
+  const [items, setItems] = useState([...new Array<undefined>(props.numberOfItems)].map(getRandomPerson));
 
   button('ADD ITEM', () => setItems([...items, getRandomPerson()]));
   button('REMOVE ITEM', () => setItems(items.slice(0, -1))); //remove last
@@ -106,9 +103,5 @@ const TableStory: React.FC<TableStroyProps> = (props) => {
   );
 };
 
-export const Small: CSFStory<JSX.Element> = () => (
-  <TableStory numberOfItems={4} />
-);
-export const Large: CSFStory<JSX.Element> = () => (
-  <TableStory numberOfItems={60} />
-);
+export const Small: CSFStory<JSX.Element> = () => <TableStory numberOfItems={4} />;
+export const Large: CSFStory<JSX.Element> = () => <TableStory numberOfItems={60} />;

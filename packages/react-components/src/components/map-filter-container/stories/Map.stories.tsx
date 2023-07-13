@@ -1,12 +1,13 @@
-import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Button, Typography } from '@map-colonies/react-core';
 import { MapFilterContainer } from '../map-filter-container';
 import { CSFStory } from '../../utils/story';
 import { Box } from '../..';
-// import { VectorLayer, VectorSource, GeoJSONFeature } from '';
+import { VectorLayer } from '../../ol-map/layers/vector-layer';
+import { VectorSource } from '../../ol-map/source/vector-source';
+import { GeoJSONFeature } from '../../ol-map/feature';
 
-export default {
+const story = {
   title: 'Map Filter Container',
   component: MapFilterContainer,
   parameters: {
@@ -14,11 +15,10 @@ export default {
   },
 };
 
+export default story;
+
 export const Basic: CSFStory<JSX.Element> = () => (
-  <MapFilterContainer
-    handlePolygonReset={action('vector source cleared')}
-    handlePolygonSelected={action('shape selected')}
-  />
+  <MapFilterContainer handlePolygonReset={action('vector source cleared')} handlePolygonSelected={action('shape selected')} />
 );
 
 export const ExtraFilters: CSFStory<JSX.Element> = () => (
@@ -37,10 +37,7 @@ export const ExtraFilters: CSFStory<JSX.Element> = () => (
 );
 
 export const WithChildren: CSFStory<JSX.Element> = () => (
-  <MapFilterContainer
-    handlePolygonReset={action('vector source cleared')}
-    handlePolygonSelected={action('shape selected')}
-  >
+  <MapFilterContainer handlePolygonReset={action('vector source cleared')} handlePolygonSelected={action('shape selected')}>
     <Box style={{ height: '300px' }}>
       <Typography tag="div" style={{ margin: '16px 0' }} use="headline1">
         Generic title

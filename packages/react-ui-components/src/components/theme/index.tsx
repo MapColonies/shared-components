@@ -5,11 +5,9 @@ import {
   ThemeProps as RMWCThemeProps,
   ThemeProvider as RMWCThemeProvider,
   ThemeProviderProps as RMWCThemeProviderProps,
-  
 } from '@rmwc/theme';
 import { Themes } from './themes';
 import { ExtractProps } from '../typeHelpers';
-
 
 export interface ThemeProps extends ExtractProps<typeof RMWCTheme> {}
 export interface ThemeProviderProps extends ExtractProps<typeof RMWCThemeProvider> {}
@@ -37,10 +35,7 @@ export const Theme = React.forwardRef<any, ThemeProps & RMWCThemeProps>((props, 
   return <RMWCTheme ref={ref} {...props} />;
 });
 
-export const ThemeProvider = React.forwardRef<
-  any,
-  ThemeProviderProps & RMWCThemeProviderProps
->((props, ref) => {
+export const ThemeProvider = React.forwardRef<any, ThemeProviderProps & RMWCThemeProviderProps>((props, ref) => {
   return (
     <ThemeContext.Provider value={props.options}>
       <RMWCThemeProvider ref={ref} {...props} />

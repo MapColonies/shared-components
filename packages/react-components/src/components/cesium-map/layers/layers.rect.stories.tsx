@@ -28,8 +28,7 @@ const BASE_MAPS = {
       id: '3rd',
       title: '3rd Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
       baseRasteLayers: [
         {
           id: 'VECTOR_TILES',
@@ -37,8 +36,7 @@ const BASE_MAPS = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url:
-              'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
             layers: '',
             credit: 'thunderforest',
           },
@@ -60,8 +58,7 @@ const BASE_MAPS = {
           opacity: 0.4,
           zIndex: 2,
           options: {
-            url:
-              'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+            url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
             layer: 'USGSShadedReliefOnly',
             style: 'default',
             format: 'image/jpeg',
@@ -85,8 +82,7 @@ const mapViewProps: CesiumMapProps = {
 };
 
 const optionsRectXYZ = {
-  url:
-    'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
+  url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
   footprint: {
     type: 'Polygon',
     coordinates: [
@@ -123,8 +119,7 @@ export const MapWithSettings: Story = () => {
     zIndex: 0,
     show: true,
     options: {
-      url:
-        'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
+      url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
     },
   };
 

@@ -35,8 +35,7 @@ const BASE_MAPS = {
       id: '1st',
       title: '1st Map Title',
       isCurrent: true,
-      thumbnail:
-        'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
+      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -94,8 +93,7 @@ const EllipsoidProvider = new EllipsoidTerrainProvider({});
 //#endregion
 
 const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
-  url:
-    'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
+  url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
 });
 
 const terrainProviderListQmesh = [
@@ -118,9 +116,7 @@ interface ITerrainProviderSelectorProps {
   terrainProviderList: ITerrainProviderItem[];
 }
 
-const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({
-  terrainProviderList,
-}) => {
+const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terrainProviderList }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
 
   return (
@@ -128,11 +124,8 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({
       <select
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
-          const selected = terrainProviderList.find(
-            (item) => item.id === evt.target.value
-          );
-          mapViewer.terrainProvider = (selected as ITerrainProviderItem)
-            .value as TerrainProvider;
+          const selected = terrainProviderList.find((item) => item.id === evt.target.value);
+          mapViewer.terrainProvider = (selected as ITerrainProviderItem).value as TerrainProvider;
         }}
       >
         {terrainProviderList.map((provider) => {
@@ -154,13 +147,8 @@ export const QuantizedMeshHeightsTool: Story = () => {
         sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
         baseMaps={BASE_MAPS}
       >
-        <Cesium3DTileset
-          url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json"
-          isZoomTo={true}
-        />
-        <TerrainProviderSelector
-          terrainProviderList={terrainProviderListQmesh}
-        />
+        <Cesium3DTileset url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" isZoomTo={true} />
+        <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
         <TerrainianHeightTool />
         <InspectorTool />
       </CesiumMap>

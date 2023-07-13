@@ -17,15 +17,7 @@ interface SmartTableRowProps<T> {
 }
 
 export function SmartTableRow<T>(props: SmartTableRowProps<T>) {
-  const {
-    cellsMetadata,
-    isRowSelected,
-    item,
-    onRowSelected,
-    rowIndex,
-    isCollapseable,
-    collapsedElement,
-  } = props;
+  const { cellsMetadata, isRowSelected, item, onRowSelected, rowIndex, isCollapseable, collapsedElement } = props;
   const [open, setOpen] = useState(false);
   const cellCount = cellsMetadata.length;
 
@@ -61,10 +53,7 @@ export function SmartTableRow<T>(props: SmartTableRowProps<T>) {
       </TableRow>
       {isCollapseable && (
         <TableRow>
-          <TableCell
-            style={{ paddingBottom: 0, paddingTop: 0 }}
-            colSpan={cellCount + 1}
-          >
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={cellCount + 1}>
             <Collapse in={open} unmountOnExit timeout="auto">
               {collapsedElement?.(item)}
             </Collapse>

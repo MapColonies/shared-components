@@ -21,8 +21,6 @@ export const AvatarGroup = React.forwardRef<any, AvatarGroupProps>((props, ref) 
   return <RMWCAvatarGroup ref={ref} {...props}></RMWCAvatarGroup>;
 });
 
-export const AvatarCount = React.forwardRef<any, AvatarCountProps & RMWCAvatarCountProps>(
-  (props, ref) => {
-    return <RMWCAvatarCount ref={ref} {...props} />;
-  }
-);
+export const AvatarCount = React.forwardRef<any, AvatarCountProps & RMWCAvatarCountProps>((props, ref) => {
+  return <RMWCAvatarCount ref={ref} {...props} />;
+});

@@ -22,7 +22,6 @@ const StandardDialog: React.FC = () => {
       <Dialog
         open={open}
         onClose={(): void => {
-          
           setOpen(false);
         }}
       >
@@ -44,7 +43,6 @@ const StandardDialog: React.FC = () => {
 };
 
 const DialogQueueExample: React.FC = () => {
-
   const [response, setResponse] = React.useState<string | boolean>('___');
 
   const fireAlert = async (): Promise<void> => alert({ title: 'Hello!' }).then((res: boolean) => setResponse(res));

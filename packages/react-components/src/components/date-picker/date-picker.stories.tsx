@@ -12,21 +12,14 @@ export default {
   component: DateTimePicker,
 };
 
-export const DatePickerDefault: CSFStory<JSX.Element> = () => (
-  <DateTimePicker onChange={action('date changed')} value={TODAY} />
-);
+export const DatePickerDefault: CSFStory<JSX.Element> = () => <DateTimePicker onChange={action('date changed')} value={TODAY} />;
 
 DatePickerDefault.story = {
   name: 'Date picker default',
 };
 
 export const DateTimePickerMode: CSFStory<JSX.Element> = () => (
-  <DateTimePicker
-    value={TODAY}
-    onChange={action('date changed')}
-    showTime={true}
-    format={'dd/MM/yyyy HH:mm'}
-  />
+  <DateTimePicker value={TODAY} onChange={action('date changed')} showTime={true} format={'dd/MM/yyyy HH:mm'} />
 );
 
 DateTimePickerMode.story = {
@@ -34,11 +27,7 @@ DateTimePickerMode.story = {
 };
 
 export const DateNoFutureLimitTime: CSFStory<JSX.Element> = () => (
-  <DateTimePicker
-    value={TODAY}
-    disableFuture={false}
-    onChange={action('date changed')}
-  />
+  <DateTimePicker value={TODAY} disableFuture={false} onChange={action('date changed')} />
 );
 
 DateNoFutureLimitTime.story = {
@@ -96,9 +85,7 @@ DateMinMaxLimitTimeWithOnBlur.story = {
 };
 
 export const DateTimeWithControlArgs: Story = (args: unknown) => {
-  return (
-    <DateTimePicker {...args} value={TODAY} onChange={action('date changed')} />
-  );
+  return <DateTimePicker {...args} value={TODAY} onChange={action('date changed')} />;
 };
 
 DateTimeWithControlArgs.storyName = 'Date time control with args';
@@ -116,15 +103,7 @@ export const DateTimeHebrewLocalized: Story = (args: unknown) => {
     placeHolderText: 'הכנס תאריך',
     calendarLocale: SupportedLocales.HE,
   };
-  return (
-    <DateTimePicker
-      local={local}
-      {...args}
-      value={TODAY}
-      onChange={action('date changed')}
-    />
-  );
+  return <DateTimePicker local={local} {...args} value={TODAY} onChange={action('date changed')} />;
 };
 
-DateTimeHebrewLocalized.storyName =
-  'Date time range looks like input with Hebrew calendar';
+DateTimeHebrewLocalized.storyName = 'Date time range looks like input with Hebrew calendar';

@@ -35,39 +35,27 @@ function customCommonRequestImage(
     const requestedLayerMeta = this.layerListInstance.find(
       /* eslint-disable */
       (layer: ImageryLayer): boolean => {
-        return (
-          (layer as any)._imageryProvider._resource?._url ===
-          (this as any)._resource?._url
-        );
+        return (layer as any)._imageryProvider._resource?._url === (this as any)._resource?._url;
       }
       /* eslint-enable */
     )?.meta;
 
-    const layerHasTransparency =
-      get(requestedLayerMeta, HAS_TRANSPARENCY_META_PROP) === true;
+    const layerHasTransparency = get(requestedLayerMeta, HAS_TRANSPARENCY_META_PROP) === true;
 
-    if (
-      this.tileTransparencyCheckedCounter < NUMBER_OF_TILES_TO_CHECK &&
-      !layerHasTransparency
-    ) {
-      void imageHasTransparency(request?.url as string, this).then(
-        (hasTransparency) => {
-          this.mapViewer.layersManager?.addMetaToLayer(
-            { [HAS_TRANSPARENCY_META_PROP]: hasTransparency },
-            /* eslint-disable */
-            (layer: ImageryLayer): boolean => {
-              return (
-                (layer as any)._imageryProvider._resource._url ===
-                (this as any)._resource._url
-              );
-            }
-            /* eslint-enable */
-          );
-        }
-      );
+    if (this.tileTransparencyCheckedCounter < NUMBER_OF_TILES_TO_CHECK && !layerHasTransparency) {
+      void imageHasTransparency(request?.url as string, this).then((hasTransparency) => {
+        this.mapViewer.layersManager?.addMetaToLayer(
+          { [HAS_TRANSPARENCY_META_PROP]: hasTransparency },
+          /* eslint-disable */
+          (layer: ImageryLayer): boolean => {
+            return (layer as any)._imageryProvider._resource._url === (this as any)._resource._url;
+          }
+          /* eslint-enable */
+        );
+      });
     }
   }, 0);
-  
+
   return requestImageFn(x, y, level, request);
 }
 
@@ -78,30 +66,14 @@ export class CustomUrlTemplateImageryProvider extends UrlTemplateImageryProvider
 
   public tileTransparencyCheckedCounter = 0;
 
-  public constructor(
-    opts: UrlTemplateImageryProvider.ConstructorOptions,
-    mapViewer: CesiumViewer
-  ) {
+  public constructor(opts: UrlTemplateImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);
-    this.layerListInstance = mapViewer.layersManager
-      ?.layerList as ICesiumImageryLayer[];
+    this.layerListInstance = mapViewer.layersManager?.layerList as ICesiumImageryLayer[];
     this.mapViewer = mapViewer;
   }
 
-  public requestImage(
-    x: number,
-    y: number,
-    level: number,
-    request?: Request | undefined
-  ): Promise<ImageryTypes> | undefined {
-    return customCommonRequestImage.call(
-      this,
-      super.requestImage.bind(this),
-      x,
-      y,
-      level,
-      request
-    );
+  public requestImage(x: number, y: number, level: number, request?: Request | undefined): Promise<ImageryTypes> | undefined {
+    return customCommonRequestImage.call(this, super.requestImage.bind(this), x, y, level, request);
   }
 }
 
@@ -112,30 +84,14 @@ export class CustomWebMapServiceImageryProvider extends WebMapServiceImageryProv
 
   public tileTransparencyCheckedCounter = 0;
 
-  public constructor(
-    opts: WebMapServiceImageryProvider.ConstructorOptions,
-    mapViewer: CesiumViewer
-  ) {
+  public constructor(opts: WebMapServiceImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);
-    this.layerListInstance = mapViewer.layersManager
-      ?.layerList as ICesiumImageryLayer[];
+    this.layerListInstance = mapViewer.layersManager?.layerList as ICesiumImageryLayer[];
     this.mapViewer = mapViewer;
   }
 
-  public requestImage(
-    x: number,
-    y: number,
-    level: number,
-    request?: Request | undefined
-  ): Promise<ImageryTypes> | undefined {
-    return customCommonRequestImage.call(
-      this,
-      super.requestImage.bind(this),
-      x,
-      y,
-      level,
-      request
-    );
+  public requestImage(x: number, y: number, level: number, request?: Request | undefined): Promise<ImageryTypes> | undefined {
+    return customCommonRequestImage.call(this, super.requestImage.bind(this), x, y, level, request);
   }
 }
 
@@ -146,29 +102,13 @@ export class CustomWebMapTileServiceImageryProvider extends WebMapTileServiceIma
 
   public tileTransparencyCheckedCounter = 0;
 
-  public constructor(
-    opts: WebMapTileServiceImageryProvider.ConstructorOptions,
-    mapViewer: CesiumViewer
-  ) {
+  public constructor(opts: WebMapTileServiceImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);
-    this.layerListInstance = mapViewer.layersManager
-      ?.layerList as ICesiumImageryLayer[];
+    this.layerListInstance = mapViewer.layersManager?.layerList as ICesiumImageryLayer[];
     this.mapViewer = mapViewer;
   }
 
-  public requestImage(
-    x: number,
-    y: number,
-    level: number,
-    request?: Request | undefined
-  ): Promise<ImageryTypes> | undefined {
-    return customCommonRequestImage.call(
-      this,
-      super.requestImage.bind(this),
-      x,
-      y,
-      level,
-      request
-    );
+  public requestImage(x: number, y: number, level: number, request?: Request | undefined): Promise<ImageryTypes> | undefined {
+    return customCommonRequestImage.call(this, super.requestImage.bind(this), x, y, level, request);
   }
 }
