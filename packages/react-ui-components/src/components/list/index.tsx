@@ -29,40 +29,40 @@ export interface ListItemMetaProps extends ExtractProps<typeof RMWCListItemMeta>
 
 export const List = React.forwardRef<any, ListProps>((props, ref) => {
   return <RMWCList ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListProps>;
 
 export const CollapsibleList = React.forwardRef<any, ListProps & RMWCCollapsibleListProps>((props, ref) => {
   return <RMWCCollapsibleList ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListProps & RMWCCollapsibleListProps>;
 
 export const ListDivider = React.forwardRef<any, ListDividerProps>((props, ref) => {
   return <RMWCListDivider ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListDividerProps>;
 
 export const ListItem = React.forwardRef<any, ListItemProps>((props, ref) => {
   return <RMWCListItem ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemProps>;
 
 export const SimpleListItem = React.forwardRef<any, SimpleListItemProps>((props, ref) => {
   return <RMWCSimpleListItem ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<SimpleListItemProps>;
 
 export const ListItemGraphic = React.forwardRef<any, ListItemGraphicProps>((props, ref) => {
   return <RMWCListItemGraphic ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemGraphicProps>;
 
 export const ListItemText = React.forwardRef<any, ListItemTextProps>((props, ref) => {
   return <RMWCListItemText ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemTextProps>;
 
 export const ListItemPrimaryText = React.forwardRef<any, ListItemPrimaryTextProps>((props, ref) => {
   return <RMWCListItemPrimaryText ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemPrimaryTextProps>;
 
 export const ListItemSecondaryText = React.forwardRef<any, ListItemSecondaryTextProps>((props, ref) => {
   return <RMWCListItemSecondaryText ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemSecondaryTextProps>;
 
 export const ListItemMeta = React.forwardRef<any, ListItemMetaProps>((props, ref) => {
   return <RMWCListItemMeta ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ListItemMetaProps>;

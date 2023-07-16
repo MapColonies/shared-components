@@ -8,4 +8,4 @@ export interface IconButtonProps extends ExtractProps<typeof RMWCIconButton> {}
 
 export const IconButton = forwardRef<any, IconButtonProps & IconButtonPropsWithHtml>((props, ref) => {
   return <RMWCIconButton ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<IconButtonProps & IconButtonPropsWithHtml>;

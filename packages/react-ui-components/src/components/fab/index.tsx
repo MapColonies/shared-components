@@ -7,4 +7,4 @@ export interface FabProps extends ExtractProps<typeof RMWCFab> {}
 
 export const Fab = React.forwardRef<any, FabProps>((props, ref) => {
   return <RMWCFab ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<FabProps>;

@@ -18,16 +18,16 @@ export interface MenuSurfaceAnchorProps extends ExtractProps<typeof RMWCMenuSurf
 
 export const Menu = forwardRef<any, MenuProps & MenuHTMLProps & RMWCMenuSurfaceProps>((props, ref) => {
   return <RMWCMenu ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<MenuProps & MenuHTMLProps & RMWCMenuSurfaceProps>;
 
 export const MenuItem = forwardRef<any, MenuItemProps & MenuHTMLProps>((props, ref) => {
   return <RMWCMenuItem ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<MenuItemProps & MenuHTMLProps>;
 
 export const MenuSurface = forwardRef<any, MenuSurfaceProps & MenuHTMLProps>((props, ref) => {
   return <RMWCMenuSurface ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<MenuSurfaceProps & MenuHTMLProps>;
 
 export const MenuSurfaceAnchor = forwardRef<any, MenuSurfaceAnchorProps & MenuHTMLProps>((props, ref) => {
   return <RMWCMenuSurfaceAnchor ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<MenuSurfaceAnchorProps & MenuHTMLProps>;

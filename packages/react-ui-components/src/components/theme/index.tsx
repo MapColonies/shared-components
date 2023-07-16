@@ -41,4 +41,4 @@ export const ThemeProvider = React.forwardRef<any, ThemeProviderProps & RMWCThem
       <RMWCThemeProvider ref={ref} {...props} />
     </ThemeContext.Provider>
   );
-});
+}) as React.ForwardRefExoticComponent<ThemeProps & RMWCThemeProps>;

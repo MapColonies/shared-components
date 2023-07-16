@@ -9,4 +9,4 @@ export interface TextFieldProps extends ExtractProps<typeof RMWCTextField> {}
 
 export const TextField = forwardRef<any, TextFieldProps & TextFieldPropsWithHtml>((props, ref) => {
   return <RMWCTextField ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<TextFieldProps & TextFieldPropsWithHtml>;

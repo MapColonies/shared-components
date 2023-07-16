@@ -7,4 +7,4 @@ export interface CircularProgressProps extends ExtractProps<typeof RMWCCircularP
 
 export const CircularProgress = React.forwardRef<any, CircularProgressProps>((props, ref) => {
   return <RMWCCircularProgress ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<CircularProgressProps>;

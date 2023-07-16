@@ -18,20 +18,20 @@ export interface DrawerContentProps extends ExtractProps<typeof RMWCDrawerConten
 
 export const Drawer = React.forwardRef<any, DrawerProps>((props, ref) => {
   return <RMWCDrawer ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DrawerProps>;
 
 export const DrawerHeader = React.forwardRef<any, DrawerHeaderProps>((props, ref) => {
   return <RMWCDrawerHeader ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DrawerHeaderProps>;
 
 export const DrawerTitle = React.forwardRef<any, DrawerTitleProps>((props, ref) => {
   return <RMWCDrawerTitle ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DrawerTitleProps>;
 
 export const DrawerSubtitle = React.forwardRef<any, DrawerSubtitleProps>((props, ref) => {
   return <RMWCDrawerSubtitle ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DrawerSubtitleProps>;
 
 export const DrawerContent = React.forwardRef<any, DrawerContentProps>((props, ref) => {
   return <RMWCDrawerContent ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DrawerContentProps>;

@@ -7,4 +7,4 @@ export interface LinearProgressProps extends ExtractProps<typeof RMWCLinearProgr
 
 export const LinearProgress = React.forwardRef<any, LinearProgressProps>((props, ref) => {
   return <RMWCLinearProgress ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<LinearProgressProps>;

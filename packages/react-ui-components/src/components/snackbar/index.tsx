@@ -19,11 +19,11 @@ export const createSnackbarQueue = RMWCCreateSnackbarQueue;
 
 export const Snackbar: React.FC<SnackbarProps> = React.forwardRef<any, SnackbarProps>((props, ref) => {
   return <RMWCSnackbar ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<SnackbarProps>;
 
 export const SnackbarAction: React.FC<SnackbarActionProps> = React.forwardRef<any, SnackbarActionProps>((props, ref) => {
   return <RMWCSnackbarAction ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<SnackbarActionProps>;
 
 export const SnackbarQueue: React.FC<SnackbarQueueProps & HTMLProps> = (props) => {
   return <RMWCSnackbarQueue {...props} />;

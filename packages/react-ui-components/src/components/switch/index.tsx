@@ -9,4 +9,4 @@ export interface SwitchProps extends ExtractProps<typeof RMWCSwitch> {}
 
 export const Switch = forwardRef<any, SwitchProps & SwitchPropsWithHtml>((props, ref) => {
   return <RMWCSwitch ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<SwitchProps & SwitchPropsWithHtml>;

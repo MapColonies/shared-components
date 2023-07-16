@@ -23,15 +23,15 @@ export const Dialog = React.forwardRef<any, DialogProps>((props, ref) => {
 
 export const DialogTitle = React.forwardRef<any, DialogTitleProps>((props, ref) => {
   return <RMWCDialogTitle ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DialogTitleProps>;
 
 export const DialogContent = React.forwardRef<any, DialogContentProps>((props, ref) => {
   return <RMWCDialogContent ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DialogContentProps>;
 
 export const DialogActions = React.forwardRef<any, DialogActionsProps>((props, ref) => {
   return <RMWCDialogActions ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<DialogActionsProps>;
 
 export const createDialogQueue = RMWCCreateDialogQueue;
 

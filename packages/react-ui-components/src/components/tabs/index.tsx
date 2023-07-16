@@ -11,8 +11,8 @@ export type TabBarOnActivateEventT = RMWCTabBarOnActivateEventT;
 
 export const Tab = React.forwardRef<any, TabProps>((props, ref) => {
   return <RMWCTab ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<TabProps>;
 
 export const TabBar = React.forwardRef<any, TabBarProps>((props, ref) => {
   return <RMWCTabBar ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<TabBarProps>;

@@ -14,4 +14,4 @@ export interface TypographyProps extends ExtractProps<typeof RMWCTypography> {}
 
 export const Typography = forwardRef<any, TypographyProps & CustomTypographyProps>((props, ref) => {
   return <RMWCTypography ref={ref} {...props} tag={props.tag ?? 'span'} use={props.use ?? ''} />;
-});
+}) as React.ForwardRefExoticComponent<TypographyProps & CustomTypographyProps>;

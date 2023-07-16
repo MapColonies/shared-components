@@ -9,4 +9,4 @@ export type FormattedOption = RMWCFormattedOption;
 
 export const Select = forwardRef<any, SelectProps & SelectPropsWithHtml>((props, ref) => {
   return <RMWCSelect ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<SelectProps & SelectPropsWithHtml>;

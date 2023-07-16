@@ -9,4 +9,4 @@ export interface CheckboxProps extends ExtractProps<typeof RMWCCheckbox> {}
 
 export const Checkbox = forwardRef<any, CheckboxProps & CheckboxPropsWithHtml>((props, ref) => {
   return <RMWCCheckbox ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<CheckboxProps & CheckboxPropsWithHtml>;

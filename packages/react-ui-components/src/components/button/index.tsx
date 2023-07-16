@@ -10,4 +10,4 @@ export interface ButtonProps extends ExtractProps<typeof RMWCButton> {}
 
 export const Button = forwardRef<any, ButtonProps & ButtonPropsWithHtml>((props, ref) => {
   return <RMWCButton ref={ref} {...props} />;
-});
+}) as React.ForwardRefExoticComponent<ButtonProps & ButtonPropsWithHtml>;
