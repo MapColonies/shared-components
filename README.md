@@ -5,7 +5,7 @@ A Refactured version of the [shard components library](https://github.com/MapCol
 ### Technical Updates:
 
  - [X] Using [vite bundler](https://vitejs.dev/).
- - [X] Latest version of lerna + NX[enter link description here](https://lerna.js.org/).
+ - [X] Latest version of [lerna + NX](https://lerna.js.org/).
  - [X] React version 18
  - [X] Latest version of [RMWC](https://rmwc.io/).
  - [X] Latest version of [storybook](https://storybook.js.org/) (with vite).
