@@ -10,6 +10,7 @@ export * from './icon-button';
 export * from './linear-progress';
 export * from './list';
 export * from './menu';
+export * from './context-menu';
 export * from './select';
 export * from './snackbar';
 export * from './switch';

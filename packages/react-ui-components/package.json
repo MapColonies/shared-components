@@ -40,7 +40,7 @@
     "@rmwc/theme": "^8.0.8",
     "@rmwc/tooltip": "^8.0.8",
     "@rmwc/typography": "^8.0.8",
-    "material-design-icons": "^3.0.1",
+    "react-contexify": "^6.0.0",
     "storybook-dark-mode": "^3.0.0",
     "tslib": "^2.5.3"
   },

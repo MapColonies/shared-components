@@ -9,7 +9,8 @@
     "D": "^1.0.0",
     "copyfiles": "^2.4.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-ui-components": "^1.1.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.5",
