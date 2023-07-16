@@ -1,15 +1,15 @@
-import { Menu, Item, Separator, Submenu, useContextMenu, ItemParams, RightSlot } from './';
+import { ContextMenu, Item, Separator, Submenu, useContextMenu, ItemParams, RightSlot } from './';
 
 import './styles';
 import { Meta, StoryObj } from '@storybook/react';
 
 const MENU_ID = 'menu-id';
 
-const meta: Meta<typeof Menu> = {
-  component: Menu,
+const meta: Meta<typeof ContextMenu> = {
+  component: ContextMenu,
 };
 
-type Story = StoryObj<typeof Menu>;
+type Story = StoryObj<typeof ContextMenu>;
 
 function ContextMenuExample() {
   // 🔥 you can use this hook from everywhere. All you need is the menu id
@@ -37,7 +37,7 @@ function ContextMenuExample() {
   return (
     <div style={containerStyle} className="menuContainer" onContextMenu={(e) => show({ event: e })}>
       Right click anywhere
-      <Menu animation={{enter: 'scale', exit: 'fade'}} id={MENU_ID}>
+      <ContextMenu animation={{enter: 'scale', exit: 'fade'}} id={MENU_ID}>
         <Item onClick={handleItemClick}>
           Item 1
           <RightSlot>With Right Slot</RightSlot>
@@ -62,7 +62,7 @@ function ContextMenuExample() {
               <Item onClick={handleItemClick}>Sub Item 5</Item>
             </Submenu>
         </Submenu>
-      </Menu>
+      </ContextMenu>
     </div>
   );
 }

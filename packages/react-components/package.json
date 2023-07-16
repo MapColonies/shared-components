@@ -11,7 +11,7 @@
     "transpileTS": "tsc --project ./tsconfig-build.json",
     "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build",
     "printTSVersion": "echo TS $(tsc -v)",
-    "postbuild": "copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
+    "postbuild": "yarn copyassets:all && copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "prepack": "yarn build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
