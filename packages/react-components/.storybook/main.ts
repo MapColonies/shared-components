@@ -16,7 +16,8 @@ const config = {
     return mergeConfig(config, {
       ...conf,
       base: '',
-      plugins: [cesium({ cesiumBuildPath: '../../node_modules/cesium/Build/Cesium' })],
+      // Cesium is installed in the main node_modules folder, need to configure the routes for cesium vite plugin.
+      plugins: [cesium({cesiumBuildPath: '../../node_modules/cesium/Build/Cesium', cesiumBuildRootPath: '../../node_modules/cesium/Build' })],
     });
   },
 };
