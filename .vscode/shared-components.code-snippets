@@ -20,18 +20,17 @@
     "prefix": "rmwcWrapper",
     "body": [
       "import React from 'react';",
-      "import {${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}HTMLProps, ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props, ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}} from '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}';",
-      "import '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}/styles'",
+      "import {${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} as RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}} from '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}';",
+      "import { ExtractProps } from '../typeHelpers';",
+      "import '@rmwc/${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1}/}/styles';",
       "",
-      "type ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}PropsWithHtml = ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}HTMLProps & RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props;",
+      "export interface ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props extends ExtractProps<typeof RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}> {};",
       "",
-      "export interface ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props extends React.ComponentProps<typeof RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}> {};",
-      "",
-      "export const ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}: React.FC<${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props & ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}PropsWithHtml> = props => {",
+      "export const ${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} = React.forwardRef<any,${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props>((props, ref) => {",
       "",
       "return <RMWC${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/} ref={props.ref} {...props} />",
       "",
-      "};"
+      "}) as React.ForwardRefExoticComponent<${TM_DIRECTORY/.*[\\\\|\\/]+(.*)/${1:/capitalize}/}Props>;"
     ]
   }
 }
