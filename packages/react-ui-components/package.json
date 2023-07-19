@@ -10,6 +10,7 @@
     "clean": "rimraf dist",
     "transpileTS": "tsc --project ./tsconfig-build.json",
     "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build",
+    "postbuild": "copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "printTSVersion": "echo TS $(tsc -v)",
     "prepack": "yarn build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
