@@ -27,6 +27,9 @@ export const Themes = {
     textDisabledOnDark: 'rgba(255, 255, 255, 0.5)',
     textIconOnDark: 'rgba(255, 255, 255, 0.5)',
     checkboxCheckedColor: '#2979ff',
+    elevatedShadow: `1px 2px 2px rgba(0, 0, 0, 0.1),
+    2px 4px 4px rgba(0, 0, 0, 0.1),
+    3px 6px 6px rgba(0, 0, 0, 0.1)`,
   },
   darkTheme: {
     type: 'dark',
@@ -55,5 +58,8 @@ export const Themes = {
     textDisabledOnDark: '#AFBFDA',
     textIconOnDark: '#AFBFDA',
     checkboxCheckedColor: '#24aee9',
+    elevatedShadow: `1px 2px 2px rgba(0, 0, 0, 0.1),
+    2px 4px 4px rgba(0, 0, 0, 0.1),
+    3px 6px 6px rgba(0, 0, 0, 0.1)`,
   },
 };

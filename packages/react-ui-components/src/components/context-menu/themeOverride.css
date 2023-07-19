@@ -1,0 +1,19 @@
+/* Mapping between contexify theme and ours */
+.context-menu-container {
+  --contexify-menu-padding: 6px;
+  --contexify-menu-radius: 6px;
+  --contexify-menu-bgColor: var(--mdc-theme-background);
+  --contexify-menu-shadow: var(--mdc-theme-elevated-shadow);
+  --contexify-menu-negatePadding: var(--contexify-menu-padding);
+  --contexify-separator-color: var(--mdc-theme-text-secondary-on-background);
+  --contexify-separator-margin: 5px;
+  --contexify-itemContent-padding: 6px;
+  --contexify-activeItem-radius: 4px;
+  --contexify-item-color: var(--mdc-theme-text-primary-on-background);
+  --contexify-activeItem-color: var(--mdc-theme-on-surface);
+  --contexify-activeItem-bgColor: var(--mdc-theme-gc-alternative-surface);
+  --contexify-rightSlot-color: var(--mdc-theme-text-hint-on-background);
+  --contexify-activeRightSlot-color: var(mdc-text-secondary-on-background);
+  --contexify-arrow-color: var(--mdc-theme-text-secondary-on-background);
+  --contexify-activeArrow-color: var(--mdc-theme-text-primary-on-background);
+}

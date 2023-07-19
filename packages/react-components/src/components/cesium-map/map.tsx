@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 
@@ -14,6 +14,7 @@ import {
   ScreenSpaceEventType,
   TerrainProvider,
   Ray,
+  ScreenSpaceEventHandler
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { getAltitude, toDegrees } from '../utils/map';
@@ -84,6 +85,7 @@ export interface IContextMenuData {
     width: number;
   };
   handleClose: () => void;
+  contextEvt: MouseEvent | TouchEvent | KeyboardEvent | React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 }
 
 interface ILegends {
@@ -138,6 +140,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
+  const imageryMenuEvent = useRef<MouseEvent>();
   const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
   const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(false);
   const [rightClickCoordinates, setRightClickCoordinates] = useState<{
@@ -179,15 +182,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
 
       if (props.imageryContextMenu) {
-        viewer.screenSpaceEventHandler.setInputAction((evt: Record<string, unknown>) => {
-          // console.log('RIGHT click', evt.position);
-          const pos = evt.position as Record<string, unknown>;
-
+        // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
+        // We need the native event for the new context menu component.
+        // This is a workaround.
+        viewer.scene.canvas.addEventListener('contextmenu', (evt) => {
+          const pos = {x: evt.offsetX, y: evt.offsetY} as Record<string, unknown>;
+ 
           setShowImageryMenu(false);
           setImageryMenuPosition(pos);
           setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
           setShowImageryMenu(true);
-        }, ScreenSpaceEventType.RIGHT_CLICK);
+ 
+          console.log("native event!", evt);
+          imageryMenuEvent.current = evt as unknown as MouseEvent;
+       })
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
@@ -402,6 +410,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             handleClose: () => {
               setShowImageryMenu(!showImageryMenu);
             },
+            contextEvt: imageryMenuEvent.current
           })}
       </MapViewProvider>
     </Viewer>
