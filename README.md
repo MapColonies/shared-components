@@ -55,7 +55,7 @@ We are using conventional commits in order to be able to get an automatic change
 
 First, log in to NPM as usual for publishing. (`npm login`)
 
-Next, run `yarn release` from root dir and let lerna do its thing :)
+Next, run `yarn release` from root dir and let lerna do its thing 😎
 
 ### General Info
 
@@ -70,13 +70,13 @@ So we are utilising the storybook shared config from the root folder to serve th
 
 * Our react-components package uses a slightly older version of storybook than the one used as a baseline, this is because cesium didn't play well with the latest version for some reason. this is expected to be addressed at some point in the future updates.
 
-* Sometimes in development you might face some weird issues of some changes you made that are not working properly or simply not seem to be showing at all, especially after adding a new package via the package manager.
+* 🧟‍♀️🪡 Sometimes in development you might face some weird issues of some changes you made that are not working properly or simply not seem to be showing at all, especially after adding a new package via the package manager.
 This could be due to caching either by Lerna NX we mentioned before, or Vite and Vite-Storybook.
 Before you start investigating the issue further and spent too much time, simply try to delete `.cache` and `.vite-storybook` via the package's node_modules folder, and also `.cache` folder inside the root node_modules which is the NX cache. If it wouldn't work, it wont harm, and cost no time compared to an intense debugging session (But the slightly longer build time at the first run).
-* In react-ui-core package we are now using a custom wrappers on top of RMWC core components so we could extend them as we need. We added a handy vs-code snippet to ease up some of the work, anywhere inside the project you can type  `rmwcWrapper` and hit `TAB` in order to create a simple wrapper for the main component you want to create a wrapper for.
+* #️⃣ In react-ui-core package we are now using a custom wrappers on top of RMWC core components so we could extend them as we need. We added a handy vs-code snippet to ease up some of the work, anywhere inside the project you can type  `rmwcWrapper` and hit `TAB` in order to create a simple wrapper for the main component you want to create a wrapper for.
  **NOTICE**: this is bases on the folder name, so if it includes any special characters, you might need to make some tweaks on top of the basic structure for it to work properly.
  In addition, make sure to wrap and export all of the side components that might have been exported from RMWC in addition to the main component, this shouldn't be that hard and most of the time is just a copy and paste from the wrapper you've created using the provided snippet, and sometimes you would need to write it manually as it wont fit all sorts of exports (Such as types you would want to include, utility functions, hooks, etc).
-* RMWC provides external styles for their components as a css loaders.
+* 🎨 RMWC provides external styles for their components as a css loaders.
 notice the import from the snippet mentioned before i.e `import  '@rmwc/avatar/styles';`,
 this import should **NOT** be included inside the component wrapper. instead create a file `styles.js` inside the component folder and include it there.
 This is because we are importing their styles manually in our application in a certain order so we could override it and customize as needed.
