@@ -193,7 +193,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
           setShowImageryMenu(true);
  
-          console.log("native event!", evt);
           imageryMenuEvent.current = evt as unknown as MouseEvent;
        })
       }

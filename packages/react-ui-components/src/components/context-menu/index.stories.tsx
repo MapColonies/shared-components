@@ -15,6 +15,9 @@ function ContextMenuExample() {
   // 🔥 you can use this hook from everywhere. All you need is the menu id
   const { show } = useContextMenu({
     id: MENU_ID,
+    locale: {
+      dir: 'ltr'
+    }
   });
 
   const handleItemClick = ({ event, props, triggerEvent, data }: ItemParams) => {

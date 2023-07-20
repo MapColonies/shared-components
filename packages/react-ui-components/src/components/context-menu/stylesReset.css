@@ -1,3 +1,14 @@
-.contexify {
+.containerized {
   position: unset;
+}
+
+/* RTL support overrides */
+
+body[dir="rtl"] .contexify_rightSlot {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+body[dir="rtl"] .contexify_rightSlot > * {
+  transform: rotate(180deg);
 }
