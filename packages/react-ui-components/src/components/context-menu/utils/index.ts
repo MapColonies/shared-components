@@ -4,7 +4,7 @@ export const calcSubMenuPositioning = (contextEvt: MouseEvent, isRtl: boolean) =
   const contextMenuContainer = document.querySelector('.context-menu-container');
   if(contextMenuContainer) {
     // remove prev styles to recalculate
-    const prevStyleElem = document.head.querySelector('style[contextMenuRTLStyle="true"]');
+    const prevStyleElem = document.head.querySelector('style#contextMenuRTLStyle');
     prevStyleElem?.remove();
 
     const containerStyles = getComputedStyle(contextMenuContainer);
@@ -15,7 +15,7 @@ export const calcSubMenuPositioning = (contextEvt: MouseEvent, isRtl: boolean) =
     const overflowXStart = clickPosition.x - menuMinWidth < 0;
     const headElement = document.head;
     const overrideStyle = document.createElement('style');
-    overrideStyle.dataset.contextMenuRTLStyle = "true";
+    overrideStyle.id = "contextMenuRTLStyle";
     headElement.appendChild(overrideStyle);
     const defaultSubmenuPositioning = isRtl ? `left: 100%; right: unset;`: `left: unset; right: 100%;`;
     const defaultStyleForSubMenu = `.contexify .contexify_submenu {${defaultSubmenuPositioning}}`;
