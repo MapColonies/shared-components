@@ -13,7 +13,7 @@
   --contexify-activeItem-color: var(--mdc-theme-on-surface);
   --contexify-activeItem-bgColor: var(--mdc-theme-gc-alternative-surface);
   --contexify-rightSlot-color: var(--mdc-theme-text-hint-on-background);
-  --contexify-activeRightSlot-color: var(mdc-text-secondary-on-background);
+  --contexify-activeRightSlot-color: var(--mdc-text-secondary-on-background);
   --contexify-arrow-color: var(--mdc-theme-text-secondary-on-background);
   --contexify-activeArrow-color: var(--mdc-theme-text-primary-on-background);
 }
