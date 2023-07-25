@@ -1,11 +1,11 @@
 
 # Map Colonies Updated Shared Components Library
 
-A Refactured version of the [shard components library](https://github.com/MapColonies/shared-components) for map colonies application.
+A Refactured version of the [shard components library](https://github.com/MapColonies/shared-components-deprecated) for map colonies application.
 
   
 
-**NOTE: Previeous version will soon be deprecated.**
+**NOTE: Previeous version is now deprecated.**
 
 ### Technical Updates:
 
