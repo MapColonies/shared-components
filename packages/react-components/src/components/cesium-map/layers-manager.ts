@@ -23,6 +23,7 @@ import {
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
 import { cesiumRectangleContained } from './helpers/utils';
+import { CesiumCartesian2 } from './proxied.types';
 
 const INC = 1;
 const DEC = -1;
@@ -312,6 +313,20 @@ class LayerManager {
     const layerIdx = this.mapViewer.imageryLayers.indexOf(layerInt as ImageryLayer);
 
     return layerIdx ? this.mapViewer.imageryLayers.get(layerIdx) : undefined;
+  }
+
+  public pickImageryLayers(position: CesiumCartesian2): ICesiumImageryLayer[] | undefined {
+    const pickRay = this.mapViewer.camera.getPickRay(position);
+    let nonBaseLayers: ICesiumImageryLayer[] | undefined = undefined;
+
+    if (pickRay) {
+      nonBaseLayers = this.mapViewer.imageryLayers.pickImageryLayers(pickRay, this.mapViewer.scene)?.filter((layer: ICesiumImageryLayer) => {
+        const parentId = get(layer.meta, 'parentBasetMapId') as string;
+        return parentId ? false : true;
+      });
+    }
+
+    return nonBaseLayers;
   }
 
   public findLayerByPOI(x: number, y: number): ICesiumImageryLayer[] | undefined {
