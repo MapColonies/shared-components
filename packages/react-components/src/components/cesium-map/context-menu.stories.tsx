@@ -428,12 +428,6 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
 
 export const MapWithLayersManagerAndContextMenu: Story = () => {
   const [center] = useState<[number, number]>([34.811, 31.908]);
-  const [delayedLayers, setDelayedLayers] = useState(layers);
-  useEffect(() => {
-    setTimeout(() => {
-      setDelayedLayers(layers);
-    }, 200);
-  }, []);
 
   return (
     <div style={mapDivStyle}>
@@ -448,7 +442,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
       >
-        <LayersMozaik layers={delayedLayers} />
+        <LayersMozaik layers={layers} />
       </CesiumMap>
     </div>
   );
