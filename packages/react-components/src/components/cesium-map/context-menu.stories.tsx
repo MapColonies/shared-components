@@ -1,11 +1,12 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Story, Meta } from '@storybook/react';
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
 import { CesiumSceneMode } from './map.types';
-import { IRasterLayer } from './layers-manager';
+import { ICesiumImageryLayer, IRasterLayer } from './layers-manager';
 import { IBaseMaps } from './settings/settings';
+import { CesiumCartesian2 } from './proxied.types';
 
 export default {
   title: 'Cesium Map',
@@ -64,7 +65,6 @@ const BASE_MAPS = {
     {
       id: '2nd',
       title: '2nd Map Title',
-      isCurrent: true,
       thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
       baseRasteLayers: [
         {
@@ -110,6 +110,7 @@ const BASE_MAPS = {
     {
       id: '3rd',
       title: '3rd Map Title',
+      isCurrent: true,
       thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
       baseRasteLayers: [
         {
@@ -157,11 +158,13 @@ const BASE_MAPS = {
 
 const layers = [
   {
-    id: '2_raster_ext',
+    id: 'near_amphy',
     type: 'XYZ_LAYER',
     opacity: 1,
-    zIndex: 0,
-    show: false,
+    show: true,
+    meta: {
+      zIndex: 0,
+    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
     },
@@ -181,11 +184,13 @@ const layers = [
     },
   },
   {
-    id: '3_raster_ext',
+    id: 'coin_zoom_17',
     type: 'XYZ_LAYER',
     opacity: 1,
-    zIndex: 1,
-    show: false,
+    show: true,
+    meta: {
+      zIndex: 1,
+    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
     },
@@ -205,11 +210,13 @@ const layers = [
     },
   },
   {
-    id: '4_raster1_ext',
+    id: 'biggest',
     type: 'XYZ_LAYER',
     opacity: 1,
-    zIndex: 2,
-    show: false,
+    show: true,
+    meta: {
+      zIndex: 2,
+    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
     },
@@ -231,18 +238,18 @@ const layers = [
 ];
 
 const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, handleClose }) => {
-  const layerId = data[0]?.meta !== undefined ? ((data[0]?.meta as Record<string, unknown>).id as string) : '';
-
-  const handleAction = (action: string, data: Record<string, unknown>[]): void => {
-    console.log(`ACTION: ${action}`);
-    console.log('DATA:', data);
-    console.log('SIZE:', size);
-  };
+  const mapViewer = useCesiumMap();
+  const [pickedLayers, setPickedLayers] = useState<ICesiumImageryLayer[] | undefined>();
 
   const emptyStyle = {
     left: `${position.x}px`,
     top: `${position.y}px`,
   };
+
+  useEffect(() => {
+    setPickedLayers(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
+    console.log(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
+  }, [position]);
 
   return (
     <>
@@ -251,34 +258,46 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
           style={{
             ...emptyStyle,
             ...style,
-            background: 'var(--mdc-theme-surface)',
+            background: 'grey',
             position: 'absolute',
             borderRadius: '4px',
             padding: '12px',
             paddingBottom: '220px',
           }}
         >
-          <h4>Actions on {layerId}:</h4>
-          {data.length > 1 && (
-            <h3>
-              <span style={{ color: 'red' }}>{data.length}</span> layers overlapping
-            </h3>
+          {data.length > 0 && (
+            <>
+              <h3>
+                From POI <span style={{ color: 'red' }}>{data.length}</span> layers overlapping
+              </h3>
+              <div style={{ paddingLeft: '30px' }}>
+                {data?.map((layer) => {
+                  return (
+                    <p>{`${(layer as unknown as Record<string, unknown>).meta?.id} <--> ${
+                      (layer as unknown as Record<string, unknown>).meta?.meta?.zIndex
+                    }`}</p>
+                  );
+                })}
+              </div>
+            </>
           )}
+          <h3>
+            From PICK API <span style={{ color: 'red' }}>{pickedLayers?.length}</span> layers at point
+          </h3>
+          <div style={{ paddingLeft: '30px' }}>
+            {pickedLayers?.map((layer) => {
+              return (
+                <p>{`${(layer as unknown as Record<string, unknown>).meta?.id} <--> ${
+                  (layer as unknown as Record<string, unknown>).meta?.meta?.zIndex
+                }`}</p>
+              );
+            })}
+          </div>
           <MenuSurfaceAnchor>
-            <Menu open={true} onClose={(evt): void => handleClose()} style={{ width: '100%' }}>
-              {['Top', 'Up', 'Down', 'Bottom'].map((action) => {
-                return (
-                  <MenuItem key={`imageryMenuItemAction_${action}`}>
-                    <Box
-                      onClick={(evt): void => {
-                        handleAction(action, data);
-                      }}
-                    >
-                      {action}
-                    </Box>
-                  </MenuItem>
-                );
-              })}
+            <Menu open={true} onClose={(evt): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
+              <MenuItem>
+                <Box></Box>
+              </MenuItem>
             </Menu>
           </MenuSurfaceAnchor>
         </Box>
@@ -287,13 +306,20 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
         <Box
           style={{
             ...emptyStyle,
-            background: 'var(--mdc-theme-surface)',
+            background: 'orange',
             position: 'absolute',
             borderRadius: '4px',
             padding: '12px',
           }}
         >
-          No data found
+          <h3>No data found</h3>
+          <MenuSurfaceAnchor>
+            <Menu open={true} onClose={(evt): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
+              <MenuItem>
+                <Box></Box>
+              </MenuItem>
+            </Menu>
+          </MenuSurfaceAnchor>
         </Box>
       )}
     </>
@@ -303,16 +329,20 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
 const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
   const mapViewer = useCesiumMap();
   const { layers } = props;
-  const [selectedLayer, setSelectedLayer] = useState<string>(layers[0].id);
+  const [selectedLayer, setSelectedLayer] = useState<string>('');
   const [times, setTimes] = useState<number>(1);
   const [allShow, setAllShow] = useState<boolean>(false);
 
-  useLayoutEffect(() => {
-    const sortedLayers = layers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
-    sortedLayers.forEach((layer, idx) => {
+  // IMPORTANT: For non CesiumSceneMode.SCENE2D CESIUM mapViewer.scene.pickPosition() not working well if NO TILT (probably CESIUM issue)
+  mapViewer.scene.globe.depthTestAgainstTerrain = true;
+
+  useEffect(() => {
+    const sortedLayers = layers?.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
+    sortedLayers?.forEach((layer, idx) => {
       mapViewer.layersManager?.addRasterLayer(layer, idx, '');
     });
-  }, [layers, mapViewer]);
+    setSelectedLayer(layers ? layers[0].id : '');
+  }, [layers, mapViewer.layersManager]);
 
   const handleRaise = (): void => {
     mapViewer.layersManager?.raise(selectedLayer, times);
@@ -336,14 +366,15 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
   };
 
   return (
-    <>
+    <div style={{ height: '30px' }}>
+      <h3 style={{ color: 'green' }}>Change BASE MAP to see effective layers</h3>
       <select
         defaultValue={selectedLayer}
         onChange={(evt): void => {
           setSelectedLayer(evt.target.value);
         }}
       >
-        {layers.map((layer) => (
+        {layers?.map((layer) => (
           <option key={layer.id} defaultValue={layer.id}>
             {layer.id}
           </option>
@@ -391,19 +422,21 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
       >
         Toggle All
       </button>
-    </>
+    </div>
   );
 };
 
-export const MapWithContextMenu: Story = () => {
+export const MapWithLayersManagerAndContextMenu: Story = () => {
   const [center] = useState<[number, number]>([34.811, 31.908]);
+
   return (
     <div style={mapDivStyle}>
       <CesiumMap
         center={center}
         zoom={14}
         imageryProvider={false}
-        sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
+        sceneModes={[CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
+        sceneMode={CesiumSceneMode.SCENE2D}
         baseMaps={BASE_MAPS as IBaseMaps}
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
