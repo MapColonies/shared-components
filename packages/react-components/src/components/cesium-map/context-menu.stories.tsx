@@ -441,6 +441,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
+        layerManagerFootprintMetaFieldPath={'details.footprint'}
       >
         <LayersMozaik layers={layers} />
       </CesiumMap>

@@ -14,7 +14,7 @@ import {
   ScreenSpaceEventType,
   TerrainProvider,
   Ray,
-  ScreenSpaceEventHandler
+  ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { getAltitude, toDegrees } from '../utils/map';
@@ -115,6 +115,7 @@ export interface CesiumMapProps extends ViewerProps {
     dynamicHeightIncrement?: number;
   };
   legends?: ILegends;
+  layerManagerFootprintMetaFieldPath?: string;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -186,15 +187,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         // We need the native event for the new context menu component.
         // This is a workaround.
         viewer.scene.canvas.addEventListener('contextmenu', (evt) => {
-          const pos = {x: evt.offsetX, y: evt.offsetY} as Record<string, unknown>;
- 
+          const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
+
           setShowImageryMenu(false);
           setImageryMenuPosition(pos);
           setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
           setShowImageryMenu(true);
- 
+
           imageryMenuEvent.current = evt as unknown as MouseEvent;
-       })
+        });
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
@@ -204,9 +205,14 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     if (mapViewRef) {
       mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
 
-      mapViewRef.layersManager = new LayerManager(mapViewRef, props.legends?.mapLegendsExtractor, () => {
-        setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-      });
+      mapViewRef.layersManager = new LayerManager(
+        mapViewRef,
+        props.legends?.mapLegendsExtractor,
+        () => {
+          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+        },
+        props.layerManagerFootprintMetaFieldPath
+      );
     }
   }, [mapViewRef]);
 
@@ -409,7 +415,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             handleClose: () => {
               setShowImageryMenu(!showImageryMenu);
             },
-            contextEvt: imageryMenuEvent.current
+            contextEvt: imageryMenuEvent.current,
           })}
       </MapViewProvider>
     </Viewer>

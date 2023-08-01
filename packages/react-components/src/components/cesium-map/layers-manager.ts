@@ -62,14 +62,22 @@ class LayerManager {
   public layerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly legendsExtractor?: LegendExtractor;
+  private readonly layerManagerFootprintMetaFieldPath: string | undefined;
 
-  public constructor(mapViewer: CesiumViewer, legendsExtractor?: LegendExtractor, onLayersUpdate?: () => void) {
+  public constructor(
+    mapViewer: CesiumViewer,
+    legendsExtractor?: LegendExtractor,
+    onLayersUpdate?: () => void,
+    layerManagerFootprintMetaFieldPath?: string
+  ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
+    this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
+
     if (onLayersUpdate) {
       this.layerUpdated.addEventListener(onLayersUpdate, this);
     }
@@ -112,16 +120,19 @@ class LayerManager {
     return this.layers;
   }
 
-  /* eslint-disable */
+  // It's a general place to extend layer's data. Should be done when all providers(different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const layer = this.layers.find(layerPredicate);
-    if (layer) {
-      layer.meta = { ...(layer.meta ?? {}), ...meta };
-      this.setLegends();
-      this.layerUpdated.raiseEvent(meta);
-    }
+    const laeyrsReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
+
+    Promise.all(laeyrsReadyPromises).then((data) => {
+      const layer = this.layers.find(layerPredicate);
+      if (layer) {
+        layer.meta = { ...(layer.meta ?? {}), ...meta };
+        this.setLegends();
+        this.layerUpdated.raiseEvent(meta);
+      }
+    });
   }
-  /* eslint-enable */
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
     const sortedBaseMapLayers = baseMap.baseRasteLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
@@ -330,35 +341,40 @@ class LayerManager {
   }
 
   public findLayerByPOI(x: number, y: number): ICesiumImageryLayer[] | undefined {
-    const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
+    if (this.layerManagerFootprintMetaFieldPath) {
+      const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
 
-    const nonBaseLayers = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? false : true;
-    });
+      const nonBaseLayers = this.layers.filter((layer) => {
+        const parentId = get(layer.meta, 'parentBasetMapId') as string;
+        return parentId ? false : true;
+      });
 
-    const selectedVisibleLayers = nonBaseLayers.filter((layer) => {
-      const layerFootprint = get(layer.meta, 'details.footprint') as Polygon | undefined;
-      if (layerFootprint !== undefined) {
-        /* eslint-disable */
-        const isInLayer = booleanPointInPolygon(position.geometry, {
-          type: 'Feature',
-          properties: {},
-          geometry: layerFootprint,
-        });
-        /* eslint-enable */
+      const selectedVisibleLayers = nonBaseLayers.filter((layer) => {
+        const layerFootprint = get(layer.meta, this.layerManagerFootprintMetaFieldPath as string) as Polygon | undefined;
+        if (layerFootprint !== undefined) {
+          /* eslint-disable */
+          const isInLayer = booleanPointInPolygon(position.geometry, {
+            type: 'Feature',
+            properties: {},
+            geometry: layerFootprint,
+          });
+          /* eslint-enable */
 
-        return isInLayer && layer.show;
-      } else {
-        console.warn('CesiumImageryLayer has no defined footprint', layer.meta);
-        return false;
-      }
-    });
+          return isInLayer && layer.show;
+        } else {
+          console.warn('[LayerManager] [findLayerByPOI] CesiumImageryLayer has no defined footprint', layer.meta);
+          return false;
+        }
+      });
 
-    return selectedVisibleLayers.sort((layer1, layer2) => {
-      // @ts-ignore
-      return layer2.meta?.zIndex - layer1.meta?.zIndex;
-    });
+      return selectedVisibleLayers.sort((layer1, layer2) => {
+        // @ts-ignore
+        return layer2.meta?.zIndex - layer1.meta?.zIndex;
+      });
+    } else {
+      console.warn('[LayerManager] [findLayerByPOI]layerManagerFootprintMetaFieldPath is not defined');
+      return [];
+    }
   }
 
   public addTransparentImageryProvider(): void {
