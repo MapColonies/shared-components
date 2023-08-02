@@ -392,6 +392,7 @@ class LayerManager {
     (transparentLayer as ICesiumImageryLayer).meta = {
       id: TRANSPARENT_LAYER_ID,
       skipRelevancyCheck: true,
+      parentBasetMapId: 'TRANSPARENT_LAYER',
     };
   }
 
