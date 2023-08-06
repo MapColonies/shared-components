@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, MouseEventHandler } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 
@@ -178,24 +178,31 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     };
   };
 
+  const contextMenuHandler = useCallback((evt: any) => {
+    if(ref.current !== null) {
+      const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
+
+      const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
+  
+      setShowImageryMenu(false);
+      setImageryMenuPosition(pos);
+      setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
+      setShowImageryMenu(true);
+      imageryMenuEvent.current = evt as unknown as MouseEvent;
+    }  
+  }, [ref]);
+
   useEffect(() => {
     if (ref.current !== null) {
       const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
-
       if (props.imageryContextMenu) {
         // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
         // We need the native event for the new context menu component.
         // This is a workaround.
-        viewer.scene.canvas.addEventListener('contextmenu', (evt) => {
-          const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
 
-          setShowImageryMenu(false);
-          setImageryMenuPosition(pos);
-          setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
-          setShowImageryMenu(true);
+        viewer.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
 
-          imageryMenuEvent.current = evt as unknown as MouseEvent;
-        });
+        viewer.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
       }
     }
     setMapViewRef(ref.current?.cesiumElement);
