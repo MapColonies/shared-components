@@ -136,7 +136,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
   const [locale, setLocale] = useState<{ [key: string]: string }>();
-  const [cameraState, setCameraState] = useState<ICameraState | undefined>();
+  // const [cameraState, setCameraState] = useState<ICameraState | undefined>();
+  const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
@@ -306,30 +307,31 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       }
     };
 
-    const intervalHandle = setInterval(() => {
-      if (mapViewRef && mapViewRef.scene.mode !== SceneMode.MORPHING) {
-        const camera = mapViewRef.camera;
+    if(mapViewRef) {
+      mapViewRef.camera.moveEnd.addEventListener(() => {
+        if(mapViewRef.scene.mode !== SceneMode.MORPHING) {
+          const camera = mapViewRef.camera;
+    
+          const store: ICameraState = {
+            position: getCameraPosition(),
+            direction: camera.direction.clone(),
+            up: camera.up.clone(),
+            right: camera.right.clone(),
+            transform: camera.transform.clone(),
+            frustum: camera.frustum.clone(),
+          };
+          cameraStateRef.current = store;
+        }
+      });
+    }
 
-        const store: ICameraState = {
-          position: getCameraPosition(),
-          direction: camera.direction.clone(),
-          up: camera.up.clone(),
-          right: camera.right.clone(),
-          transform: camera.transform.clone(),
-          frustum: camera.frustum.clone(),
-        };
-        setCameraState(store);
-      }
-    }, cameraPositionRefreshRate);
-
-    return (): void => {
-      clearInterval(intervalHandle);
-    };
+   
   }, [mapViewRef]);
 
   useEffect(() => {
     const morphCompleteHandler = (): void => {
-      if (mapViewRef && cameraState) {
+      if (mapViewRef && cameraStateRef.current) {
+        const cameraState = cameraStateRef.current;
         void mapViewRef.camera.flyTo({
           destination: Cartesian3.fromDegrees(cameraState.position.longitude, cameraState.position.latitude, cameraState.position.height),
           duration: 0,
@@ -348,7 +350,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         }
       }
     };
-  }, [mapViewRef, cameraState]);
+  }, [mapViewRef]);
 
   useEffect(() => {
     const zoom = props.zoom;
