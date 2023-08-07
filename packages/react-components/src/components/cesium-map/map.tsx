@@ -70,7 +70,6 @@ export class CesiumViewer extends CesiumViewerCls {
 
 const mapContext = createContext<CesiumViewer | null>(null);
 const MapViewProvider = mapContext.Provider;
-const cameraPositionRefreshRate = 10000;
 
 export interface IContextMenuData {
   data: Record<string, unknown>[];
@@ -136,7 +135,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
   const [locale, setLocale] = useState<{ [key: string]: string }>();
-  // const [cameraState, setCameraState] = useState<ICameraState | undefined>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
