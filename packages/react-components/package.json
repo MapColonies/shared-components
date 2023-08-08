@@ -15,8 +15,9 @@
     "prepack": "yarn build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "copyassets:all": "yarn run copyassets:cesium",
+    "copyassets:all": "yarn run copyassets:cesium && yarn run copyassets:components",
     "copyassets:cesium": "copyfiles -u 5 \"../../node_modules/cesium/Build/Cesium/**/*\" \"./public\"",
+    "copyassets:components": "copyfiles -u 1 \"./public/assets/**/*\" \"dist\"",
     "storybook": "start-storybook -p 9010",
     "build-storybook": "rimraf storybook-static && build-storybook"
   },

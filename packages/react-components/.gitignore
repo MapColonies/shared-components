@@ -23,7 +23,5 @@ yarn-error.log*
 #storybook
 /storybook-static
 
-/public/**/*
-!/public/mock
-
+/public/Cesium
 *.tgz
