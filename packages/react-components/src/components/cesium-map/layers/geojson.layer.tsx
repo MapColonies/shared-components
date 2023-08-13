@@ -1,4 +1,4 @@
-import { Feature, Geometry, Polygon, Position } from 'geojson';
+import { Feature, Geometry, LineString, Polygon, Position } from 'geojson';
 import React, { ComponentProps } from 'react';
 
 import { GeoJsonDataSource as ResiumGeoJsonDataSource } from 'resium';
@@ -13,10 +13,18 @@ const getSign = (num: number) => Math.abs(num) / num;
 
 const fixFootprint = (footprint: Geometry): void => {
   switch (footprint.type) {
+    case 'LineString':
+      (footprint as LineString).coordinates.forEach((tupleArray: Position): void => {
+          if (Math.abs(tupleArray[0]) === PI_DEGREES && Math.abs(tupleArray[1]) === PI_DEGREES / 2) {
+            tupleArray[0] += NEGATIVE * getSign(tupleArray[0]) * DELTA; //-180 ==> -180 + 0.0001 = -179.9999;    //180 ==> 180 - 0.0001 = 179.9999;
+            tupleArray[1] += NEGATIVE * getSign(tupleArray[1]) * DELTA; //-90 ==> -90 + 0.0001 = -89.9999;       //90 ==> 90 - 0.0001 = 89.9999;
+          }
+      });
+      break;
     case 'Polygon':
       (footprint as Polygon).coordinates.forEach((tupleArray: Position[]): void => {
         tupleArray.forEach((tuple: Position): void => {
-          if (Math.abs(tuple[0]) === PI_DEGREES / 2 && Math.abs(tuple[1]) === PI_DEGREES) {
+          if (Math.abs(tuple[0]) === PI_DEGREES && Math.abs(tuple[1]) === PI_DEGREES / 2) {
             tuple[0] += NEGATIVE * getSign(tuple[0]) * DELTA; //-180 ==> -180 + 0.0001 = -179.9999;    //180 ==> 180 - 0.0001 = 179.9999;
             tuple[1] += NEGATIVE * getSign(tuple[1]) * DELTA; //-90 ==> -90 + 0.0001 = -89.9999;       //90 ==> 90 - 0.0001 = 89.9999;
           }
@@ -32,9 +40,9 @@ const fixFootprint = (footprint: Geometry): void => {
 export const CesiumGeojsonLayer: React.FC<RCesiumGeojsonLayerProps> = (props) => {
   const { data, ...rest } = props;
 
-  data.features.forEach((feature: Feature) => {
+  data?.features?.forEach((feature: Feature) => {
     fixFootprint(feature.geometry);
   });
 
-  return <ResiumGeoJsonDataSource data {...rest} />;
+  return <ResiumGeoJsonDataSource data={data} {...rest} />;
 };
