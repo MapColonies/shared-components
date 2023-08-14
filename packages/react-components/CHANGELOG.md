@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.0.3...@map-colonies/react-components@4.1.0) (2023-08-14)
+
+
+### Bug Fixes
+
+* 3rd party css includes ([8c387f1](https://github.com/MapColonies/shared-components/commit/8c387f1670fe117ac7d2faf5a33c09eabdb795d4))
+* add lineString handling for footprint fix ([bbb19ab](https://github.com/MapColonies/shared-components/commit/bbb19abca9f5b8408a66164f47ab852f5f302454))
+* add react components assets to build ([0946f44](https://github.com/MapColonies/shared-components/commit/0946f4473d4acfc29328f812ef1aee887a99766a))
+* camera position sample in interval (MAPCO-3352) ([3c070fc](https://github.com/MapColonies/shared-components/commit/3c070fc003c48da9590052995e1ed61065b9c2e0))
+* define transparent layer as basemap layer ([26b8bae](https://github.com/MapColonies/shared-components/commit/26b8bae78cbb19df873c3f18589832a951acb3e8))
+* exclude cesium from npm build ([04d1760](https://github.com/MapColonies/shared-components/commit/04d1760ed544ac7ac26297598b8c3a6a35b46142))
+* footprint correction delta ([699d309](https://github.com/MapColonies/shared-components/commit/699d309bceaef9909ab348b47927a22fb7af006d))
+* footprint field path ([76ce9da](https://github.com/MapColonies/shared-components/commit/76ce9da6263004c487d325905df7cf22f2c2f540))
+* include static assets in dist ([56ea78f](https://github.com/MapColonies/shared-components/commit/56ea78f0b1478defbca3387ee5768856abd15a74))
+* map context menu remove event listeners ([e370e13](https://github.com/MapColonies/shared-components/commit/e370e13f2d159499e9e2389a43a6ce84e702e27d))
+* pick imagery layer with cesium api ([de8fa75](https://github.com/MapColonies/shared-components/commit/de8fa75bf38538289d1ca22e0fa93380ad958938))
+* pr review comment ([b6c790f](https://github.com/MapColonies/shared-components/commit/b6c790fdee2729efb88ff295f0fa5fe4e884ed17))
+* refactor due to dry ([3fb300e](https://github.com/MapColonies/shared-components/commit/3fb300eecb6777aa905d8cc942f15ec534823a0e))
+* remove unnecessary code ([c7f53ef](https://github.com/MapColonies/shared-components/commit/c7f53ef3ee7740540735b11eb1e20bfcf1568580))
+* storybook cesium bugs and remove unnecessary assets ([4935d29](https://github.com/MapColonies/shared-components/commit/4935d295c7416e022773d53324ab03983903fee7))
+* whole world geojson polygon visualization ([05ba7ad](https://github.com/MapColonies/shared-components/commit/05ba7ad3ae2dceb8ae900e86ef803db8ea29d492))
+
+
+### Features
+
+* add readme and copy after build ([db57b82](https://github.com/MapColonies/shared-components/commit/db57b828e1351fe2b599f768c3c466fce74e36fa))
+* context menu rtl support (mostly working) ([b175c5d](https://github.com/MapColonies/shared-components/commit/b175c5d194f0014362103f5fb1199098773275f1))
+* context menu theme bridging ([94c20fc](https://github.com/MapColonies/shared-components/commit/94c20fcef52dc1bd09bcc5cc76ddce59a25efb21))
+
+
+
+
+
+
 ## [4.0.3](https://github.com/MapColonies/mc-shared-components/compare/@map-colonies/react-components@4.0.2...@map-colonies/react-components@4.0.3) (2023-07-12)
 
 
