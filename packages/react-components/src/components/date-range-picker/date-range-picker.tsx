@@ -120,7 +120,7 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
             maxDate={props.maxDate}
             minDate={props.minDate}
           />
-          <RmwcThemeProvider use={theme as any}>
+          <RmwcThemeProvider options={theme as any}>
             <Button
               className={`${classes.setButton} ${classes.margin}`}
               raised
