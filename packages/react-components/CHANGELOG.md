@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.0...@map-colonies/react-components@4.1.1) (2023-08-15)
+
+
+### Bug Fixes
+
+* theme provider bug in date range picker ([41f9992](https://github.com/MapColonies/shared-components/commit/41f99925f108a20dd8f87449fa636de9b81500ca))
+
+
+
+
+
 # [4.1.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.0.3...@map-colonies/react-components@4.1.0) (2023-08-14)
 
 
