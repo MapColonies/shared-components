@@ -40,9 +40,17 @@ const fixFootprint = (footprint: Geometry): void => {
 export const CesiumGeojsonLayer: React.FC<RCesiumGeojsonLayerProps> = (props) => {
   const { data, ...rest } = props;
 
-  data?.features?.forEach((feature: Feature) => {
-    fixFootprint(feature.geometry);
-  });
+  if(data) {
+    // For feature collections
+    if(typeof data.features !== 'undefined') {
+      data.features.forEach((feature: Feature) => {
+        fixFootprint(feature.geometry);
+      });
+    } else {
+      // For single geometry
+      fixFootprint(data)
+    }
+  }
 
   return <ResiumGeoJsonDataSource data={data} {...rest} />;
 };
