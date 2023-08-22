@@ -1,11 +1,11 @@
 
 # Map Colonies Updated Shared Components Library
 
-A Refactured version of the [shard components library](https://github.com/MapColonies/shared-components-deprecated) for map colonies application.
+A Refactored version of the [shard components library](https://github.com/MapColonies/shared-components-deprecated) for map colonies application.
 
   
 
-**NOTE: Previeous version is now deprecated.**
+**NOTE: Previous version is now deprecated.**
 
 ### Technical Updates:
 
@@ -25,7 +25,7 @@ A Refactured version of the [shard components library](https://github.com/MapCol
 
 - [X] Migrate from old "forked", self maintained RMWC components to component wrappers.
 
-- [X] Updgrade CesiumJS in react-components to v1.103.0 in order to utilize some of the latest features and bug fixes.
+- [X] Upgrade CesiumJS in react-components to v1.103.0 in order to utilize some of the latest features and bug fixes.
 
   
 
@@ -33,7 +33,7 @@ A Refactured version of the [shard components library](https://github.com/MapCol
 
   
 
-### Prequisites
+### Perquisites
 
 1. From root directory, run `yarn`. lerna (using yarn workspaces) will install all the projects dependencies (root deps and deps for each individual package).
 
@@ -64,7 +64,7 @@ As a baseline, we installed storybook, react, vite, lerna, etc, at the most upda
 Moreover, we created some base configs for storybook, vite and typescript at the root level, and each package can extend it as further as it needs, or just use it as-is if it doesn't have any special requirements, so its just plug and play.
 
 	A simple example would be the storybook static directories, allows you to serve some static assets which will be available for you when running the storybook dev server (and when building storybook static).
-So we are utilising the storybook shared config from the root folder to serve the public dir from the root folder which including the favicon for our storybook, and extends it in each package to serve its own public dir as well, so that each package will include the same favicon (or not, as you wish).
+So we are utilizing the storybook shared config from the root folder to serve the public dir from the root folder which including the favicon for our storybook, and extends it in each package to serve its own public dir as well, so that each package will include the same favicon (or not, as you wish).
 
 * As a rule of thumb, when need some extra configuration, always think where it should be added. if its more of a general config, put it on root so the internal packages will extend it and use it, and if its some more specific config, there are internal `vite.config`, `tsconfig.json`, `tsconfig-build.json` and `.storybook` directory in each package for you to override and customize global config.
 
@@ -80,4 +80,4 @@ Before you start investigating the issue further and spent too much time, simply
 notice the import from the snippet mentioned before i.e `import  '@rmwc/avatar/styles';`,
 this import should **NOT** be included inside the component wrapper. instead create a file `styles.js` inside the component folder and include it there.
 This is because we are importing their styles manually in our application in a certain order so we could override it and customize as needed.
-However, if you still need to override some styles or css behaviours beforehand, you need to add an additional file `stylesReset.css`, make any overrides as you wish and import it as well after the first styles import in the `styles.js` file from before.
+However, if you still need to override some styles or css behaviors beforehand, you need to add an additional file `stylesReset.css`, make any overrides as you wish and import it as well after the first styles import in the `styles.js` file mentioned before.
