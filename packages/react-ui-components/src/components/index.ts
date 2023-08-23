@@ -20,3 +20,4 @@ export * from './theme';
 export * from './tooltip';
 export * from './typography';
 export * from './provider';
+export * from './date-range-picker';
