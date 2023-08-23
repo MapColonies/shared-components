@@ -1,4 +1,18 @@
 .pickerCalendar {
+  /* --date-picker-calendar-background: var(--mdc-theme-background);
+  --date-picker-day-background: var(--mdc-theme-gc-alternative-surface);
+  --date-picker-day-font-color: var(--mdc-theme-text-primary-on-background);
+  --date-picker-day-selecting-range-background: var(--mdc-theme-gc-selection-background);
+  --date-picker-day-selecting-range-font-color: var(--mdc-theme-on-surface);
+  --date-picker-day-hover-background: var(--mdc-theme-text-hint-on-dark);
+  --date-picker-day-hover-font-color: var(--mdc-theme-alternative-surface);
+  --date-picker-selected-day-background: var(--mdc-theme-gc-selection-background);
+  --date-picker-selected-day-font-color: var(--mdc-theme-on-surface);
+  --date-picker-nav-icons-color: var(--mdc-theme-text-primary-on-background);
+  --date-picker-header-background: var(--mdc-theme-gc-selection-background);
+  --date-picker-header-color: var(--mdc-theme-text-primary-on-background);
+  background-color: var(--date-picker-calendar-background); */
+
   /* Theme Variables `date-picker` prefixed */
   --date-picker-calendar-background: var(--mdc-theme-background);
 
