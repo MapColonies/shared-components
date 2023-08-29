@@ -1,8 +1,39 @@
 .timeRangeWrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    flex: 1;
-    padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  padding: 10px;
+}
+
+.pickerContainer-withShortcuts {
+  --shortcuts-container-width: 150px;
+}
+
+.pickerContainer-rtl .react-datepicker__month-container {
+  float: right;
+}
+
+.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
+  left: calc(2px + var(--shortcuts-container-width));
+}
+
+.shortcutsContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--date-picker-header-background);
+  width: var(--shortcuts-container-width);
+  align-items: center;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.shortcut {
+    width: 80%;
+    height: 40px;
+    color: white;
+    padding: 0;
+    margin: 0;
+    margin-top: 10px;
 }

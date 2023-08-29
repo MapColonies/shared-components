@@ -3,6 +3,7 @@ import { Meta, StoryObj } from '@storybook/react';
 
 import './styles';
 import { useState } from 'react';
+import { endOfMonth, endOfWeek, endOfYear, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 
 const meta: Meta<typeof DateRangePicker> = {
   component: DateRangePicker,
@@ -30,12 +31,21 @@ function DateRangePickerExample() {
         endDate={dateEnd}
         locale="he"
         autoFocus={false}
-        dateFormat="dd/MM/yyyy HH:mm"
+        dateFormat="dd/MM/yyyy"
         placeholderText="Pick date and time range"
+        withShortcuts={[
+          {id: "1", label: 'היום', startDate: new Date(), endDate: new Date()},
+          {id: "2", label: 'מתחילת השבוע', startDate: startOfWeek(new Date(), {weekStartsOn: 0}), endDate: new Date()},
+          () => {
+            const lastWeekStart = startOfWeek(subWeeks(new Date(), 1));
+            const lastWeekEnd = endOfWeek(lastWeekStart);
+
+            return { id: "3", label: 'שבוע שעבר', startDate: lastWeekStart, endDate: lastWeekEnd }
+          },
+          {id: "4", label: 'מתחילת החודש', startDate: startOfMonth(new Date()), endDate: new Date()},
+          {id: "5", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
+        ]}
         isClearable
-        showIcon
-        startTimeLabel='Start time'
-        endTimeLabel='End time'
       />
       <div>
         <a rel="noreferrer" target="_blank" href="https://reactdatepicker.com/">

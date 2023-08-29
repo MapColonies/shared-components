@@ -1,35 +1,33 @@
-.pickerCalendar {
-  /* --date-picker-calendar-background: var(--mdc-theme-background);
-  --date-picker-day-background: var(--mdc-theme-gc-alternative-surface);
-  --date-picker-day-font-color: var(--mdc-theme-text-primary-on-background);
-  --date-picker-day-selecting-range-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-day-selecting-range-font-color: var(--mdc-theme-on-surface);
-  --date-picker-day-hover-background: var(--mdc-theme-text-hint-on-dark);
-  --date-picker-day-hover-font-color: var(--mdc-theme-alternative-surface);
-  --date-picker-selected-day-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-selected-day-font-color: var(--mdc-theme-on-surface);
-  --date-picker-nav-icons-color: var(--mdc-theme-text-primary-on-background);
-  --date-picker-header-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-header-color: var(--mdc-theme-text-primary-on-background);
-  background-color: var(--date-picker-calendar-background); */
+.pickerContainer, .pickerContainer-rtl {
+  /* Theme Variables - `date-picker` prefixed */
 
-  /* Theme Variables `date-picker` prefixed */
-  --date-picker-calendar-background: var(--mdc-theme-background);
+  --date-picker-calendar-background: #151A22;
 
-  --date-picker-day-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-day-font-color: var(--mdc-theme-text-primary-on-background);
-  --date-picker-day-selecting-range-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-day-selecting-range-font-color: var(--mdc-theme-on-surface);
-  --date-picker-day-hover-background: var(--mdc-theme-gc-hover-background);
-  --date-picker-day-hover-font-color: var(--mdc-theme-on-surface);
-  --date-picker-selected-day-background: var(--mdc-theme-gc-alternative-surface);
-  --date-picker-selected-day-font-color: var(--mdc-theme-on-surface);
+  --date-picker-day-background: #2D3748;
+  --date-picker-day-font-color: rgba(255, 255, 255, 1);
+  --date-picker-day-selecting-range-background: #455570;
+  --date-picker-day-selecting-range-font-color: rgba(255,255,255,.87);
+  --date-picker-day-hover-background: #D2E1F9;
+  --date-picker-day-hover-font-color: rgba(0, 0, 0, 0.87);
+  --date-picker-selected-day-background: #455570;
+  --date-picker-selected-day-hover-background: #D2E1F9;
+  --date-picker-selected-day-hover-font-color: rgba(0, 0, 0, 0.87);
+  --date-picker-selected-day-font-color: rgba(255,255,255,.87);
 
-  --date-picker-nav-icons-color: var(--mdc-theme-primary);
-  --date-picker-header-background: var(--mdc-theme-on-surface);
-  --date-picker-header-color: var(--mdc-theme-primary);
+  --date-picker-nav-icons-color: rgba(255, 255, 255, 1);
+  --date-picker-header-background: #455570;
+  --date-picker-header-color: rgba(255, 255, 255, 1);
+
+  --date-picker-shortcuts-hover-background: #D2E1F9;
+  --date-picker-shortcuts-background: #2D3748;
+  --date-picker-shortcuts-font-color: rgba(255, 255, 255, 1);
   /* -------------------------------------- */
+}
+
+.pickerCalendar {
   background-color: var(--date-picker-calendar-background);
+  border: none;
+  height: 270px;
 }
 
 .pickerDay {
@@ -68,6 +66,12 @@
   color: var(--date-picker-selected-day-font-color);
 }
 
+/* Hovered Selected Dates  */
+.pickerDay.react-datepicker__day--in-range:hover {
+  background-color: var(--date-picker-selected-day-hover-background);
+  color: var(--date-picker-selected-day-hover-font-color);
+}
+
 /* Selecting Dates */
 .pickerDay.react-datepicker__day--in-selecting-range:not(
     .react-datepicker__day--in-range,
@@ -77,4 +81,16 @@
   ) {
   background-color: var(--date-picker-day-selecting-range-background);
   color: var(--date-picker-day-selecting-range-font-color);
+}
+
+.shortcut.mdc-button:hover,
+.shortcut.selected.mdc-button {
+  background-color: var(--date-picker-shortcuts-hover-background);
+  color: var(--date-picker-shortcuts-font-color);
+}
+
+.shortcut.mdc-button {
+  background-color:  var(--date-picker-shortcuts-background);
+  font-size: 0.8rem;
+  min-height: 2rem;
 }

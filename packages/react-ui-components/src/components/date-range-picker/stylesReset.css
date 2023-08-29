@@ -16,10 +16,24 @@
 .react-datepicker {
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
 }
 
-.react-datepicker__header {
+.react-datepicker__header:not(.react-datepicker__header--has-time-select) {
   border: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+
+}
+.react-datepicker__input-time-container,
+.react-datepicker__input-time-container .react-datepicker-time__input,
+.react-datepicker__input-time-container .react-datepicker-time__input-container,
+.react-datepicker__input-time-container .react-datepicker-time__input-container .react-datepicker-time__input {
+  margin: 0;
+  height: 100%;
+}
+
+.react-datepicker {
+  user-select: none;
 }
