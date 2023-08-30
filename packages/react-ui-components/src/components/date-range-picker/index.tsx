@@ -5,6 +5,7 @@ import moment from 'moment';
 import { ExtractProps } from '../typeHelpers';
 import { TextField } from '../textfield';
 import { Button } from '../button';
+import { isSameDay } from 'date-fns';
 
 type OriginalPickerProps = ExtractProps<typeof DatePicker>;
 
@@ -26,12 +27,22 @@ interface Shortcut {
   id: string,
   label: string,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 }
 
-export interface DateRangePickerProps extends Omit<OriginalPickerProps & TimeRangeInputProps, 'onChange' | 'customTimeInput' | 'timeInputLabel'> {
+interface DateRange {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+const isDateRange = (date?: DateRange | Date | null): date is DateRange => {
+  return typeof date !== 'undefined' && date !== null && "startDate" in date && "endDate" in date;
+}
+
+type DateRangePickerPropsToExclude = 'onChange' | 'customTimeInput' | 'timeInputLabel' | 'startDate' | 'endDate' |  'setStartDate' | 'setEndDate';
+export interface DateRangePickerProps extends Omit<OriginalPickerProps & TimeRangeInputProps, DateRangePickerPropsToExclude> {
   locale?: 'he' | 'en';
-  onChange?: (date: Date | [Date | null, Date | null] | null, event?: React.SyntheticEvent<any>) => void;
+  onChange?: (date: DateRange | Date, event?: React.SyntheticEvent<any>) => void;
   withTimeRange?: boolean;
   withShortcuts?: (Shortcut | (() => Shortcut))[];
 }
@@ -39,7 +50,8 @@ export interface DateRangePickerProps extends Omit<OriginalPickerProps & TimeRan
 interface ShortcutsProps {
   setStartDate?: (startDate: Date | null) => void;
   setEndDate?: (endDate: Date | null) => void;
-  shortcuts: (Shortcut | (() => Shortcut))[]
+  shortcuts: (Shortcut | (() => Shortcut))[];
+  dateRange: DateRange
 }
 
 export const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
@@ -101,20 +113,40 @@ export const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
 };
 
 const CustomInput = forwardRef<HTMLInputElement, React.HTMLProps<HTMLInputElement>>(({ value, onClick, ...props }, ref) => (
-  <TextField className="dateRangeCustomInput" disabled onClick={onClick} ref={ref} value={value as string} {...props} />
+  <TextField {...props} className="dateRangeCustomInput" readOnly onClick={onClick} ref={ref} value={value as string} />
 ));
 
-const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {}, setEndDate = () => {}, shortcuts }) => {
+const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {}, setEndDate = () => {}, shortcuts, dateRange }) => {
   const [shortcutSelectedId, setShortcutSelectedId] = useState<string>();
+  const shortcutsList = useMemo(() => shortcuts.map(shortcutOrFunction => shortcutOrFunction instanceof Function ? shortcutOrFunction() : shortcutOrFunction), [shortcuts])
+
+    useEffect(() => {
+      for(const shortcut of shortcutsList) {
+        const isSelectedRangeAsShortcut =
+          dateRange.startDate &&
+          dateRange.endDate &&
+          isSameDay(shortcut.startDate, dateRange.startDate) &&
+          isSameDay(shortcut.endDate, dateRange.endDate);
+
+        if(shortcutSelectedId) {
+          if(shortcut.id === shortcutSelectedId){
+            if(!isSelectedRangeAsShortcut) {
+              setShortcutSelectedId(undefined);
+            } 
+          }
+        } else if(isSelectedRangeAsShortcut) {
+          setShortcutSelectedId(shortcut.id);
+        }
+      }
+
+  }, [dateRange, shortcutSelectedId, shortcutsList])
 
   return (
     <div className="shortcutsContainer">
-      {shortcuts.map((shortcutOrFunction, i) => {
-        const shortcut = shortcutOrFunction instanceof Function ? shortcutOrFunction() : shortcutOrFunction;
+      {shortcutsList.map((shortcut, i) => {
         const handleShortcutClick: React.MouseEventHandler<HTMLButtonElement> = () => {
           setStartDate(shortcut.startDate);
           setEndDate(shortcut.endDate);
-          setShortcutSelectedId(shortcut.id);
         };
 
         return (
@@ -142,16 +174,17 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
     // ---------------
     dayClassName,
     monthClassName,
-    setStartDate,
-    setEndDate,
-    endDate,
-    startDate,
     selectsRange,
     onChange,
     withTimeRange,
     withShortcuts,
     locale = 'en',
   } = props;
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const date: DateRange | Date | null = selectsRange ? ({startDate, endDate}) : startDate;
 
   useEffect(() => {
     if (locale === 'he') {
@@ -162,17 +195,20 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
 
   const containerClassName = useMemo(() => {
     let className = locale === 'he' ? 'pickerContainer-rtl' : 'pickerContainer';
-    if(withShortcuts) {
+    if(withShortcuts && selectsRange) {
       className += ' pickerContainer-withShortcuts'
     }
 
     return className;
-  }, [locale, withShortcuts]) 
+  }, [locale, withShortcuts, selectsRange])
+
 
   return (
     <div className={containerClassName} style={{ direction: locale === 'he' ? 'rtl' : 'ltr' }}>
       <DatePicker
         {...props}
+        startDate={startDate}
+        endDate={isDateRange(date) ? endDate : undefined}
         monthsShown={props.monthsShown ?? 2}
         calendarClassName={`pickerCalendar ${calendarClassName}`}
         weekDayClassName={(date) => {
@@ -186,21 +222,26 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
         }}
         onChange={(date, event) => {
           if (date) {
-            if (Array.isArray(date) && setStartDate && setEndDate) {
+            if (Array.isArray(date)) {
               const [start, end] = date;
               setStartDate(start);
               setEndDate(end);
+
+              onChange?.({ startDate: start, endDate: end }, event);
+            } else {
+              onChange?.(date, event);
             }
           }
-
-          onChange?.(date, event);
         }}
         customInput={<CustomInput />}
-        showTimeInput={!!withShortcuts}
+        showTimeInput={!!(withShortcuts && selectsRange)}
         timeInputLabel=""
-        customTimeInput={withShortcuts && <ShortcutsContainer shortcuts={withShortcuts} setEndDate={setEndDate} setStartDate={setStartDate} />}
+        customTimeInput={
+          withShortcuts &&
+          isDateRange(date) && <ShortcutsContainer shortcuts={withShortcuts} setEndDate={setEndDate} setStartDate={setStartDate} dateRange={date} />
+        }
       >
-        {setEndDate && setStartDate && selectsRange && withTimeRange && (
+        {selectsRange && withTimeRange && isDateRange(date) && (
           <TimeRangeInput
             timeRangeInputsWrapperClassName={timeRangeInputsWrapperClassName}
             startTimeWrapperClassName={startTimeWrapperClassName}

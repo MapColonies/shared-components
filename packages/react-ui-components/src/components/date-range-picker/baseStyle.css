@@ -15,8 +15,14 @@
   float: right;
 }
 
-.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
+/* RTL previous with shortcuts fix */
+.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
   left: calc(2px + var(--shortcuts-container-width));
+}
+
+/* LTR previous with shortcuts fix */
+.pickerContainer-withShortcuts .react-datepicker__navigation--next:not(.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--next) {
+  right: calc(2px + var(--shortcuts-container-width));
 }
 
 .shortcutsContainer {

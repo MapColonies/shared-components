@@ -20,7 +20,7 @@
 
   --date-picker-shortcuts-hover-background: #D2E1F9;
   --date-picker-shortcuts-background: #2D3748;
-  --date-picker-shortcuts-font-color: rgba(255, 255, 255, 1);
+  --date-picker-shortcuts-font-color: rgba(0, 0, 0, 0.87);
   /* -------------------------------------- */
 }
 
@@ -91,6 +91,5 @@
 
 .shortcut.mdc-button {
   background-color:  var(--date-picker-shortcuts-background);
-  font-size: 0.8rem;
-  min-height: 2rem;
+  min-height: 2.5rem;
 }

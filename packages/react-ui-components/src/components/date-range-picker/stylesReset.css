@@ -1,6 +1,7 @@
 .react-datepicker__day[aria-disabled='true'] {
   user-select: none;
-  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .wrapper input {

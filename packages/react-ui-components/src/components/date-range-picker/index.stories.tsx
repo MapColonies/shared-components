@@ -1,9 +1,7 @@
 import { DateRangePicker } from '.';
 import { Meta, StoryObj } from '@storybook/react';
-
 import './styles';
-import { useState } from 'react';
-import { endOfMonth, endOfWeek, endOfYear, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
+import { endOfWeek, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 
 const meta: Meta<typeof DateRangePicker> = {
   component: DateRangePicker,
@@ -12,9 +10,6 @@ const meta: Meta<typeof DateRangePicker> = {
 type Story = StoryObj<typeof DateRangePicker>;
 
 function DateRangePickerExample() {
-  const [dateStart, setDateStart] = useState<Date | null>(null);
-  const [dateEnd, setDateEnd] = useState<Date | null>(null);
-
   return (
     <>
       <DateRangePicker
@@ -25,14 +20,11 @@ function DateRangePickerExample() {
         monthClassName={() => 'month'}
         shouldCloseOnSelect={false}
         selectsRange
-        setEndDate={setDateEnd}
-        setStartDate={setDateStart}
-        startDate={dateStart}
-        endDate={dateEnd}
         locale="he"
         autoFocus={false}
         dateFormat="dd/MM/yyyy"
         placeholderText="Pick date and time range"
+        maxDate={new Date()}
         withShortcuts={[
           {id: "1", label: 'היום', startDate: new Date(), endDate: new Date()},
           {id: "2", label: 'מתחילת השבוע', startDate: startOfWeek(new Date(), {weekStartsOn: 0}), endDate: new Date()},
