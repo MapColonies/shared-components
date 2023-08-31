@@ -61,6 +61,7 @@
 }
 
 /* Selected Dates */
+.pickerDay.react-datepicker__day--selected,
 .pickerDay.react-datepicker__day--in-range {
   background-color: var(--date-picker-selected-day-background);
   color: var(--date-picker-selected-day-font-color);

@@ -1,13 +1,12 @@
 import { forwardRef, useEffect, useMemo, useState } from 'react';
-import DatePicker, { registerLocale } from 'react-datepicker';
+import DatePicker, { registerLocale, ReactDatePickerProps } from 'react-datepicker';
 import datePickerHebrewLocale from 'date-fns/locale/he';
 import moment from 'moment';
-import { ExtractProps } from '../typeHelpers';
+// import { ExtractProps } from '../typeHelpers';
 import { TextField } from '../textfield';
 import { Button } from '../button';
 import { isSameDay } from 'date-fns';
-
-type OriginalPickerProps = ExtractProps<typeof DatePicker>;
+import { ExtractProps } from '../typeHelpers';
 
 export interface TimeRangeInputProps {
   setStartDate?: (startDate: Date | null) => void;
@@ -24,10 +23,10 @@ export interface TimeRangeInputProps {
 }
 
 interface Shortcut {
-  id: string,
-  label: string,
-  startDate: Date,
-  endDate: Date,
+  id: string;
+  label: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 interface DateRange {
@@ -36,22 +35,31 @@ interface DateRange {
 }
 
 const isDateRange = (date?: DateRange | Date | null): date is DateRange => {
-  return typeof date !== 'undefined' && date !== null && "startDate" in date && "endDate" in date;
-}
+  return typeof date !== 'undefined' && date !== null && 'startDate' in date && 'endDate' in date;
+};
 
-type DateRangePickerPropsToExclude = 'onChange' | 'customTimeInput' | 'timeInputLabel' | 'startDate' | 'endDate' |  'setStartDate' | 'setEndDate';
-export interface DateRangePickerProps extends Omit<OriginalPickerProps & TimeRangeInputProps, DateRangePickerPropsToExclude> {
+type DateRangePickerPropsToExclude =
+  | 'selectsRange'
+  | 'onChange'
+  | 'customTimeInput'
+  | 'timeInputLabel'
+  | 'startDate'
+  | 'endDate'
+  | 'setStartDate'
+  | 'setEndDate';
+export interface ExtraDateRangePickerProps {
   locale?: 'he' | 'en';
-  onChange?: (date: DateRange | Date, event?: React.SyntheticEvent<any>) => void;
-  withTimeRange?: boolean;
+  onChange?: (date: DateRange | Date | null, event?: React.SyntheticEvent<any>) => void;
+  // withTimeRange?: boolean;
   withShortcuts?: (Shortcut | (() => Shortcut))[];
+  selectsRange?: boolean;
 }
 
 interface ShortcutsProps {
   setStartDate?: (startDate: Date | null) => void;
   setEndDate?: (endDate: Date | null) => void;
   shortcuts: (Shortcut | (() => Shortcut))[];
-  dateRange: DateRange
+  dateRange: DateRange;
 }
 
 export const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
@@ -118,28 +126,30 @@ const CustomInput = forwardRef<HTMLInputElement, React.HTMLProps<HTMLInputElemen
 
 const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {}, setEndDate = () => {}, shortcuts, dateRange }) => {
   const [shortcutSelectedId, setShortcutSelectedId] = useState<string>();
-  const shortcutsList = useMemo(() => shortcuts.map(shortcutOrFunction => shortcutOrFunction instanceof Function ? shortcutOrFunction() : shortcutOrFunction), [shortcuts])
+  const shortcutsList = useMemo(
+    () => shortcuts.map((shortcutOrFunction) => (shortcutOrFunction instanceof Function ? shortcutOrFunction() : shortcutOrFunction)),
+    [shortcuts]
+  );
 
-    useEffect(() => {
-      for(const shortcut of shortcutsList) {
-        const isSelectedRangeAsShortcut =
-          dateRange.startDate &&
-          dateRange.endDate &&
-          isSameDay(shortcut.startDate, dateRange.startDate) &&
-          isSameDay(shortcut.endDate, dateRange.endDate);
+  useEffect(() => {
+    for (const shortcut of shortcutsList) {
+      const isSelectedRangeAsShortcut =
+        dateRange.startDate &&
+        dateRange.endDate &&
+        isSameDay(shortcut.startDate, dateRange.startDate) &&
+        isSameDay(shortcut.endDate, dateRange.endDate);
 
-        if(shortcutSelectedId) {
-          if(shortcut.id === shortcutSelectedId){
-            if(!isSelectedRangeAsShortcut) {
-              setShortcutSelectedId(undefined);
-            } 
+      if (shortcutSelectedId) {
+        if (shortcut.id === shortcutSelectedId) {
+          if (!isSelectedRangeAsShortcut) {
+            setShortcutSelectedId(undefined);
           }
-        } else if(isSelectedRangeAsShortcut) {
-          setShortcutSelectedId(shortcut.id);
         }
+      } else if (isSelectedRangeAsShortcut) {
+        setShortcutSelectedId(shortcut.id);
       }
-
-  }, [dateRange, shortcutSelectedId, shortcutsList])
+    }
+  }, [dateRange, shortcutSelectedId, shortcutsList]);
 
   return (
     <div className="shortcutsContainer">
@@ -150,33 +160,42 @@ const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {},
         };
 
         return (
-          <Button className={`shortcut ${shortcutSelectedId === shortcut.id ? 'selected' : ''}`} key={shortcut.id + i} onClick={handleShortcutClick} unelevated ripple={false} outlined>
+          <Button
+            type="button"
+            className={`shortcut ${shortcutSelectedId === shortcut.id ? 'selected' : ''}`}
+            key={shortcut.id + i}
+            onClick={handleShortcutClick}
+            unelevated
+            ripple={false}
+            outlined
+          >
             {shortcut.label}
           </Button>
         );
       })}
     </div>
   );
-}
+};
 
-export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
-
+export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps> = (
+  props
+) => {
   const {
     // Time range input props
-    endTimeInputClassName,
-    endTimeLabel,
-    endTimeWrapperClassName,
-    timeRangeInputsWrapperClassName,
-    startTimeInputClassName,
-    startTimeLabel,
-    startTimeWrapperClassName,
-    calendarClassName,
+    // endTimeInputClassName,
+    // endTimeLabel,
+    // endTimeWrapperClassName,
+    // timeRangeInputsWrapperClassName,
+    // startTimeInputClassName,
+    // startTimeLabel,
+    // startTimeWrapperClassName,
     // ---------------
+    calendarClassName,
     dayClassName,
     monthClassName,
     selectsRange,
     onChange,
-    withTimeRange,
+    // withTimeRange,
     withShortcuts,
     locale = 'en',
   } = props;
@@ -184,7 +203,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const date: DateRange | Date | null = selectsRange ? ({startDate, endDate}) : startDate;
+  const date: DateRange | Date | null = selectsRange ? { startDate, endDate } : startDate;
 
   useEffect(() => {
     if (locale === 'he') {
@@ -195,19 +214,19 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
 
   const containerClassName = useMemo(() => {
     let className = locale === 'he' ? 'pickerContainer-rtl' : 'pickerContainer';
-    if(withShortcuts && selectsRange) {
-      className += ' pickerContainer-withShortcuts'
+    if (withShortcuts && selectsRange) {
+      className += ' pickerContainer-withShortcuts';
     }
 
     return className;
-  }, [locale, withShortcuts, selectsRange])
-
+  }, [locale, withShortcuts, selectsRange]);
 
   return (
     <div className={containerClassName} style={{ direction: locale === 'he' ? 'rtl' : 'ltr' }}>
       <DatePicker
         {...props}
-        startDate={startDate}
+        startDate={isDateRange(date) ? startDate : undefined}
+        selected={!isDateRange(date) ? startDate : undefined}
         endDate={isDateRange(date) ? endDate : undefined}
         monthsShown={props.monthsShown ?? 2}
         calendarClassName={`pickerCalendar ${calendarClassName}`}
@@ -220,17 +239,16 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
         monthClassName={(date) => {
           return `pickerMonth ${monthClassName?.(date) ?? ''}`;
         }}
-        onChange={(date, event) => {
-          if (date) {
-            if (Array.isArray(date)) {
-              const [start, end] = date;
-              setStartDate(start);
-              setEndDate(end);
+        onChange={(newDate, event) => {
+          if (Array.isArray(newDate)) {
+            const [start, end] = newDate;
+            setStartDate(start);
+            setEndDate(end);
 
-              onChange?.({ startDate: start, endDate: end }, event);
-            } else {
-              onChange?.(date, event);
-            }
+            onChange?.({ startDate: start, endDate: end }, event);
+          } else {
+            setStartDate(newDate);
+            onChange?.(newDate, event);
           }
         }}
         customInput={<CustomInput />}
@@ -241,7 +259,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
           isDateRange(date) && <ShortcutsContainer shortcuts={withShortcuts} setEndDate={setEndDate} setStartDate={setStartDate} dateRange={date} />
         }
       >
-        {selectsRange && withTimeRange && isDateRange(date) && (
+        {/* selectsRange && withTimeRange && isDateRange(date) && (
           <TimeRangeInput
             timeRangeInputsWrapperClassName={timeRangeInputsWrapperClassName}
             startTimeWrapperClassName={startTimeWrapperClassName}
@@ -255,7 +273,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
             setEndDate={setEndDate}
             setStartDate={setStartDate}
           />
-        )}
+        ) */}
       </DatePicker>
     </div>
   );
