@@ -21,7 +21,49 @@
   --date-picker-shortcuts-hover-background: #D2E1F9;
   --date-picker-shortcuts-background: #2D3748;
   --date-picker-shortcuts-font-color: rgba(0, 0, 0, 0.87);
+
+  --year-picker-background: #151A22;
+  --year-picker-font-color: rgba(255,255,255,.87);
+  --year-picker-border-color: #455570;
+
+  --date-picker-scrollbar-track-background: rgba(0, 0, 0, 0.87);
+  --date-picker-scrollbar-thumb-background: #2D3748;
+  --date-picker-scrollbar-thumb-hover-background: #D2E1F9;
   /* -------------------------------------- */
+}
+  /* Scrollbar styling */
+  
+  /* width */
+  .pickerContainer *::-webkit-scrollbar, .pickerContainer-rtl *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  /* Track */
+  .pickerContainer *::-webkit-scrollbar-track, .pickerContainer-rtl *::-webkit-scrollbar-track {
+    background: var(--date-picker-scrollbar-track-background);
+  }
+  
+  /* Handle */
+  .pickerContainer *::-webkit-scrollbar-thumb, .pickerContainer-rtl *::-webkit-scrollbar-thumb {
+    background: var(--date-picker-scrollbar-thumb-background);
+  }
+  
+  /* Handle on hover */
+  .pickerContainer *::-webkit-scrollbar-thumb:hover, .pickerContainer-rtl *::-webkit-scrollbar-thumb:hover {
+    background: var(--date-picker-scrollbar-thumb-hover-background); 
+  
+    /* ***************** */
+  }
+
+.react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll  {
+  color: var(--date-picker-header-color);
+  font-size: 0.9rem;
+}
+
+.react-datepicker__year-dropdown.react-datepicker__year-dropdown--scrollable {
+  background: var(--year-picker-background);
+  color: var(--year-picker-font-color);
+  border-color: var(--year-picker-border-color);
 }
 
 .pickerCalendar {

@@ -19,6 +19,7 @@
   justify-content: center;
   align-items: flex-start;
   height: 100%;
+  flex-direction: row-reverse;
 }
 
 .react-datepicker__header:not(.react-datepicker__header--has-time-select) {
@@ -37,4 +38,34 @@
 
 .react-datepicker {
   user-select: none;
+}
+
+.react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll {
+  position: absolute;
+  top: 9px;
+  z-index: 99;
+}
+
+.react-datepicker__year-dropdown-container--scroll {
+  margin: 0;
+  padding: 0;
+}
+
+.react-datepicker__year-dropdown--scrollable, .react-datepicker__month-year-dropdown--scrollable {
+  height: 150px;
+}
+
+.react-datepicker__year-dropdown, .react-datepicker__month-year-dropdown {
+  position: absolute;
+  width: 100px;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  z-index: 1;
+  text-align: center;
+  border-radius: 0.3rem;
+}
+
+.react-datepicker__year-read-view, .react-datepicker__month-year-read-view {
+  visibility: visible !important; 
 }

@@ -20,7 +20,7 @@ function DateRangePickerExample() {
         monthClassName={() => 'month'}
         shouldCloseOnSelect={false}
         selectsRange
-        locale="he"
+        locale="en"
         autoFocus={false}
         dateFormat="dd/MM/yyyy"
         placeholderText="Pick date and time range"
@@ -36,8 +36,13 @@ function DateRangePickerExample() {
           },
           {id: "4", label: 'מתחילת החודש', startDate: startOfMonth(new Date()), endDate: new Date()},
           {id: "5", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
+          {id: "6", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
+          {id: "7", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
         ]}
         isClearable
+        showYearDropdown
+        scrollableYearDropdown
+        dateFormatCalendar="MMMM"
       />
       <div>
         <a rel="noreferrer" target="_blank" href="https://reactdatepicker.com/">

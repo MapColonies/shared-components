@@ -11,17 +11,38 @@
   --shortcuts-container-width: 150px;
 }
 
+.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll:not(.pickerContainer-rtl.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll) {
+  left: -30px;
+}
+
+.pickerContainer-rtl .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll {
+  left: unset;
+}
+
 .pickerContainer-rtl .react-datepicker__month-container {
   float: right;
 }
 
-/* RTL previous with shortcuts fix */
-.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
+/* RTL previous fix position and rotation */
+.pickerContainer-rtl .react-datepicker__navigation--previous {
+  right: 2px;
+  transform: rotateY(180deg);
+}
+
+/* RTL next fix position and rotation */
+.pickerContainer-rtl .react-datepicker__navigation--next {
+  right: unset;
+  left: 2px;
+  transform: rotateY(180deg);
+}
+
+/* LTR previous with shortcut fix */
+.pickerContainer.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
   left: calc(2px + var(--shortcuts-container-width));
 }
 
-/* LTR previous with shortcuts fix */
-.pickerContainer-withShortcuts .react-datepicker__navigation--next:not(.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--next) {
+/* RTL next with shortcuts fix */
+.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--previous{
   right: calc(2px + var(--shortcuts-container-width));
 }
 
