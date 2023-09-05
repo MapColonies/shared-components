@@ -1,18 +1,17 @@
-import { DateRangePicker } from '.';
-import { Meta, StoryObj } from '@storybook/react';
+import { DateRangePicker as DateRangePickerWithPresets} from '.';
+import { Meta, Story } from '@storybook/react';
 import './styles';
 import { endOfWeek, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 
-const meta: Meta<typeof DateRangePicker> = {
-  component: DateRangePicker,
+const meta: Meta<typeof DateRangePickerWithPresets> = {
+  title: 'Date Range Picker With Presets',
+  component: DateRangePickerWithPresets,
 };
 
-type Story = StoryObj<typeof DateRangePicker>;
-
-function DateRangePickerExample() {
+export const DateRangePickerExample: Story = (args: Record<string, unknown>) => {
   return (
     <>
-      <DateRangePicker
+      <DateRangePickerWithPresets
         wrapperClassName="wrapper"
         calendarClassName="calendar"
         popperClassName="popper"
@@ -50,12 +49,5 @@ function DateRangePickerExample() {
   );
 }
 
-export const DateRangePickerStory: Story = {
-  render: () => (
-    <>
-      <DateRangePickerExample />
-    </>
-  ),
-};
 
 export default meta;

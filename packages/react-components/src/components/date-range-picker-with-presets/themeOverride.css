@@ -29,6 +29,7 @@
   --date-picker-scrollbar-track-background: rgba(0, 0, 0, 0.87);
   --date-picker-scrollbar-thumb-background: #2D3748;
   --date-picker-scrollbar-thumb-hover-background: #D2E1F9;
+
   /* -------------------------------------- */
 }
   /* Scrollbar styling */
@@ -133,12 +134,13 @@
   color: var(--date-picker-day-selecting-range-font-color);
 }
 
-.shortcut.mdc-button:hover,
-.shortcut.selected.mdc-button {
+.shortcut.mdc-button__ripple:hover,
+.shortcut.selected.mdc-button__ripple {
   background-color: var(--date-picker-shortcuts-hover-background);
   color: var(--date-picker-shortcuts-font-color);
 }
 
-.shortcut.mdc-button {
-  background-color:  var(--date-picker-shortcuts-background);
+.shortcut.mdc-button__ripple {
+   color:  var(--date-picker-shortcuts-hover-background);
+   border: 1px solid currentColor;
 }
