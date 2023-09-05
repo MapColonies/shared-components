@@ -1,4 +1,5 @@
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import React from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker, { registerLocale, ReactDatePickerProps } from 'react-datepicker';
 import datePickerHebrewLocale from 'date-fns/locale/he';
 import moment from 'moment';
@@ -46,7 +47,13 @@ type DateRangePickerPropsToExclude =
   | 'startDate'
   | 'endDate'
   | 'setStartDate'
-  | 'setEndDate';
+  | 'setEndDate'
+  | 'dropdownMode'
+  | 'showYearDropdown'
+  | 'showMonthDropdown'
+  | 'scrollableMonthYearDropdown'
+
+export type DateRangeFullProps = Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps;
 export interface ExtraDateRangePickerProps {
   locale?: 'he' | 'en';
   onChange?: (date: DateRange | Date | null, event?: React.SyntheticEvent<any>) => void;
@@ -58,6 +65,7 @@ export interface ExtraDateRangePickerProps {
 interface ShortcutsProps {
   setStartDate?: (startDate: Date | null) => void;
   setEndDate?: (endDate: Date | null) => void;
+  onShortcut?: () => void;
   shortcuts: (Shortcut | (() => Shortcut))[];
   dateRange: DateRange;
 }
@@ -120,11 +128,23 @@ export const TimeRangeInput: React.FC<TimeRangeInputProps> = ({
   );
 };
 
-const CustomInput = forwardRef<HTMLInputElement, React.HTMLProps<HTMLInputElement>>(({ value, onClick, ...props }, ref) => (
-  <TextField {...props} className="dateRangeCustomInput" readOnly onClick={onClick} ref={ref} value={value as string} />
-));
+const CustomInput = forwardRef<HTMLInputElement, React.HTMLProps<HTMLInputElement> & { onInputClick?: () => void }>(
+  ({ value, onClick, onInputClick: clickSideEffect, ...props }, ref) => (
+    <TextField
+      {...props}
+      className="dateRangeCustomInput"
+      readOnly
+      onClick={(e) => {
+        onClick?.(e);
+        clickSideEffect?.();
+      }}
+      ref={ref}
+      value={value as string}
+    />
+  )
+);
 
-const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {}, setEndDate = () => {}, shortcuts, dateRange }) => {
+const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {}, setEndDate = () => {}, shortcuts, dateRange, onShortcut }) => {
   const [shortcutSelectedId, setShortcutSelectedId] = useState<string>();
   const shortcutsList = useMemo(
     () => shortcuts.map((shortcutOrFunction) => (shortcutOrFunction instanceof Function ? shortcutOrFunction() : shortcutOrFunction)),
@@ -164,7 +184,10 @@ const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {},
             type="button"
             className={`shortcut ${shortcutSelectedId === shortcut.id ? 'selected' : ''}`}
             key={shortcut.id + i}
-            onClick={handleShortcutClick}
+            onClick={(e) => {
+              handleShortcutClick(e);
+              onShortcut?.();
+            }}
             unelevated
             ripple={false}
             outlined
@@ -177,8 +200,9 @@ const ShortcutsContainer: React.FC<ShortcutsProps> = ({ setStartDate = () => {},
   );
 };
 
-export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps> = (
-  props
+export const DateRangePicker = React.forwardRef<DatePicker, DateRangeFullProps>((
+  props,
+  ref
 ) => {
   const {
     // Time range input props
@@ -195,6 +219,7 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
     monthClassName,
     selectsRange,
     onChange,
+    showMonthYearDropdown,
     // withTimeRange,
     withShortcuts,
     locale = 'en',
@@ -202,7 +227,7 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const date: DateRange | Date | null = selectsRange ? { startDate, endDate } : startDate;
 
   useEffect(() => {
@@ -212,8 +237,10 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
     }
   }, [locale]);
 
+
   const containerClassName = useMemo(() => {
-    let className = locale === 'he' ? 'pickerContainer-rtl' : 'pickerContainer';
+    let className = 'pickerContainer' + (locale === 'he' ? ' pickerContainer-rtl' : '');
+    
     if (withShortcuts && selectsRange) {
       className += ' pickerContainer-withShortcuts';
     }
@@ -221,12 +248,21 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
     return className;
   }, [locale, withShortcuts, selectsRange]);
 
+  const monthsYearsDropdown = showMonthYearDropdown ? {
+    showMonthDropdown: true,
+    showYearDropdown: true,
+    dropdownMode: "select" as any
+  } : {}
+
   return (
     <div className={containerClassName} style={{ direction: locale === 'he' ? 'rtl' : 'ltr' }}>
       <DatePicker
         {...props}
+        ref={ref}
+        onClickOutside={() => setCalendarOpen(false)}
+        open={calendarOpen}
         startDate={isDateRange(date) ? startDate : undefined}
-        selected={!isDateRange(date) ? startDate : undefined}
+        selected={startDate}
         endDate={isDateRange(date) ? endDate : undefined}
         monthsShown={props.monthsShown ?? 2}
         calendarClassName={`pickerCalendar ${calendarClassName}`}
@@ -251,13 +287,21 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
             onChange?.(newDate, event);
           }
         }}
-        customInput={<CustomInput />}
+        customInput={<CustomInput onInputClick={()=> {
+          setCalendarOpen(true)
+        }} />}
         showTimeInput={!!(withShortcuts && selectsRange)}
         timeInputLabel=""
         customTimeInput={
           withShortcuts &&
-          isDateRange(date) && <ShortcutsContainer shortcuts={withShortcuts} setEndDate={setEndDate} setStartDate={setStartDate} dateRange={date} />
+          isDateRange(date) && <ShortcutsContainer onShortcut={() => {
+            setCalendarOpen(false)
+          }} shortcuts={withShortcuts} setEndDate={setEndDate} setStartDate={setStartDate} dateRange={date} />
         }
+        // We don't want it, just use it as our own
+        showMonthYearDropdown={undefined}
+        {...monthsYearsDropdown}
+
       >
         {/* selectsRange && withTimeRange && isDateRange(date) && (
           <TimeRangeInput
@@ -277,4 +321,4 @@ export const DateRangePicker: React.FC<Omit<ExtractProps<typeof DatePicker>, Dat
       </DatePicker>
     </div>
   );
-};
+}) as React.ForwardRefExoticComponent<DateRangeFullProps>;

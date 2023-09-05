@@ -35,11 +35,10 @@ function DateRangePickerExample() {
             return { id: "3", label: 'שבוע שעבר', startDate: lastWeekStart, endDate: lastWeekEnd }
           },
           {id: "4", label: 'מתחילת החודש', startDate: startOfMonth(new Date()), endDate: new Date()},
-          {id: "5", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()}
+          {id: "5", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
         ]}
         isClearable
-        showYearDropdown
-        scrollableYearDropdown
+        showMonthYearDropdown
         dateFormatCalendar="MMMM"
       />
       <div>

@@ -1,4 +1,4 @@
-.pickerContainer, .pickerContainer-rtl {
+.pickerContainer {
   /* Theme Variables - `date-picker` prefixed */
 
   --date-picker-calendar-background: #151A22;
@@ -22,9 +22,9 @@
   --date-picker-shortcuts-background: #2D3748;
   --date-picker-shortcuts-font-color: rgba(0, 0, 0, 0.87);
 
-  --year-picker-background: #151A22;
-  --year-picker-font-color: rgba(255,255,255,.87);
-  --year-picker-border-color: #455570;
+  --month-year-pickers-background: #151A22;
+  --month-year-pickers-font-color: rgba(255,255,255,.87);
+  --month-year-pickers-border-color: #455570;
 
   --date-picker-scrollbar-track-background: rgba(0, 0, 0, 0.87);
   --date-picker-scrollbar-thumb-background: #2D3748;
@@ -34,22 +34,22 @@
   /* Scrollbar styling */
   
   /* width */
-  .pickerContainer *::-webkit-scrollbar, .pickerContainer-rtl *::-webkit-scrollbar {
+  .pickerContainer *::-webkit-scrollbar {
     width: 8px;
   }
 
   /* Track */
-  .pickerContainer *::-webkit-scrollbar-track, .pickerContainer-rtl *::-webkit-scrollbar-track {
+  .pickerContainer *::-webkit-scrollbar-track {
     background: var(--date-picker-scrollbar-track-background);
   }
   
   /* Handle */
-  .pickerContainer *::-webkit-scrollbar-thumb, .pickerContainer-rtl *::-webkit-scrollbar-thumb {
+  .pickerContainer *::-webkit-scrollbar-thumb {
     background: var(--date-picker-scrollbar-thumb-background);
   }
   
   /* Handle on hover */
-  .pickerContainer *::-webkit-scrollbar-thumb:hover, .pickerContainer-rtl *::-webkit-scrollbar-thumb:hover {
+  .pickerContainer *::-webkit-scrollbar-thumb:hover {
     background: var(--date-picker-scrollbar-thumb-hover-background); 
   
     /* ***************** */
@@ -60,16 +60,22 @@
   font-size: 0.9rem;
 }
 
-.react-datepicker__year-dropdown.react-datepicker__year-dropdown--scrollable {
-  background: var(--year-picker-background);
-  color: var(--year-picker-font-color);
-  border-color: var(--year-picker-border-color);
+.react-datepicker__year-select,
+.react-datepicker__month-select {
+  background: var(--month-year-pickers-background);
+  color: var(--month-year-pickers-font-color);
+  border-color: var(--month-year-pickers-border-color);
+}
+.react-datepicker__month-select:focus,
+.react-datepicker__year-select:focus {
+  outline: none;
 }
 
 .pickerCalendar {
   background-color: var(--date-picker-calendar-background);
   border: none;
-  height: 270px;
+  width: var(--picker-container-width);
+  height: var(--picker-container-height);
 }
 
 .pickerDay {
@@ -79,6 +85,7 @@
 
 .react-datepicker__header {
   background-color: var(--date-picker-header-background);
+  width: calc(var(--picker-container-width) / 2);
 }
 
 .react-datepicker__current-month,
@@ -134,5 +141,4 @@
 
 .shortcut.mdc-button {
   background-color:  var(--date-picker-shortcuts-background);
-  min-height: 2.5rem;
 }

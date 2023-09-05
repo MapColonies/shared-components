@@ -1,22 +1,20 @@
-.timeRangeWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex: 1;
-  padding: 10px;
+.pickerContainer {
+  --picker-container-width: 560px;
+  --picker-container-height: 300px;
 }
 
 .pickerContainer-withShortcuts {
-  --shortcuts-container-width: 150px;
+  --picker-container-height: 350px;
+  --shortcuts-container-width: calc(var(--picker-container-width) - 20px);
 }
 
-.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll:not(.pickerContainer-rtl.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll) {
+.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown:not(.pickerContainer-rtl.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown) {
+  right: 0px;
+}
+
+.pickerContainer-rtl .react-datepicker__header__dropdown.react-datepicker__header__dropdown {
+  right: unset;
   left: -30px;
-}
-
-.pickerContainer-rtl .react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll {
-  left: unset;
 }
 
 .pickerContainer-rtl .react-datepicker__month-container {
@@ -36,31 +34,52 @@
   transform: rotateY(180deg);
 }
 
-/* LTR previous with shortcut fix */
-.pickerContainer.pickerContainer-withShortcuts .react-datepicker__navigation--previous {
-  left: calc(2px + var(--shortcuts-container-width));
-}
-
-/* RTL next with shortcuts fix */
-.pickerContainer-rtl.pickerContainer-withShortcuts .react-datepicker__navigation--previous{
-  right: calc(2px + var(--shortcuts-container-width));
-}
-
 .shortcutsContainer {
+  position: absolute;
+  bottom: -20px;
+  right: 10px;
+  left: 10px;
   display: flex;
-  flex-direction: column;
-  background-color: var(--date-picker-header-background);
+  flex-direction: row;
   width: var(--shortcuts-container-width);
-  align-items: center;
-  overflow-y: auto;
-  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 80px;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-.shortcut {
-    width: 80%;
-    height: 40px;
-    color: white;
-    padding: 0;
-    margin: 0;
-    margin-top: 10px;
+
+.shortcut.mdc-button {
+  min-width: 60px;
+  max-width: 80px;
+  height: 0px;
+  padding: 20px;
+}
+
+/* Date and year pickers */
+
+.pickerContainer-rtl .react-datepicker__month-select {
+  left: 0px; 
+  top: 4px; 
+  transform: translateX(-50%);
+}
+
+.pickerContainer-rtl .react-datepicker__year-select {
+  left: 0px;
+  top: 28px;
+  transform: translateX(-50%);
+}
+
+.pickerContainer .react-datepicker__month-select:not(.pickerContainer.pickerContainer-rtl .react-datepicker__month-select) {
+  right: 0px; 
+  top: 4px; 
+  transform: translateX(50%);
+}
+
+.pickerContainer .react-datepicker__year-select:not(.pickerContainer.pickerContainer-rtl .react-datepicker__year-select) {
+  right: 0px;
+  top: 28px;
+  transform: translateX(50%);
 }
