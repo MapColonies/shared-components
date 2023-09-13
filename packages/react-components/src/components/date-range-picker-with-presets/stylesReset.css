@@ -62,3 +62,8 @@
 .react-datepicker__year-read-view, .react-datepicker__month-year-read-view {
   visibility: visible !important; 
 }
+
+/* Padding input when close icon is rendered to prevent date hiding under the button */
+.dateRangeCustomInput:has(~ .react-datepicker__close-icon) .mdc-text-field__input{
+  padding-inline: 12px;
+} 

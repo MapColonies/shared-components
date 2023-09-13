@@ -134,13 +134,13 @@
   color: var(--date-picker-day-selecting-range-font-color);
 }
 
-.shortcut.mdc-button__ripple:hover,
-.shortcut.selected.mdc-button__ripple {
+.shortcut.mdc-button--outlined:not(:disabled):hover,
+.shortcut.selected.mdc-button--outlined:not(:disabled) {
   background-color: var(--date-picker-shortcuts-hover-background);
   color: var(--date-picker-shortcuts-font-color);
 }
 
-.shortcut.mdc-button__ripple {
+.shortcut.mdc-button--outlined:not(:disabled) {
    color:  var(--date-picker-shortcuts-hover-background);
    border: 1px solid currentColor;
 }
