@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import datePickerHebrewLocale from 'date-fns/locale/he';
 import moment from 'moment';
-import { endOfDay, isSameDay } from 'date-fns';
+import { endOfDay, isEqual, isSameDay } from 'date-fns';
 import { ExtractProps } from '../typeHelpers';
 
 export interface TimeRangeInputProps {
@@ -42,8 +42,6 @@ type DateRangePickerPropsToExclude =
   | 'onChange'
   | 'customTimeInput'
   | 'timeInputLabel'
-  | 'startDate'
-  | 'endDate'
   | 'setStartDate'
   | 'setEndDate'
   | 'dropdownMode'
@@ -58,6 +56,7 @@ type DateRangePickerPropsToExclude =
     withShortcuts?: (Shortcut | (() => Shortcut))[];
     selectsRange?: boolean;
     inputName?: string;
+
   }
 
   export type DateRangeFullProps = Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps;
@@ -237,6 +236,17 @@ export const DateRangePicker = React.forwardRef<DatePicker, DateRangeFullProps>(
       registerLocale('he', datePickerHebrewLocale);
     }
   }, [locale]);
+
+  useEffect(() => {
+    if(props.startDate?.toString() !== startDate?.toString()) {
+      setStartDate(props.startDate as Date);
+    }
+    
+    if(props.endDate?.toString() !== endDate?.toString()) {
+      setEndDate(props.endDate as Date);
+    }
+    
+  }, [props.startDate, props.endDate, startDate, endDate])
 
 
   const containerClassName = useMemo(() => {
