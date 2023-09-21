@@ -38,6 +38,8 @@
     "@rmwc/theme": "^8.0.8",
     "@rmwc/tooltip": "^8.0.8",
     "@rmwc/typography": "^8.0.8",
+    "date-fns": "^2.30.0",
+    "moment": "^2.29.4",
     "react-contexify": "^6.0.0",
     "storybook-dark-mode": "^3.0.0",
     "tslib": "^2.5.3"
@@ -45,6 +47,7 @@
   "devDependencies": {
     "@rmwc/types": "^8.0.8",
     "@types/node": "^20.3.1",
+    "@types/react-datepicker": "^4.15.0",
     "rimraf": "^5.0.1"
   },
   "files": [
