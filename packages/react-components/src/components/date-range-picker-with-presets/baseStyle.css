@@ -1,0 +1,85 @@
+.pickerContainer {
+  --picker-container-width: 560px;
+  --picker-container-height: 300px;
+}
+
+.pickerContainer-withShortcuts {
+  --picker-container-height: 350px;
+  --shortcuts-container-width: calc(var(--picker-container-width) - 20px);
+}
+
+.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown:not(.pickerContainer-rtl.pickerContainer .react-datepicker__header__dropdown.react-datepicker__header__dropdown) {
+  right: 0px;
+}
+
+.pickerContainer-rtl .react-datepicker__header__dropdown.react-datepicker__header__dropdown {
+  right: unset;
+  left: -30px;
+}
+
+.pickerContainer-rtl .react-datepicker__month-container {
+  float: right;
+}
+
+/* RTL previous fix position and rotation */
+.pickerContainer-rtl .react-datepicker__navigation--previous {
+  right: 2px;
+  transform: rotateY(180deg);
+}
+
+/* RTL next fix position and rotation */
+.pickerContainer-rtl .react-datepicker__navigation--next {
+  right: unset;
+  left: 2px;
+  transform: rotateY(180deg);
+}
+
+.shortcutsContainer {
+  position: absolute;
+  bottom: -20px;
+  right: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: row;
+  width: var(--shortcuts-container-width);
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 80px;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+
+.shortcut.mdc-button {
+  min-width: 60px;
+  max-width: 80px;
+  height: 0px;
+  padding: 20px;
+}
+
+/* Date and year pickers */
+
+.pickerContainer-rtl .react-datepicker__month-select {
+  left: 0px; 
+  top: 4px; 
+  transform: translateX(-50%);
+}
+
+.pickerContainer-rtl .react-datepicker__year-select {
+  left: 0px;
+  top: 28px;
+  transform: translateX(-50%);
+}
+
+.pickerContainer .react-datepicker__month-select:not(.pickerContainer.pickerContainer-rtl .react-datepicker__month-select) {
+  right: 0px; 
+  top: 4px; 
+  transform: translateX(50%);
+}
+
+.pickerContainer .react-datepicker__year-select:not(.pickerContainer.pickerContainer-rtl .react-datepicker__year-select) {
+  right: 0px;
+  top: 28px;
+  transform: translateX(50%);
+}

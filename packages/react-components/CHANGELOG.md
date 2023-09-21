@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.1...@map-colonies/react-components@4.1.2) (2023-09-21)
+
+
+### Bug Fixes
+
+* date range picker set date externally ([9b30e52](https://github.com/MapColonies/shared-components/commit/9b30e52a49abd2f589721302b6e11614259adf91))
+* move date range picker to react-components ([fdee109](https://github.com/MapColonies/shared-components/commit/fdee1096a3e7de848055948ec308321f04047bf9))
+* styles and functionalities after app integration ([1f7da2f](https://github.com/MapColonies/shared-components/commit/1f7da2f168beaaeb2a2736128c06abffe5803354))
+* whole world footprint correction support single geometries ([c2be718](https://github.com/MapColonies/shared-components/commit/c2be7181030ea02e02a59e4a01ed4ed803ce6bad))
+
+
+
+
+
 ## [4.1.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.0...@map-colonies/react-components@4.1.1) (2023-08-15)
 
 
