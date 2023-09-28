@@ -290,6 +290,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         );
         const pickRay = mapViewRef.scene.camera.getPickRay(windowPosition);
         const pickPosition = mapViewRef.scene.globe.pick(pickRay as Ray, mapViewRef.scene);
+        
+        // When camera is tilted towards the sky in 3d mode, pick couldn't pick the position and returns undefined,
+        // Then the cartesianToCartographic will crash the map.
+        if(!pickPosition) return ({
+          longitude: 0,
+          latitude: 0,
+          height: 0,
+        });
+
         const pickPositionCartographic = mapViewRef.scene.globe.ellipsoid.cartesianToCartographic(pickPosition as Cartesian3);
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
