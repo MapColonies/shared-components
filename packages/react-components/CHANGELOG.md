@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.2...@map-colonies/react-components@4.1.3) (2023-09-28)
+
+
+### Bug Fixes
+
+* camera position sampling crash on 3d mode MAPCO-3524 ([30a2e22](https://github.com/MapColonies/shared-components/commit/30a2e2239c7e325eeb1f53a4867fd2fd6158831c))
+
+
+
+
+
 ## [4.1.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.1...@map-colonies/react-components@4.1.2) (2023-09-21)
 
 
