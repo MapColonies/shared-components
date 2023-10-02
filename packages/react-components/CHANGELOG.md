@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.3...@map-colonies/react-components@4.2.0) (2023-10-02)
+
+
+### Features
+
+* support finding hidden layers in poi via findLayerByPOI ([961a67f](https://github.com/MapColonies/shared-components/commit/961a67fe5164a0b06495e5bd02cf6eeb4ecd0d84))
+
+
+
+
+
 ## [4.1.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.2...@map-colonies/react-components@4.1.3) (2023-09-28)
 
 
