@@ -408,7 +408,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           imageryMenuPosition &&
           rightClickCoordinates &&
           React.cloneElement(props.imageryContextMenu, {
-            data: mapViewRef?.layersManager?.findLayerByPOI(imageryMenuPosition.x as number, imageryMenuPosition.y as number) as unknown as Record<
+            data: mapViewRef?.layersManager?.findLayerByPOI(imageryMenuPosition.x as number, imageryMenuPosition.y as number, false) as unknown as Record<
               string,
               unknown
             >[],

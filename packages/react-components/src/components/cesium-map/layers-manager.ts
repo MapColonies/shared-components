@@ -340,7 +340,7 @@ class LayerManager {
     return nonBaseLayers;
   }
 
-  public findLayerByPOI(x: number, y: number): ICesiumImageryLayer[] | undefined {
+  public findLayerByPOI(x: number, y: number, onlyShown = true): ICesiumImageryLayer[] | undefined {
     if (this.layerManagerFootprintMetaFieldPath) {
       const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
 
@@ -360,7 +360,7 @@ class LayerManager {
           });
           /* eslint-enable */
 
-          return isInLayer && layer.show;
+          return isInLayer && (onlyShown ? layer.show : true);
         } else {
           console.warn('[LayerManager] [findLayerByPOI] CesiumImageryLayer has no defined footprint', layer.meta);
           return false;
