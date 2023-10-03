@@ -159,6 +159,7 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
         return <CesiumPolylineGraphics positions={coordinates} width={outlineWidth ?? 1} material={material ?? drawingMaterial} />;
       }
     } catch(e) {
+      console.error(e);
       return <></>;
     }
   };
