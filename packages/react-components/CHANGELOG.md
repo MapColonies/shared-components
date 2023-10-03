@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.2.0...@map-colonies/react-components@4.2.1) (2023-10-03)
+
+
+### Bug Fixes
+
+* catch geoJSONToPrimitive to fix crash ([e24f417](https://github.com/MapColonies/shared-components/commit/e24f4171844d9978955cec69b4be0e17de57eed8))
+* log catched error ([c4a02da](https://github.com/MapColonies/shared-components/commit/c4a02da047274a896228f627d8e27f5c560165c5))
+
+
+
+
+
 # [4.2.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.1.3...@map-colonies/react-components@4.2.0) (2023-10-02)
 
 
