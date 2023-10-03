@@ -136,7 +136,9 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
     <div className="scalePosition">
       {isNumber(scaleData.barWidth) && (
         <>
-          <div className="distance-legend-label">{scaleData.distanceLabel}</div>
+          <div className="distance-legend-label">
+            <bdi>{scaleData.distanceLabel}</bdi>
+          </div>
           <div
             className="distance-legend-scale-bar"
             style={{
