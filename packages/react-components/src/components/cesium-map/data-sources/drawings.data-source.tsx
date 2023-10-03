@@ -133,29 +133,34 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
   }, [drawState, drawHelper]);
 
   const renderGraphicsComponent = (drawEntity: IDrawing): React.ReactElement => {
-    let coordinates: Rectangle | Cartesian3[] | undefined =
-      drawEntity.coordinates !== undefined ? drawEntity.coordinates : geoJSONToPrimitive(drawEntity.type, drawEntity.geojson as FeatureCollection);
-    if (hollow !== true) {
-      switch (drawEntity.type) {
-        case DrawType.BOX:
-          return <CesiumRectangleGraphics coordinates={coordinates as Rectangle} material={material ?? drawingMaterial} />;
-        case DrawType.POLYGON:
-          return <CesiumPolygonGraphics hierarchy={new PolygonHierarchy(coordinates as Cartesian3[])} material={material ?? drawingMaterial} />;
-        default:
-          return <></>;
+    try {
+      let coordinates: Rectangle | Cartesian3[] | undefined =
+        drawEntity.coordinates !== undefined ? drawEntity.coordinates : geoJSONToPrimitive(drawEntity.type, drawEntity.geojson as FeatureCollection);
+      if (hollow !== true) {
+        switch (drawEntity.type) {
+          case DrawType.BOX:
+            return <CesiumRectangleGraphics coordinates={coordinates as Rectangle} material={material ?? drawingMaterial} />;
+          case DrawType.POLYGON:
+            return <CesiumPolygonGraphics hierarchy={new PolygonHierarchy(coordinates as Cartesian3[])} material={material ?? drawingMaterial} />;
+          default:
+            return <></>;
+        }
+      } else {
+        switch (drawEntity.type) {
+          case DrawType.BOX:
+            coordinates = rectangleToPositions(coordinates as Rectangle);
+            break;
+          case DrawType.POLYGON:
+            coordinates = [...(coordinates as Cartesian3[]), (coordinates as Cartesian3[])[0]];
+            break;
+          default:
+            return <></>;
+        }
+        return <CesiumPolylineGraphics positions={coordinates} width={outlineWidth ?? 1} material={material ?? drawingMaterial} />;
       }
-    } else {
-      switch (drawEntity.type) {
-        case DrawType.BOX:
-          coordinates = rectangleToPositions(coordinates as Rectangle);
-          break;
-        case DrawType.POLYGON:
-          coordinates = [...(coordinates as Cartesian3[]), (coordinates as Cartesian3[])[0]];
-          break;
-        default:
-          return <></>;
-      }
-      return <CesiumPolylineGraphics positions={coordinates} width={outlineWidth ?? 1} material={material ?? drawingMaterial} />;
+    } catch(e) {
+      console.error(e);
+      return <></>;
     }
   };
 
