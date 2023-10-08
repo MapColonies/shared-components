@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.2.2...@map-colonies/react-components@4.3.0) (2023-10-08)
+
+
+### Features
+
+* clamp drawing selection to terrain ([aa08f2e](https://github.com/MapColonies/shared-components/commit/aa08f2e29ca1dc08efec7d14a227b1d31fdbbc12))
+
+
+
+
+
 ## [4.2.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.2.1...@map-colonies/react-components@4.2.2) (2023-10-03)
 
 
