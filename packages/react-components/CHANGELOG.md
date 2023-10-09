@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.3.0...@map-colonies/react-components@4.3.1) (2023-10-09)
+
+
+### Bug Fixes
+
+* loading indicator ([02376f9](https://github.com/MapColonies/shared-components/commit/02376f9313f4fc6e52170422abc7062274a71db7))
+* unused class ([8b83fd2](https://github.com/MapColonies/shared-components/commit/8b83fd2cd9197b9a0fea47f75f12c82d38080773))
+
+
+
+
+
 # [4.3.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.2.2...@map-colonies/react-components@4.3.0) (2023-10-08)
 
 
