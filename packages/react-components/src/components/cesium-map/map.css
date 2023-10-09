@@ -57,3 +57,7 @@ body[dir='rtl'] .sideToolsContainer {
   display: flex;
   flex-direction: row;
 }
+
+.viewer .mdc-linear-progress__bar-inner {
+  border-top-width: 10px;
+}
