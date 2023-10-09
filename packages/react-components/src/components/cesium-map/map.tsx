@@ -391,7 +391,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          {showLoadingProgress === true ? isLoading && <LinearProgress style={{position: 'absolute', top: 0, height: '10px',zIndex:4}} /> : <></>}
+          {showLoadingProgress === true ? isLoading && <LinearProgress style={{position: 'absolute', top: 0, height: '10px', zIndex:4}} /> : <></>}
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />

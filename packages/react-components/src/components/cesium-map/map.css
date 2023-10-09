@@ -53,12 +53,6 @@ body[dir='rtl'] .sideToolsContainer {
   right: unset;
 }
 
-.loadingProgressContainer {
-  position: absolute;
-  top: 0;
-  height: 10px;
-}
-
 .viewer {
   display: flex;
   flex-direction: row;
