@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, MouseEventHandler } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
-
 import {
   Viewer as CesiumViewerCls,
   Cartesian3,
@@ -17,10 +16,12 @@ import {
   ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
+import { LinearProgress } from '@map-colonies/react-core';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Box } from '../box';
 import { Proj } from '../utils/projections';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
+import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
 import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
@@ -29,7 +30,7 @@ import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 
 import './map.css';
-import { pointToLonLat } from './tools/geojson/point.geojson';
+import '@map-colonies/react-core/dist/linear-progress/styles';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -99,6 +100,7 @@ export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
   showScale?: boolean;
+  showLoadingProgress?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
@@ -134,6 +136,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showMousePosition, setShowMousePosition] = useState<boolean>();
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
+  const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
@@ -262,6 +266,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showScale]);
 
   useEffect(() => {
+    setShowLoadingProgress(props.showLoadingProgress ?? true);
+  }, [props.showLoadingProgress]);
+
+  useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
       if (mapViewRef === undefined) {
         return {
@@ -293,7 +301,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         
         // When camera is tilted towards the sky in 3d mode, pick couldn't pick the position and returns undefined,
         // Then the cartesianToCartographic will crash the map.
-        if(!pickPosition) return ({
+        if (!pickPosition) return ({
           longitude: 0,
           latitude: 0,
           height: 0,
@@ -314,9 +322,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       }
     };
 
-    if(mapViewRef) {
+    if (mapViewRef) {
       mapViewRef.camera.moveEnd.addEventListener(() => {
-        if(mapViewRef.scene.mode !== SceneMode.MORPHING) {
+        if (mapViewRef.scene.mode !== SceneMode.MORPHING) {
           const camera = mapViewRef.camera;
     
           const store: ICameraState = {
@@ -330,9 +338,17 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           cameraStateRef.current = store;
         }
       });
+      if (showLoadingProgress) {
+        mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
+          if (mapViewRef.scene.globe.tilesLoaded === true){
+            setIsLoading(false);
+          }
+          else {
+            setIsLoading(true);
+          }
+        });
+      }
     }
-
-   
   }, [mapViewRef]);
 
   useEffect(() => {
@@ -375,6 +391,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
+          {showLoadingProgress === true ? isLoading && <LinearProgress style={{position: 'absolute', top: 0, height: '10px',zIndex:4}} /> : <></>}
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
@@ -388,7 +405,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen]);
+  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoading]);
 
   return (
     <Viewer className="viewer" full ref={ref} {...viewerProps}>
