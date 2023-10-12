@@ -44,7 +44,7 @@
     "lodash": "^4.17.20",
     "ol": "^6.4.3",
     "react-datepicker": "^4.16.0",
-    "resium": "^1.16.1",
+    "resium": "1.16.1",
     "rimraf": "3.0.2",
     "textarea-caret": "^3.1.0"
   },
