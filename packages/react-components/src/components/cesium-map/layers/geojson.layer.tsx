@@ -11,8 +11,11 @@ const NEGATIVE = -1;
 
 const getSign = (num: number) => Math.abs(num) / num;
 const fixTuple = (tuple: Position) => {
-  if (Math.abs(tuple[0]) === PI_DEGREES && Math.abs(tuple[1]) === PI_DEGREES / 2) {
+  if (Math.abs(tuple[0]) === PI_DEGREES) {
     tuple[0] += NEGATIVE * getSign(tuple[0]) * DELTA; //-180 ==> -180 + 0.0001 = -179.9999;    //180 ==> 180 - 0.0001 = 179.9999;
+  }
+
+  if(Math.abs(tuple[1]) === PI_DEGREES / 2) {
     tuple[1] += NEGATIVE * getSign(tuple[1]) * DELTA; //-90 ==> -90 + 0.0001 = -89.9999;       //90 ==> 90 - 0.0001 = 89.9999;
   }
 };
