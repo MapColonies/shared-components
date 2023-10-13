@@ -18685,7 +18685,7 @@ reselect@^4.1.8:
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.8.tgz#3f5dc671ea168dccdeb3e141236f69f02eaec524"
   integrity sha512-ab9EmR80F/zQTMNeneUr4cv+jSwPJgIlvEmVwLerwrWVbpLlBuls9XHzIeTFy4cegU2NHBp3va0LKOzU5qFEYQ==
 
-resium@^1.16.1:
+resium@1.16.1:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/resium/-/resium-1.16.1.tgz#9ace9a39104c40c1e5717a21f84f54eff2a38d25"
   integrity sha512-I9vyClyR4+JZzQGUv5wc9DSc+bQWh9S7qMUwy6vYWJ3GkeSQW4vgTa7qiCv87w5zyw6lL+dRXZFjuiKogYnHJA==
