@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.3.1...@map-colonies/react-components@4.4.0) (2023-10-13)
+
+
+### Bug Fixes
+
+* world wide footprint correction edge case ([011abfe](https://github.com/MapColonies/shared-components/commit/011abfee46561b30f83c526531f883477e93bbd5))
+
+
+### Features
+
+* export cesium map tools ([3aca72d](https://github.com/MapColonies/shared-components/commit/3aca72d976aec8ef0614acb63e50aa18c1ec3c95))
+
+
+
+
+
 ## [4.3.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.3.0...@map-colonies/react-components@4.3.1) (2023-10-09)
 
 
