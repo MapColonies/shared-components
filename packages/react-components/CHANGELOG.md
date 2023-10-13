@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.4.0...@map-colonies/react-components@4.4.1) (2023-10-13)
+
+
+### Bug Fixes
+
+* disable imagery provider by default for cesium viewer ([2eeac7b](https://github.com/MapColonies/shared-components/commit/2eeac7b4d22b2ad5650ea84189bcb2bc3c547148))
+
+
+
+
+
 # [4.4.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.3.1...@map-colonies/react-components@4.4.0) (2023-10-13)
 
 
