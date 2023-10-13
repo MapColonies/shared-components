@@ -152,7 +152,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
 
-  const viewerProps = {
+  const viewerProps: ViewerProps = {
     fullscreenButton: true,
     timeline: false,
     animation: false,
@@ -161,6 +161,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     navigationHelpButton: false,
     homeButton: false,
     sceneModePicker: false,
+    imageryProvider: false,
     ...(props as ViewerProps),
   };
 
