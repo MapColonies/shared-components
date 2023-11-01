@@ -6,6 +6,7 @@ import '@cmcleese/cesium-navigation/dist/index.css';
 import './cesium-compass.tool.css';
 
 import { useEffect } from 'react';
+import { get } from 'lodash';
 
 interface CesiumCompassToolProps {
   enableCompass?: boolean;
@@ -20,21 +21,27 @@ const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
   const {enableCompass = true, enableZoomControls = false, lockCompassNavigation = false, locale = {DIRECTION: 'ltr'}} = props;
 
   useEffect(() => {
-    mapViewer.extend(viewerCesiumNavigationMixin, {
-      enableCompass,
-      enableZoomControls,
-      enableDistanceLegend: false
-    });
-    
-    // @ts-ignore
-    mapViewer.cesiumNavigation.setNavigationLocked(lockCompassNavigation);
-
-    const compassElem = document.querySelector('.compass');
-    console.log(compassElem);
-    if(compassElem && locale.DIRECTION) {
-      compassElem.classList.add(locale.DIRECTION);
+    if(typeof get(mapViewer, 'cesiumNavigation') === 'undefined') {
+      mapViewer.extend(viewerCesiumNavigationMixin, {
+        enableCompass,
+        enableZoomControls,
+        enableDistanceLegend: false
+      });
+      
+      // @ts-ignore
+      mapViewer.cesiumNavigation.setNavigationLocked(lockCompassNavigation);
+  
+      const compassElem = document.querySelector('.compass');
+      if(compassElem && locale.DIRECTION) {
+        compassElem.classList.add(locale.DIRECTION);
+      }
     }
-  }, [mapViewer]);
+
+    return () => {
+      // @ts-ignore
+      mapViewer.cesiumNavigation?.destroy();
+    }
+  }, [mapViewer, enableCompass, enableZoomControls, locale.DIRECTION, lockCompassNavigation]);
 
 
   return null;
