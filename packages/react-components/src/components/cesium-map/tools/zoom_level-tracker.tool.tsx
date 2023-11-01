@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { PerspectiveOffCenterFrustum } from 'cesium';
 import { CesiumViewer, useCesiumMap } from '../map';
@@ -6,8 +6,10 @@ import { CesiumSceneMode } from '../map.types';
 
 import './zoom_level-tracker.tool.css';
 
+type ValueBy = 'CALCULATION' | 'RENDERED_TILES'
 export interface RZoomLevelTrackerToolProps {
   locale?: { [key: string]: string };
+  valueBy?: ValueBy;
 }
 
 /* eslint-disable @typescript-eslint/no-magic-numbers, @typescript-eslint/naming-convention, @typescript-eslint/no-unsafe-assignment,  @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -70,61 +72,87 @@ const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
 };
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = (props) => {
+export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({locale = undefined, valueBy = 'RENDERED_TILES'}) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const [zoomLevel, setZoomLevel] = useState(1);
   const zoomLevelHeights = getZoomLevelHeights(1, mapViewer);
 
+  const calculateZoomLevel = useCallback(() => {
+    const camera = mapViewer.camera;
+    const ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR = 0.5;
+    let cameraHeight = 0;
+
+    switch (mapViewer.scene.mode) {
+      case CesiumSceneMode.SCENE3D:
+        cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(camera.positionWC).height;
+        break;
+      case CesiumSceneMode.SCENE2D:
+        cameraHeight =
+          ((camera.frustum as PerspectiveOffCenterFrustum).right - (camera.frustum as PerspectiveOffCenterFrustum).left) *
+          ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
+        break;
+      case CesiumSceneMode.COLUMBUS_VIEW:
+        cameraHeight = camera.position.z;
+        break;
+      default:
+        cameraHeight = 0;
+        break;
+    }
+
+    if (zoomLevelHeights.length > 0) {
+      const closestZoom = zoomLevelHeights.reduce((a, b) => {
+        return Math.abs(b.height - cameraHeight) < Math.abs(a.height - cameraHeight) ? b : a;
+      });
+
+      setZoomLevel(closestZoom.level);
+    }
+  }, [mapViewer, zoomLevelHeights]);
+
+  const extractMaxZoomLevelFromRenderedTiles = useCallback(() => {
+    let maxZoom = 0;
+
+    // @ts-ignore
+    mapViewer.scene.globe._surface.forEachRenderedTile(function (tile) {
+      maxZoom = Math.max(maxZoom, tile.level);
+    });
+
+    setZoomLevel(maxZoom);
+  }, [mapViewer]);
+
+  const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(() => ({
+    CALCULATION: calculateZoomLevel,
+    RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles
+  }), [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]); 
+
+  const zoomExtractionMethod = extractZoomMethods[valueBy];
+  
   useEffect(() => {
-    const calculateZoomLevel = () => {
-      const camera = mapViewer.camera;
-      const ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR = 0.5;
-      let cameraHeight = 0;
-
-      switch (mapViewer.scene.mode) {
-        case CesiumSceneMode.SCENE3D:
-          cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(camera.positionWC).height;
-          break;
-        case CesiumSceneMode.SCENE2D:
-          cameraHeight =
-            ((camera.frustum as PerspectiveOffCenterFrustum).right - (camera.frustum as PerspectiveOffCenterFrustum).left) *
-            ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
-          break;
-        case CesiumSceneMode.COLUMBUS_VIEW:
-          cameraHeight = camera.position.z;
-          break;
-        default:
-          cameraHeight = 0;
-          break;
+    // Handle correct zoom since camera.moveEnd wont trigger when map first loaded.
+    const removeTilesLoadedListener = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener(function () {
+      if(mapViewer.scene.globe.tilesLoaded) {
+        zoomExtractionMethod();
       }
-
-      if (zoomLevelHeights.length > 0) {
-        const closestZoom = zoomLevelHeights.reduce((a, b) => {
-          return Math.abs(b.height - cameraHeight) < Math.abs(a.height - cameraHeight) ? b : a;
-        });
-
-        setZoomLevel(closestZoom.level);
-      }
-    };
-
-    mapViewer.camera.moveEnd.addEventListener(calculateZoomLevel);
+    });
+    
+    mapViewer.camera.moveEnd.addEventListener(zoomExtractionMethod);
 
     return (): void => {
       try {
         /* eslint-disable @typescript-eslint/no-unnecessary-condition*/
-        if (get(mapViewer, '_cesiumWidget') != undefined) {
-          mapViewer.camera.moveEnd.removeEventListener(calculateZoomLevel);
+        if (typeof get(mapViewer, '_cesiumWidget') !== 'undefined') {
+          mapViewer.camera.moveEnd.removeEventListener(zoomExtractionMethod);  
+          removeTilesLoadedListener();
         }
       } catch (e) {
         console.log('CESIUM camera "moveEnd"(from zoom tracker) remove listener failed', e);
       }
     };
-  }, [mapViewer, zoomLevelHeights.length]);
+  }, [mapViewer, zoomExtractionMethod]);
 
   return (
     <div className="zoomLevel">
       <div className="zoomLevelValue">{zoomLevel}</div>
-      <div className="zoomLevelLabel">{get(props.locale, 'ZOOM_LABEL') ?? 'zoom'}</div>
+      <div className="zoomLevelLabel">{get(locale, 'ZOOM_LABEL') ?? 'zoom'}</div>
     </div>
   );
 };
