@@ -22,6 +22,7 @@
     "build-storybook": "rimraf storybook-static && build-storybook"
   },
   "dependencies": {
+    "@cmcleese/cesium-navigation": "^4.0.7",
     "@date-io/date-fns": "^1.3.13",
     "@here/quantized-mesh-decoder": "^1.2.8",
     "@map-colonies/react-core": "^4.2.0",

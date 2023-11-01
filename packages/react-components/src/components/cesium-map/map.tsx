@@ -31,6 +31,7 @@ import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import CesiumCompassTool from './tools/cesium-compass.tool';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -101,6 +102,7 @@ export interface CesiumMapProps extends ViewerProps {
   showZoomLevel?: boolean;
   showScale?: boolean;
   showLoadingProgress?: boolean;
+  showCompass?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
@@ -136,6 +138,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showMousePosition, setShowMousePosition] = useState<boolean>();
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
+  const [showCompass, setShowCompass] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
@@ -265,6 +268,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowScale(props.showScale ?? true);
   }, [props.showScale]);
+
+  useEffect(() => {
+    setShowCompass(props.showCompass ?? true);
+  }, [props.showCompass]);
 
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
@@ -401,6 +408,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             {showMousePosition === true ? <CoordinatesTrackerTool projection={projection} /> : <></>}
             {showZoomLevel === true ? <ZoomLevelTrackerTool locale={locale} valueBy='RENDERED_TILES' /> : <></>}
             {showScale === true ? <ScaleTrackerTool locale={locale} /> : <></>}
+            {showCompass === true ? <CesiumCompassTool locale={locale} /> : <></>}
           </Box>
         </>,
         document.querySelector('.cesium-viewer') as Element

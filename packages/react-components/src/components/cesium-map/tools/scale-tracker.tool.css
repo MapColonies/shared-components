@@ -5,10 +5,10 @@
   font-size: 12px;
   width: 110px;
 }
-.distance-legend-label {
+.scale-tracker-label {
   text-align: center;
 }
-.distance-legend-scale-bar {
+.scale-tracker-bar {
   background: var(--mdc-theme-on-surface);
   margin: 0 auto;
   display: block;
