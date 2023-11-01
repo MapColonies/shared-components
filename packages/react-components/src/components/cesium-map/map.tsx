@@ -399,7 +399,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           </Box>
           <Box className="toolsContainer">
             {showMousePosition === true ? <CoordinatesTrackerTool projection={projection} /> : <></>}
-            {showZoomLevel === true ? <ZoomLevelTrackerTool locale={locale} /> : <></>}
+            {showZoomLevel === true ? <ZoomLevelTrackerTool locale={locale} valueBy='RENDERED_TILES' /> : <></>}
             {showScale === true ? <ScaleTrackerTool locale={locale} /> : <></>}
           </Box>
         </>,
