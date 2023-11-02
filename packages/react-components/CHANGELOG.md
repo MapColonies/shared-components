@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.4.2...@map-colonies/react-components@4.5.0) (2023-11-02)
+
+
+### Bug Fixes
+
+* destroy widget on unmount, check if not exist ([c4445d1](https://github.com/MapColonies/shared-components/commit/c4445d176dc7e0cae806f707ace02c993bb05eff))
+* map tracker tool coordinates ([3d14997](https://github.com/MapColonies/shared-components/commit/3d14997d5a21fa9a19bfe496ec36d3e67b7afbd6))
+
+
+### Features
+
+* add compass tool to cesium map ([8af5de6](https://github.com/MapColonies/shared-components/commit/8af5de6cd30563cee01f1561e1832073ffd472a1))
+* extract zoom level from rendered tiles ([60692a3](https://github.com/MapColonies/shared-components/commit/60692a39464d4e75aff5a377ac79e9dbbf0dfaf3))
+
+
+
+
+
 ## [4.4.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.4.1...@map-colonies/react-components@4.4.2) (2023-10-17)
 
 
