@@ -13,6 +13,7 @@ export interface IBaseMap {
   title?: string;
   thumbnail?: string;
   isCurrent?: boolean;
+  isForPreview?: boolean;
   baseRasteLayers: IRasterLayer[];
   baseVectorLayers: IVectorLayer[];
 }
