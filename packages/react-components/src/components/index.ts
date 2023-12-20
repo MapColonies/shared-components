@@ -3,7 +3,7 @@ export * from './date-range-picker-with-presets';
 export * from './date-picker';
 export * from './map-filter-container';
 export * from './models';
-// export * from './ol-map';
+export * from './ol-map';
 export * from './smart-table';
 export * from './popover';
 export * from './box';
