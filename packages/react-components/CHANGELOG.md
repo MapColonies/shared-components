@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.5.0...@map-colonies/react-components@4.6.0) (2023-12-20)
+
+
+### Features
+
+* ol map re-exposed ([dcec353](https://github.com/MapColonies/shared-components/commit/dcec353bd21ff575012fca9fe7211df1835b8022))
+
+
+
+
+
 # [4.5.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.4.2...@map-colonies/react-components@4.5.0) (2023-11-02)
 
 
