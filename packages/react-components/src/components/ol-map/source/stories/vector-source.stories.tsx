@@ -1,5 +1,6 @@
 import React from 'react';
 import { Geometries } from '@turf/helpers';
+import { Fill, Stroke, Style } from 'ol/style';
 import { Proj } from '../../../utils/projections';
 import { Map } from '../../map';
 import { TileLayer, VectorLayer } from '../../layers';
@@ -68,9 +69,20 @@ export const Basic = (): JSX.Element => (
       </TileLayer>
       <VectorLayer>
         <VectorSource>
-          {geometries.map((geometry, index) => (
-            <GeoJSONFeature key={index} geometry={geometry} />
-          ))}
+          {geometries.map((geometry, index) => {
+            const selected_polygon_style = new Style({
+              stroke: new Stroke({
+                width: 5,
+                color: '#ff0000',
+              }),
+              fill: new Fill({
+                color: '#aa2727',
+              }),
+            });
+            let featStyle = index === 0 ? selected_polygon_style : undefined;
+
+            return <GeoJSONFeature key={index} geometry={geometry} featureStyle={featStyle} />;
+          })}
         </VectorSource>
       </VectorLayer>
     </Map>
