@@ -4,7 +4,7 @@ import { GeoJSON } from 'ol/format';
 import { FitOptions } from 'ol/View';
 import { useVectorSource } from './source/vector-source';
 import { useMap } from './map';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Style } from 'ol/style';
 
 export interface FeatureProps {
   geometry: Geometry;
