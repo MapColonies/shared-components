@@ -1,43 +1,60 @@
-import React, { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react';
-import { Vector } from 'ol/layer';
+import React, { useEffect } from 'react';
+import { Style } from 'ol/style';
 import OlExtLegend from 'ol-ext/legend/Legend';
 import OlExtLegendCtrl from 'ol-ext/control/Legend';
 import { useMap } from '../map';
 
-const legendContext = createContext<Vector<any> | null>(null);
-const LegendProvider = legendContext.Provider;
+import 'ol-ext/dist/ol-ext.css';
 
-export const useLegend = (): Vector<any> => {
-  const legend = useContext(legendContext);
+export interface LegendItem {
+  title: string;
+  style: Style;
+}
 
-  if (legend === null) {
-    throw new Error('legend context is null, please check the provider');
-  }
+export interface LegendParams {
+  legendItems: LegendItem[];
+  title?: string;
+  isCollapsed?: boolean;
+}
 
-  return legend;
-};
-
-export const Legend: React.FC<PropsWithChildren> = ({ children }) => {
+export const Legend: React.FC<LegendParams> = ({ legendItems, title, isCollapsed }) => {
   const map = useMap();
-  // const [vectorLayer] = useState(new OlExtLegend());
 
   useEffect(() => {
     const legend = new OlExtLegend({
-      title: 'Legend',
+      title: title ?? '',
       margin: 5,
       maxWidth: 300,
     });
+
     const legendCtrl = new OlExtLegendCtrl({
       legend: legend,
-      collapsed: false,
+      collapsed: isCollapsed === undefined ? true : isCollapsed,
     });
 
     map.addControl(legendCtrl);
+
+    const vectorLegend = new OlExtLegend({ margin: 4 });
+    legendItems.forEach((legendItem) => {
+      vectorLegend.addItem({
+        title: legendItem.title,
+        style: legendItem.style,
+        typeGeom: 'Polygon',
+      });
+    });
+    // **** Generic way to present legend by feature geometry style
+    // vectorLegend.addItem({
+    //   title: 'DUMMY',
+    //   feature: (map.getLayers().getArray()[1] as any).getSource().getFeatures()[0],
+    // });
+
+    // @ts-ignore
+    legend.addItem(vectorLegend);
+
     return (): void => {
       map.removeControl(legendCtrl);
     };
-  }, [map /*, vectorLayer*/]);
+  }, [map, legendItems, title, isCollapsed]);
 
-  // return <LegendProvider value={vectorLayer}>{children}</LegendProvider>;
   return <></>;
 };
