@@ -4,14 +4,16 @@ import { GeoJSON } from 'ol/format';
 import { FitOptions } from 'ol/View';
 import { useVectorSource } from './source/vector-source';
 import { useMap } from './map';
+import { Style } from 'ol/style';
 
 export interface FeatureProps {
   geometry: Geometry;
   fitOptions?: FitOptions;
   fit?: boolean;
+  featureStyle?: Style;
 }
 
-export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, fit }) => {
+export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, fit, featureStyle }) => {
   const source = useVectorSource();
   const map = useMap();
 
@@ -23,6 +25,10 @@ export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, f
       source.on('addfeature', function () {
         map.getView().fit(source.getExtent(), fitOptions);
       });
+    }
+
+    if (featureStyle) {
+      feature.setStyle(featureStyle);
     }
 
     source.addFeature(feature);
