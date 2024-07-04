@@ -9,7 +9,7 @@ const config = {
     builder: '@storybook/builder-vite',
   },
   stories: ['../src/**/*.stories.@(js|ts|tsx|mdx)'],
-  addons: ['@storybook/addon-storysource'],
+  addons: ['@storybook/addon-essentials', '@storybook/addon-knobs', 'storybook-addon-mock'],
   viteFinal: async (config: Record<string, unknown>) => {
     const conf = await (commonConfig as any).viteFinal(config);
 
@@ -17,7 +17,7 @@ const config = {
       ...conf,
       base: '',
       // Cesium is installed in the main node_modules folder, need to configure the routes for cesium vite plugin.
-      plugins: [cesium({cesiumBuildPath: '../../node_modules/cesium/Build/Cesium', cesiumBuildRootPath: '../../node_modules/cesium/Build' })],
+      plugins: [cesium({ cesiumBuildPath: '../../node_modules/cesium/Build/Cesium', cesiumBuildRootPath: '../../node_modules/cesium/Build' })],
     });
   },
 };
