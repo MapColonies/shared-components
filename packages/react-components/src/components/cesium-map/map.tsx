@@ -25,6 +25,7 @@ import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
 import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
+import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
@@ -119,6 +120,7 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
+  displayZoomButtons?: boolean;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -154,6 +156,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     longitude: number;
     latitude: number;
   }>();
+  const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -185,19 +188,22 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     };
   };
 
-  const contextMenuHandler = useCallback((evt: any) => {
-    if(ref.current !== null) {
-      const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
+  const contextMenuHandler = useCallback(
+    (evt: any) => {
+      if (ref.current !== null) {
+        const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
 
-      const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
-  
-      setShowImageryMenu(false);
-      setImageryMenuPosition(pos);
-      setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
-      setShowImageryMenu(true);
-      imageryMenuEvent.current = evt as unknown as MouseEvent;
-    }  
-  }, [ref]);
+        const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
+
+        setShowImageryMenu(false);
+        setImageryMenuPosition(pos);
+        setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
+        setShowImageryMenu(true);
+        imageryMenuEvent.current = evt as unknown as MouseEvent;
+      }
+    },
+    [ref]
+  );
 
   useEffect(() => {
     if (ref.current !== null) {
@@ -306,14 +312,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         );
         const pickRay = mapViewRef.scene.camera.getPickRay(windowPosition);
         const pickPosition = mapViewRef.scene.globe.pick(pickRay as Ray, mapViewRef.scene);
-        
+
         // When camera is tilted towards the sky in 3d mode, pick couldn't pick the position and returns undefined,
         // Then the cartesianToCartographic will crash the map.
-        if (!pickPosition) return ({
-          longitude: 0,
-          latitude: 0,
-          height: 0,
-        });
+        if (!pickPosition)
+          return {
+            longitude: 0,
+            latitude: 0,
+            height: 0,
+          };
 
         const pickPositionCartographic = mapViewRef.scene.globe.ellipsoid.cartesianToCartographic(pickPosition as Cartesian3);
 
@@ -334,7 +341,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef.camera.moveEnd.addEventListener(() => {
         if (mapViewRef.scene.mode !== SceneMode.MORPHING) {
           const camera = mapViewRef.camera;
-    
+
           const store: ICameraState = {
             position: getCameraPosition(),
             direction: camera.direction.clone(),
@@ -348,10 +355,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       });
       if (showLoadingProgress) {
         mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
-          if (mapViewRef.scene.globe.tilesLoaded === true){
+          if (mapViewRef.scene.globe.tilesLoaded === true) {
             setIsLoading(false);
-          }
-          else {
+          } else {
             setIsLoading(true);
           }
         });
@@ -394,22 +400,28 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     }
   }, [props.zoom, props.center, mapViewRef]);
 
+  useEffect(() => {
+    setDisplayZoomButtons(props.displayZoomButtons ?? true);
+  }, [props.displayZoomButtons]);
+
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
     return (
       mapViewRef &&
       createPortal(
         <>
-          {showLoadingProgress === true ? isLoading && <LinearProgress style={{position: 'absolute', top: 0, height: '10px', zIndex:4}} /> : <></>}
+          {showLoadingProgress && isLoading && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
+
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
-            {showMousePosition === true ? <CoordinatesTrackerTool projection={projection} /> : <></>}
-            {showZoomLevel === true ? <ZoomLevelTrackerTool locale={locale} valueBy='RENDERED_TILES' /> : <></>}
-            {showScale === true ? <ScaleTrackerTool locale={locale} /> : <></>}
-            {showCompass === true ? <CesiumCompassTool locale={locale} /> : <></>}
+            {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
+            {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
+            {showScale && <ScaleTrackerTool locale={locale} />}
+            {showCompass && <CesiumCompassTool locale={locale} />}
           </Box>
+          {displayZoomButtons && <ZoomButtons />}
         </>,
         document.querySelector('.cesium-viewer') as Element
       )
@@ -434,10 +446,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           imageryMenuPosition &&
           rightClickCoordinates &&
           React.cloneElement(props.imageryContextMenu, {
-            data: mapViewRef?.layersManager?.findLayerByPOI(imageryMenuPosition.x as number, imageryMenuPosition.y as number, false) as unknown as Record<
-              string,
-              unknown
-            >[],
+            data: mapViewRef?.layersManager?.findLayerByPOI(
+              imageryMenuPosition.x as number,
+              imageryMenuPosition.y as number,
+              false
+            ) as unknown as Record<string, unknown>[],
             position: {
               x: imageryMenuPosition.x as number,
               y: imageryMenuPosition.y as number,

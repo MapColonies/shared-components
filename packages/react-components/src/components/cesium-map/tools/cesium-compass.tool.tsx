@@ -15,34 +15,28 @@ interface CesiumCompassToolProps {
   locale?: { [key: string]: string };
 }
 
-const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {  
+const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
   const mapViewer = useCesiumMap();
 
-  const {enableCompass = true, enableZoomControls = false, lockCompassNavigation = false, locale = {DIRECTION: 'ltr'}} = props;
+  const { enableCompass = true, enableZoomControls = false, lockCompassNavigation = false, locale = { DIRECTION: 'ltr' } } = props;
 
   useEffect(() => {
-    if(typeof get(mapViewer, 'cesiumNavigation') === 'undefined') {
+    if (typeof get(mapViewer, 'cesiumNavigation') === 'undefined') {
       mapViewer.extend(viewerCesiumNavigationMixin, {
         enableCompass,
         enableZoomControls,
-        enableDistanceLegend: false
+        enableDistanceLegend: false,
       });
-      
+
       // @ts-ignore
       mapViewer.cesiumNavigation.setNavigationLocked(lockCompassNavigation);
-  
+
       const compassElem = document.querySelector('.compass');
-      if(compassElem && locale.DIRECTION) {
+      if (compassElem && locale.DIRECTION) {
         compassElem.classList.add(locale.DIRECTION);
       }
     }
-
-    return () => {
-      // @ts-ignore
-      mapViewer.cesiumNavigation?.destroy();
-    }
   }, [mapViewer, enableCompass, enableZoomControls, locale.DIRECTION, lockCompassNavigation]);
-
 
   return null;
 };
