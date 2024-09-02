@@ -32,7 +32,7 @@ export const DateTimePicker: React.FC<DatePickerProps> = (props) => {
     local,
     onChange,
     showTime = DEFAULTS.DATE_PICKER.showTime,
-    value: propValue,
+    value,
     ...resProps
   } = props;
 
@@ -55,7 +55,7 @@ export const DateTimePicker: React.FC<DatePickerProps> = (props) => {
             variant={variant as WrapperVariant}
             placeholder={placeHolderText}
             onChange={handleOnChange}
-            value={props.value}
+            value={value}
             disableFuture={disableFuture}
             format={format}
             {...resProps}
@@ -66,7 +66,7 @@ export const DateTimePicker: React.FC<DatePickerProps> = (props) => {
             variant={variant as WrapperVariant}
             placeholder={placeHolderText}
             onChange={handleOnChange}
-            value={props.value}
+            value={value}
             disableFuture={disableFuture}
             format={format}
             {...resProps}
