@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.6.0...@map-colonies/react-components@4.7.0) (2024-09-03)
+
+
+### Bug Fixes
+
+* cr fix ([87474db](https://github.com/MapColonies/shared-components/commit/87474db1459f71145e2ab0947ec36ce8d3f54b24))
+* delete unecesary useState in date-picker.tsx ([102c5ff](https://github.com/MapColonies/shared-components/commit/102c5ff2091ecc5600701674310f50d9c42d71f8))
+* transfer_style ([42d4402](https://github.com/MapColonies/shared-components/commit/42d440229e405880abb52ec6cf1ac95376819776))
+
+
+### Features
+
+* cesium zoom buttons ([82e6d8b](https://github.com/MapColonies/shared-components/commit/82e6d8bbed1e8f06ab6568e069f105a97eeed679))
+* ol legend ([8c1d3c3](https://github.com/MapColonies/shared-components/commit/8c1d3c3fa1ef14a3eef84de7633e0daea7958e63))
+* ol legend packages installed ([1039f98](https://github.com/MapColonies/shared-components/commit/1039f98e5b96fba5705733a38d19451d6f41b05b))
+
+
+
+
+
 # [4.6.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.5.0...@map-colonies/react-components@4.6.0) (2023-12-20)
 
 
