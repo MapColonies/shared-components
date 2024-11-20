@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.0...@map-colonies/react-components@4.7.1) (2024-11-20)
+
+
+### Bug Fixes
+
+* centralize the zoom buttons icons ([a04abd7](https://github.com/MapColonies/shared-components/commit/a04abd7e20010fd5a99318057938dfc99945034e))
+
+
+
+
+
 # [4.7.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.6.0...@map-colonies/react-components@4.7.0) (2024-09-03)
 
 
