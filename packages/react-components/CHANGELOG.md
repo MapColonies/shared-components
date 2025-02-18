@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.1...@map-colonies/react-components@4.7.2) (2025-02-18)
+
+
+### Bug Fixes
+
+* exposing map current zoom level ([ea2579f](https://github.com/MapColonies/shared-components/commit/ea2579f0061ac8839659d311c41e8b5d4510686b))
+
+
+
+
+
 ## [4.7.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.0...@map-colonies/react-components@4.7.1) (2024-11-20)
 
 
