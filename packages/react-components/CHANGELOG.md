@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.2...@map-colonies/react-components@4.7.3) (2025-02-20)
+
+
+### Bug Fixes
+
+* missing cesium proxied type ([adbe892](https://github.com/MapColonies/shared-components/commit/adbe89220602f9a9be005480144712b0bfc2942b))
+
+
+
+
+
 ## [4.7.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.1...@map-colonies/react-components@4.7.2) (2025-02-18)
 
 
