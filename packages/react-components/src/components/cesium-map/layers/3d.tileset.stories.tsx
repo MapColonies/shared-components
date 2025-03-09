@@ -85,7 +85,7 @@ Cesium3DTilesetLayer.argTypes = {
 
 Cesium3DTilesetLayer.storyName = '3D Layer';
 
-export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: unknown) => (
+export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset
@@ -125,7 +125,7 @@ Cesium3DTilesetWithHeightCorrectionLayer.argTypes = {
 
 Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction Layer';
 
-export const CesiumSolar3DTilesetLayer: Story = (args: unknown) => (
+export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset isZoomTo={true} url="/mock/tileset_2/L16_31023/L16_31023.json" />
