@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Color, Ellipsoid, GeoJsonDataSource, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
+import { Cartesian2, Color, Ellipsoid, GeoJsonDataSource, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
 import { get } from 'lodash';
 import { Feature } from 'geojson';
 import { useCesiumMap } from '../map';
@@ -120,7 +120,7 @@ export const CesiumWFSLayer: React.FC = () => {
 
     let hoveredEntity: any = null;
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
-    handler.setInputAction((movement) => {
+    handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
       const pickedObject = mapViewer.scene.pick(movement.endPosition);
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
