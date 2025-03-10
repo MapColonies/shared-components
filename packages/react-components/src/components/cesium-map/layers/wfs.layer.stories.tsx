@@ -45,8 +45,7 @@ const BASE_MAPS = {
 
 const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
-  featureType: 'core:buildings',
-  meta: {},
+  featureType: 'buildings',
   style: {
     stroke: Color.RED,
     fill: Color.RED.withAlpha(0.5),
@@ -54,13 +53,33 @@ const optionsBuildings = {
     markerSymbol: '?'
   },
   pageSize: 300,
-  zoomLevel: 14
+  zoomLevel: 14,
+  meta: {},
+  sortBy: 'id',
+  shouldFilter: true
+};
+
+const optionsBuildingsDates = {
+  url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
+  featureType: 'buildings_dates',
+  style: {
+    stroke: Color.BLUE,
+    fill: Color.BLUE.withAlpha(0.5),
+    strokeWidth: 3,
+    markerSymbol: '?'
+  },
+  pageSize: 300,
+  zoomLevel: 14,
+  meta: {},
+  sortBy: 'year_day_numeric',
+  shouldFilter: false
 };
 
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildingsDates} />
     </CesiumMap>
   </div>
 );

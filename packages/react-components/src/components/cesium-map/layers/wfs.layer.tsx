@@ -13,6 +13,8 @@ export interface CesiumWFSLayerOptions {
   pageSize: number;
   zoomLevel: number;
   meta?: Record<string, unknown>;
+  sortBy?: string;
+  shouldFilter?: boolean;
 }
 
 export interface CesiumWFSLayerProps {
@@ -20,7 +22,7 @@ export interface CesiumWFSLayerProps {
 }
 
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
-  const { url, featureType, style, pageSize, zoomLevel, meta } = options;
+  const { url, featureType, style, pageSize, zoomLevel, meta, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
   const wfsDataSourceRef = useRef<GeoJsonDataSource | null>(null);
   const wfsCache = useRef(new Set<string>());
@@ -31,8 +33,26 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
-    
+
     if (mapViewer.currentZoomLevel as number <= zoomLevel) { return; }
+
+    const filterSection = shouldFilter ? `
+      <fes:Filter>
+        <fes:And>
+          <fes:Intersects>
+            <fes:ValueReference>geom</fes:ValueReference>
+            <gml:Polygon srsName="EPSG:4326">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>
+                    ${toDegrees(bbox.west)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.south)}
+                  </gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </fes:Intersects>
+        </fes:And>
+      </fes:Filter>` : '';
 
     const req_body_xml = `<wfs:GetFeature
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -48,25 +68,10 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       http://schemas.opengis.net/gml/3.2.1/gml.xsd" 
       outputFormat="application/json">
       <wfs:Query typeNames="${featureType}">
-        <fes:Filter>
-          <fes:And>
-            <fes:Intersects>
-              <fes:ValueReference>geom</fes:ValueReference>
-              <gml:Polygon srsName="EPSG:4326">
-                <gml:exterior>
-                  <gml:LinearRing>
-                    <gml:posList>
-                      ${toDegrees(bbox.west)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.south)}
-                    </gml:posList>
-                  </gml:LinearRing>
-                </gml:exterior>
-              </gml:Polygon>
-            </fes:Intersects>
-          </fes:And>
-        </fes:Filter>
+        ${filterSection}
         <wfs:SortBy>
           <wfs:SortProperty>
-            <wfs:ValueReference>id</wfs:ValueReference>
+            <wfs:ValueReference>${sortBy}</wfs:ValueReference>
             <wfs:SortOrder>ASC</wfs:SortOrder>
           </wfs:SortProperty>
         </wfs:SortBy>
