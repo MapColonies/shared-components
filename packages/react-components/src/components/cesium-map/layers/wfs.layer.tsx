@@ -25,10 +25,12 @@ export const CesiumWFSLayer: React.FC = () => {
   const page = useRef(0);
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
-    if (!mapViewer) return;
+    if (!mapViewer) { return; }
 
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
-    if (!bbox) return;
+    if (!bbox) { return; }
+    
+    if (mapViewer.currentZoomLevel as number <= 14) { return; }
 
     const req_body_xml = `<wfs:GetFeature
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
