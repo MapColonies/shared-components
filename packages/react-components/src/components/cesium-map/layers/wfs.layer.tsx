@@ -34,7 +34,14 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
 
-    if (mapViewer.currentZoomLevel as number <= zoomLevel) { return; }
+    if (mapViewer.currentZoomLevel as number <= zoomLevel) {
+      if (wfsDataSourceRef.current) {
+        wfsDataSourceRef.current.entities.removeAll();
+      }
+      wfsCache.current.clear();
+      page.current = 0;
+      return;
+    }
 
     const filterSection = shouldFilter ? `
       <fes:Filter>
