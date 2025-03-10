@@ -4,21 +4,23 @@ import { get } from 'lodash';
 import { Feature } from 'geojson';
 import { useCesiumMap } from '../map';
 
-const featureName = 'core:buildings';
-const wfsUrl = 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows';
-const pageSize = 300;
-const defaultFillMaterial = Color.RED.withAlpha(0.5);
-
-const layerStyle = {
-  stroke: Color.RED,
-  fill: defaultFillMaterial,
-  strokeWidth: 3,
-  markerSymbol: '?'
-};
-
 const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
-export const CesiumWFSLayer: React.FC = () => {
+export interface CesiumWFSLayerOptions {
+  url: string;
+  featureType: string;
+  style: Record<string, unknown>;
+  pageSize: number;
+  zoomLevel: number;
+  meta?: Record<string, unknown>;
+}
+
+export interface CesiumWFSLayerProps {
+  options: CesiumWFSLayerOptions;
+}
+
+export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
+  const { url, featureType, style, pageSize, zoomLevel, meta } = options;
   const mapViewer = useCesiumMap();
   const wfsDataSourceRef = useRef<GeoJsonDataSource | null>(null);
   const wfsCache = useRef(new Set<string>());
@@ -30,7 +32,7 @@ export const CesiumWFSLayer: React.FC = () => {
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
     
-    if (mapViewer.currentZoomLevel as number <= 14) { return; }
+    if (mapViewer.currentZoomLevel as number <= zoomLevel) { return; }
 
     const req_body_xml = `<wfs:GetFeature
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -45,7 +47,7 @@ export const CesiumWFSLayer: React.FC = () => {
       http://www.opengis.net/gml/3.2 
       http://schemas.opengis.net/gml/3.2.1/gml.xsd" 
       outputFormat="application/json">
-      <wfs:Query typeNames="${featureName}">
+      <wfs:Query typeNames="${featureType}">
         <fes:Filter>
           <fes:And>
             <fes:Intersects>
@@ -73,16 +75,16 @@ export const CesiumWFSLayer: React.FC = () => {
       <wfs:StartIndex>${offset}</wfs:StartIndex>
     </wfs:GetFeature>`;
 
-    const response = await fetch(wfsUrl, {
+    const response = await fetch(url, {
       method: 'POST',
       body: req_body_xml
     });
-    const geoJson = await response.json();
+    const layer = await response.json();
 
-    const newFeatures = geoJson.features.filter((f: Feature) => !wfsCache.current.has(f.properties?.osm_id));
+    const newFeatures = layer.features.filter((f: Feature) => !wfsCache.current.has(f.properties?.osm_id));
     
     if (newFeatures.length === 0) {
-      if (geoJson.numberReturned !== 0) {
+      if (layer.numberReturned !== 0) {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
@@ -94,14 +96,14 @@ export const CesiumWFSLayer: React.FC = () => {
       wfsCache.current.add(f.properties?.osm_id);
     });
 
-    const updatedGeoJson = {
+    const newGeoJson = {
       type: "FeatureCollection",
       features: newFeatures
     };
 
     if (wfsDataSourceRef.current) {
-      await wfsDataSourceRef.current.process(updatedGeoJson, layerStyle);
-      if (geoJson.numberReturned !== 0) {
+      await wfsDataSourceRef.current.process(newGeoJson, style);
+      if (layer.numberReturned !== 0) {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
@@ -127,14 +129,14 @@ export const CesiumWFSLayer: React.FC = () => {
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
           if (hoveredEntity) {
-            hoveredEntity.polygon.material = defaultFillMaterial;
+            hoveredEntity.polygon.material = style.fill;
           }
           hoveredEntity = pickedObject.id;
           hoveredEntity.polygon.material = Color.BLUE.withAlpha(0.8);
         }
       } else {
         if (hoveredEntity) {
-          hoveredEntity.polygon.material = defaultFillMaterial;
+          hoveredEntity.polygon.material = style.fill;
           hoveredEntity = null;
         }
       }
@@ -146,7 +148,7 @@ export const CesiumWFSLayer: React.FC = () => {
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
     };
-  }, []);
+  }, [fetchAndUpdateWfs]);
 
   return null;
 };

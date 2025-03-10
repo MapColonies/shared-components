@@ -1,9 +1,7 @@
 import React from 'react';
-
 import { WebMapServiceImageryProvider } from 'cesium';
 import { CustomWebMapServiceImageryProvider } from '../helpers/customImageryProviders';
 import { useCesiumMap } from '../map';
-import { ICesiumImageryLayer } from '../layers-manager';
 import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
 export interface RCesiumWMSLayerOptions extends WebMapServiceImageryProvider.ConstructorOptions {}

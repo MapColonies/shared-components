@@ -1,3 +1,4 @@
+import { Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { LayerType } from '../layers-manager';
@@ -42,10 +43,24 @@ const BASE_MAPS = {
   ],
 };
 
+const optionsBuildings = {
+  url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
+  featureType: 'core:buildings',
+  meta: {},
+  style: {
+    stroke: Color.RED,
+    fill: Color.RED.withAlpha(0.5),
+    strokeWidth: 3,
+    markerSymbol: '?'
+  },
+  pageSize: 300,
+  zoomLevel: 14
+};
+
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <CesiumWFSLayer />
+      <CesiumWFSLayer options={optionsBuildings} />
     </CesiumMap>
   </div>
 );
