@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Cartesian2, Color, Ellipsoid, GeoJsonDataSource, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
 import { get } from 'lodash';
 import { Feature } from 'geojson';
@@ -48,6 +48,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
   const wfsDataSourceRef = useRef<GeoJsonDataSource | null>(null);
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
+  const [isDataSourceRemoved, setIsDataSourceRemoved] = useState(false);
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
     if (!mapViewer) { return; }
@@ -57,11 +58,16 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
     if (mapViewer.currentZoomLevel as number <= zoomLevel) {
       if (wfsDataSourceRef.current) {
-        wfsDataSourceRef.current.entities.removeAll();
+        mapViewer.dataSources.remove(wfsDataSourceRef.current);
+        setIsDataSourceRemoved(true);
       }
-      wfsCache.current.clear();
       page.current = 0;
       return;
+    }
+
+    if (wfsDataSourceRef.current && isDataSourceRemoved === true) {
+      mapViewer.dataSources.add(wfsDataSourceRef.current);
+      setIsDataSourceRemoved(false);
     }
 
     const filterSection = shouldFilter ? `
@@ -143,7 +149,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         page.current = 0;
       }
     }
-  }, []);
+  }, [isDataSourceRemoved]);
 
   useEffect(() => {
     const wfsDataSource = new GeoJsonDataSource('wfs');
@@ -195,7 +201,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         }
       }
     };
-  }, [fetchAndUpdateWfs]);
+  }, []);
 
   return null;
 };
