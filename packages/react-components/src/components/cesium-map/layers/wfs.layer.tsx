@@ -6,6 +6,27 @@ import { useCesiumMap } from '../map';
 
 const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
+const innerHtml = `<iframe class="cesium-infoBox-iframe" sandbox="allow-same-origin allow-popups allow-forms" data-bind="style : { maxHeight : maxHeightOffset(40) }" allowfullscreen="true" src="about:blank" style="max-height: 526px; height: 192px;">
+  <html>
+    <head><link href="http://localhost:9010/cesium/Widgets/InfoBox/InfoBoxDescription.css" rel="stylesheet" type="text/css"></head>
+    <body>
+      <div class="cesium-infoBox-description" dir="rtl">
+        <table class="cesium-infoBox-defaultTable">
+          <tbody>
+            <tr><th>osm_id</th><td>959703929</td></tr>
+            <tr><th>id</th><td>3382</td></tr>
+            <tr><th>building_type</th><td>yes</td></tr>
+            <tr><th>sensitivity</th><td>רגיש</td></tr>
+            <tr><th>entity_id</th><td>{66f12ef3-80c5-41c0-b539-1ac8afd83f87}</td></tr>
+            <tr><th>is_sensitive</th><td>true</td></tr>
+            <tr><th>date</th><td>2022-07-26T11:01:41Z</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </body>
+  </html>
+</iframe>`;
+
 export interface CesiumWFSLayerOptions {
   url: string;
   featureType: string;
@@ -115,6 +136,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
     if (wfsDataSourceRef.current) {
       await wfsDataSourceRef.current.process(newGeoJson, style);
+      mapViewer.scene.requestRender();
       if (layer.numberReturned !== 0) {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
@@ -133,6 +155,16 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     };
 
     mapViewer.scene.camera.moveEnd.addEventListener(fetchHandler);
+
+    const infoBoxFrame = mapViewer.infoBox.frame;
+    const onLoad = () => {
+      if (infoBoxFrame.contentWindow) {
+        infoBoxFrame.contentWindow.document.body.innerHTML = innerHtml;
+      }
+    };
+    if (infoBoxFrame) {
+      infoBoxFrame.addEventListener('load', onLoad);
+    }
 
     let hoveredEntity: any = null;
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
@@ -158,6 +190,9 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       if (get(mapViewer, '_cesiumWidget') != undefined) {
         mapViewer.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+        if (infoBoxFrame) {
+          infoBoxFrame.removeEventListener('load', onLoad);
+        }
       }
     };
   }, [fetchAndUpdateWfs]);

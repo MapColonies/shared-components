@@ -54,7 +54,47 @@ const optionsBuildings = {
   },
   pageSize: 300,
   zoomLevel: 14,
-  meta: {},
+  meta: {
+    layer_name: 'buildings',
+    alias_layer_name: 'מבנים',
+    fields: [
+      {
+        field_name: 'osm_id',
+        alias_field_name: 'מזהה OSM',
+        type: 'string'
+      },
+      {
+        field_name: 'id',
+        alias_field_name: 'מזהה',
+        type: 'string'
+      },
+      {
+        field_name: 'building_type',
+        alias_field_name: 'סוג',
+        type: 'string'
+      },
+      {
+        field_name: 'sensitivity',
+        alias_field_name: 'רגישות',
+        type: 'string'
+      },
+      {
+        field_name: 'entity_id',
+        alias_field_name: 'מזהה יישות',
+        type: 'string'
+      },
+      {
+        field_name: 'is_sensitive',
+        alias_field_name: 'רגיש',
+        type: 'boolean'
+      },
+      {
+        field_name: 'date',
+        alias_field_name: 'תאריך',
+        type: 'date'
+      }
+    ]
+  },
   sortBy: 'id',
   shouldFilter: true
 };
@@ -70,7 +110,47 @@ const optionsBuildingsDates = {
   },
   pageSize: 300,
   zoomLevel: 14,
-  meta: {},
+  meta: {
+    layer_name: 'buildings_dates',
+    alias_layer_name: 'תאריכי מבנים',
+    fields: [
+      {
+        field_name: 'osm_id',
+        alias_field_name: 'מזהה OSM',
+        type: 'string'
+      },
+      {
+        field_name: 'id',
+        alias_field_name: 'מזהה',
+        type: 'string'
+      },
+      {
+        field_name: 'building_type',
+        alias_field_name: 'סוג',
+        type: 'string'
+      },
+      {
+        field_name: 'sensitivity',
+        alias_field_name: 'רגישות',
+        type: 'string'
+      },
+      {
+        field_name: 'entity_id',
+        alias_field_name: 'מזהה יישות',
+        type: 'string'
+      },
+      {
+        field_name: 'is_sensitive',
+        alias_field_name: 'רגיש',
+        type: 'boolean'
+      },
+      {
+        field_name: 'date',
+        alias_field_name: 'תאריך',
+        type: 'date'
+      }
+    ]
+  },
   sortBy: 'year_day_numeric',
   shouldFilter: false
 };
