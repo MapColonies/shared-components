@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { WebMercatorProjection, ScreenSpaceEventType } from 'cesium';
+import { Proj, COORDINATES_WGS_FRACTION_DIGITS, COORDINATES_MERCATOR_FRACTION_DIGITS } from '../../utils/projections';
 import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumCartographic } from '../proxied.types';
+import { pointToLonLat } from './geojson/point.geojson';
 
 import './coordinates-tracker.tool.css';
-import { Proj, COORDINATES_WGS_FRACTION_DIGITS, COORDINATES_MERCATOR_FRACTION_DIGITS } from '../../utils/projections';
-import { pointToLonLat } from './geojson/point.geojson';
-import { CesiumCartographic } from '../proxied.types';
 
 export interface RCoordinatesTrackerToolProps {
   projection?: Proj;
