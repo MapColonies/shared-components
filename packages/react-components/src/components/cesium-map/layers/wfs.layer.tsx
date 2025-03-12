@@ -6,14 +6,14 @@ import { useCesiumMap } from '../map';
 
 const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
-const innerHtml = `<iframe class="cesium-infoBox-iframe" sandbox="allow-same-origin allow-popups allow-forms" data-bind="style : { maxHeight : maxHeightOffset(40) }" allowfullscreen="true" src="about:blank" style="max-height: 526px; height: 192px;">
+const innerHTML = `<iframe class="cesium-infoBox-iframe" sandbox="allow-same-origin allow-popups allow-forms allow-scripts" data-bind="style : { maxHeight : maxHeightOffset(40) }" allowfullscreen="true" src="about:blank" style="max-height: 526px; height: 192px;">
   <html>
     <head><link href="http://localhost:9010/cesium/Widgets/InfoBox/InfoBoxDescription.css" rel="stylesheet" type="text/css"></head>
     <body>
       <div class="cesium-infoBox-description" dir="rtl">
         <table class="cesium-infoBox-defaultTable">
           <tbody>
-            <tr><th>osm_id</th><td>959703929</td></tr>
+            <tr><th>osm_id</th><td>959703929XXXXX</td></tr>
             <tr><th>id</th><td>3382</td></tr>
             <tr><th>building_type</th><td>yes</td></tr>
             <tr><th>sensitivity</th><td>רגיש</td></tr>
@@ -145,6 +145,16 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     }
   }, []);
 
+  const onLoad = useCallback(() => {
+    const infoBoxFrame = mapViewer.infoBox.frame;
+    const span = document.createElement('span');
+    span.innerHTML = 'kuku';
+    if (infoBoxFrame?.contentDocument) {
+      infoBoxFrame.contentDocument.body.innerHTML = innerHTML;
+    }
+    infoBoxFrame?.contentWindow?.document.body.appendChild(span);
+  }, []);
+
   useEffect(() => {
     const wfsDataSource = new GeoJsonDataSource('wfs');
     wfsDataSourceRef.current = wfsDataSource;
@@ -153,18 +163,12 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     const fetchHandler = () => {
       fetchAndUpdateWfs();
     };
-
     mapViewer.scene.camera.moveEnd.addEventListener(fetchHandler);
 
-    const infoBoxFrame = mapViewer.infoBox.frame;
-    const onLoad = () => {
-      if (infoBoxFrame.contentWindow) {
-        infoBoxFrame.contentWindow.document.body.innerHTML = innerHtml;
-      }
+    const loadHandler = () => {
+      onLoad();
     };
-    if (infoBoxFrame) {
-      infoBoxFrame.addEventListener('load', onLoad);
-    }
+    mapViewer.infoBox.frame.addEventListener('load', loadHandler);
 
     let hoveredEntity: any = null;
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
@@ -188,11 +192,9 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
     return () => {
       if (get(mapViewer, '_cesiumWidget') != undefined) {
-        mapViewer.camera.moveEnd.removeEventListener(fetchHandler);
+        mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
+        mapViewer.infoBox.frame.removeEventListener('load', loadHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-        if (infoBoxFrame) {
-          infoBoxFrame.removeEventListener('load', onLoad);
-        }
       }
     };
   }, []);

@@ -103,8 +103,8 @@ const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
   style: {
-    stroke: Color.BLUE,
-    fill: Color.BLUE.withAlpha(0.5),
+    stroke: Color.GREEN,
+    fill: Color.GREEN.withAlpha(0.5),
     strokeWidth: 3,
     markerSymbol: '?'
   },
@@ -159,7 +159,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildingsDates} />
+      {/* <CesiumWFSLayer options={optionsBuildingsDates} /> */}
     </CesiumMap>
   </div>
 );
