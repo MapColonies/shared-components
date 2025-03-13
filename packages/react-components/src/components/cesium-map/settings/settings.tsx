@@ -77,7 +77,8 @@ export const CesiumSettings: React.FC<RCesiumMapProps> = (props) => {
           setIsOpen(!isOpen);
         }}
       />
-      {isOpen && (
+      {
+        isOpen && (
         <div id="dialog-portal-example" className="settingsDialogPortal" ref={dialogPortalRef}>
           <Dialog
             open={isOpen}
@@ -93,7 +94,8 @@ export const CesiumSettings: React.FC<RCesiumMapProps> = (props) => {
               </Box>
 
               <Box className="baseMapsContainer">
-                {baseMaps && (
+                {
+                  baseMaps && (
                   <>
                     <h4 className="sectionLabel">{baseMapTitle}</h4>
                     <CesiumBaseMaps baseMaps={baseMaps}></CesiumBaseMaps>

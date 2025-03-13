@@ -4,6 +4,11 @@ import { get } from 'lodash';
 import { Feature } from 'geojson';
 import { useCesiumMap } from '../map';
 
+const CACHE_MAX_SIZE = 50000; // Size in heap: 500 MB
+const CACHE_MAX_TIME = 5; // (minutes)
+const CACHE_MAX_DISTANCE = 2500; // (meters) Zoom level 15 = 2.5 meters per pixel
+// Calculation was based on: in this area 50K features with area of approximately 200 m each can feet inside
+
 const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
 export interface CesiumWFSLayerOptions {
@@ -24,20 +29,20 @@ export interface CesiumWFSLayerProps {
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
   const { url, featureType, style, pageSize, zoomLevel, meta, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
-  const wfsDataSourceRef = useRef<GeoJsonDataSource | null>(null);
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
+    console.log('zoom: ', mapViewer.currentZoomLevel);
     if (!mapViewer) { return; }
 
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
 
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel as number <= zoomLevel) {
-      if (wfsDataSourceRef.current?.entities && wfsDataSourceRef.current.entities.values.length > 0) {
-        wfsDataSourceRef.current.entities.removeAll();
+      if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
+        wfsDataSource.entities.removeAll();
         wfsCache.current.clear();
         page.current = 0;
       }
@@ -114,19 +119,16 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       features: newFeatures
     };
 
-    if (wfsDataSourceRef.current) {
-      await wfsDataSourceRef.current.process(newGeoJson, style);
-      mapViewer.scene.requestRender();
-      if (layer.numberReturned !== 0) {
-        fetchAndUpdateWfs(page.current++ * pageSize);
-      } else {
-        page.current = 0;
-      }
+    await wfsDataSource.process(newGeoJson, style);
+    mapViewer.scene.requestRender();
+    if (layer.numberReturned !== 0) {
+      fetchAndUpdateWfs(page.current++ * pageSize);
+    } else {
+      page.current = 0;
     }
-  }, []);
+  }, [mapViewer.currentZoomLevel]);
 
   useEffect(() => {
-    wfsDataSourceRef.current = wfsDataSource;
     mapViewer.dataSources.add(wfsDataSource);
 
     const fetchHandler = () => {

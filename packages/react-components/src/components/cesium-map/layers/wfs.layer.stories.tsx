@@ -2,6 +2,7 @@ import { Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { LayerType } from '../layers-manager';
+import { WFSInspectorTool } from '../tools/wfs-inspector.tool';
 import { CesiumWFSLayer } from './wfs.layer';
 
 export default {
@@ -53,7 +54,7 @@ const optionsBuildings = {
     markerSymbol: '?'
   },
   pageSize: 300,
-  zoomLevel: 14,
+  zoomLevel: 13,
   meta: {
     layer_name: 'buildings',
     alias_layer_name: 'מבנים',
@@ -159,7 +160,27 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
       {/* <CesiumWFSLayer options={optionsBuildingsDates} /> */}
+      <WFSInspectorTool />
     </CesiumMap>
   </div>
 );
