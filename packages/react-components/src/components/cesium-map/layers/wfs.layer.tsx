@@ -34,7 +34,6 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
-    console.log('zoom: ', mapViewer.currentZoomLevel);
     if (!mapViewer) { return; }
 
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
@@ -42,12 +41,14 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel as number <= zoomLevel) {
       if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
-        wfsDataSource.entities.removeAll();
-        wfsCache.current.clear();
+        wfsDataSource.show = false;
         page.current = 0;
       }
       return;
     }
+
+    wfsDataSource.show = true;
+    console.log('cache size: ', wfsCache.current.size);
 
     const filterSection = shouldFilter ? `
       <fes:Filter>

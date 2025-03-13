@@ -163,6 +163,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
+      {/* <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
@@ -177,8 +178,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} /> */}
       {/* <CesiumWFSLayer options={optionsBuildingsDates} /> */}
       <WFSInspectorTool />
     </CesiumMap>
