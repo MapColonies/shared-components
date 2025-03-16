@@ -27,9 +27,15 @@ export interface CesiumWFSLayerProps {
   options: CesiumWFSLayerOptions;
 }
 
+interface FetchMetadata {
+  bbox: { west: number; south: number; east: number; north: number };
+  timestamp: Date;
+}
+
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
   const { url, featureType, style, pageSize, zoomLevel, meta, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
+  const fetchMetadata = useRef<FetchMetadata[]>([]);
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const wfsDataSource = new GeoJsonDataSource('wfs');
@@ -40,7 +46,17 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
 
-    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel as number <= zoomLevel) {
+    fetchMetadata.current.push({
+      bbox: {
+        west: bbox.west,
+        south: bbox.south,
+        east: bbox.east,
+        north: bbox.north,
+      },
+      timestamp: new Date(),
+    });
+
+    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel <= zoomLevel) {
       if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
         wfsDataSource.show = false;
         page.current = 0;
@@ -122,7 +138,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       (item: Entity, idx: number) => {
         if (idx % 2) {
           wfsDataSource.entities.remove(item);
-        };
+        }
       }
     ); 
 
