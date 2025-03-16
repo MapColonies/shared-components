@@ -11,75 +11,93 @@ const CACHE_MAX_DISTANCE = 2500; // (meters) Zoom level 15 = 2.5 meters per pixe
 
 const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
-async function pMap(
-	iterable,
-	mapper,
-	{
-		concurrency = Number.POSITIVE_INFINITY,
-		stopOnError = true,
-		signal,
-	} = {},
-) {
-	return new Promise((resolve_, reject_) => {
-		if (iterable[Symbol.iterator] === undefined && iterable[Symbol.asyncIterator] === undefined) {
-			throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
-		}
+type Mapper<T, U> = (item: T, index: number) => Promise<U> | U;
 
-		if (typeof mapper !== 'function') {
-			throw new TypeError('Mapper function is required');
-		}
+interface PMapOptions {
+  concurrency?: number;
+  stopOnError?: boolean;
+  signal?: AbortSignal;
+}
 
-		if (!((Number.isSafeInteger(concurrency) && concurrency >= 1) || concurrency === Number.POSITIVE_INFINITY)) {
-			throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
-		}
+class AggregateError extends Error {
+  errors: Error[];
 
-		const result = [];
-		const errors = [];
-		const skippedIndexesMap = new Map();
-		let isRejected = false;
-		let isResolved = false;
-		let isIterableDone = false;
-		let resolvingCount = 0;
-		let currentIndex = 0;
-		const iterator = iterable[Symbol.iterator] === undefined ? iterable[Symbol.asyncIterator]() : iterable[Symbol.iterator]();
+  constructor(errors: Error[], message?: string) {
+    super(message);
+    this.errors = errors;
+    this.name = 'AggregateError';
+  }
+}
 
-		const signalListener = () => {
-			reject(signal.reason);
-		};
+async function pMap<T, U>(
+  iterable: Iterable<T> | AsyncIterable<T>,
+  mapper: Mapper<T, U>,
+  {
+    concurrency = Number.POSITIVE_INFINITY,
+    stopOnError = true,
+    signal,
+  }: PMapOptions = {},
+): Promise<U[]> {
+  return new Promise<U[]>((resolve_, reject_) => {
+    if (!(Symbol.iterator in iterable) && !(Symbol.asyncIterator in iterable)) {
+      throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
+    }
 
-		const cleanup = () => {
-			signal?.removeEventListener('abort', signalListener);
-		};
+    if (typeof mapper !== 'function') {
+      throw new TypeError('Mapper function is required');
+    }
 
-		const resolve = value => {
-			resolve_(value);
-			cleanup();
-		};
+    if (!((Number.isSafeInteger(concurrency) && concurrency >= 1) || concurrency === Number.POSITIVE_INFINITY)) {
+      throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
+    }
 
-		const reject = reason => {
-			isRejected = true;
-			isResolved = true;
-			reject_(reason);
-			cleanup();
-		};
+    const result: U[] = [];
+    const errors: Error[] = [];
+    const skippedIndexesMap = new Map<number, any>();
+    let isRejected = false;
+    let isResolved = false;
+    let isIterableDone = false;
+    let resolvingCount = 0;
+    let currentIndex = 0;
+    const iterator = (iterable as Iterable<T>)[Symbol.iterator] === undefined ? (iterable as AsyncIterable<T>)[Symbol.asyncIterator]() : (iterable as Iterable<T>)[Symbol.iterator]();
 
-		if (signal) {
-			if (signal.aborted) {
-				reject(signal.reason);
-			}
+    const signalListener = () => {
+      reject(signal?.reason);
+    };
 
-			signal.addEventListener('abort', signalListener, {once: true});
-		}
+    const cleanup = () => {
+      signal?.removeEventListener('abort', signalListener);
+    };
 
-		const next = async () => {
-			if (isResolved) {
-				return;
-			}
+    const resolve = (value: U[]) => {
+      resolve_(value);
+      cleanup();
+    };
 
-			const nextItem = await iterator.next();
+    const reject = (reason: any) => {
+      isRejected = true;
+      isResolved = true;
+      reject_(reason);
+      cleanup();
+    };
 
-			const index = currentIndex;
-			currentIndex++;
+    if (signal) {
+      if (signal.aborted) {
+        reject(signal.reason);
+      }
+
+      signal.addEventListener('abort', signalListener, { once: true });
+    }
+
+    const next = async () => {
+      if (isResolved) {
+        return;
+      }
+
+      const nextItem = await iterator.next();
+
+      const index = currentIndex;
+      currentIndex++;
 
 			// Note: `iterator.next()` can be called many times in parallel.
 			// This can cause multiple calls to this `next()` function to
@@ -87,211 +105,223 @@ async function pMap(
 			// The shutdown logic that rejects/resolves must be protected
 			// so it runs only one time as the `skippedIndex` logic is
 			// non-idempotent.
-			if (nextItem.done) {
-				isIterableDone = true;
 
-				if (resolvingCount === 0 && !isResolved) {
-					if (!stopOnError && errors.length > 0) {
-						reject(new AggregateError(errors)); // eslint-disable-line unicorn/error-message
-						return;
-					}
+      if (nextItem.done) {
+        isIterableDone = true;
 
-					isResolved = true;
+        if (resolvingCount === 0 && !isResolved) {
+          if (!stopOnError && errors.length > 0) {
+            reject(new AggregateError(errors)); // eslint-disable-line unicorn/error-message
+            return;
+          }
 
-					if (skippedIndexesMap.size === 0) {
-						resolve(result);
-						return;
-					}
+          isResolved = true;
 
-					const pureResult = [];
+          if (skippedIndexesMap.size === 0) {
+            resolve(result);
+            return;
+          }
 
-					// Support multiple `pMapSkip`'s.
-					for (const [index, value] of result.entries()) {
-						if (skippedIndexesMap.get(index) === pMapSkip) {
-							continue;
-						}
+          const pureResult: U[] = [];
 
-						pureResult.push(value);
-					}
+					// Support multiple `pMapSkip`'s
+          for (const [index, value] of result.entries()) {
+            if (skippedIndexesMap.get(index) === pMapSkip) {
+              continue;
+            }
 
-					resolve(pureResult);
-				}
+            pureResult.push(value);
+          }
 
-				return;
-			}
+          resolve(pureResult);
+        }
 
-			resolvingCount++;
+        return;
+      }
+
+      resolvingCount++;
 
 			// Intentionally detached
-			(async () => {
-				try {
-					const element = await nextItem.value;
+      (async () => {
+        try {
+          const element = await nextItem.value;
 
-					if (isResolved) {
-						return;
-					}
+          if (isResolved) {
+            return;
+          }
 
-					const value = await mapper(element, index);
+          const value = await mapper(element, index);
 
-					// Use Map to stage the index of the element.
-					if (value === pMapSkip) {
-						skippedIndexesMap.set(index, value);
-					}
+					// Use Map to stage the index of the element
+          if (value === pMapSkip) {
+            skippedIndexesMap.set(index, value);
+          }
 
-					result[index] = value;
+          result[index] = value;
 
-					resolvingCount--;
-					await next();
-				} catch (error) {
-					if (stopOnError) {
-						reject(error);
-					} else {
-						errors.push(error);
-						resolvingCount--;
+          resolvingCount--;
+          await next();
+        } catch (error) {
+          if (stopOnError) {
+            reject(error);
+          } else {
+            errors.push(error as Error);
+            resolvingCount--;
 
 						// In that case we can't really continue regardless of `stopOnError` state
 						// since an iterable is likely to continue throwing after it throws once.
 						// If we continue calling `next()` indefinitely we will likely end up
-						// in an infinite loop of failed iteration.
-						try {
-							await next();
-						} catch (error) {
-							reject(error);
-						}
-					}
-				}
-			})();
-		};
+						// in an infinite loop of failed iteration
+            try {
+              await next();
+            } catch (error) {
+              reject(error);
+            }
+          }
+        }
+      })();
+    };
 
 		// Create the concurrent runners in a detached (non-awaited)
 		// promise. We need this so we can await the `next()` calls
 		// to stop creating runners before hitting the concurrency limit
 		// if the iterable has already been marked as done.
 		// NOTE: We *must* do this for async iterators otherwise we'll spin up
-		// infinite `next()` calls by default and never start the event loop.
-		(async () => {
-			for (let index = 0; index < concurrency; index++) {
-				try {
+		// infinite `next()` calls by default and never start the event loop
+    (async () => {
+      for (let index = 0; index < concurrency; index++) {
+        try {
 					// eslint-disable-next-line no-await-in-loop
-					await next();
-				} catch (error) {
-					reject(error);
-					break;
-				}
+          await next();
+        } catch (error) {
+          reject(error);
+          break;
+        }
 
-				if (isIterableDone || isRejected) {
-					break;
-				}
-			}
-		})();
-	});
+        if (isIterableDone || isRejected) {
+          break;
+        }
+      }
+    })();
+  });
 }
 
-function pMapIterable(
-	iterable,
-	mapper,
-	{
-		concurrency = Number.POSITIVE_INFINITY,
-		backpressure = concurrency,
-	} = {},
-) {
-	if (iterable[Symbol.iterator] === undefined && iterable[Symbol.asyncIterator] === undefined) {
-		throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
-	}
+interface PMapIterableOptions {
+  concurrency?: number;
+  backpressure?: number;
+}
 
-	if (typeof mapper !== 'function') {
-		throw new TypeError('Mapper function is required');
-	}
+function pMapIterable<T, U>(
+  iterable: Iterable<T> | AsyncIterable<T>,
+  mapper: Mapper<T, U>,
+  {
+    concurrency = Number.POSITIVE_INFINITY,
+    backpressure = concurrency,
+  }: PMapIterableOptions = {},
+): { [Symbol.asyncIterator](): AsyncIterator<U> } {
+  if (!(Symbol.iterator in iterable) && !(Symbol.asyncIterator in iterable)) {
+    throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
+  }
 
-	if (!((Number.isSafeInteger(concurrency) && concurrency >= 1) || concurrency === Number.POSITIVE_INFINITY)) {
-		throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
-	}
+  if (typeof mapper !== 'function') {
+    throw new TypeError('Mapper function is required');
+  }
 
-	if (!((Number.isSafeInteger(backpressure) && backpressure >= concurrency) || backpressure === Number.POSITIVE_INFINITY)) {
-		throw new TypeError(`Expected \`backpressure\` to be an integer from \`concurrency\` (${concurrency}) and up or \`Infinity\`, got \`${backpressure}\` (${typeof backpressure})`);
-	}
+  if (!((Number.isSafeInteger(concurrency) && concurrency >= 1) || concurrency === Number.POSITIVE_INFINITY)) {
+    throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
+  }
 
-	return {
-		async * [Symbol.asyncIterator]() {
-			const iterator = iterable[Symbol.asyncIterator] === undefined ? iterable[Symbol.iterator]() : iterable[Symbol.asyncIterator]();
+  if (!((Number.isSafeInteger(backpressure) && backpressure >= concurrency) || backpressure === Number.POSITIVE_INFINITY)) {
+    throw new TypeError(`Expected \`backpressure\` to be an integer from \`concurrency\` (${concurrency}) and up or \`Infinity\`, got \`${backpressure}\` (${typeof backpressure})`);
+  }
 
-			const promises = [];
-			let runningMappersCount = 0;
-			let isDone = false;
-			let index = 0;
+  return {
+    async * [Symbol.asyncIterator]() {
+      const iterator = (iterable as AsyncIterable<T>)[Symbol.asyncIterator] !== undefined 
+        ? (iterable as AsyncIterable<T>)[Symbol.asyncIterator]() 
+        : (iterable as Iterable<T>)[Symbol.iterator]();
 
-			function trySpawn() {
-				if (isDone || !(runningMappersCount < concurrency && promises.length < backpressure)) {
-					return;
-				}
+      const promises: Promise<any>[] = [];
+      let runningMappersCount = 0;
+      let isDone = false;
+      let index = 0;
 
-				const promise = (async () => {
-					const {done, value} = await iterator.next();
+      function trySpawn() {
+        if (isDone || !(runningMappersCount < concurrency && promises.length < backpressure)) {
+          return;
+        }
 
-					if (done) {
-						return {done: true};
-					}
+        const promise = (async () => {
+          const { done, value } = await iterator.next();
 
-					runningMappersCount++;
+          if (done) {
+            return { done: true };
+          }
+
+          runningMappersCount++;
 
 					// Spawn if still below concurrency and backpressure limit
-					trySpawn();
+          trySpawn();
 
-					try {
-						const returnValue = await mapper(await value, index++);
+          try {
+            const returnValue = await mapper(await value, index++);
 
-						runningMappersCount--;
+            runningMappersCount--;
 
-						if (returnValue === pMapSkip) {
-							const index = promises.indexOf(promise);
-
-							if (index > 0) {
-								promises.splice(index, 1);
-							}
-						}
+            if (returnValue === pMapSkip) {
+              // @ts-ignore
+              const index = promises.indexOf(promise);
+              if (index > 0) {
+                promises.splice(index, 1);
+              }
+            }
 
 						// Spawn if still below backpressure limit and just dropped below concurrency limit
-						trySpawn();
+            trySpawn();
 
-						return {done: false, value: returnValue};
-					} catch (error) {
-						isDone = true;
-						return {error};
-					}
-				})();
+            return { done: false, value: returnValue };
+          } catch (error) {
+            isDone = true;
+            return { error };
+          }
+        })();
 
-				promises.push(promise);
-			}
+        promises.push(promise);
+      }
 
-			trySpawn();
+      trySpawn();
 
-			while (promises.length > 0) {
-				const {error, done, value} = await promises[0]; // eslint-disable-line no-await-in-loop
+      while (promises.length > 0) {
+        const { error, done, value } = await promises[0]; // eslint-disable-line no-await-in-loop
 
-				promises.shift();
+        promises.shift();
 
-				if (error) {
-					throw error;
-				}
+        if (error) {
+          throw error;
+        }
 
-				if (done) {
-					return;
-				}
+        if (done) {
+          return;
+        }
 
 				// Spawn if just dropped below backpressure limit and below the concurrency limit
-				trySpawn();
+        trySpawn();
 
-				if (value === pMapSkip) {
-					continue;
-				}
+        if (value === pMapSkip) {
+          continue;
+        }
 
-				yield value;
-			}
-		},
-	};
+        yield value;
+      }
+    },
+  };
 }
 
-async function processArrayWithConcurrency(array: any[], concurrency: number, processFn: any) {
+async function processArrayWithConcurrency<T>(
+  array: T[],
+  concurrency: number,
+  processFn: Mapper<T, any>,
+): Promise<void> {
   await pMap(array, processFn, { concurrency });
 }
 
