@@ -10,10 +10,8 @@ import {
   PerspectiveFrustum,
   PerspectiveOffCenterFrustum,
   OrthographicFrustum,
-  ScreenSpaceEventType,
   TerrainProvider,
   Ray,
-  ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { LinearProgress } from '@map-colonies/react-core';
@@ -29,11 +27,11 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import CesiumCompassTool from './tools/cesium-compass.tool';
+import { WFSInspectorTool } from './tools/wfs-inspector.tool';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
-import CesiumCompassTool from './tools/cesium-compass.tool';
-import { WFSInspectorTool } from './tools/wfs-inspector.tool';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 

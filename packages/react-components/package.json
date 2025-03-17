@@ -32,6 +32,7 @@
     "@turf/bbox-polygon": "^6.0.1",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.1.4",
+    "@turf/point-to-polygon-distance": "^7.2.0",
     "@turf/rewind": "^5.1.5",
     "cesium": "1.103.0",
     "chonky": "^2.3.2",
@@ -48,7 +49,8 @@
     "react-datepicker": "^4.16.0",
     "resium": "1.16.1",
     "rimraf": "3.0.2",
-    "textarea-caret": "^3.1.0"
+    "textarea-caret": "^3.1.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "6.5.16",

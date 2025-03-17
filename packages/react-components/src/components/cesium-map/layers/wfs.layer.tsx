@@ -1,16 +1,26 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Cartesian2, Color, Ellipsoid, Entity, GeoJsonDataSource, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
-import { Feature } from 'geojson';
+import {
+  Cartesian2,
+  Color,
+  Ellipsoid,
+  Entity,
+  GeoJsonDataSource,
+  Math as CesiumMath, 
+  ScreenSpaceEventHandler,
+  ScreenSpaceEventType
+} from 'cesium';
+import { BBox, Feature } from 'geojson';
 import { get } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
+// import bboxPolygon from '@turf/bbox-polygon';
 import { processArrayWithConcurrency } from '../helpers/pMap';
+import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
-const CACHE_MAX_SIZE = 50000; // Size in heap: 500 MB
+const CACHE_MAX_SIZE = 50000; // Size in heap: 1GB (1000 -> 20MB)
 const CACHE_MAX_TIME = 5; // (minutes)
-const CACHE_MAX_DISTANCE = 2500; // (meters) Zoom level 15 = 2.5 meters per pixel
+const CACHE_MAX_DISTANCE = 2.5; // (kilometers) Zoom level 15 = 2.5 meters per pixel
 // Calculation was based on: in this area 50K features with area of approximately 200 m each can feet inside
-
-const toDegrees = (coord: number) => (coord * 180) / Math.PI;
 
 export interface CesiumWFSLayerOptions {
   url: string;
@@ -28,7 +38,8 @@ export interface CesiumWFSLayerProps {
 }
 
 interface FetchMetadata {
-  bbox: { west: number; south: number; east: number; north: number };
+  id: string;
+  bbox: BBox;
   timestamp: Date;
 }
 
@@ -46,16 +57,6 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
 
-    fetchMetadata.current.push({
-      bbox: {
-        west: bbox.west,
-        south: bbox.south,
-        east: bbox.east,
-        north: bbox.north,
-      },
-      timestamp: new Date(),
-    });
-
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel <= zoomLevel) {
       if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
         wfsDataSource.show = false;
@@ -65,7 +66,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     }
 
     wfsDataSource.show = true;
-    console.log('cache size: ', wfsCache.current.size);
+    console.log('Cache size: ', wfsCache.current.size);
 
     const filterSection = shouldFilter ? `
       <fes:Filter>
@@ -76,7 +77,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
               <gml:exterior>
                 <gml:LinearRing>
                   <gml:posList>
-                    ${toDegrees(bbox.west)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.north)} ${toDegrees(bbox.east)} ${toDegrees(bbox.south)} ${toDegrees(bbox.west)} ${toDegrees(bbox.south)}
+                    ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)}
                   </gml:posList>
                 </gml:LinearRing>
               </gml:exterior>
@@ -111,48 +112,73 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       <wfs:StartIndex>${offset}</wfs:StartIndex>
     </wfs:GetFeature>`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      body: req_body_xml
-    });
-    const layer = await response.json();
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: req_body_xml
+      });
+      const json = await response.json();
 
-    const newFeatures = layer.features.filter((f: Feature) => !wfsCache.current.has(f.properties?.osm_id));
-    
-    if (newFeatures.length === 0) {
-      if (layer.numberReturned !== 0) {
+      const fetchId = uuidv4();
+      fetchMetadata.current.push({
+        id: fetchId,
+        bbox: json.bbox,
+        timestamp: json.timeStamp
+      });
+
+      const newFeatures: Feature[] = [];
+      json.features.forEach((f: Feature) => {
+        const osmId = f.properties?.osm_id;
+        if (!wfsCache.current.has(osmId)) {
+          wfsCache.current.add(osmId);
+          (f.properties as any).fetchId = fetchId;
+          newFeatures.push(f);
+        }
+      });
+
+      if (newFeatures.length === 0) {
+        if (json.numberReturned !== 0) {
+          fetchAndUpdateWfs(page.current++ * pageSize);
+        } else {
+          page.current = 0;
+        }
+        return;
+      }
+
+      const position = center(bbox);
+      const farthest = fetchMetadata.current.reduce((farthest, fetched) => {
+        const dist = distance(position, fetched.bbox);
+        // console.log(bboxPolygon(fetched.bbox));
+        return dist > farthest.distance ? { id: fetched.id, distance: dist } : farthest;
+      }, { id: '', distance: 0 });
+
+      console.log('Farthest bbox ID:', farthest.id);
+
+      await processArrayWithConcurrency(
+        wfsDataSource.entities.values,
+        10,
+        (item: Entity, idx: number) => {
+          if (idx % 2) {
+            wfsDataSource.entities.remove(item);
+          }
+        }
+      );
+
+      const newGeoJson = {
+        type: "FeatureCollection",
+        features: newFeatures
+      };
+
+      await wfsDataSource.process(newGeoJson, style);
+      mapViewer.scene.requestRender();
+
+      if (json.numberReturned !== 0) {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
       }
-      return;
-    }
-
-    newFeatures.forEach((f: Feature) => {
-      wfsCache.current.add(f.properties?.osm_id);
-    });
-
-    processArrayWithConcurrency(
-      wfsDataSource.entities.values,
-      10,
-      (item: Entity, idx: number) => {
-        if (idx % 2) {
-          wfsDataSource.entities.remove(item);
-        }
-      }
-    ); 
-
-    const newGeoJson = {
-      type: "FeatureCollection",
-      features: newFeatures
-    };
-
-    await wfsDataSource.process(newGeoJson, style);
-    mapViewer.scene.requestRender();
-    if (layer.numberReturned !== 0) {
-      fetchAndUpdateWfs(page.current++ * pageSize);
-    } else {
-      page.current = 0;
+    } catch (error) {
+      console.error('Error fetching WFS data:', error);
     }
   }, [mapViewer.currentZoomLevel]);
 
@@ -185,7 +211,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     }, ScreenSpaceEventType.MOUSE_MOVE);
 
     return () => {
-      if (get(mapViewer, '_cesiumWidget') != undefined) {
+      if (get(mapViewer, '_cesiumWidget') !== undefined) {
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
