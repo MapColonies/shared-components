@@ -5,14 +5,13 @@ import {
   Ellipsoid,
   Entity,
   GeoJsonDataSource,
-  Math as CesiumMath, 
+  Math as CesiumMath,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType
 } from 'cesium';
 import { BBox, Feature } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-// import bboxPolygon from '@turf/bbox-polygon';
 import { processArrayWithConcurrency } from '../helpers/pMap';
 import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
@@ -46,7 +45,7 @@ interface FetchMetadata {
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
   const { url, featureType, style, pageSize, zoomLevel, meta, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
-  const fetchMetadata = useRef<FetchMetadata[]>([]);
+  const fetchMetadata = useRef<Map<string, FetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const wfsDataSource = new GeoJsonDataSource('wfs');
@@ -119,19 +118,25 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       });
       const json = await response.json();
 
-      const fetchId = uuidv4();
-      fetchMetadata.current.push({
-        id: fetchId,
-        bbox: json.bbox,
-        timestamp: json.timeStamp
-      });
+      let fetchId: string = '';
+      if (json.numberReturned !== 0 && json.bbox) {
+        const bboxKey = json.bbox.join(',');
+        if (!fetchMetadata.current.has(bboxKey)) {
+          fetchId = uuidv4();
+          fetchMetadata.current.set(bboxKey, {
+            id: fetchId,
+            bbox: json.bbox,
+            timestamp: json.timeStamp
+          });
+        }
+      }
 
       const newFeatures: Feature[] = [];
       json.features.forEach((f: Feature) => {
         const osmId = f.properties?.osm_id;
         if (!wfsCache.current.has(osmId)) {
           wfsCache.current.add(osmId);
-          (f.properties as any).fetchId = fetchId;
+          (f.properties as any).fetch_id = fetchId;
           newFeatures.push(f);
         }
       });
@@ -146,11 +151,10 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       }
 
       const position = center(bbox);
-      const farthest = fetchMetadata.current.reduce((farthest, fetched) => {
+      const farthest = Array.from(fetchMetadata.current.values()).reduce((farthest, fetched) => {
         const dist = distance(position, fetched.bbox);
-        // console.log(bboxPolygon(fetched.bbox));
         return dist > farthest.distance ? { id: fetched.id, distance: dist } : farthest;
-      }, { id: '', distance: 0 });
+      }, { id: '', distance: -Infinity });
 
       console.log('Farthest bbox ID:', farthest.id);
 
