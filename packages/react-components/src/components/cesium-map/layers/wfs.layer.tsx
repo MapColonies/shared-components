@@ -11,8 +11,8 @@ import {
 } from 'cesium';
 import { BBox, Feature } from 'geojson';
 import { get } from 'lodash';
+import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
-import { processArrayWithConcurrency } from '../helpers/pMap';
 import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
@@ -138,14 +138,15 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       }
 
       const newFeatures: Feature[] = [];
-      json.features.forEach((f: Feature) => {
+      const calcNewFeatures = (f: Feature): void => {
         const osmId = f.properties?.osm_id;
         if (!wfsCache.current.has(osmId)) {
           wfsCache.current.add(osmId);
           (f.properties as any).fetch_id = fetchId;
           newFeatures.push(f);
         }
-      });
+      };
+      await pMap(json.features, calcNewFeatures, { concurrency: 10 });
 
       if (json.numberReturned !== 0 &&
         json.bbox &&
@@ -186,22 +187,19 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
           const fetchIdToRemove = farthest.id;
 
           const entitiesToDelete: Entity[] = [];
-
-          await processArrayWithConcurrency(
-            wfsDataSource.entities.values,
-            10,
-            (entity: Entity) => {
-              if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-                const osmId = entity.properties.osm_id.getValue();
-                wfsCache.current.delete(osmId);
-                entitiesToDelete.push(entity);
-              }
+          const calcEntitiesToDelete = (entity: Entity): void => {
+            if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
+              const osmId = entity.properties.osm_id.getValue();
+              wfsCache.current.delete(osmId);
+              entitiesToDelete.push(entity);
             }
-          );
+          };
+          await pMap(wfsDataSource.entities.values, calcEntitiesToDelete, { concurrency: 10 });
 
-          entitiesToDelete.forEach((entity) => {
+          const deleteEntities = (entity: Entity): void => {
             wfsDataSource.entities.remove(entity);
-          });
+          };
+          await pMap(entitiesToDelete, deleteEntities, { concurrency: 10 });
 
           if (farthest.key) {
             fetchMetadata.current.delete(farthest.key);
