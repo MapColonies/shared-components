@@ -16,7 +16,7 @@ import { processArrayWithConcurrency } from '../helpers/pMap';
 import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
-const CACHE_MAX_SIZE = 50000; // Size in heap: 1GB (1000 -> 20MB)
+const CACHE_MAX_SIZE = 6000; // 50000 geometries -> size in heap: 1GB (1000 -> 20MB)
 const CACHE_MAX_TIME = 5; // (minutes)
 const CACHE_MAX_DISTANCE = 2.5; // (kilometers) Zoom level 15 = 2.5 meters per pixel
 // Calculation was based on: in this area 50K features with area of approximately 200 m each can feet inside
@@ -38,8 +38,10 @@ export interface CesiumWFSLayerProps {
 
 interface FetchMetadata {
   id: string;
+  parentBBox: BBox;
   bbox: BBox;
   timestamp: Date;
+  items?: number;
 }
 
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
@@ -56,7 +58,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     if (!bbox) { return; }
 
-    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel <= zoomLevel) {
+    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
       if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
         wfsDataSource.show = false;
         page.current = 0;
@@ -65,7 +67,15 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     }
 
     wfsDataSource.show = true;
+
     console.log('Cache size: ', wfsCache.current.size);
+
+    const extent: BBox = [
+      CesiumMath.toDegrees(bbox.west),
+      CesiumMath.toDegrees(bbox.south),
+      CesiumMath.toDegrees(bbox.east),
+      CesiumMath.toDegrees(bbox.north)
+    ];
 
     const filterSection = shouldFilter ? `
       <fes:Filter>
@@ -119,15 +129,11 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       const json = await response.json();
 
       let fetchId: string = '';
+      let bboxKey: string = '';
       if (json.numberReturned !== 0 && json.bbox) {
-        const bboxKey = json.bbox.join(',');
+        bboxKey = json.bbox.join(',');
         if (!fetchMetadata.current.has(bboxKey)) {
           fetchId = uuidv4();
-          fetchMetadata.current.set(bboxKey, {
-            id: fetchId,
-            bbox: json.bbox,
-            timestamp: json.timeStamp
-          });
         }
       }
 
@@ -141,6 +147,19 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         }
       });
 
+      if (json.numberReturned !== 0 &&
+        json.bbox &&
+        newFeatures.length > 0 &&
+        !fetchMetadata.current.has(bboxKey)) {
+        fetchMetadata.current.set(bboxKey, {
+          id: fetchId,
+          parentBBox: extent,
+          bbox: json.bbox,
+          timestamp: json.timeStamp,
+          items: newFeatures.length
+        });
+      }
+
       if (newFeatures.length === 0) {
         if (json.numberReturned !== 0) {
           fetchAndUpdateWfs(page.current++ * pageSize);
@@ -150,23 +169,46 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         return;
       }
 
-      const position = center(bbox);
-      const farthest = Array.from(fetchMetadata.current.values()).reduce((farthest, fetched) => {
-        const dist = distance(position, fetched.bbox);
-        return dist > farthest.distance ? { id: fetched.id, distance: dist } : farthest;
-      }, { id: '', distance: -Infinity });
+      if (wfsCache.current.size > CACHE_MAX_SIZE) {
+        do {
+          const position = center(bbox);
+          const farthest = Array.from(fetchMetadata.current.values())
+            .filter((item) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
+            .reduce((farthest, fetched) => {
+              const dist = distance(position, fetched.bbox);
+              return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
+            }, { id: '', key: '', distance: -Infinity });
 
-      console.log('Farthest bbox ID:', farthest.id);
-
-      await processArrayWithConcurrency(
-        wfsDataSource.entities.values,
-        10,
-        (item: Entity, idx: number) => {
-          if (idx % 2) {
-            wfsDataSource.entities.remove(item);
+          if (farthest.id === '') {
+            break;
           }
-        }
-      );
+
+          const fetchIdToRemove = farthest.id;
+
+          const entitiesToDelete: Entity[] = [];
+
+          await processArrayWithConcurrency(
+            wfsDataSource.entities.values,
+            10,
+            (entity: Entity) => {
+              if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
+                const osmId = entity.properties.osm_id.getValue();
+                wfsCache.current.delete(osmId);
+                entitiesToDelete.push(entity);
+              }
+            }
+          );
+
+          entitiesToDelete.forEach((entity) => {
+            wfsDataSource.entities.remove(entity);
+          });
+
+          if (farthest.key) {
+            fetchMetadata.current.delete(farthest.key);
+          }
+
+        } while (wfsCache.current.size > CACHE_MAX_SIZE);
+      }
 
       const newGeoJson = {
         type: "FeatureCollection",

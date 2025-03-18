@@ -54,7 +54,7 @@ const optionsBuildings = {
     markerSymbol: '?'
   },
   pageSize: 300,
-  zoomLevel: 13,
+  zoomLevel: 14,
   meta: {
     layer_name: 'buildings',
     alias_layer_name: 'מבנים',
@@ -162,8 +162,8 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
+      {/*<CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
-      {/* <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
