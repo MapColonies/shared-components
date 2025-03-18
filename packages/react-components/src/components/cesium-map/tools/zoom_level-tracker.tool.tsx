@@ -105,6 +105,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({loca
       });
 
       setZoomLevel(closestZoom.level);
+      mapViewer.currentZoomLevel = closestZoom.level;
     }
   }, [mapViewer, zoomLevelHeights]);
 
@@ -117,6 +118,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({loca
     });
 
     setZoomLevel(maxZoom);
+    mapViewer.currentZoomLevel = maxZoom;
   }, [mapViewer]);
 
   const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(() => ({

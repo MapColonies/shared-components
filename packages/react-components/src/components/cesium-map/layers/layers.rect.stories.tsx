@@ -1,5 +1,5 @@
-import React, { useLayoutEffect, useState } from 'react';
-import { Rectangle, Color } from 'cesium';
+import React, { useLayoutEffect } from 'react';
+import { Rectangle } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import bbox from '@turf/bbox';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
@@ -141,6 +141,11 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
   const mapViewer = useCesiumMap();
   const { layer } = props;
 
+  // For testing the exposure of current zoom level on map viewer
+  setInterval(() => {
+    console.log('######################### Zoom level: ', mapViewer.currentZoomLevel);
+  }, 2000);
+
   // Mockin footprint data on layer meta
   const layerFootprint = {
     type: 'Polygon',
@@ -162,5 +167,6 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
 
     mapViewer.layersManager?.addRasterLayer(layer, 0, '');
   }, [mapViewer, layerFootprint, layer]);
+  
   return <></>;
 };
