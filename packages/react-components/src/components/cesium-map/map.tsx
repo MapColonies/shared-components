@@ -56,6 +56,7 @@ interface ICameraState {
 }
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
+  public currentZoomLevel?: number;
   private useOptimizedTileRequests?: boolean;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
