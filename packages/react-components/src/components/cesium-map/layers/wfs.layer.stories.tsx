@@ -55,6 +55,7 @@ const optionsBuildings = {
   },
   pageSize: 300,
   zoomLevel: 14,
+  maxCacheSize: 6000,
   meta: {
     layer_name: 'buildings',
     alias_layer_name: 'מבנים',
@@ -111,6 +112,7 @@ const optionsBuildingsDates = {
   },
   pageSize: 300,
   zoomLevel: 14,
+  maxCacheSize: 6000,
   meta: {
     layer_name: 'buildings_dates',
     alias_layer_name: 'תאריכי מבנים',
@@ -160,9 +162,9 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
       {/*<CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />
       <CesiumWFSLayer options={optionsBuildings} />

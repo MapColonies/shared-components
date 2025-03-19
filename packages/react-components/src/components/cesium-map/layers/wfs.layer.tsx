@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import {
   Cartesian2,
   Color,
@@ -6,6 +6,7 @@ import {
   Entity,
   GeoJsonDataSource,
   Math as CesiumMath,
+  Rectangle,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType
 } from 'cesium';
@@ -16,17 +17,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
-const CACHE_MAX_SIZE = 6000; // 50000 geometries -> size in heap: 1GB (1000 -> 20MB)
-const CACHE_MAX_TIME = 5; // (minutes)
-const CACHE_MAX_DISTANCE = 2.5; // (kilometers) Zoom level 15 = 2.5 meters per pixel
-// Calculation was based on: in this area 50K features with area of approximately 200 m each can feet inside
-
 export interface CesiumWFSLayerOptions {
   url: string;
   featureType: string;
   style: Record<string, unknown>;
   pageSize: number;
   zoomLevel: number;
+  maxCacheSize: number;
   meta?: Record<string, unknown>;
   sortBy?: string;
   shouldFilter?: boolean;
@@ -45,39 +42,15 @@ interface FetchMetadata {
 }
 
 export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
-  const { url, featureType, style, pageSize, zoomLevel, meta, sortBy, shouldFilter } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, meta, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, FetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
-  const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
-    if (!mapViewer) { return; }
-
-    const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
-    if (!bbox) { return; }
-
-    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
-      if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
-        wfsDataSource.show = false;
-        page.current = 0;
-      }
-      return;
-    }
-
-    wfsDataSource.show = true;
-
-    console.log('Cache size: ', wfsCache.current.size);
-
-    const extent: BBox = [
-      CesiumMath.toDegrees(bbox.west),
-      CesiumMath.toDegrees(bbox.south),
-      CesiumMath.toDegrees(bbox.east),
-      CesiumMath.toDegrees(bbox.north)
-    ];
-
-    const filterSection = shouldFilter ? `
+  const buildFilterSection = (bbox: Rectangle): string => {
+    return `
       <fes:Filter>
         <fes:And>
           <fes:Intersects>
@@ -93,9 +66,11 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
             </gml:Polygon>
           </fes:Intersects>
         </fes:And>
-      </fes:Filter>` : '';
+      </fes:Filter>`;
+  };
 
-    const req_body_xml = `<wfs:GetFeature
+  const buildRequestBody = (filterSection: string, offset: number): string => {
+    return `<wfs:GetFeature
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
       xmlns:fes="http://www.opengis.net/fes/2.0"
       xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -120,16 +95,90 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       <wfs:Count>${pageSize}</wfs:Count>
       <wfs:StartIndex>${offset}</wfs:StartIndex>
     </wfs:GetFeature>`;
+  };
+
+  const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
+    const newFeatures: Feature[] = [];
+    await pMap(features, async (f: Feature) => {
+      const osmId = f.properties?.osm_id;
+      if (!wfsCache.current.has(osmId)) {
+        wfsCache.current.add(osmId);
+        (f.properties as any).fetch_id = fetchId;
+        newFeatures.push(f);
+      }
+    }, { concurrency: 10 });
+    return newFeatures;
+  };
+
+  const manageCache = async (extent: BBox, bbox: any) => {
+    if (wfsCache.current.size <= maxCacheSize) { return; }
+
+    do {
+      const position = center(bbox);
+      const farthest = Array.from(fetchMetadata.current.values())
+        .filter((item: FetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
+        .reduce((farthest: { id: string, key: string, distance: number }, fetched: FetchMetadata) => {
+          const dist = distance(position, fetched.bbox);
+          return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
+        }, { id: '', key: '', distance: -Infinity });
+
+      if (farthest.id === '') { break; }
+
+      const fetchIdToRemove = farthest.id;
+
+      const entitiesToDelete: Entity[] = [];
+      await pMap(wfsDataSource.entities.values, async (entity: Entity) => {
+        if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
+          const osmId = entity.properties.osm_id.getValue();
+          wfsCache.current.delete(osmId);
+          entitiesToDelete.push(entity);
+        }
+      }, { concurrency: 10 });
+
+      await pMap(entitiesToDelete, (entity: Entity) => {
+        wfsDataSource.entities.remove(entity);
+      }, { concurrency: 10 });
+
+      if (farthest.key) {
+        fetchMetadata.current.delete(farthest.key);
+      }
+
+    } while (wfsCache.current.size > maxCacheSize);
+  };
+
+  const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
+    if (!mapViewer) return;
+
+    const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
+    if (!bbox) return;
+
+    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
+      if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
+        wfsDataSource.show = false;
+        page.current = 0;
+      }
+      return;
+    }
+
+    wfsDataSource.show = true;
+    console.log('Cache size: ', wfsCache.current.size);
+
+    const extent: BBox = [
+      CesiumMath.toDegrees(bbox.west),
+      CesiumMath.toDegrees(bbox.south),
+      CesiumMath.toDegrees(bbox.east),
+      CesiumMath.toDegrees(bbox.north)
+    ];
+
+    const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
+    const req_body_xml = buildRequestBody(filterSection, offset);
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        body: req_body_xml
-      });
+      const response = await fetch(url, { method: 'POST', body: req_body_xml });
       const json = await response.json();
 
-      let fetchId: string = '';
-      let bboxKey: string = '';
+      let fetchId = '';
+      let bboxKey = '';
       if (json.numberReturned !== 0 && json.bbox) {
         bboxKey = json.bbox.join(',');
         if (!fetchMetadata.current.has(bboxKey)) {
@@ -137,21 +186,9 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         }
       }
 
-      const newFeatures: Feature[] = [];
-      const calcNewFeatures = (f: Feature): void => {
-        const osmId = f.properties?.osm_id;
-        if (!wfsCache.current.has(osmId)) {
-          wfsCache.current.add(osmId);
-          (f.properties as any).fetch_id = fetchId;
-          newFeatures.push(f);
-        }
-      };
-      await pMap(json.features, calcNewFeatures, { concurrency: 10 });
+      const newFeatures = await processFeatures(json.features, fetchId);
 
-      if (json.numberReturned !== 0 &&
-        json.bbox &&
-        newFeatures.length > 0 &&
-        !fetchMetadata.current.has(bboxKey)) {
+      if (json.numberReturned !== 0 && json.bbox && newFeatures.length > 0 && !fetchMetadata.current.has(bboxKey)) {
         fetchMetadata.current.set(bboxKey, {
           id: fetchId,
           parentBBox: extent,
@@ -170,43 +207,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         return;
       }
 
-      if (wfsCache.current.size > CACHE_MAX_SIZE) {
-        do {
-          const position = center(bbox);
-          const farthest = Array.from(fetchMetadata.current.values())
-            .filter((item) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
-            .reduce((farthest, fetched) => {
-              const dist = distance(position, fetched.bbox);
-              return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
-            }, { id: '', key: '', distance: -Infinity });
-
-          if (farthest.id === '') {
-            break;
-          }
-
-          const fetchIdToRemove = farthest.id;
-
-          const entitiesToDelete: Entity[] = [];
-          const calcEntitiesToDelete = (entity: Entity): void => {
-            if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-              const osmId = entity.properties.osm_id.getValue();
-              wfsCache.current.delete(osmId);
-              entitiesToDelete.push(entity);
-            }
-          };
-          await pMap(wfsDataSource.entities.values, calcEntitiesToDelete, { concurrency: 10 });
-
-          const deleteEntities = (entity: Entity): void => {
-            wfsDataSource.entities.remove(entity);
-          };
-          await pMap(entitiesToDelete, deleteEntities, { concurrency: 10 });
-
-          if (farthest.key) {
-            fetchMetadata.current.delete(farthest.key);
-          }
-
-        } while (wfsCache.current.size > CACHE_MAX_SIZE);
-      }
+      await manageCache(extent, bbox);
 
       const newGeoJson = {
         type: "FeatureCollection",
@@ -224,16 +225,19 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     } catch (error) {
       console.error('Error fetching WFS data:', error);
     }
-  }, [mapViewer.currentZoomLevel]);
+  }, []);
 
   useEffect(() => {
+    // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 
+    // Move event
     const fetchHandler = () => {
       fetchAndUpdateWfs();
     };
     mapViewer.scene.camera.moveEnd.addEventListener(fetchHandler);
 
+    // Hover event
     let hoveredEntity: any = null;
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
     handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
@@ -254,6 +258,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
 
+    // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
