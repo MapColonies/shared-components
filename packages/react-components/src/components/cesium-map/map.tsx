@@ -10,10 +10,8 @@ import {
   PerspectiveFrustum,
   PerspectiveOffCenterFrustum,
   OrthographicFrustum,
-  ScreenSpaceEventType,
   TerrainProvider,
   Ray,
-  ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { LinearProgress } from '@map-colonies/react-core';
@@ -29,10 +27,11 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import CesiumCompassTool from './tools/cesium-compass.tool';
+import { WFSInspectorTool } from './tools/wfs-inspector.tool';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
-import CesiumCompassTool from './tools/cesium-compass.tool';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -56,6 +55,7 @@ interface ICameraState {
 }
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
+  public currentZoomLevel?: number;
   private useOptimizedTileRequests?: boolean;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
@@ -412,8 +412,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {showLoadingProgress && isLoading && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
-
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
+            <WFSInspectorTool locale={locale} />
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}

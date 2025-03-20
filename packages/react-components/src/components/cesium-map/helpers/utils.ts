@@ -1,10 +1,15 @@
-import { Rectangle } from 'cesium';
+import { Math as CesiumMath, Rectangle } from 'cesium';
+import { BBox, Feature, Point } from 'geojson';
+import bboxPolygon from '@turf/bbox-polygon';
+import pointToPolygonDistance from '@turf/point-to-polygon-distance';
 import { CustomImageryProvider } from './customImageryProviders';
+import { point } from '@turf/helpers';
 
 const canvasElem = document.createElement('canvas');
 const canvasCtx = canvasElem.getContext('2d');
 
 /**
+ * Checks if image data has at least one transparent pixel.
  * @param image Image data to check
  * @returns `true` if image data has at least one transparent pixel, `false` otherwise.
  */
@@ -105,4 +110,26 @@ export const cesiumRectangleContained = (rect: Rectangle, anotherRect: Rectangle
   const isRectInsideAnother = west >= anotherWest && east <= anotherEast && north <= anotherNorth && south >= anotherSouth;
 
   return isRectInsideAnother;
+};
+
+/**
+ * Calculates distance from a point to the edges of a given bbox.
+ * @param position Point to calculate distance from
+ * @param bbox Bounding box to calculate distance to
+ * @returns Distance in km
+ */
+export const distance = (position: Feature<Point>, bbox: BBox) => {
+  return pointToPolygonDistance(position, bboxPolygon(bbox));
+};
+
+/**
+ * Calculates the center of a given bbox.
+ * @param bbox Cesium extent
+ * @returns Center point of the bbox
+ */
+export const center = (bbox: Rectangle): Feature<Point> => {
+  const centerX = (CesiumMath.toDegrees(bbox.west) + CesiumMath.toDegrees(bbox.east)) / 2;
+  const centerY = (CesiumMath.toDegrees(bbox.south) + CesiumMath.toDegrees(bbox.north)) / 2;
+  const position = point([centerX, centerY]);
+  return position;
 };

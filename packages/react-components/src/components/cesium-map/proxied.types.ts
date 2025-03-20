@@ -9,6 +9,7 @@ import {
   Ellipsoid,
   EllipsoidTerrainProvider,
   GeographicTilingScheme,
+  HorizontalOrigin,
   LabelStyle,
   PolylineDashMaterialProperty,
   Rectangle,
@@ -46,6 +47,7 @@ export class CesiumCesiumTerrainProvider extends CesiumTerrainProvider {}
 // PROXIED ENUMS
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumVerticalOrigin = VerticalOrigin;
+export const CesiumHorizontalOrigin = HorizontalOrigin;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumLabelStyle = LabelStyle;
