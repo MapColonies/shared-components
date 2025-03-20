@@ -56,49 +56,64 @@ const optionsBuildings = {
   pageSize: 300,
   zoomLevel: 14,
   maxCacheSize: 6000,
-  meta: {
-    layer_name: 'buildings',
-    alias_layer_name: 'מבנים',
+  sortBy: 'id',
+  shouldFilter: true
+};
+
+const metaBuildings = {
+  id: 'buildings',
+  keywords: ['buildings', 'osm'],
+  links: '',
+  type: 'RECORD_VECTOR',
+  classification: 'Top secret',
+  productName: '',
+  description: 'Buildings layer',
+  srsId: '',
+  srsName: '',
+  producerName: 'Moria',
+  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  productType: 'VECTOR_BEST',
+  featureStructure: {
+    layerName: 'buildings',
+    aliasLayerName: 'מבנים',
     fields: [
       {
-        field_name: 'osm_id',
-        alias_field_name: 'מזהה OSM',
+        fieldName: 'osm_id',
+        aliasFieldName: 'מזהה OSM',
         type: 'string'
       },
       {
-        field_name: 'id',
-        alias_field_name: 'מזהה',
+        fieldName: 'id',
+        aliasFieldName: 'מזהה',
         type: 'string'
       },
       {
-        field_name: 'building_type',
-        alias_field_name: 'סוג',
+        fieldName: 'building_type',
+        aliasFieldName: 'סוג',
         type: 'string'
       },
       {
-        field_name: 'sensitivity',
-        alias_field_name: 'רגישות',
+        fieldName: 'sensitivity',
+        aliasFieldName: 'רגישות',
         type: 'string'
       },
       {
-        field_name: 'entity_id',
-        alias_field_name: 'מזהה יישות',
+        fieldName: 'entity_id',
+        aliasFieldName: 'מזהה יישות',
         type: 'string'
       },
       {
-        field_name: 'is_sensitive',
-        alias_field_name: 'רגיש',
+        fieldName: 'is_sensitive',
+        aliasFieldName: 'רגיש',
         type: 'boolean'
       },
       {
-        field_name: 'date',
-        alias_field_name: 'תאריך',
+        fieldName: 'date',
+        aliasFieldName: 'תאריך',
         type: 'date'
       }
     ]
-  },
-  sortBy: 'id',
-  shouldFilter: true
+  }
 };
 
 const optionsBuildingsDates = {
@@ -113,75 +128,90 @@ const optionsBuildingsDates = {
   pageSize: 300,
   zoomLevel: 14,
   maxCacheSize: 6000,
-  meta: {
-    layer_name: 'buildings_dates',
-    alias_layer_name: 'תאריכי מבנים',
+  sortBy: 'year_day_numeric',
+  shouldFilter: false
+};
+
+const metaBuildingsDates = {
+  id: 'buildings_dates',
+  keywords: ['buildings_dates', 'osm'],
+  links: '',
+  type: 'RECORD_VECTOR',
+  classification: 'Top secret',
+  productName: '',
+  description: 'Buildings dates layer',
+  srsId: '',
+  srsName: '',
+  producerName: 'Moria',
+  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  productType: 'VECTOR_BEST',
+  featureStructure: {
+    layerName: 'buildings_dates',
+    aliasLayerName: 'תאריכי מבנים',
     fields: [
       {
-        field_name: 'osm_id',
-        alias_field_name: 'מזהה OSM',
+        fieldName: 'osm_id',
+        aliasFieldName: 'מזהה OSM',
         type: 'string'
       },
       {
-        field_name: 'id',
-        alias_field_name: 'מזהה',
+        fieldName: 'id',
+        aliasFieldName: 'מזהה',
         type: 'string'
       },
       {
-        field_name: 'building_type',
-        alias_field_name: 'סוג',
+        fieldName: 'building_type',
+        aliasFieldName: 'סוג',
         type: 'string'
       },
       {
-        field_name: 'sensitivity',
-        alias_field_name: 'רגישות',
+        fieldName: 'sensitivity',
+        aliasFieldName: 'רגישות',
         type: 'string'
       },
       {
-        field_name: 'entity_id',
-        alias_field_name: 'מזהה יישות',
+        fieldName: 'entity_id',
+        aliasFieldName: 'מזהה יישות',
         type: 'string'
       },
       {
-        field_name: 'is_sensitive',
-        alias_field_name: 'רגיש',
+        fieldName: 'is_sensitive',
+        aliasFieldName: 'רגיש',
         type: 'boolean'
       },
       {
-        field_name: 'date',
-        alias_field_name: 'תאריך',
+        fieldName: 'date',
+        aliasFieldName: 'תאריך',
         type: 'date'
       }
     ]
-  },
-  sortBy: 'year_day_numeric',
-  shouldFilter: false
+  }
 };
 
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <CesiumWFSLayer options={optionsBuildings} />
-      {/*<CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} /> */}
-      {/* <CesiumWFSLayer options={optionsBuildingsDates} /> */}
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      {/*<CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} /> */}
+      {/* <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} /> */}
     </CesiumMap>
   </div>
 );

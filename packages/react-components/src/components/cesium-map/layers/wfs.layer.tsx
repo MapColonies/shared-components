@@ -17,20 +17,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { distance, center } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
-export interface CesiumWFSLayerOptions {
+export interface ICesiumWFSLayerOptions {
   url: string;
   featureType: string;
   style: Record<string, unknown>;
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
-  meta?: Record<string, unknown>;
   sortBy?: string;
   shouldFilter?: boolean;
 }
 
-export interface CesiumWFSLayerProps {
-  options: CesiumWFSLayerOptions;
+export interface ICesiumWFSLayer {
+  options: ICesiumWFSLayerOptions;
+  meta: Record<string, unknown>;
 }
 
 interface FetchMetadata {
@@ -41,8 +41,8 @@ interface FetchMetadata {
   items?: number;
 }
 
-export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, meta, sortBy, shouldFilter } = options;
+export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => {
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, FetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
@@ -99,7 +99,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
 
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
     const newFeatures: Feature[] = [];
-    await pMap(features, async (f: Feature) => {
+    await pMap(features, async (f: Feature): Promise<void> => {
       const osmId = f.properties?.osm_id;
       if (!wfsCache.current.has(osmId)) {
         wfsCache.current.add(osmId);
@@ -110,7 +110,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     return newFeatures;
   };
 
-  const manageCache = async (extent: BBox, bbox: any) => {
+  const manageCache = async (extent: BBox, bbox: any): Promise<void> => {
     if (wfsCache.current.size <= maxCacheSize) { return; }
 
     do {
@@ -127,7 +127,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
       const fetchIdToRemove = farthest.id;
 
       const entitiesToDelete: Entity[] = [];
-      await pMap(wfsDataSource.entities.values, async (entity: Entity) => {
+      await pMap(wfsDataSource.entities.values, async (entity: Entity): Promise<void> => {
         if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
           const osmId = entity.properties.osm_id.getValue();
           wfsCache.current.delete(osmId);
@@ -135,7 +135,7 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
         }
       }, { concurrency: 10 });
 
-      await pMap(entitiesToDelete, (entity: Entity) => {
+      await pMap(entitiesToDelete, (entity: Entity): void => {
         wfsDataSource.entities.remove(entity);
       }, { concurrency: 10 });
 
@@ -227,7 +227,13 @@ export const CesiumWFSLayer: React.FC<CesiumWFSLayerProps> = ({ options }) => {
     }
   }, []);
 
+  useLayoutEffect(() => {
+    mapViewer.layersManager?.addMetaToDataLayer(meta, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
+  }, [meta]);
+
   useEffect(() => {
+    mapViewer.layersManager?.addDataLayer({ options, meta });
+    
     // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 

@@ -23,6 +23,7 @@ import {
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
 import { cesiumRectangleContained } from './helpers/utils';
+import { ICesiumWFSLayer } from './layers/wfs.layer';
 import { CesiumCartesian2 } from './proxied.types';
 
 const INC = 1;
@@ -61,6 +62,7 @@ class LayerManager {
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
+  private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
 
@@ -73,6 +75,7 @@ class LayerManager {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
+    this.dataLayers = [];
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
@@ -82,7 +85,7 @@ class LayerManager {
       this.layerUpdated.addEventListener(onLayersUpdate, this);
     }
 
-    // Binding layer's relevancy check to cesium lifecycle if optimized tile requests enabled.
+    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
     if (this.mapViewer.shouldOptimizedTileRequests) {
       this.layerUpdated.addEventListener((meta: Record<string, unknown>) => {
         const newMetaKeys = Object.keys(meta);
@@ -120,11 +123,19 @@ class LayerManager {
     return this.layers;
   }
 
-  // It's a general place to extend layer's data. Should be done when all providers(different types) are initialized
-  public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const laeyrsReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
+  public get dataLayerList(): ICesiumWFSLayer[] {
+    return this.dataLayers;
+  }
 
-    Promise.all(laeyrsReadyPromises).then((data) => {
+  public addDataLayer(dataLayer: ICesiumWFSLayer): void {
+    this.dataLayers.push({...dataLayer});
+  }
+
+  // A general place to extend layer's data. Should be done when all providers(different types) are initialized
+  public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
+    const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
+
+    Promise.all(layersReadyPromises).then((data) => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -132,6 +143,14 @@ class LayerManager {
         this.layerUpdated.raiseEvent(meta);
       }
     });
+  }
+
+  // A general place to extend data layer's data
+  public addMetaToDataLayer(meta: any, layerPredicate: (layer: ICesiumWFSLayer) => boolean): void {
+    const dataLayer = this.dataLayers.find(layerPredicate);
+    if (dataLayer) {
+      dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
+    }
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
@@ -214,6 +233,16 @@ class LayerManager {
 
     if (layer) {
       this.mapViewer.imageryLayers.remove(layer, true);
+    }
+  }
+
+  public removeDataLayer(dataLayerId: string): void {
+    const dataLayer = this.findDataLayerById(dataLayerId);
+    if (dataLayer) {
+      const index = this.dataLayers.indexOf(dataLayer);
+      if (index > -1) {
+        this.dataLayers.splice(index, 1);
+      }
     }
   }
 
@@ -414,6 +443,13 @@ class LayerManager {
     return this.layers.find((layer) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       return layer.meta !== undefined ? layer.meta.id === layerId : false;
+    });
+  }
+
+  private findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
+    return this.dataLayers.find((dataLayer) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      return dataLayer.meta !== undefined ? dataLayer.meta.id === dataLayerId : false;
     });
   }
 
