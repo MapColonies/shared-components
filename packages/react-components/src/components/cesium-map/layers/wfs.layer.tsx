@@ -33,7 +33,7 @@ export interface ICesiumWFSLayer {
   meta: Record<string, unknown>;
 }
 
-interface FetchMetadata {
+interface IFetchMetadata {
   id: string;
   parentBBox: BBox;
   bbox: BBox;
@@ -44,7 +44,7 @@ interface FetchMetadata {
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => {
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
-  const fetchMetadata = useRef<Map<string, FetchMetadata>>(new Map());
+  const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const wfsDataSource = new GeoJsonDataSource('wfs');
@@ -116,8 +116,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     do {
       const position = center(bbox);
       const farthest = Array.from(fetchMetadata.current.values())
-        .filter((item: FetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
-        .reduce((farthest: { id: string, key: string, distance: number }, fetched: FetchMetadata) => {
+        .filter((item: IFetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
+        .reduce((farthest: { id: string, key: string, distance: number }, fetched: IFetchMetadata) => {
           const dist = distance(position, fetched.bbox);
           return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
         }, { id: '', key: '', distance: -Infinity });
@@ -233,7 +233,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
 
   useEffect(() => {
     mapViewer.layersManager?.addDataLayer({ options, meta });
-    
+
     // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 
