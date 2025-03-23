@@ -211,7 +211,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} /> */}
-      {/* <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} /> */}
+      <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} />
     </CesiumMap>
   </div>
 );

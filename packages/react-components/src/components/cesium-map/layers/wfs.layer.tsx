@@ -235,11 +235,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
   }, []);
 
   useEffect(() => { // Happens each time the metadata from STATE changes   
-    mapViewer.layersManager?.addMetaToDataLayer(metadata, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
+    if (mapViewer.layersManager &&
+      mapViewer.layersManager.dataLayerList.length > 0 &&
+      mapViewer.layersManager.findDataLayerById(featureType) !== undefined) {
+      mapViewer.layersManager.addMetaToDataLayer(metadata, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
+    }
   }, [metadata]);
 
   useEffect(() => { // Happens when layersManager is initialized by parent map component
-    mapViewer.layersManager?.addDataLayer({ options, meta: metadata });
+    mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata } });
   }, [mapViewer.layersManager]);
 
   useEffect(() => {

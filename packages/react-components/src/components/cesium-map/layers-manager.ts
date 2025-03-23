@@ -61,6 +61,7 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
+  public dataLayerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
@@ -79,6 +80,7 @@ class LayerManager {
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
+    this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
 
     if (onLayersUpdate) {
@@ -150,6 +152,7 @@ class LayerManager {
     const dataLayer = this.dataLayers.find(layerPredicate);
     if (dataLayer) {
       dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
+      this.dataLayerUpdated.raiseEvent(this.dataLayers);
     }
   }
 
@@ -257,7 +260,6 @@ class LayerManager {
     // TODO: remove vector layers
   }
 
-  // Remove all non base layers
   public removeNotBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
       const parentId = get(layer.meta, 'parentBasetMapId') as string;
@@ -425,6 +427,20 @@ class LayerManager {
     };
   }
 
+  public addDataLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.dataLayerUpdated.addEventListener(callback, this);
+  }
+
+  public removeDataLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.dataLayerUpdated.removeEventListener(callback, this);
+  }
+
+  public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
+    return this.dataLayers.find((dataLayer) => {
+      return dataLayer.meta.id === dataLayerId;
+    });
+  }
+
   private setLegends(): void {
     if (typeof this.legendsExtractor !== 'undefined') {
       this.legendsList = this.legendsExtractor(this.layers);
@@ -443,13 +459,6 @@ class LayerManager {
     return this.layers.find((layer) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       return layer.meta !== undefined ? layer.meta.id === layerId : false;
-    });
-  }
-
-  private findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
-    return this.dataLayers.find((dataLayer) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      return dataLayer.meta !== undefined ? dataLayer.meta.id === dataLayerId : false;
     });
   }
 

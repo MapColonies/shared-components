@@ -1,9 +1,18 @@
+import { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
+import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
-import { get } from 'lodash';
 
 import './wfs-inspector.tool.css';
+
+interface IFeatureTypeMetadata {
+  id: string;
+  zoomLevel: number;
+  items: number;
+  total: number;
+  cache: number;
+}
 
 export interface WFSInspectorToolProps {
   locale?: { [key: string]: string };
@@ -11,31 +20,38 @@ export interface WFSInspectorToolProps {
 
 export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [featureTypes, setFeatureTypes] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [featureTypes, setFeatureTypes] = useState<IFeatureTypeMetadata[]>([]);
+  const [isOpen, setIsOpen] = useState(true);
 
-  const dialogTitle = get(locale, 'WFS_INSPECTOR_DIALOG_TITLE') ?? 'WFS Layers Inspector';
+  const dialogTitle = get(locale, 'WFS_INSPECTOR_DIALOG_TITLE') ?? 'Data Layers';
 
   useEffect(() => {
-    if (!mapViewer) return;
+    if (!mapViewer.layersManager) return;
 
-    const updateFeatureTypes = () => {
-      const types = [...new Set(mapViewer.entities.values.map(entity => (entity as any).featureType))];
-      setFeatureTypes(types.filter(Boolean));
+    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[]): void => {
+      dataLayers.forEach((layer: ICesiumWFSLayer): void => {
+        const { options, meta } = layer;
+        const { zoomLevel } = options;
+        const { id, items, total, cache } = meta as { id: string; items: number; total: number; cache: number };
+        const existingIndex = featureTypes.findIndex(type => type.id === id);
+        if (existingIndex >= 0) {
+          if (JSON.stringify(featureTypes[existingIndex]) !== JSON.stringify({ id, zoomLevel, items, total, cache })) {
+            const updatedFeatureTypes = [...featureTypes];
+            updatedFeatureTypes[existingIndex] = { id, zoomLevel, items, total, cache };
+            setFeatureTypes(updatedFeatureTypes);
+          }
+        } else {
+          setFeatureTypes([...featureTypes, { id, zoomLevel, items, total, cache }]);
+        }
+      });
     };
 
-    updateFeatureTypes();
+    mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
 
-    const entityCollectionChanged = () => {
-      updateFeatureTypes();
+    return () => {
+      mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
-    
-    mapViewer.entities.collectionChanged.addEventListener(entityCollectionChanged);
-
-    // return () => {
-    //   mapViewer.entities.collectionChanged.removeEventListener(entityCollectionChanged);
-    // };
-  }, []);
+  }, [mapViewer.layersManager]);
 
   return (
     <>
@@ -62,13 +78,17 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
           >
             <DialogTitle>{dialogTitle}</DialogTitle>
             <DialogContent>
-            <ul>
-              {
-                featureTypes.map((type, index) => (
-                  <li key={index}>{type}</li>
-                ))
-              }
-            </ul>
+              <ul>
+                {
+                  featureTypes.map((type, index) => (
+                    <li key={index}>
+                      {type.id} (zoom {type.zoomLevel}):
+                      Total in cache: 
+                      Extent: {type.items} / {type.total}
+                    </li>
+                  ))
+                }
+              </ul>
             </DialogContent>
           </Dialog>
         </div>
