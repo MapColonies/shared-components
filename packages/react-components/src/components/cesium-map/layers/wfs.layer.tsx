@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import {
   Cartesian2,
   Color,
@@ -47,6 +47,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
+  const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
   const buildFilterSection = (bbox: Rectangle): string => {
@@ -207,6 +208,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         return;
       }
 
+      setMetadata({
+        ...meta,
+        items: json.numberReturned !== 0 ? offset + newFeatures.length : json.numberMatched,
+        total: json.numberMatched
+      });
+
       await manageCache(extent, bbox);
 
       const newGeoJson = {
@@ -227,13 +234,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     }
   }, []);
 
-  useLayoutEffect(() => {
-    mapViewer.layersManager?.addMetaToDataLayer(meta, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
-  }, [meta]);
+  useEffect(() => { // Happens each time the metadata from STATE changes   
+    mapViewer.layersManager?.addMetaToDataLayer(metadata, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
+  }, [metadata]);
+
+  useEffect(() => { // Happens when layersManager is initialized by parent map component
+    mapViewer.layersManager?.addDataLayer({ options, meta: metadata });
+  }, [mapViewer.layersManager]);
 
   useEffect(() => {
-    mapViewer.layersManager?.addDataLayer({ options, meta });
-
     // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 
