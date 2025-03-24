@@ -1,6 +1,7 @@
 import { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
+import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
 
@@ -33,16 +34,20 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
         const { options, meta } = layer;
         const { zoomLevel } = options;
         const { id, items, total, cache } = meta as { id: string; items: number; total: number; cache: number };
-        const existingIndex = featureTypes.findIndex(type => type.id === id);
-        if (existingIndex >= 0) {
-          if (JSON.stringify(featureTypes[existingIndex]) !== JSON.stringify({ id, zoomLevel, items, total, cache })) {
-            const updatedFeatureTypes = [...featureTypes];
-            updatedFeatureTypes[existingIndex] = { id, zoomLevel, items, total, cache };
-            setFeatureTypes(updatedFeatureTypes);
+
+        setFeatureTypes(prevFeatureTypes => {
+          const existingIndex = prevFeatureTypes.findIndex(type => type.id === id);
+          if (existingIndex >= 0) {
+            if (JSON.stringify(prevFeatureTypes[existingIndex]) !== JSON.stringify({ id, zoomLevel, items, total, cache })) {
+              const updatedFeatureTypes = [...prevFeatureTypes];
+              updatedFeatureTypes[existingIndex] = { id, zoomLevel, items, total, cache };
+              return updatedFeatureTypes;
+            }
+          } else {
+            return [...prevFeatureTypes, { id, zoomLevel, items, total, cache }];
           }
-        } else {
-          setFeatureTypes([...featureTypes, { id, zoomLevel, items, total, cache }]);
-        }
+          return prevFeatureTypes;
+        });
       });
     };
 
@@ -76,19 +81,19 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
               setIsOpen(false);
             }}
           >
-            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogTitle className="title">{dialogTitle}</DialogTitle>
             <DialogContent>
-              <ul>
+              <Box>
                 {
                   featureTypes.map((type, index) => (
-                    <li key={index}>
-                      {type.id} (zoom {type.zoomLevel}):
-                      Total in cache: 
-                      Extent: {type.items} / {type.total}
-                    </li>
+                    <Box key={index} className="featureType">
+                      <Box className="name">{type.id} (zoom {type.zoomLevel}):</Box>
+                      <Box>Total in cache: {type.cache}</Box>
+                      <Box>Extent: {type.items} / {type.total}</Box>
+                    </Box>
                   ))
                 }
-              </ul>
+              </Box>
             </DialogContent>
           </Dialog>
         </div>

@@ -25,3 +25,16 @@
     left: 80px;
     right: unset;
   }
+
+  .wfsLayersInspector .title {
+    text-align: center;
+  }
+
+  .wfsLayersInspector .featureType {
+    margin-bottom: 12px;
+  }
+
+  .wfsLayersInspector .name {
+    color: #AEF;
+    font-weight: bold;
+  }

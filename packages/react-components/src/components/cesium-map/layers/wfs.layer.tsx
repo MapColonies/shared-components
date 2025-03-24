@@ -162,7 +162,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     }
 
     wfsDataSource.show = true;
-    console.log('Cache size: ', wfsCache.current.size);
 
     const extent: BBox = [
       CesiumMath.toDegrees(bbox.west),
@@ -199,6 +198,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         });
       }
 
+      setMetadata({
+        ...meta,
+        cache: wfsCache.current.size,
+        items: json.numberReturned !== 0 ? offset + newFeatures.length : json.numberMatched,
+        total: json.numberMatched
+      });
+
       if (newFeatures.length === 0) {
         if (json.numberReturned !== 0) {
           fetchAndUpdateWfs(page.current++ * pageSize);
@@ -207,12 +213,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         }
         return;
       }
-
-      setMetadata({
-        ...meta,
-        items: json.numberReturned !== 0 ? offset + newFeatures.length : json.numberMatched,
-        total: json.numberMatched
-      });
 
       await manageCache(extent, bbox);
 
@@ -237,8 +237,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
   useEffect(() => { // Happens each time the metadata from STATE changes   
     if (mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
-      mapViewer.layersManager.findDataLayerById(featureType) !== undefined) {
-      mapViewer.layersManager.addMetaToDataLayer(metadata, (layer: ICesiumWFSLayer) => layer.meta.id === featureType);
+      mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined) {
+      mapViewer.layersManager.addMetaToDataLayer(metadata, metadata.searchLayerPredicate as (layer: ICesiumWFSLayer) => boolean);
     }
   }, [metadata]);
 

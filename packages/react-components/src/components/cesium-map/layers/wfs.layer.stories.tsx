@@ -2,8 +2,7 @@ import { Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { LayerType } from '../layers-manager';
-import { WFSInspectorTool } from '../tools/wfs-inspector.tool';
-import { CesiumWFSLayer } from './wfs.layer';
+import { CesiumWFSLayer, ICesiumWFSLayer } from './wfs.layer';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -61,9 +60,10 @@ const optionsBuildings = {
 };
 
 const metaBuildings = {
-  id: 'buildings',
+  id: '1111111',
+  searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '1111111',
   keywords: ['buildings', 'osm'],
-  links: '',
+  links: '^http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   type: 'RECORD_VECTOR',
   classification: 'Top secret',
   productName: '',
@@ -133,9 +133,10 @@ const optionsBuildingsDates = {
 };
 
 const metaBuildingsDates = {
-  id: 'buildings_dates',
+  id: '7777777',
+  searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '7777777',
   keywords: ['buildings_dates', 'osm'],
-  links: '',
+  links: '^http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   type: 'RECORD_VECTOR',
   classification: 'Top secret',
   productName: '',
@@ -192,6 +193,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '2222222', searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '2222222',}} />
       {/*<CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
@@ -209,9 +211,8 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} /> */}
-      <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} />
+      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} /> 
+      <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} />*/}
     </CesiumMap>
   </div>
 );

@@ -131,6 +131,7 @@ class LayerManager {
 
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
     this.dataLayers.push({...dataLayer});
+    this.dataLayerUpdated.raiseEvent(this.dataLayers);
   }
 
   // A general place to extend layer's data. Should be done when all providers(different types) are initialized
