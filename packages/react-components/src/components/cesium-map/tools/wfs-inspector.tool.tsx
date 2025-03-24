@@ -16,13 +16,17 @@ interface IFeatureTypeMetadata {
   featureStructure: Record<string, unknown>;
 }
 
+type IActiveFeatureTypes = IFeatureTypeMetadata & {
+  zoomLevel: number;
+};
+
 export interface WFSInspectorToolProps {
   locale?: { [key: string]: string };
 }
 
 export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [featureTypes, setFeatureTypes] = useState<IFeatureTypeMetadata[]>([]);
+  const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const [isOpen, setIsOpen] = useState(true);
 
   const dialogTitle = get(locale, 'WFS_INSPECTOR_DIALOG_TITLE') ?? 'Data Layers';
@@ -34,18 +38,25 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as { id: string; items: number; total: number; cache: number; currentZoomLevel: number, featureStructure: Record<string, unknown> };
+        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as { 
+          id: string; 
+          items: number; 
+          total: number; 
+          cache: number; 
+          currentZoomLevel: number; 
+          featureStructure: Record<string, unknown>; 
+        };
 
         setFeatureTypes(prevFeatureTypes => {
           const existingIndex = prevFeatureTypes.findIndex(type => type.id === id);
           if (existingIndex >= 0) {
-            if (JSON.stringify(prevFeatureTypes[existingIndex]) !== JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure })) {
+            if (JSON.stringify(prevFeatureTypes[existingIndex]) !== JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel })) {
               const updatedFeatureTypes = [...prevFeatureTypes];
-              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure };
+              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel };
               return updatedFeatureTypes;
             }
           } else {
-            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure }];
+            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel }];
           }
           return prevFeatureTypes;
         });
@@ -88,10 +99,12 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
                 {
                   featureTypes.map((type, index) => (
                     <Box key={index} className="featureType">
-                      <Box className="name warning">{type.id} (zoom {type.zoomLevel}):</Box>
+                      <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : ''}`}>
+                        {type.id} (zoom {type.zoomLevel}):
+                      </Box>
                       <Box>{type.featureStructure.aliasLayerName as string}</Box>
                       <Box>Total in cache: {type.cache}</Box>
-                      <Box>Extent: {type.items} / {type.total}</Box>
+                      <Box>Features in extent: {type.items} / {type.total}</Box>
                     </Box>
                   ))
                 }
