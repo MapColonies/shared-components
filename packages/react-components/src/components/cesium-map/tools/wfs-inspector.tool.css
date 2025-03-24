@@ -38,3 +38,7 @@
     color: #AEF;
     font-weight: bold;
   }
+
+  .wfsLayersInspector .warning {
+    color: #FFA032;
+  }

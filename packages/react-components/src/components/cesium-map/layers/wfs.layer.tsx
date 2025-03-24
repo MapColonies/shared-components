@@ -158,6 +158,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         wfsDataSource.show = false;
         page.current = 0;
       }
+      setMetadata({
+        ...meta,
+        cache: wfsCache.current.size,
+        items: 0,
+        total: 0,
+        currentZoomLevel: mapViewer.currentZoomLevel
+      });
       return;
     }
 
@@ -202,7 +209,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         ...meta,
         cache: wfsCache.current.size,
         items: json.numberReturned !== 0 ? offset + newFeatures.length : json.numberMatched,
-        total: json.numberMatched
+        total: json.numberMatched,
+        currentZoomLevel: mapViewer.currentZoomLevel
       });
 
       if (newFeatures.length === 0) {
@@ -238,7 +246,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     if (mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
       mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined) {
-      mapViewer.layersManager.addMetaToDataLayer(metadata, metadata.searchLayerPredicate as (layer: ICesiumWFSLayer) => boolean);
+      mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
   }, [metadata]);
 

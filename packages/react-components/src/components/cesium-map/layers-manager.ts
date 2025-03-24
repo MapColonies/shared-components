@@ -149,8 +149,8 @@ class LayerManager {
   }
 
   // A general place to extend data layer's data
-  public addMetaToDataLayer(meta: any, layerPredicate: (layer: ICesiumWFSLayer) => boolean): void {
-    const dataLayer = this.dataLayers.find(layerPredicate);
+  public addMetaToDataLayer(meta: any): void {
+    const dataLayer = this.findDataLayerById(meta.id);
     if (dataLayer) {
       dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
       this.dataLayerUpdated.raiseEvent(this.dataLayers);

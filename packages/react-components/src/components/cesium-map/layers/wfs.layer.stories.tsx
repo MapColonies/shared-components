@@ -61,7 +61,6 @@ const optionsBuildings = {
 
 const metaBuildings = {
   id: '1111111',
-  searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '1111111',
   keywords: ['buildings', 'osm'],
   links: '^http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   type: 'RECORD_VECTOR',
@@ -134,7 +133,6 @@ const optionsBuildingsDates = {
 
 const metaBuildingsDates = {
   id: '7777777',
-  searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '7777777',
   keywords: ['buildings_dates', 'osm'],
   links: '^http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   type: 'RECORD_VECTOR',
@@ -193,7 +191,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '2222222', searchLayerPredicate: (layer: ICesiumWFSLayer) => layer.meta.id === '2222222',}} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
       {/*<CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />

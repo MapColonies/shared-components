@@ -9,10 +9,11 @@ import './wfs-inspector.tool.css';
 
 interface IFeatureTypeMetadata {
   id: string;
-  zoomLevel: number;
   items: number;
   total: number;
   cache: number;
+  currentZoomLevel: number;
+  featureStructure: Record<string, unknown>;
 }
 
 export interface WFSInspectorToolProps {
@@ -33,18 +34,18 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache } = meta as { id: string; items: number; total: number; cache: number };
+        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as { id: string; items: number; total: number; cache: number; currentZoomLevel: number, featureStructure: Record<string, unknown> };
 
         setFeatureTypes(prevFeatureTypes => {
           const existingIndex = prevFeatureTypes.findIndex(type => type.id === id);
           if (existingIndex >= 0) {
-            if (JSON.stringify(prevFeatureTypes[existingIndex]) !== JSON.stringify({ id, zoomLevel, items, total, cache })) {
+            if (JSON.stringify(prevFeatureTypes[existingIndex]) !== JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure })) {
               const updatedFeatureTypes = [...prevFeatureTypes];
-              updatedFeatureTypes[existingIndex] = { id, zoomLevel, items, total, cache };
+              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure };
               return updatedFeatureTypes;
             }
           } else {
-            return [...prevFeatureTypes, { id, zoomLevel, items, total, cache }];
+            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure }];
           }
           return prevFeatureTypes;
         });
@@ -87,7 +88,8 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
                 {
                   featureTypes.map((type, index) => (
                     <Box key={index} className="featureType">
-                      <Box className="name">{type.id} (zoom {type.zoomLevel}):</Box>
+                      <Box className="name warning">{type.id} (zoom {type.zoomLevel}):</Box>
+                      <Box>{type.featureStructure.aliasLayerName as string}</Box>
                       <Box>Total in cache: {type.cache}</Box>
                       <Box>Extent: {type.items} / {type.total}</Box>
                     </Box>
