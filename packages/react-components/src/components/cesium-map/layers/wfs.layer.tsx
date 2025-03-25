@@ -100,14 +100,16 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
 
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
     const newFeatures: Feature[] = [];
-    await pMap(features, async (f: Feature): Promise<void> => {
-      const osmId = f.properties?.osm_id;
-      if (!wfsCache.current.has(osmId)) {
-        wfsCache.current.add(osmId);
-        (f.properties as any).fetch_id = fetchId;
-        newFeatures.push(f);
-      }
-    }, { concurrency: 10 });
+    if (features.length > 0) {
+      await pMap(features, (f: Feature): void => {
+        const osmId = f.properties?.osm_id;
+        if (!wfsCache.current.has(osmId)) {
+          wfsCache.current.add(osmId);
+          (f.properties as any).fetch_id = fetchId;
+          newFeatures.push(f);
+        }
+      }, { concurrency: Math.ceil(features.length / 10) });
+    }
     return newFeatures;
   };
 
@@ -128,17 +130,19 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
       const fetchIdToRemove = farthest.id;
 
       const entitiesToDelete: Entity[] = [];
-      await pMap(wfsDataSource.entities.values, async (entity: Entity): Promise<void> => {
+      await pMap(wfsDataSource.entities.values, (entity: Entity): void => {
         if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
           const osmId = entity.properties.osm_id.getValue();
           wfsCache.current.delete(osmId);
           entitiesToDelete.push(entity);
         }
-      }, { concurrency: 10 });
+      }, { concurrency: Math.ceil(wfsDataSource.entities.values.length / 10) });
 
-      await pMap(entitiesToDelete, (entity: Entity): void => {
-        wfsDataSource.entities.remove(entity);
-      }, { concurrency: 10 });
+      if (entitiesToDelete.length > 0) {
+        await pMap(entitiesToDelete, (entity: Entity): void => {
+          wfsDataSource.entities.remove(entity);
+        }, { concurrency: Math.ceil(entitiesToDelete.length / 10) });
+      }
 
       if (farthest.key) {
         fetchMetadata.current.delete(farthest.key);

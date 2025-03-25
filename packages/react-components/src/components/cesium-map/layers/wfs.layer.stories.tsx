@@ -192,11 +192,11 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
     <CesiumMap {...args}>
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
+      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
       {/*<CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
       <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />

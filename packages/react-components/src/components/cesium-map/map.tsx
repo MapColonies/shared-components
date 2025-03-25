@@ -413,7 +413,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-            <WFSInspectorTool locale={locale} />
+            {/* <DebugPanel> */}
+              <WFSInspectorTool locale={locale} />
+            {/* </DebugPanel> */}
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}

@@ -28,10 +28,16 @@
 
   .wfsLayersInspector .title {
     text-align: center;
+    font-weight: bold;
   }
 
   .wfsLayersInspector .featureType {
     margin-bottom: 12px;
+  }
+
+  body[dir='rtl'] .wfsLayersInspector .featureType {
+    left: 0;
+    right: unset;
   }
 
   .wfsLayersInspector .name {

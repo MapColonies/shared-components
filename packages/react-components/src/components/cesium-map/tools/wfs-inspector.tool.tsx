@@ -29,7 +29,9 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const [isOpen, setIsOpen] = useState(true);
 
-  const dialogTitle = get(locale, 'WFS_INSPECTOR_DIALOG_TITLE') ?? 'Data Layers';
+  const title = get(locale, 'WFS_TITLE') ?? 'שכבות מידע';
+  const cache = get(locale, 'WFS_CACHE') ?? 'בזכרון';
+  const extent = get(locale, 'WFS_EXTENT') ?? 'בתצוגה';
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -85,7 +87,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
         }}
       />
       {
-        isOpen && (
+        isOpen &&
         <div className="wfsLayersInspector">
           <Dialog
             open={isOpen}
@@ -93,18 +95,17 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
               setIsOpen(false);
             }}
           >
-            <DialogTitle className="title">{dialogTitle}</DialogTitle>
+            <DialogTitle></DialogTitle>
             <DialogContent>
               <Box>
+                <Box className="title">{title}</Box>
                 {
                   featureTypes.map((type, index) => (
                     <Box key={index} className="featureType">
                       <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : ''}`}>
-                        {type.featureStructure.aliasLayerName as string} (zoom {type.zoomLevel}):
+                        {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
                       </Box>
-                      <Box>ID: {type.id}</Box>
-                      <Box>Total in cache: {type.cache}</Box>
-                      <Box>Features in extent: {type.items} / {type.total}</Box>
+                      <Box>{cache}: {type.cache}&nbsp;&nbsp;&nbsp;{extent}: {type.items} / {type.total}</Box>
                     </Box>
                   ))
                 }
@@ -112,7 +113,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
             </DialogContent>
           </Dialog>
         </div>
-      )}
+      }
     </>
   );
 };
