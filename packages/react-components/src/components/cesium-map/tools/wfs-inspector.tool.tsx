@@ -29,9 +29,9 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const [isOpen, setIsOpen] = useState(true);
 
-  const title = get(locale, 'WFS_TITLE') ?? 'שכבות מידע';
-  const cache = get(locale, 'WFS_CACHE') ?? 'בזכרון';
-  const extent = get(locale, 'WFS_EXTENT') ?? 'בתצוגה';
+  const title = get(locale, 'WFS_TITLE') ?? 'Data Layers';
+  const cache = get(locale, 'WFS_CACHE') ?? 'Cache';
+  const extent = get(locale, 'WFS_EXTENT') ?? 'Extent';
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -105,7 +105,10 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
                       <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : ''}`}>
                         {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
                       </Box>
-                      <Box>{cache}: {type.cache}&nbsp;&nbsp;&nbsp;{extent}: {type.items} / {type.total}</Box>
+                      <Box className="info">
+                        <Box>{cache}: {type.cache}</Box>
+                        {type.total > 0 && <Box className="spacer">{extent}: {type.items} / {type.total}</Box>}
+                      </Box>
                     </Box>
                   ))
                 }
