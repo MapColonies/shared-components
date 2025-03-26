@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.8.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.3...@map-colonies/react-components@4.8.0) (2025-03-26)
+
+
+### Features
+
+* new MultiSelection component and exposing map current zoom level and missing cesium proxied type ([1c41119](https://github.com/MapColonies/shared-components/commit/1c41119dccd9083a53ed0c5412111fda26ace810))
+
+
+
+
+
 ## [4.7.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.7.2...@map-colonies/react-components@4.7.3) (2025-02-20)
 
 
