@@ -98,6 +98,27 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     </wfs:GetFeature>`;
   };
 
+  const getOptimalConcurrency = (arraySize: number, taskType: 'io' | 'cpu' | undefined) => {
+    const cpuCores = navigator.hardwareConcurrency || 4; // Fallback to 4 if unavailable
+    
+    let baseConcurrency = Math.ceil(cpuCores * 1.5); // Scale concurrency based on cores
+
+    if (taskType === "cpu") {
+      baseConcurrency = Math.max(2, Math.ceil(cpuCores / 2)); // Lower for CPU-heavy tasks
+    }
+
+    // Scale concurrency based on array size
+    if (arraySize >= maxCacheSize) {
+      return Math.min(200, baseConcurrency * 4);
+    } else if (arraySize > 1000) {
+      return Math.min(100, baseConcurrency * 2);
+    } else if (arraySize > 300) {
+      return Math.min(50, baseConcurrency);
+    } else {
+      return Math.min(10, baseConcurrency);
+    }
+  };
+
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
     const newFeatures: Feature[] = [];
     if (features.length > 0) {
@@ -108,7 +129,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
           (f.properties as any).fetch_id = fetchId;
           newFeatures.push(f);
         }
-      }, { concurrency: Math.ceil(features.length / 10) });
+      }, { concurrency: getOptimalConcurrency(features.length, 'cpu') });
     }
     return newFeatures;
   };
@@ -136,12 +157,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
           wfsCache.current.delete(osmId);
           entitiesToDelete.push(entity);
         }
-      }, { concurrency: Math.ceil(wfsDataSource.entities.values.length / 10) });
+      }, { concurrency: getOptimalConcurrency(wfsDataSource.entities.values.length, 'cpu') });
 
       if (entitiesToDelete.length > 0) {
         await pMap(entitiesToDelete, (entity: Entity): void => {
           wfsDataSource.entities.remove(entity);
-        }, { concurrency: Math.ceil(entitiesToDelete.length / 10) });
+        }, { concurrency: getOptimalConcurrency(entitiesToDelete.length, 'cpu') });
       }
 
       if (farthest.key) {
