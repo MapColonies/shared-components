@@ -44,14 +44,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
 
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as { 
-          id: string; 
-          items: number; 
-          total: number; 
-          cache: number; 
-          currentZoomLevel: number; 
-          featureStructure: Record<string, unknown>; 
-        };
+        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as unknown as IFeatureTypeMetadata;
 
         setFeatureTypes(prevFeatureTypes => {
           const existingIndex = prevFeatureTypes.findIndex(type => type.id === id);
