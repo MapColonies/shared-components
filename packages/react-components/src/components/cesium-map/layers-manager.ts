@@ -148,12 +148,11 @@ class LayerManager {
     });
   }
 
-  // A general place to extend data layer's data
   public addMetaToDataLayer(meta: any): void {
     const dataLayer = this.findDataLayerById(meta.id);
     if (dataLayer) {
       dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
-      this.dataLayerUpdated.raiseEvent(this.dataLayers);
+      this.dataLayerUpdated.raiseEvent(this.dataLayers, meta.id);
     }
   }
 

@@ -30,14 +30,18 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
   const [isOpen, setIsOpen] = useState(true);
 
   const title = get(locale, 'WFS_TITLE') ?? 'Data Layers';
-  const cache = get(locale, 'WFS_CACHE') ?? 'Cache';
-  const extent = get(locale, 'WFS_EXTENT') ?? 'Extent';
+  const cacheLabel = get(locale, 'WFS_CACHE') ?? 'Cache';
+  const extentLabel = get(locale, 'WFS_EXTENT') ?? 'Extent';
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
 
-    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[]): void => {
+    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], LayerId?: string | undefined): void => {
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
+        if (LayerId !== undefined) {
+          if (LayerId !== layer.meta.id) return;
+        }
+
         const { options, meta } = layer;
         const { zoomLevel } = options;
         const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as { 
@@ -106,8 +110,8 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
                         {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
                       </Box>
                       <Box className="info">
-                        <Box>{cache}: {type.cache}</Box>
-                        {type.total > 0 && <Box className="spacer">{extent}: {type.items} / {type.total}</Box>}
+                        <Box>{cacheLabel}: {type.cache}</Box>
+                        {type.total > 0 && <Box className="spacer">{extentLabel}: {type.items} / {type.total}</Box>}
                       </Box>
                     </Box>
                   ))
