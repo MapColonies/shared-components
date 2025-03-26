@@ -77,39 +77,39 @@ const metaBuildings = {
     aliasLayerName: 'מבנים',
     fields: [
       {
-        fieldName: 'osm_id',
+        fieldName: 'OSM_ID',
         aliasFieldName: 'מזהה OSM',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'id',
+        fieldName: 'ID',
         aliasFieldName: 'מזהה',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'building_type',
+        fieldName: 'BUILDING_TYPE',
         aliasFieldName: 'סוג',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'sensitivity',
+        fieldName: 'SENSITIVITY',
         aliasFieldName: 'רגישות',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'entity_id',
+        fieldName: 'ENTITY_ID',
         aliasFieldName: 'מזהה יישות',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'is_sensitive',
+        fieldName: 'IS_SENSITIVE',
         aliasFieldName: 'רגיש',
-        type: 'boolean'
+        type: 'Boolean'
       },
       {
-        fieldName: 'date',
+        fieldName: 'DATE',
         aliasFieldName: 'תאריך',
-        type: 'date'
+        type: 'Date'
       }
     ]
   }
@@ -149,39 +149,39 @@ const metaBuildingsDates = {
     aliasLayerName: 'תאריכי מבנים',
     fields: [
       {
-        fieldName: 'osm_id',
+        fieldName: 'OSM_ID',
         aliasFieldName: 'מזהה OSM',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'id',
+        fieldName: 'ID',
         aliasFieldName: 'מזהה',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'building_type',
+        fieldName: 'BUILDING_TYPE',
         aliasFieldName: 'סוג',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'sensitivity',
+        fieldName: 'SENSITIVITY',
         aliasFieldName: 'רגישות',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'entity_id',
+        fieldName: 'ENTITY_ID',
         aliasFieldName: 'מזהה יישות',
-        type: 'string'
+        type: 'String'
       },
       {
-        fieldName: 'is_sensitive',
+        fieldName: 'IS_SENSITIVE',
         aliasFieldName: 'רגיש',
-        type: 'boolean'
+        type: 'Boolean'
       },
       {
-        fieldName: 'date',
+        fieldName: 'DATE',
         aliasFieldName: 'תאריך',
-        type: 'date'
+        type: 'Date'
       }
     ]
   }
