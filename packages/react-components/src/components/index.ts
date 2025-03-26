@@ -12,3 +12,4 @@ export * from './theme';
 export * from './cesium-map';
 export * from './autocomplete';
 export * from './file-picker';
+export * from './multiSelection';
