@@ -124,7 +124,7 @@ export const distance = (position: Feature<Point>, bbox: BBox) => {
 
 /**
  * Calculates the center of a given bbox.
- * @param bbox Cesium extent
+ * @param bbox Cesium Rectangle
  * @returns Center point of the bbox
  */
 export const center = (bbox: Rectangle): Feature<Point> => {
@@ -133,3 +133,15 @@ export const center = (bbox: Rectangle): Feature<Point> => {
   const position = point([centerX, centerY]);
   return position;
 };
+
+/**
+ * Converts a Cesium Rectangle to a GeoJSON bbox array.
+ * @param bbox Cesium Rectangle
+ * @returns BBox array
+ */
+export const rectangle2bbox = (bbox: Rectangle): BBox => [
+  CesiumMath.toDegrees(bbox.west),
+  CesiumMath.toDegrees(bbox.south),
+  CesiumMath.toDegrees(bbox.east),
+  CesiumMath.toDegrees(bbox.north)
+];

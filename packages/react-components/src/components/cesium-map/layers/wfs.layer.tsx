@@ -10,11 +10,11 @@ import {
   ScreenSpaceEventHandler,
   ScreenSpaceEventType
 } from 'cesium';
-import { BBox, Feature } from 'geojson';
+import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
 import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
-import { distance, center } from '../helpers/utils';
+import { distance, center, rectangle2bbox } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
 export interface ICesiumWFSLayerOptions {
@@ -49,6 +49,61 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
+
+  const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
+    let hoveredEntity: any = null;
+    handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
+      const pickedObject = mapViewer.scene.pick(movement.endPosition);
+      if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
+        if (hoveredEntity !== pickedObject.id) {
+          if (hoveredEntity) {
+            hoveredEntity.polygon.material = style.fill;
+          }
+          hoveredEntity = pickedObject.id;
+          hoveredEntity.polygon.material = Color.BLUE.withAlpha(0.8);
+        }
+      } else {
+        if (hoveredEntity) {
+          hoveredEntity.polygon.material = style.fill;
+          hoveredEntity = null;
+        }
+      }
+    }, ScreenSpaceEventType.MOUSE_MOVE);
+  };
+
+  const getOptimalConcurrency = (arraySize: number, taskType: 'io' | 'cpu' | undefined) => {
+    const cpuCores = navigator.hardwareConcurrency || 4; // Fallback to 4 if unavailable
+    let baseConcurrency = Math.ceil(cpuCores * 1.5); // Scale concurrency based on cores
+    if (taskType === "cpu") {
+      baseConcurrency = Math.max(2, Math.ceil(cpuCores / 2)); // Lower for CPU-heavy tasks
+    }
+    // Scale concurrency based on array size
+    return arraySize >= maxCacheSize 
+      ? Math.min(200, baseConcurrency * 4)
+      : arraySize > 1000 
+        ? Math.min(100, baseConcurrency * 2)
+        : arraySize > 300 
+          ? Math.min(50, baseConcurrency)
+          : Math.min(10, baseConcurrency);
+  };
+
+  const updateMetadata = (items: number, total: number): void => {
+    setMetadata({
+      ...meta,
+      cache: wfsCache.current.size,
+      items,
+      total,
+      currentZoomLevel: mapViewer.currentZoomLevel
+    });
+  };
+
+  const hideEntities = (): void => {
+    if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
+      wfsDataSource.show = false;
+      page.current = 0;
+    }
+    updateMetadata(0, 0);
+  };
 
   const buildFilterSection = (bbox: Rectangle): string => {
     return `
@@ -98,23 +153,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
     </wfs:GetFeature>`;
   };
 
-  const getOptimalConcurrency = (arraySize: number, taskType: 'io' | 'cpu' | undefined) => {
-    const cpuCores = navigator.hardwareConcurrency || 4; // Fallback to 4 if unavailable
-    
-    let baseConcurrency = Math.ceil(cpuCores * 1.5); // Scale concurrency based on cores
-
-    if (taskType === "cpu") {
-      baseConcurrency = Math.max(2, Math.ceil(cpuCores / 2)); // Lower for CPU-heavy tasks
-    }
-
-    // Scale concurrency based on array size
-    return arraySize >= maxCacheSize 
-      ? Math.min(200, baseConcurrency * 4)
-      : arraySize > 1000 
-        ? Math.min(100, baseConcurrency * 2)
-        : arraySize > 300 
-          ? Math.min(50, baseConcurrency)
-          : Math.min(10, baseConcurrency);
+  const fetchWfsData = async (body: string): Promise<any> => {
+    const response = await fetch(url, { method: 'POST', body });
+    return await response.json();
   };
 
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
@@ -132,42 +173,93 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
     return newFeatures;
   };
 
-  const manageCache = async (extent: BBox, bbox: any): Promise<void> => {
-    if (wfsCache.current.size <= maxCacheSize) { return; }
+  const findFarthestFetchMetadata = (extent: BBox, position: Feature<Point>): { id: string; key: string; distance: number } => {
+    return Array.from(fetchMetadata.current.values())
+      .filter((item: IFetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
+      .reduce((farthest: { id: string; key: string; distance: number }, fetched: IFetchMetadata) => {
+        const dist = distance(position, fetched.bbox);
+        return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
+      }, { id: '', key: '', distance: -Infinity });
+  };
 
-    do {
-      const position = center(bbox);
-      const farthest = Array.from(fetchMetadata.current.values())
-        .filter((item: IFetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
-        .reduce((farthest: { id: string, key: string, distance: number }, fetched: IFetchMetadata) => {
-          const dist = distance(position, fetched.bbox);
-          return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
-        }, { id: '', key: '', distance: -Infinity });
-
-      if (farthest.id === '') { break; }
-
-      const fetchIdToRemove = farthest.id;
-
-      const entitiesToDelete: Entity[] = [];
-      await pMap(wfsDataSource.entities.values, (entity: Entity): void => {
-        if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-          const osmId = entity.properties.osm_id.getValue();
-          wfsCache.current.delete(osmId);
-          entitiesToDelete.push(entity);
-        }
-      }, { concurrency: getOptimalConcurrency(wfsDataSource.entities.values.length, 'cpu') });
-
-      if (entitiesToDelete.length > 0) {
-        await pMap(entitiesToDelete, (entity: Entity): void => {
-          wfsDataSource.entities.remove(entity);
-        }, { concurrency: getOptimalConcurrency(entitiesToDelete.length, 'cpu') });
+  const removeEntitiesByFetchId = async (fetchIdToRemove: string): Promise<void> => {
+    const entitiesToDelete: Entity[] = [];
+    await pMap(wfsDataSource.entities.values, (entity: Entity): void => {
+      if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
+        const osmId = entity.properties.osm_id.getValue();
+        wfsCache.current.delete(osmId);
+        entitiesToDelete.push(entity);
       }
+    }, { concurrency: getOptimalConcurrency(wfsDataSource.entities.values.length, 'cpu') });
+    if (entitiesToDelete.length > 0) {
+      await pMap(entitiesToDelete, (entity: Entity): void => {
+        wfsDataSource.entities.remove(entity);
+      }, { concurrency: getOptimalConcurrency(entitiesToDelete.length, 'cpu') });
+    }
+  };
 
+  const manageCache = async (extent: BBox, position: Feature<Point>): Promise<void> => {
+    while (wfsCache.current.size > maxCacheSize) {
+      const farthest = findFarthestFetchMetadata(extent, position);
+      if (farthest.id === '') { break; }
+      await removeEntitiesByFetchId(farthest.id);
       if (farthest.key) {
         fetchMetadata.current.delete(farthest.key);
       }
+    }
+  };
 
-    } while (wfsCache.current.size > maxCacheSize);
+  const handleWfsResponse = async (wfsResponse: any, extent: BBox, offset: number, position: Feature<Point>): Promise<void> => {
+    let fetchId = '';
+    let bboxKey = '';
+    let newFeatures: Feature[] = [];
+
+    if (wfsResponse.numberReturned !== 0) {
+      if (wfsResponse.bbox) {
+        bboxKey = wfsResponse.bbox.join(',');
+        if (!fetchMetadata.current.has(bboxKey)) {
+          fetchId = uuidv4();
+        }
+      }
+
+      newFeatures = await processFeatures(wfsResponse.features, fetchId);
+
+      if (wfsResponse.bbox && newFeatures.length > 0 && !fetchMetadata.current.has(bboxKey)) {
+        fetchMetadata.current.set(bboxKey, {
+          id: fetchId,
+          parentBBox: extent,
+          bbox: wfsResponse.bbox,
+          timestamp: wfsResponse.timeStamp,
+          items: newFeatures.length
+        });
+      }
+    }
+
+    updateMetadata(wfsResponse.numberReturned !== 0 ? offset + wfsResponse.numberReturned : wfsResponse.numberMatched, wfsResponse.numberMatched);
+
+    if (newFeatures.length === 0) {
+      if (wfsResponse.numberReturned !== 0) {
+        fetchAndUpdateWfs(page.current++ * pageSize);
+      } else {
+        page.current = 0;
+      }
+      return;
+    }
+    await manageCache(extent, position);
+
+    const newGeoJson = {
+      type: "FeatureCollection",
+      features: newFeatures
+    };
+
+    await wfsDataSource.process(newGeoJson, style);
+    mapViewer.scene.requestRender();
+
+    if (wfsResponse.numberReturned !== 0) {
+      fetchAndUpdateWfs(page.current++ * pageSize);
+    } else {
+      page.current = 0;
+    }
   };
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
@@ -177,91 +269,22 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
     if (!bbox) return;
 
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
-      if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
-        wfsDataSource.show = false;
-        page.current = 0;
-      }
-      setMetadata({
-        ...meta,
-        cache: wfsCache.current.size,
-        items: 0,
-        total: 0,
-        currentZoomLevel: mapViewer.currentZoomLevel
-      });
+      hideEntities();
       return;
     }
 
     wfsDataSource.show = true;
-
-    const extent: BBox = [
-      CesiumMath.toDegrees(bbox.west),
-      CesiumMath.toDegrees(bbox.south),
-      CesiumMath.toDegrees(bbox.east),
-      CesiumMath.toDegrees(bbox.north)
-    ];
-
+    const extent: BBox = rectangle2bbox(bbox);
+    const position: Feature<Point> = center(bbox);
     const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
-    const req_body_xml = buildRequestBody(filterSection, offset);
+    const requestBodyXml = buildRequestBody(filterSection, offset);
 
     try {
-      const response = await fetch(url, { method: 'POST', body: req_body_xml });
-      const json = await response.json();
-
-      let fetchId = '';
-      let bboxKey = '';
-      if (json.numberReturned !== 0 && json.bbox) {
-        bboxKey = json.bbox.join(',');
-        if (!fetchMetadata.current.has(bboxKey)) {
-          fetchId = uuidv4();
-        }
-      }
-
-      const newFeatures = await processFeatures(json.features, fetchId);
-
-      if (json.numberReturned !== 0 && json.bbox && newFeatures.length > 0 && !fetchMetadata.current.has(bboxKey)) {
-        fetchMetadata.current.set(bboxKey, {
-          id: fetchId,
-          parentBBox: extent,
-          bbox: json.bbox,
-          timestamp: json.timeStamp,
-          items: newFeatures.length
-        });
-      }
-
-      setMetadata({
-        ...meta,
-        cache: wfsCache.current.size,
-        items: json.numberReturned !== 0 ? offset + newFeatures.length : json.numberMatched,
-        total: json.numberMatched,
-        currentZoomLevel: mapViewer.currentZoomLevel
-      });
-
-      if (newFeatures.length === 0) {
-        if (json.numberReturned !== 0) {
-          fetchAndUpdateWfs(page.current++ * pageSize);
-        } else {
-          page.current = 0;
-        }
-        return;
-      }
-
-      await manageCache(extent, bbox);
-
-      const newGeoJson = {
-        type: "FeatureCollection",
-        features: newFeatures
-      };
-
-      await wfsDataSource.process(newGeoJson, style);
-      mapViewer.scene.requestRender();
-
-      if (json.numberReturned !== 0) {
-        fetchAndUpdateWfs(page.current++ * pageSize);
-      } else {
-        page.current = 0;
-      }
+      const wfsResponse = await fetchWfsData(requestBodyXml);
+      await handleWfsResponse(wfsResponse, extent, offset, position);
     } catch (error) {
       console.error('Error fetching WFS data:', error);
+      updateMetadata(-1, -1);
     }
   }, []);
 
@@ -299,27 +322,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
       }
     };
   }, []);
-
-  const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
-    let hoveredEntity: any = null;
-    handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
-      const pickedObject = mapViewer.scene.pick(movement.endPosition);
-      if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
-        if (hoveredEntity !== pickedObject.id) {
-          if (hoveredEntity) {
-            hoveredEntity.polygon.material = style.fill;
-          }
-          hoveredEntity = pickedObject.id;
-          hoveredEntity.polygon.material = Color.BLUE.withAlpha(0.8);
-        }
-      } else {
-        if (hoveredEntity) {
-          hoveredEntity.polygon.material = style.fill;
-          hoveredEntity = null;
-        }
-      }
-    }, ScreenSpaceEventType.MOUSE_MOVE);
-  };
 
   return null;
 };

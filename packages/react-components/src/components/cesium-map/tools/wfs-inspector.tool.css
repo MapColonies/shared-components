@@ -58,6 +58,11 @@ body[dir='rtl'] .wfsLayersInspector .featureType {
   animation: blink 1s infinite;
 }
 
+.wfsLayersInspector .error {
+  color: #B00020;
+  animation: blink 1s infinite;
+}
+
 @keyframes blink {
   0%, 100% {
     opacity: 1;

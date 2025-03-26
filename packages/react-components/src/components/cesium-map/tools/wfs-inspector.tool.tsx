@@ -99,7 +99,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
                 {
                   featureTypes.map((type, index) => (
                     <Box key={index} className="featureType">
-                      <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : ''}`}>
+                      <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : type.total === -1 ? 'error' : ''}`}>
                         {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
                       </Box>
                       <Box className="info">
