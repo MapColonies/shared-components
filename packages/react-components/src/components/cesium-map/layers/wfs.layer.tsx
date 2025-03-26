@@ -8,7 +8,7 @@ import {
   Math as CesiumMath,
   Rectangle,
   ScreenSpaceEventHandler,
-  ScreenSpaceEventType
+  ScreenSpaceEventType,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -52,7 +52,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
-    handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
+    handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
       const pickedObject = mapViewer.scene.pick(movement.endPosition);
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
@@ -74,27 +74,28 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
   const getOptimalConcurrency = (arraySize: number, taskType: 'io' | 'cpu' | undefined) => {
     const cpuCores = navigator.hardwareConcurrency || 4; // Fallback to 4 if unavailable
     let baseConcurrency = Math.ceil(cpuCores * 1.5); // Scale concurrency based on cores
-    if (taskType === "cpu") {
+    if (taskType === 'cpu') {
       baseConcurrency = Math.max(2, Math.ceil(cpuCores / 2)); // Lower for CPU-heavy tasks
     }
     // Scale concurrency based on array size
-    return arraySize >= maxCacheSize 
+    return arraySize >= maxCacheSize
       ? Math.min(200, baseConcurrency * 4)
-      : arraySize > 1000 
+      : arraySize > 1000
         ? Math.min(100, baseConcurrency * 2)
-        : arraySize > 300 
+        : arraySize > 300
           ? Math.min(50, baseConcurrency)
           : Math.min(10, baseConcurrency);
   };
 
   const updateMetadata = (items: number, total: number): void => {
-    setMetadata({
+    setMetadata((prev) => ({
+      ...prev,
       ...meta,
       cache: wfsCache.current.size,
       items,
       total,
-      currentZoomLevel: mapViewer.currentZoomLevel
-    });
+      currentZoomLevel: mapViewer.currentZoomLevel,
+    }));
   };
 
   const hideEntities = (): void => {
@@ -230,7 +231,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
           parentBBox: extent,
           bbox: wfsResponse.bbox,
           timestamp: wfsResponse.timeStamp,
-          items: newFeatures.length
+          items: newFeatures.length,
         });
       }
     }
@@ -248,8 +249,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
     await manageCache(extent, position);
 
     const newGeoJson = {
-      type: "FeatureCollection",
-      features: newFeatures
+      type: 'FeatureCollection',
+      features: newFeatures,
     };
 
     await wfsDataSource.process(newGeoJson, style);
@@ -288,7 +289,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
     }
   }, []);
 
-  useEffect(() => { // Happens each time the metadata from STATE changes   
+  useEffect(() => { // Happens each time the metadata from STATE changes
     if (mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
       mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined) {
