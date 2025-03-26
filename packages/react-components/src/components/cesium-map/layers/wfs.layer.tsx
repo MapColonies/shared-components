@@ -41,7 +41,7 @@ interface IFetchMetadata {
   items?: number;
 }
 
-export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => {
+export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => {
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy, shouldFilter } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -108,15 +108,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     }
 
     // Scale concurrency based on array size
-    if (arraySize >= maxCacheSize) {
-      return Math.min(200, baseConcurrency * 4);
-    } else if (arraySize > 1000) {
-      return Math.min(100, baseConcurrency * 2);
-    } else if (arraySize > 300) {
-      return Math.min(50, baseConcurrency);
-    } else {
-      return Math.min(10, baseConcurrency);
-    }
+    return arraySize >= maxCacheSize 
+      ? Math.min(200, baseConcurrency * 4)
+      : arraySize > 1000 
+        ? Math.min(100, baseConcurrency * 2)
+        : arraySize > 300 
+          ? Math.min(50, baseConcurrency)
+          : Math.min(10, baseConcurrency);
   };
 
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
@@ -290,8 +288,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
     mapViewer.scene.camera.moveEnd.addEventListener(fetchHandler);
 
     // Hover event
-    let hoveredEntity: any = null;
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
+    handleMouseHover(handler);
+    
+    // Cleanup
+    return () => {
+      if (get(mapViewer, '_cesiumWidget') !== undefined) {
+        mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
+        handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+      }
+    };
+  }, []);
+
+  const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
+    let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2; }) => {
       const pickedObject = mapViewer.scene.pick(movement.endPosition);
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
@@ -309,15 +319,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options , meta}) => 
         }
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
-
-    // Cleanup
-    return () => {
-      if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
-        handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
-      }
-    };
-  }, []);
+  };
 
   return null;
 };
