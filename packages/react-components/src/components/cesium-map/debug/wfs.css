@@ -1,0 +1,45 @@
+.wfsContainer .title {
+  text-align: center;
+  font-weight: bold;
+}
+
+.wfsContainer .featureType {
+  margin-bottom: 12px;
+  direction: ltr;
+}
+
+body[dir='rtl'] .wfsContainer .featureType {
+  direction: rtl;
+}
+
+.wfsContainer .name {
+  color: #AEF;
+  font-weight: bold;
+}
+
+.wfsContainer .info {
+  display: flex;
+}
+
+.wfsContainer .spacer {
+  margin: 0 20px;
+}
+
+.wfsContainer .warning {
+  color: #FFA032;
+  animation: blink 1s infinite;
+}
+
+.wfsContainer .error {
+  color: #B00020;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
