@@ -74,7 +74,7 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
       {
         featureTypes.map((type, index) => (
           <Box key={index} className="featureType">
-            <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning' : type.total === -1 ? 'error' : ''}`}>
+            <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
               {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
             </Box>
             <Box className="info">

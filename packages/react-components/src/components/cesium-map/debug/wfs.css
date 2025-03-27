@@ -5,7 +5,7 @@
 }
 
 .wfsContainer .featureType {
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 12px;
   direction: ltr;
 }
@@ -29,11 +29,13 @@ body[dir='rtl'] .wfsContainer .featureType {
 
 .wfsContainer .warning {
   color: #FFA032;
-  animation: blink 1s infinite;
 }
 
 .wfsContainer .error {
   color: #B00020;
+}
+
+.wfsContainer .blinking {
   animation: blink 1s infinite;
 }
 
