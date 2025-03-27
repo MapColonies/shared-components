@@ -1,6 +1,6 @@
 {
   "name": "@map-colonies/react-components",
-  "version": "4.7.3",
+  "version": "4.8.0",
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
@@ -48,6 +48,7 @@
     "ol-ext": "^4.0.18",
     "p-map": "^7.0.3",
     "react-datepicker": "^4.16.0",
+    "react-select": "5.7.3",
     "resium": "1.16.1",
     "rimraf": "3.0.2",
     "textarea-caret": "^3.1.0",
