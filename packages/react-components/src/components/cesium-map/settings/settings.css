@@ -5,7 +5,7 @@
 
 .settingsIconContainer,
 .mapLegendToggleContainer,
-.wfsLayersIconContainer {
+.debugPanelIconContainer {
   fill: #fff;
   width: 40px;
   height: 40px;
@@ -16,7 +16,7 @@
 
 .settingsIconContainer:hover,
 .mapLegendToggleContainer:hover,
-.wfsLayersIconContainer:hover {
+.debugPanelIconContainer:hover {
   background: #48b;
   border-color: #aef;
 }

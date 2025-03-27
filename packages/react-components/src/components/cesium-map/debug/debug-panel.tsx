@@ -5,7 +5,7 @@ import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
 
-import './wfs-inspector.tool.css';
+import './debug-panel.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -20,11 +20,11 @@ type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface WFSInspectorToolProps {
+export interface IDebugPanelProps {
   locale?: { [key: string]: string };
 }
 
-export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) => {
+export const DebugPanel: React.FC<IDebugPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const [isOpen, setIsOpen] = useState(true);
@@ -73,7 +73,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
     <>
       <Icon
         icon={
-          <div className="wfsLayersIconContainer">
+          <div className="debugPanelIconContainer">
             <svg width="100%" height="100%" viewBox="0 0 24 24">
               <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
             </svg>
@@ -85,7 +85,7 @@ export const WFSInspectorTool: React.FC<WFSInspectorToolProps> = ({ locale }) =>
       />
       {
         isOpen &&
-        <div className="wfsLayersInspector">
+        <div className="debugPanel">
           <Dialog
             open={isOpen}
             onClosed={(): void => {

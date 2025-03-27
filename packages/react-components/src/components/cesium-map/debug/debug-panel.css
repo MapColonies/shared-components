@@ -1,4 +1,4 @@
-.wfsLayersInspector {
+.debugPanel {
   transform: translateZ(0);
   height: calc(100vh - 220px);
   max-height: 460px;
@@ -13,52 +13,52 @@
   /* TO BE REMOVED - end */
 }
 
-.wfsLayersInspector .mdc-dialog__container {
+.debugPanel .mdc-dialog__container {
   align-items: unset;
 }
 
-.wfsLayersInspector .mdc-dialog .mdc-dialog__surface {
+.debugPanel .mdc-dialog .mdc-dialog__surface {
   max-height: unset;
 }
 
-body[dir='rtl'] .wfsLayersInspector {
+body[dir='rtl'] .debugPanel {
   left: 80px;
   right: unset;
 }
 
-.wfsLayersInspector .title {
+.debugPanel .title {
   text-align: center;
   font-weight: bold;
 }
 
-.wfsLayersInspector .featureType {
+.debugPanel .featureType {
   margin-bottom: 12px;
   direction: ltr;
 }
 
-body[dir='rtl'] .wfsLayersInspector .featureType {
+body[dir='rtl'] .debugPanel .featureType {
   direction: rtl;
 }
 
-.wfsLayersInspector .name {
+.debugPanel .name {
   color: #AEF;
   font-weight: bold;
 }
 
-.wfsLayersInspector .info {
+.debugPanel .info {
   display: flex;
 }
 
-.wfsLayersInspector .spacer {
+.debugPanel .spacer {
   margin: 0 20px;
 }
 
-.wfsLayersInspector .warning {
+.debugPanel .warning {
   color: #FFA032;
   animation: blink 1s infinite;
 }
 
-.wfsLayersInspector .error {
+.debugPanel .error {
   color: #B00020;
   animation: blink 1s infinite;
 }
