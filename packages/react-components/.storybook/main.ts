@@ -9,7 +9,7 @@ const config = {
     builder: '@storybook/builder-vite',
   },
   stories: ['../src/**/*.stories.@(js|ts|tsx|mdx)'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-knobs', 'storybook-addon-mock'],
+  addons: ['@storybook/addon-storysource'],
   viteFinal: async (config: Record<string, unknown>) => {
     const conf = await (commonConfig as any).viteFinal(config);
 

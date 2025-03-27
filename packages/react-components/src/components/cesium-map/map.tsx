@@ -10,10 +10,8 @@ import {
   PerspectiveFrustum,
   PerspectiveOffCenterFrustum,
   OrthographicFrustum,
-  ScreenSpaceEventType,
   TerrainProvider,
   Ray,
-  ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { LinearProgress } from '@map-colonies/react-core';
@@ -29,10 +27,12 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import CesiumCompassTool from './tools/cesium-compass.tool';
+import { DebugPanel } from './debug/debug-panel';
+import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
-import CesiumCompassTool from './tools/cesium-compass.tool';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -99,6 +99,10 @@ interface ILegends {
   mapLegendsExtractor?: LegendExtractor;
 }
 
+export interface IDebugPanel {
+  wfs?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -122,6 +126,7 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
+  debugPanel?: IDebugPanel;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -158,6 +163,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
+  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -283,6 +289,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
+
+  useEffect(() => {
+    setDebugPanel(props.debugPanel);
+  }, [props.debugPanel]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -413,8 +423,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {showLoadingProgress && isLoading && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
-
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
+            {
+              debugPanel &&
+              <DebugPanel locale={locale}>
+                {debugPanel.wfs && <WFS locale={locale} />}
+              </DebugPanel>
+            }
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
