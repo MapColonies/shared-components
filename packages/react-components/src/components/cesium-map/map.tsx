@@ -29,6 +29,7 @@ import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 import CesiumCompassTool from './tools/cesium-compass.tool';
 import { DebugPanel } from './debug/debug-panel';
+import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
@@ -413,7 +414,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-            <DebugPanel locale={locale} />
+            <DebugPanel locale={locale}>
+              <WFS locale={locale} />
+            </DebugPanel>
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}

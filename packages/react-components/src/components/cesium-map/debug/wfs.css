@@ -1,9 +1,11 @@
 .wfsContainer .title {
   text-align: center;
   font-weight: bold;
+  margin-bottom: 12px;
 }
 
 .wfsContainer .featureType {
+  font-size: 14px;
   margin-bottom: 12px;
   direction: ltr;
 }

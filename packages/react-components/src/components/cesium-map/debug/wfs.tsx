@@ -1,7 +1,7 @@
 // WFS.tsx
 
 import { get } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
@@ -28,10 +28,9 @@ interface IWFSProps {
 export const WFS: React.FC<IWFSProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-
-  const title = get(locale, 'WFS_TITLE') ?? 'Data Layers';
-  const cacheLabel = get(locale, 'WFS_CACHE') ?? 'Cache';
-  const extentLabel = get(locale, 'WFS_EXTENT') ?? 'Extent';
+  const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);
+  const cacheLabel = useMemo(() => get(locale, 'WFS_CACHE') ?? 'Cache', [locale]);
+  const extentLabel = useMemo(() => get(locale, 'WFS_EXTENT') ?? 'Extent', [locale]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -68,7 +67,7 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
   }, [mapViewer.layersManager]);
-  
+
   return (
     <Box className="wfsContainer">
       <Box className="title">{title}</Box>

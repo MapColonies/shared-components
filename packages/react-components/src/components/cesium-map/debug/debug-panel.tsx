@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { get } from 'lodash';
 import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
-import { useCesiumMap } from '../map';
-import { WFS } from './wfs';
 
 import './debug-panel.css';
 
 export interface IDebugPanelProps {
+  children: React.ReactNode;
   locale?: { [key: string]: string };
 }
 
-export const DebugPanel: React.FC<IDebugPanelProps> = ({ locale }) => {
-  const mapViewer = useCesiumMap();
+export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
 
   return (
     <>
@@ -36,9 +36,9 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ locale }) => {
               setIsOpen(false);
             }}
           >
-            <DialogTitle></DialogTitle>
+            <DialogTitle className="title">{title}</DialogTitle>
             <DialogContent>
-              <WFS locale={locale} />
+              {children}
             </DialogContent>
           </Dialog>
         </div>
