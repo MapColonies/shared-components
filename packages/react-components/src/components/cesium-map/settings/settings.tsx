@@ -6,6 +6,7 @@ import { IRasterLayer, IVectorLayer } from '../layers-manager';
 import { CesiumSceneModeEnum } from '../map.types';
 import { CesiumSceneModes } from './scene-modes';
 import { CesiumBaseMaps } from './base-maps';
+
 import './settings.css';
 
 export interface IBaseMap {

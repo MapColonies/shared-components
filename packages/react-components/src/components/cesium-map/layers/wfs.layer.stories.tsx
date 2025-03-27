@@ -2,7 +2,7 @@ import { Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { LayerType } from '../layers-manager';
-import { CesiumWFSLayer, ICesiumWFSLayer } from './wfs.layer';
+import { CesiumWFSLayer } from './wfs.layer';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -41,6 +41,13 @@ const BASE_MAPS = {
       baseVectorLayers: [],
     },
   ],
+};
+
+const DEBUG_PANEL = {
+  wfs: {
+    style: {
+    }
+  }
 };
 
 const optionsBuildings = {
@@ -226,6 +233,9 @@ MapWithWFSLayer.argTypes = {
       min: 0,
       max: 20,
     },
+  },
+  debugPanel: {
+    defaultValue: DEBUG_PANEL,
   },
 };
 

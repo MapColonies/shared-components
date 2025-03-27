@@ -99,6 +99,10 @@ interface ILegends {
   mapLegendsExtractor?: LegendExtractor;
 }
 
+export interface IDebugPanel {
+  wfs?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -122,6 +126,7 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
+  debugPanel?: IDebugPanel;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -158,6 +163,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
+  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -283,6 +289,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
+
+  useEffect(() => {
+    setDebugPanel(props.debugPanel);
+  }, [props.debugPanel]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -414,9 +424,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           <Box className="sideToolsContainer">
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-            <DebugPanel locale={locale}>
-              <WFS locale={locale} />
-            </DebugPanel>
+            {
+              debugPanel &&
+              <DebugPanel locale={locale}>
+                {debugPanel.wfs && <WFS locale={locale} />}
+              </DebugPanel>
+            }
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
