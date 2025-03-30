@@ -12,8 +12,8 @@ import {
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
-import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
+import { pMap } from '../helpers/pMap';
 import { distance, center, rectangle2bbox } from '../helpers/utils';
 import { useCesiumMap } from '../map';
 
