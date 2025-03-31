@@ -29,6 +29,7 @@ export interface ICesiumWFSLayerOptions {
 }
 
 export interface ICesiumWFSLayer {
+  key: string;
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
 }
@@ -41,7 +42,7 @@ interface IFetchMetadata {
   items?: number;
 }
 
-export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => {
+export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ key, options, meta }) => {
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy='id', shouldFilter=true } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -298,7 +299,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => 
   }, [metadata]);
 
   useEffect(() => { // Happens when layersManager is initialized by parent map component
-    mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata } });
+    mapViewer.layersManager?.addDataLayer({ key, options, meta: { ...metadata } });
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
