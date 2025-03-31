@@ -42,7 +42,7 @@ interface IFetchMetadata {
 }
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta }) => {
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy, shouldFilter } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy='id', shouldFilter=true } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
