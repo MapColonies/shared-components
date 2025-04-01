@@ -80,7 +80,7 @@ export const CesiumSettings: React.FC<RCesiumMapProps> = (props) => {
       />
       {
         isOpen && (
-        <div id="dialog-portal-example" className="settingsDialogPortal" ref={dialogPortalRef}>
+        <div className="settingsDialogPortal" ref={dialogPortalRef}>
           <Dialog
             open={isOpen}
             onClosed={(): void => {
