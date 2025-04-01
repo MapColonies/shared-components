@@ -32,8 +32,8 @@
   max-height: 460px;
   width: 280px;
   position: absolute;
-  top: 40px;
-  right: 80px;
+  top: 44px;
+  right: 12px;
   /* TO BE REMOVED - start */
   /* color: #AFBFDA;
   background: #2D3748;
@@ -50,7 +50,7 @@
 }
 
 body[dir='rtl'] .settingsDialogPortal {
-  left: 80px;
+  left: 12px;
   right: unset;
 }
 
