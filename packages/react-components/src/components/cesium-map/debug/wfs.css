@@ -17,6 +17,10 @@ body[dir='rtl'] .wfsContainer .featureType {
 .wfsContainer .name {
   color: #AEF;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 260px;
 }
 
 .wfsContainer .info {
