@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import {
   Cartesian2,
-  Color,
+  Color as CesiumColor,
   Ellipsoid,
   Entity,
   GeoJsonDataSource,
@@ -43,13 +43,19 @@ interface IFetchMetadata {
 }
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ key, options, meta }) => {
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy='id', shouldFilter=true } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
+  const loadOptions = useMemo(() => ({
+    stroke: CesiumColor.fromCssColorString(style.color as string),
+    fill: CesiumColor.fromCssColorString(style.color as string).withAlpha(0.5),
+    strokeWidth: 3,
+    markerSymbol: '?',
+  }), [style.color]);
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
@@ -58,14 +64,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ key, options, meta }
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
           if (hoveredEntity) {
-            hoveredEntity.polygon.material = style.fill;
+            hoveredEntity.polygon.material = loadOptions.fill;
           }
           hoveredEntity = pickedObject.id;
-          hoveredEntity.polygon.material = Color.BLUE.withAlpha(0.8);
+          hoveredEntity.polygon.material = CesiumColor.BLUE.withAlpha(0.8);
         }
       } else {
         if (hoveredEntity) {
-          hoveredEntity.polygon.material = style.fill;
+          hoveredEntity.polygon.material = loadOptions.fill;
           hoveredEntity = null;
         }
       }
@@ -254,7 +260,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ key, options, meta }
       features: newFeatures,
     };
 
-    await wfsDataSource.process(newGeoJson, style);
+    await wfsDataSource.process(newGeoJson, loadOptions);
     mapViewer.scene.requestRender();
 
     if (wfsResponse.numberReturned !== 0) {

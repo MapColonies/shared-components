@@ -51,10 +51,7 @@ const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings',
   style: {
-    stroke: Color.RED,
-    fill: Color.RED.withAlpha(0.5),
-    strokeWidth: 3,
-    markerSymbol: '?'
+    color: 'orange'
   },
   pageSize: 300,
   zoomLevel: 14,
@@ -121,10 +118,7 @@ const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
   style: {
-    stroke: Color.GREEN,
-    fill: Color.GREEN.withAlpha(0.5),
-    strokeWidth: 3,
-    markerSymbol: '?'
+    color: 'green'
   },
   pageSize: 300,
   zoomLevel: 14,
@@ -198,7 +192,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
       <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
       <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
       <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
-      {/*<CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} />*/}
+      <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} />
     </CesiumMap>
   </div>
 );
