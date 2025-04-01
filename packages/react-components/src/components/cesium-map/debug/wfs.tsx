@@ -2,6 +2,7 @@
 
 import { get } from 'lodash';
 import React, { useEffect, useState, useMemo } from 'react';
+import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
@@ -74,11 +75,13 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
       {
         featureTypes.map((type, index) => (
           <Box key={index} className="featureType">
-            <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
-              {type.featureStructure.aliasLayerName as string} {type.id} ({type.zoomLevel}):
-            </Box>
+            <Tooltip content={`${type.featureStructure.aliasLayerName as string} ${type.id} (${String(type.zoomLevel)})`}>
+              <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
+                {type.featureStructure.aliasLayerName as string} {type.id} ({String(type.zoomLevel)}):
+              </Box>
+            </Tooltip>
             <Box className="info">
-              <Box>{cacheLabel}: {type.cache}</Box>
+              <Box>{cacheLabel}: {type.cache ?? 0}</Box>
               {type.total > 0 && <Box className="spacer">{extentLabel}: {type.items} / {type.total}</Box>}
             </Box>
           </Box>
