@@ -44,10 +44,7 @@ const BASE_MAPS = {
 };
 
 const DEBUG_PANEL = {
-  wfs: {
-    style: {
-    }
-  }
+  wfs: {}
 };
 
 const optionsBuildings = {
@@ -195,27 +192,13 @@ const metaBuildingsDates = {
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
-      <CesiumWFSLayer options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
-      {/*<CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} />
-      <CesiumWFSLayer options={optionsBuildings} meta={metaBuildings} /> 
-      <CesiumWFSLayer options={optionsBuildingsDates} meta={metaBuildingsDates} />*/}
+      <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} />
+      <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
+      <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
+      <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
+      <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
+      <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
+      {/*<CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} />*/}
     </CesiumMap>
   </div>
 );

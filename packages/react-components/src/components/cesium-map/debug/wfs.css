@@ -32,14 +32,6 @@ body[dir='rtl'] .wfsContainer .featureType {
   margin: 0 20px;
 }
 
-.wfsContainer .warning {
-  color: #FFA032;
-}
-
-.wfsContainer .error {
-  color: #B00020;
-}
-
 .wfsContainer .blinking {
   animation: blink 1s infinite;
 }
