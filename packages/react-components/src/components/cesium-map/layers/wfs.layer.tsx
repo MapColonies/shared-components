@@ -51,10 +51,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta, ...re
   const wfsDataSource = new GeoJsonDataSource('wfs');
   const loadOptions = useMemo<GeoJsonDataSource.LoadOptions>(() => ({
     stroke: CesiumColor.fromCssColorString(style.color as string),
-    fill: CesiumColor.fromCssColorString(style.color as string).withAlpha(0.5),
+    fill: CesiumColor.fromCssColorString(style.fill as string).withAlpha(0.5),
     strokeWidth: 3,
     clampToGround: true,
-  }), [style.color]);
+  }), [style.color, style.fill]);
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
