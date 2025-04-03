@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import {
   Cartesian2,
   Color as CesiumColor,
@@ -44,16 +44,18 @@ interface IFetchMetadata {
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
+  const { color, hover, ...loadOptions } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
-  const loadOptions = useMemo<GeoJsonDataSource.LoadOptions>(() => ({
-    stroke: CesiumColor.fromCssColorString(style.color as string ?? '#01FF1F'),
-    strokeWidth: 3,
-  }), [style.color]);
+  const geojsonColor = CesiumColor.fromCssColorString(style.color as string ?? '#01FF1F');
+  const geojsonHoveredColor = CesiumColor.fromCssColorString(style.hover as string ?? '#24AEE9').withAlpha(0.5);
+  
+  loadOptions.stroke = geojsonColor;
+  loadOptions.fill = geojsonColor;
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
@@ -61,15 +63,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const pickedObject = mapViewer.scene.pick(movement.endPosition);
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
-          if (hoveredEntity) {
-            hoveredEntity.polygon.material = loadOptions.stroke;
+          if (hoveredEntity) { // Resetting previous entity
+            hoveredEntity.polygon.material = geojsonColor;
           }
           hoveredEntity = pickedObject.id;
-          hoveredEntity.polygon.material = CesiumColor.fromCssColorString(style.hover as string ?? '#24AEE9').withAlpha(0.5);
+          hoveredEntity.polygon.material = geojsonHoveredColor;
         }
-      } else {
-        if (hoveredEntity) {
-          hoveredEntity.polygon.material = loadOptions.stroke;
+      } else { // No entity was picked thus the mouse is outside of any entity
+        if (hoveredEntity) { // Resetting previous entity
+          hoveredEntity.polygon.material = geojsonColor;
           hoveredEntity = null;
         }
       }
