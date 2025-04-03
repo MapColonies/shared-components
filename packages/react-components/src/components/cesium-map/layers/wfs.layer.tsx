@@ -41,7 +41,8 @@ interface IFetchMetadata {
   items?: number;
 }
 
-export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta, ...restProps }) => {
+export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
+  const { options, meta } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -50,11 +51,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta, ...re
   const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
   const loadOptions = useMemo<GeoJsonDataSource.LoadOptions>(() => ({
-    stroke: CesiumColor.fromCssColorString(style.color as string),
-    fill: CesiumColor.fromCssColorString(style.fill as string).withAlpha(0.5),
+    stroke: CesiumColor.fromCssColorString(style.color as string ?? '#01FF1F'),
     strokeWidth: 3,
-    clampToGround: true,
-  }), [style.color, style.fill]);
+  }), [style.color]);
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
@@ -63,14 +62,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = ({ options, meta, ...re
       if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
         if (hoveredEntity !== pickedObject.id) {
           if (hoveredEntity) {
-            hoveredEntity.polygon.material = loadOptions.fill;
+            hoveredEntity.polygon.material = loadOptions.stroke;
           }
           hoveredEntity = pickedObject.id;
-          hoveredEntity.polygon.material = CesiumColor.BLUE.withAlpha(0.8);
+          hoveredEntity.polygon.material = CesiumColor.fromCssColorString(style.hover as string ?? '#24AEE9').withAlpha(0.5);
         }
       } else {
         if (hoveredEntity) {
-          hoveredEntity.polygon.material = loadOptions.fill;
+          hoveredEntity.polygon.material = loadOptions.stroke;
           hoveredEntity = null;
         }
       }
