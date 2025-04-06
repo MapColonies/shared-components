@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import {
   Cartesian2,
   Color as CesiumColor,
@@ -44,29 +44,33 @@ interface IFetchMetadata {
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
-  const { color, hover, ...loadOptions } = style;
+  const { color, hover, ...restStyle } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const wfsDataSource = new GeoJsonDataSource('wfs');
-  const geojsonColor = CesiumColor.fromCssColorString(style.color as string ?? '#01FF1F');
-  const geojsonHoveredColor = CesiumColor.fromCssColorString(style.hover as string ?? '#24AEE9').withAlpha(0.5);
+  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F'), [color]);
+  const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
+  // const describeFeature = useMemo(() => {
+  //   return (properties: any, nameProperty: string): string => {
+  //     const name = properties[nameProperty] || 'Unnamed Feature';
+  //     const description = `
+  //       <strong>Name:</strong> ${name}<br>
+  //       <strong>Type:</strong> ${properties.type || 'N/A'}<br>
+  //       <strong>Population:</strong> ${properties.population || 'N/A'}
+  //     `;
+  //     return description;
+  //   };
+  // }, []);
 
-//   const describeFeature = (properties: any, nameProperty: string) => {
-//     const name = properties[nameProperty] || 'Unnamed Feature';
-//     const description = `
-//       <strong>Name:</strong> ${name}<br>
-//       <strong>Type:</strong> ${properties.type || 'N/A'}<br>
-//       <strong>Population:</strong> ${properties.population || 'N/A'}
-//     `;
-//     return description;
-// };
-
-  loadOptions.stroke = geojsonColor;
-  loadOptions.fill = geojsonColor;
-  // loadOptions.describe = describeFeature;
+  const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => ({
+    ...restStyle,
+    stroke: geojsonColor,
+    fill: geojsonColor,
+    // describe: describeFeature,
+  }), [restStyle, geojsonColor]);
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
