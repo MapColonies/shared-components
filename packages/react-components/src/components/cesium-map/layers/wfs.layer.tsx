@@ -53,9 +53,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const wfsDataSource = new GeoJsonDataSource('wfs');
   const geojsonColor = CesiumColor.fromCssColorString(style.color as string ?? '#01FF1F');
   const geojsonHoveredColor = CesiumColor.fromCssColorString(style.hover as string ?? '#24AEE9').withAlpha(0.5);
-  
+
+//   const describeFeature = (properties: any, nameProperty: string) => {
+//     const name = properties[nameProperty] || 'Unnamed Feature';
+//     const description = `
+//       <strong>Name:</strong> ${name}<br>
+//       <strong>Type:</strong> ${properties.type || 'N/A'}<br>
+//       <strong>Population:</strong> ${properties.population || 'N/A'}
+//     `;
+//     return description;
+// };
+
   loadOptions.stroke = geojsonColor;
   loadOptions.fill = geojsonColor;
+  // loadOptions.describe = describeFeature;
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
