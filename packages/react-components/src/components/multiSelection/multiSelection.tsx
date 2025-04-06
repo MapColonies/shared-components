@@ -16,7 +16,7 @@ interface IPropsMultiSelection {
   values?: MultiSelectOption[];
   onChange?: (data: any) => void;
   placeholder?: string;
-  styles?: StylesConfig<unknown, false, GroupBase<unknown>>;
+  styles?: COSTUM_STYLES;
 }
 
 const Option: React.FC<OptionProps> = (props) => {
@@ -64,4 +64,5 @@ export const MultiSelection = (props: IPropsMultiSelection) => {
   );
 };
 
-export default MultiSelection;
+export type COSTUM_STYLES = StylesConfig<unknown, false, GroupBase<unknown>> | undefined;
+
