@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Select, { components, GroupBase, OptionProps, StylesConfig } from 'react-select';
+import Select, { components, GroupBase, OptionProps, StylesConfig as rcStylesConfig } from 'react-select';
 import { Input, ThemeProvider } from '@material-ui/core';
 import { Checkbox, useTheme } from '@map-colonies/react-core';
 import { useMappedMuiTheme } from '../theme';
@@ -16,7 +16,7 @@ interface IPropsMultiSelection {
   values?: MultiSelectOption[];
   onChange?: (data: any) => void;
   placeholder?: string;
-  styles?: COSTUM_STYLES;
+  styles?: StylesConfig;
 }
 
 const Option: React.FC<OptionProps> = (props) => {
@@ -64,5 +64,4 @@ export const MultiSelection = (props: IPropsMultiSelection) => {
   );
 };
 
-export type COSTUM_STYLES = StylesConfig<unknown, false, GroupBase<unknown>> | undefined;
-
+export type StylesConfig = rcStylesConfig<unknown, false, GroupBase<unknown>> | undefined;
