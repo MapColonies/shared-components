@@ -9,6 +9,10 @@ import {
   Rectangle,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
+  SceneMode,
+  defined,
+  Cartesian3,
+  PerspectiveFrustum,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -44,13 +48,12 @@ interface IFetchMetadata {
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
-  const { color, hover, ...restStyle } = style;
+  const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
-  const wfsDataSource = new GeoJsonDataSource('wfs');
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F'), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
   // const describeFeature = useMemo(() => {
@@ -64,13 +67,18 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   //     return description;
   //   };
   // }, []);
-
   const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => ({
-    ...restStyle,
-    stroke: geojsonColor,
-    fill: geojsonColor,
+    stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
+    strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 3 : undefined,
+    fill: mapViewer.scene.mode === SceneMode.SCENE3D ? geojsonColor : undefined,
+    clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
+    markerColor: geojsonColor,
+    markerSymbol: undefined,
     // describe: describeFeature,
-  }), [restStyle, geojsonColor]);
+  }), [mapViewer.scene.mode]);
+
+
+  const wfsDataSource = new GeoJsonDataSource('wfs');
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
@@ -285,10 +293,133 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   };
 
+  const computeLimitedViewRectangle = (maxDistanceMeters = 100) => {
+    const scene = mapViewer.scene;
+    const camera = mapViewer.camera;
+    const mode = scene.mode;
+
+    // Get the full rectangle in 2D or 3D mode
+    const fullRect = camera.computeViewRectangle(scene.globe.ellipsoid);
+
+    // Check if fullRect is valid before proceeding
+    if (!defined(fullRect)) {
+      console.error("computeViewRectangle returned invalid rectangle.");
+      return undefined;
+    }
+
+    // In 2D mode, just return the computed view rectangle directly
+    if (mode === SceneMode.SCENE2D) {
+      return fullRect;
+    }
+
+    // In 3D mode, proceed with the scaling logic
+    const centerCartographic = camera.positionCartographic;
+
+    if (!defined(centerCartographic)) {
+      console.error("Camera position is undefined in 3D mode.");
+      return undefined;
+    }
+
+    const lat = centerCartographic.latitude;
+    const lon = centerCartographic.longitude;
+
+    // Validate latitude and longitude to ensure they are within expected ranges
+    if (lat < -CesiumMath.PI_OVER_TWO || lat > CesiumMath.PI_OVER_TWO ||
+      lon < -CesiumMath.PI || lon > CesiumMath.PI) {
+      console.error("Invalid latitude or longitude values.");
+      return undefined;
+    }
+
+    // Calculate the meters per degree for latitude and longitude
+    const metersPerDegreeLat = 111320;
+    const metersPerDegreeLon = 111320 * Math.cos(lat);
+
+    // Calculate the max deltas based on max distance (100 meters by default)
+    let deltaLat = maxDistanceMeters / metersPerDegreeLat;
+    let deltaLon = maxDistanceMeters / metersPerDegreeLon;
+
+    // Get camera height above the ellipsoid (the altitude from the ground)
+    const cameraHeight = Cartesian3.magnitude(camera.positionWC);
+
+    // If the camera is at a very high altitude (showing the whole world), cap the green rectangle size
+    if (cameraHeight > 10000000) { // Arbitrary threshold for high altitude
+      // Cap the rectangle size to cover a reasonable portion of the Earth
+      deltaLat = 10;  // Limit to a 10-degree latitude span (roughly 1110 km)
+      deltaLon = 10;  // Limit to a 10-degree longitude span (roughly 1110 km)
+    }
+
+    // Calculate the Field of View (FOV) of the camera
+    const fov = camera.frustum instanceof PerspectiveFrustum ? camera.frustum.fov : Math.PI / 3; // Default FOV if not PerspectiveFrustum
+
+    // Apply zoom scaling based on camera height and FOV
+    let zoomFactor = 1.0;
+
+    if (cameraHeight < 500000) {
+      zoomFactor = 0.05; // Strong zoom-out effect for very zoomed-in views (zoom 14+)
+    } else if (cameraHeight < 2000000) {
+      zoomFactor = 0.1; // Moderate zoom scaling for zoom levels 12-13
+    }
+
+    // Apply zoom factor based on the camera's FOV and height to reduce large areas
+    deltaLat *= zoomFactor * (fov / Math.PI);  // FOV scaling adjusts the rectangle size
+    deltaLon *= zoomFactor * (fov / Math.PI);  // Apply similar scaling to longitude
+
+    // Factor in the tilt angle to scale the rectangle
+    const cameraPitch = camera.pitch; // The pitch (tilt) of the camera
+    const maxTiltAngle = Math.PI / 4; // Example of max tilt threshold (45 degrees)
+    const tiltFactor = Math.max(0, 1 - (Math.abs(cameraPitch) / maxTiltAngle));
+
+    // Apply the tilt factor to reduce the green rectangle size at sharp tilt angles
+    deltaLat *= tiltFactor;
+    deltaLon *= tiltFactor;
+
+    // Calculate the new boundaries for the green rectangle
+    let minLat = centerCartographic.latitude - deltaLat;
+    let maxLat = centerCartographic.latitude + deltaLat;
+    const minLon = centerCartographic.longitude - deltaLon;
+    const maxLon = centerCartographic.longitude + deltaLon;
+
+    // Apply a minimum size threshold to prevent the green rectangle from becoming invisible
+    const minSize = 0.0005; // This threshold value prevents the rectangle from shrinking too much
+
+    // Ensure the green rectangle doesn't shrink below the minimum size
+    deltaLat = Math.max(deltaLat, minSize);
+    deltaLon = Math.max(deltaLon, minSize);
+
+    // Calculate the new boundaries after applying the minimum size
+    const minLatClamped = centerCartographic.latitude - deltaLat;
+    const maxLatClamped = centerCartographic.latitude + deltaLat;
+    const minLonClamped = centerCartographic.longitude - deltaLon;
+    const maxLonClamped = centerCartographic.longitude + deltaLon;
+
+    if (!fullRect) return;
+    // Clamp the new green rectangle to the full view rectangle (red rectangle)
+    const clampedMinLat = CesiumMath.clamp(minLatClamped, fullRect.south, fullRect.north);
+    const clampedMaxLat = CesiumMath.clamp(maxLatClamped, fullRect.south, fullRect.north);
+    const clampedMinLon = CesiumMath.clamp(minLonClamped, fullRect.west, fullRect.east);
+    const clampedMaxLon = CesiumMath.clamp(maxLonClamped, fullRect.west, fullRect.east);
+
+    // Reduce the upper boundary more as the pitch increases (horizon visible)
+    const pitchAdjustment = Math.min(1.0, cameraPitch / CesiumMath.PI_OVER_TWO); // Normalize pitch to [0, 1]
+    const reducedMaxLat = fullRect.north - (fullRect.north - fullRect.south) * pitchAdjustment;
+
+    // Adjust maxLat after the pitch adjustment
+    const finalMaxLat = Math.min(clampedMaxLat, reducedMaxLat);
+
+    // Return the new rectangle after ensuring it's within bounds
+    return new Rectangle(
+      CesiumMath.negativePiToPi(clampedMinLon),
+      CesiumMath.clamp(clampedMinLat, -CesiumMath.PI_OVER_TWO, CesiumMath.PI_OVER_TWO),
+      CesiumMath.negativePiToPi(clampedMaxLon),
+      CesiumMath.clamp(finalMaxLat, -CesiumMath.PI_OVER_TWO, CesiumMath.PI_OVER_TWO)
+    );
+  };
+  
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
     if (!mapViewer) return;
 
-    const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
+    // const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
+    const bbox = computeLimitedViewRectangle();
     if (!bbox) return;
 
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
@@ -304,6 +435,31 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     try {
       const wfsResponse = await fetchWfsData(requestBodyXml);
+      wfsResponse.features[0].geometry = {
+        "coordinates": [
+          35.28895116556291,
+          32.61102641988899
+        ],
+        "type": "Point"
+      };
+      wfsResponse.features[1].geometry = {
+        "coordinates": [
+          [
+            35.287724347487654,
+            32.61110591282352
+          ],
+          [
+            35.28885679494161,
+            32.6097677723582
+          ],
+          [
+            35.291750827322375,
+            32.60860185149416
+          ]
+        ],
+        "type": "LineString"
+      };
+      console.log('WFS response:', wfsResponse);
       await handleWfsResponse(wfsResponse, extent, offset, position);
     } catch (error) {
       console.error('Error fetching WFS data:', error);
