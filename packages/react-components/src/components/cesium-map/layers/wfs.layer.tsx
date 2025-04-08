@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import {
   Cartesian2,
+  Cartesian3,
   Color as CesiumColor,
-  Ellipsoid,
+  defined,
   Entity,
   GeoJsonDataSource,
   Math as CesiumMath,
+  PerspectiveFrustum,
   Rectangle,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
   SceneMode,
-  defined,
-  Cartesian3,
-  PerspectiveFrustum,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -293,7 +292,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   };
 
-  const computeLimitedViewRectangle = (maxDistanceMeters = 100) => {
+  const computeLimitedViewRectangle = (maxDistanceMeters: number = 100): Rectangle | undefined => {
     const scene = mapViewer.scene;
     const camera = mapViewer.camera;
     const mode = scene.mode;
@@ -302,7 +301,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const fullRect = camera.computeViewRectangle(scene.globe.ellipsoid);
 
     // Check if fullRect is valid before proceeding
-    if (!defined(fullRect)) {
+    if (!defined(fullRect) || !fullRect) {
       console.error("computeViewRectangle returned invalid rectangle.");
       return undefined;
     }
@@ -392,7 +391,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const minLonClamped = centerCartographic.longitude - deltaLon;
     const maxLonClamped = centerCartographic.longitude + deltaLon;
 
-    if (!fullRect) return;
     // Clamp the new green rectangle to the full view rectangle (red rectangle)
     const clampedMinLat = CesiumMath.clamp(minLatClamped, fullRect.south, fullRect.north);
     const clampedMaxLat = CesiumMath.clamp(maxLatClamped, fullRect.south, fullRect.north);
@@ -414,7 +412,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       CesiumMath.clamp(finalMaxLat, -CesiumMath.PI_OVER_TWO, CesiumMath.PI_OVER_TWO)
     );
   };
-  
+
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
     if (!mapViewer) return;
 
