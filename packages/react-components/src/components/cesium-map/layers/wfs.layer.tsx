@@ -69,13 +69,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => ({
     stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
     strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 3 : undefined,
-    fill: mapViewer.scene.mode === SceneMode.SCENE3D ? geojsonColor : undefined,
+    fill: geojsonColor,
     clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
     markerColor: geojsonColor,
     markerSymbol: undefined,
     // describe: describeFeature,
   }), [mapViewer.scene.mode]);
-
 
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
@@ -433,30 +432,34 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     try {
       const wfsResponse = await fetchWfsData(requestBodyXml);
-      wfsResponse.features[0].geometry = {
-        "coordinates": [
-          35.28895116556291,
-          32.61102641988899
-        ],
-        "type": "Point"
-      };
-      wfsResponse.features[1].geometry = {
-        "coordinates": [
-          [
-            35.287724347487654,
-            32.61110591282352
+      if (wfsResponse?.features[0]?.geometry) {
+        wfsResponse.features[0].geometry = {
+          "coordinates": [
+            35.28895116556291,
+            32.61102641988899
           ],
-          [
-            35.28885679494161,
-            32.6097677723582
+          "type": "Point"
+        };
+      }
+      if (wfsResponse?.features[1]?.geometry) {
+        wfsResponse.features[1].geometry = {
+          "coordinates": [
+            [
+              35.287724347487654,
+              32.61110591282352
+            ],
+            [
+              35.28885679494161,
+              32.6097677723582
+            ],
+            [
+              35.291750827322375,
+              32.60860185149416
+            ]
           ],
-          [
-            35.291750827322375,
-            32.60860185149416
-          ]
-        ],
-        "type": "LineString"
-      };
+          "type": "LineString"
+        };
+      }
       console.log('WFS response:', wfsResponse);
       await handleWfsResponse(wfsResponse, extent, offset, position);
     } catch (error) {
