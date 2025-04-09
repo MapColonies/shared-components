@@ -6,9 +6,9 @@ import {
   GeoJsonDataSource,
   Math as CesiumMath,
   Rectangle,
+  SceneMode,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
-  SceneMode,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -63,15 +63,21 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   //     return description;
   //   };
   // }, []);
-  const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => ({
-    stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
-    strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 3 : undefined,
-    fill: geojsonColor,
-    clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
-    markerColor: geojsonColor,
-    markerSymbol: undefined,
-    // describe: describeFeature,
-  }), [mapViewer.scene.mode]);
+  const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => {
+    wfsDataSource?.entities?.removeAll();
+    wfsCache.current?.clear();
+    fetchMetadata.current?.clear();
+    const opt = {
+      stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
+      strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 3 : undefined,
+      fill: geojsonColor,
+      clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
+      markerColor: geojsonColor,
+      markerSymbol: undefined,
+      // describe: describeFeature,
+    };
+    return opt;
+  }, [mapViewer.scene.mode]);
 
   const wfsDataSource = new GeoJsonDataSource('wfs');
 
@@ -79,17 +85,17 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
       const pickedObject = mapViewer.scene.pick(movement.endPosition);
-      if (pickedObject && pickedObject.id && pickedObject.id.polygon) {
+      if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
         if (hoveredEntity !== pickedObject.id) {
           if (hoveredEntity) { // Resetting previous entity
-            hoveredEntity.polygon.material = geojsonColor;
+            hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonColor;
           }
           hoveredEntity = pickedObject.id;
-          hoveredEntity.polygon.material = geojsonHoveredColor;
+          hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
         }
       } else { // No entity was picked thus the mouse is outside of any entity
         if (hoveredEntity) { // Resetting previous entity
-          hoveredEntity.polygon.material = geojsonColor;
+          hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonColor;
           hoveredEntity = null;
         }
       }
@@ -336,7 +342,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           "type": "LineString"
         };
       }
-      console.log('WFS response:', wfsResponse);
       await handleWfsResponse(wfsResponse, extent, offset, position);
     } catch (error) {
       console.error('Error fetching WFS data:', error);
