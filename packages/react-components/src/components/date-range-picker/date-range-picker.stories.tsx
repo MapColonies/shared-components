@@ -37,7 +37,7 @@ DateMinMaxLimitTime.story = {
   name: 'Date time range with minDate & maxDate ',
 };
 
-export const DateTimeFormControl: Story = (args: unknown) => {
+export const DateTimeFormControl: Story = (args: Record<string, unknown>) => {
   return <DateTimeRangePickerFormControl {...args} onChange={action('date changed')} />;
 };
 
@@ -105,7 +105,7 @@ DateTimeLocalizedFormControl.argTypes = {
   },
 };
 
-export const DateTimeLocalizedAsFormControl: Story = (args: unknown) => {
+export const DateTimeLocalizedAsFormControl: Story = (args: Record<string, unknown>) => {
   const local = {
     setText: 'MySet',
     startPlaceHolderText: 'MyStart',
@@ -137,7 +137,7 @@ DateTimeLocalizedAsFormControl.argTypes = {
   },
 };
 
-export const DateTimeHebrewLocalizedAsFormControl: Story = (args: unknown) => {
+export const DateTimeHebrewLocalizedAsFormControl: Story = (args: Record<string, unknown>) => {
   const local = {
     setText: 'MySet',
     startPlaceHolderText: 'MyStart',
