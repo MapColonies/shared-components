@@ -168,7 +168,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   }
 
   // In 2D mode, just return the computed view rectangle directly
-  if (mode === SceneMode.SCENE2D) {
+  if (mode !== SceneMode.SCENE3D) {
     return fullRect;
   }
 
@@ -226,6 +226,9 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
 
   // Factor in the tilt angle to scale the rectangle
   const cameraPitch = camera.pitch; // The pitch (tilt) of the camera
+  if (cameraPitch === undefined) {
+    return undefined;
+  }
   const maxTiltAngle = Math.PI / 4; // Example of max tilt threshold (45 degrees)
   const tiltFactor = Math.max(0, 1 - (Math.abs(cameraPitch) / maxTiltAngle));
 

@@ -9,6 +9,8 @@ import {
   SceneMode,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
+  JulianDate,
+  Cartesian3,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -63,40 +65,108 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   //     return description;
   //   };
   // }, []);
+
+  const wfsDataSource = new GeoJsonDataSource('wfs');
+
   const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => {
+    // if (mapViewer.scene.mode !== SceneMode.MORPHING) {
+    //   mapViewer.dataSources?.remove(wfsDataSource, true);
+    //   mapViewer.dataSources?.add(wfsDataSource);
+    // }
     wfsDataSource?.entities?.removeAll();
     wfsCache.current?.clear();
     fetchMetadata.current?.clear();
     const opt = {
       stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
-      strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 3 : undefined,
+      strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 2 : undefined,
       fill: geojsonColor,
       clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
       markerColor: geojsonColor,
       markerSymbol: undefined,
       // describe: describeFeature,
     };
+    console.log('mode', mapViewer.scene.mode, 'opt', opt);
     return opt;
   }, [mapViewer.scene.mode]);
 
-  const wfsDataSource = new GeoJsonDataSource('wfs');
+  const clear = (): void => {
+    if (wfsDataSource && wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
+      wfsDataSource.entities.removeAll();
+    }
+  };
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
-      const pickedObject = mapViewer.scene.pick(movement.endPosition);
-      if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
-        if (hoveredEntity !== pickedObject.id) {
-          if (hoveredEntity) { // Resetting previous entity
-            hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonColor;
+      // const pickedObject = mapViewer.scene.pick(movement.endPosition);
+      // if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
+      //   if (hoveredEntity !== pickedObject.id) {
+      //     if (hoveredEntity) { // Resetting previous entity
+      //       hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+      //     }
+      //     hoveredEntity = pickedObject.id;
+      //     hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+      //   }
+      // } else { // No entity was picked thus the mouse is outside of any entity
+      //   if (hoveredEntity) { // Resetting previous entity
+      //     hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+      //     hoveredEntity = null;
+      //   }
+      // }
+
+      // Pick all objects under the mouse
+      const pickedObjects = mapViewer.scene.drillPick(movement.endPosition);
+      console.log('pickedObjects', pickedObjects.length);
+
+      let closestPolygon: any = null;
+      let minDistance = Number.MAX_VALUE;
+
+      // Loop over picked objects
+      for (const picked of pickedObjects) {
+        if (picked.id && (picked.id.polyline || picked.id.polygon)) {
+          let position: Cartesian3 | undefined;
+
+          // Try getting a position to measure distance
+          if (picked.id.position) {
+            // If entity has a position property
+            position = picked.id.position.getValue(JulianDate.now());
+          } else if (picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy) {
+            // Else, try to get first vertex from polygon hierarchy
+            const hierarchy = picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy.getValue(JulianDate.now());
+            if (hierarchy && hierarchy.positions && hierarchy.positions.length > 0) {
+              position = hierarchy.positions[0];
+            }
           }
-          hoveredEntity = pickedObject.id;
-          hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+
+          // If we found a position
+          if (position) {
+            const distance = Cartesian3.distance(mapViewer.camera.positionWC, position);
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestPolygon = picked.id;
+            }
+          }
         }
-      } else { // No entity was picked thus the mouse is outside of any entity
-        if (hoveredEntity) { // Resetting previous entity
-          hoveredEntity[hoveredEntity['polyline'] ? 'polyline' : 'polygon'].material = geojsonColor;
+      }
+
+      if (closestPolygon) {
+        // If new polygon is different from current hovered
+        if (hoveredEntity !== closestPolygon) {
+          // Reset previous hovered polygon
+          if (hoveredEntity) {
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+          }
+          // Highlight new hovered polygon
+          hoveredEntity = closestPolygon;
+          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+          (mapViewer.container as HTMLElement).style.cursor = 'pointer';
+        }
+      } else {
+        // No polygon hovered anymore
+        if (hoveredEntity) {
+          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
           hoveredEntity = null;
+          (mapViewer.container as HTMLElement).style.cursor = 'default';
         }
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
@@ -295,7 +365,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   };
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
-    if (!mapViewer) return;
+    if (!mapViewer || mapViewer.scene.mode === SceneMode.MORPHING) return;
 
     // const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     const bbox = computeLimitedViewRectangle(mapViewer);
