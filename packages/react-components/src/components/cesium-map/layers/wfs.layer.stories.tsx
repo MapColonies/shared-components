@@ -51,7 +51,7 @@ const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings',
   style: {
-    color: '#00ff00',
+    color: '#fc9d03',
     hover: '#ff0000',
   },
   pageSize: 300,
@@ -119,8 +119,8 @@ const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
   style: {
-    color: 'green',
-    hover: 'blue'
+    color: '#00ff00',
+    hover: '#0000ff'
   },
   pageSize: 300,
   zoomLevel: 14,
