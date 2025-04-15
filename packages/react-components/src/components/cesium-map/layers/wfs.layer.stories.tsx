@@ -122,7 +122,7 @@ const metaBuildings = {
   }
 };
 
-const optionsBuildingsDates = {
+/*const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
   style: {
@@ -190,7 +190,7 @@ const metaBuildingsDates = {
       }
     ]
   }
-};
+};*/
 
 const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
