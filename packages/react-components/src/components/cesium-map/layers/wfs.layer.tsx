@@ -55,17 +55,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const [metadata, setMetadata] = useState(meta);
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F'), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
+  const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
 
-  const wfsDataSource = new GeoJsonDataSource(`wfs_${options.featureType}`);
+  const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
   useEffect((): void => {
-    visualizationHandler(mapViewer, mapViewer.dataSources.get(0) as GeoJsonDataSource);
+    const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
+    if (dataSource) {
+      visualizationHandler(mapViewer, dataSource);
+    }
   }, [mapViewer.scene.mode]);
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
-
       const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
       if (!is3D) {
@@ -74,14 +77,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
           if (hoveredEntity !== pickedObject.id) {
             if (hoveredEntity) { // Resetting previous entity
-              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;;
+              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;
             }
             hoveredEntity = pickedObject.id;
             hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
           }
         } else { // No entity was picked thus the mouse is outside of any entity
           if (hoveredEntity) { // Resetting previous entity
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;;
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;
             hoveredEntity = null;
           }
         }
@@ -335,7 +338,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     await wfsDataSource.process(newGeoJson);
     mapViewer.scene.requestRender();
 
-    visualizationHandler(mapViewer, mapViewer.dataSources.get(0) as GeoJsonDataSource);
+    const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
+    if (dataSource) {
+      visualizationHandler(mapViewer, dataSource);
+    }
 
     if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
       fetchAndUpdateWfs(page.current++ * pageSize);
