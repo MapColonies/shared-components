@@ -1,6 +1,13 @@
-import { Color } from 'cesium';
+import {
+  Color as CesiumColor,
+  Entity,
+  GeoJsonDataSource,
+  PolygonGraphics,
+  PolylineGraphics,
+  SceneMode
+} from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
-import { CesiumMap } from '../map';
+import { CesiumMap, CesiumViewer } from '../map';
 import { LayerType } from '../layers-manager';
 import { CesiumWFSLayer } from './wfs.layer';
 
@@ -185,19 +192,44 @@ const metaBuildingsDates = {
   }
 };
 
-export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => (
-  <div style={mapDivStyle}>
-    <CesiumMap {...args}>
-      <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} />
-      {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
-      <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
-      <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
-      <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
-      <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
-      <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} /> */}
-    </CesiumMap>
-  </div>
-);
+const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
+  const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
+  dataSource?.entities.values.forEach((entity: Entity) => {
+    if (entity.polygon) {
+      entity.polygon = new PolygonGraphics({
+        hierarchy: entity.polygon.hierarchy,
+        material: is2D ? CesiumColor.TRANSPARENT : CesiumColor.fromCssColorString('#01FF1F'), 
+        outline: true,
+        outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
+        outlineWidth: 2,
+        extrudedHeight: is2D ? 100 : undefined
+      });
+    }
+    if (entity.polyline) {
+      entity.polyline = new PolylineGraphics({
+        positions: entity.polyline.positions,
+        material: CesiumColor.fromCssColorString('#01FF1F'), 
+        clampToGround: true,
+        width: 2,
+      });
+    }
+  });
+};
+
+export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
+  return (
+    <div style={mapDivStyle}>
+      <CesiumMap {...args} sceneMode={SceneMode.SCENE2D}>
+        <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualization} />
+        {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
+        <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
+        <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
+        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
+        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
+        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} /> */}
+      </CesiumMap>
+    </div>);
+};
 
 MapWithWFSLayer.argTypes = {
   baseMaps: {
