@@ -58,8 +58,8 @@ const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings',
   style: {
-    color: '#fc9d03',
-    hover: '#ff0000',
+    color: '#01FF1F',
+    hover: '#24AEE9',
   },
   pageSize: 300,
   zoomLevel: 14,
@@ -193,16 +193,16 @@ const metaBuildingsDates = {
 };
 
 const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
-  const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
+  const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is2D ? CesiumColor.TRANSPARENT : CesiumColor.fromCssColorString('#01FF1F'), 
+        material: is3D ? CesiumColor.fromCssColorString('#01FF1F') : CesiumColor.TRANSPARENT, 
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
         outlineWidth: 2,
-        extrudedHeight: is2D ? 100 : undefined
+        extrudedHeight: is3D ? undefined : 100
       });
     }
     if (entity.polyline) {

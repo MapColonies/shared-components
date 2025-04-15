@@ -17,7 +17,7 @@ import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { pMap } from '../helpers/pMap';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
-import { useCesiumMap } from '../map';
+import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface ICesiumWFSLayerOptions {
   url: string;
@@ -33,6 +33,7 @@ export interface ICesiumWFSLayerOptions {
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
+  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource) => void;
 }
 
 interface IFetchMetadata {
@@ -44,7 +45,7 @@ interface IFetchMetadata {
 }
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
-  const { options, meta } = props;
+  const { options, meta, visualizationHandler } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
@@ -54,46 +55,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const [metadata, setMetadata] = useState(meta);
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F'), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
-  // const describeFeature = useMemo(() => {
-  //   return (properties: any, nameProperty: string): string => {
-  //     const name = properties[nameProperty] || 'Unnamed Feature';
-  //     const description = `
-  //       <strong>Name:</strong> ${name}<br>
-  //       <strong>Type:</strong> ${properties.type || 'N/A'}<br>
-  //       <strong>Population:</strong> ${properties.population || 'N/A'}
-  //     `;
-  //     return description;
-  //   };
-  // }, []);
 
-  const wfsDataSource = new GeoJsonDataSource('wfs');
+  const wfsDataSource = new GeoJsonDataSource(`wfs_${options.featureType}`);
 
-  const loadOptions = useMemo((): GeoJsonDataSource.LoadOptions => {
-    // if (mapViewer.scene.mode !== SceneMode.MORPHING) {
-    //   mapViewer.dataSources?.remove(wfsDataSource, true);
-    //   mapViewer.dataSources?.add(wfsDataSource);
-    // }
-    wfsDataSource?.entities?.removeAll();
-    wfsCache.current?.clear();
-    fetchMetadata.current?.clear();
-    const opt = {
-      stroke: mapViewer.scene.mode !== SceneMode.SCENE3D ? geojsonColor : undefined,
-      strokeWidth: mapViewer.scene.mode !== SceneMode.SCENE3D ? 2 : undefined,
-      fill: geojsonColor,
-      clampToGround: mapViewer.scene.mode === SceneMode.SCENE3D,
-      markerColor: geojsonColor,
-      markerSymbol: undefined,
-      // describe: describeFeature,
-    };
-    console.log('mode', mapViewer.scene.mode, 'opt', opt);
-    return opt;
+  useEffect((): void => {
+    visualizationHandler(mapViewer, mapViewer.dataSources.get(0) as GeoJsonDataSource);
   }, [mapViewer.scene.mode]);
-
-  const clear = (): void => {
-    if (wfsDataSource && wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
-      wfsDataSource.entities.removeAll();
-    }
-  };
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
@@ -116,7 +83,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
       // Pick all objects under the mouse
       const pickedObjects = mapViewer.scene.drillPick(movement.endPosition);
-      console.log('pickedObjects', pickedObjects.length);
+      
+      const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
       let closestPolygon: any = null;
       let minDistance = Number.MAX_VALUE;
@@ -154,7 +122,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         if (hoveredEntity !== closestPolygon) {
           // Reset previous hovered polygon
           if (hoveredEntity) {
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = is3D ? geojsonColor : CesiumColor.TRANSPARENT;
           }
           // Highlight new hovered polygon
           hoveredEntity = closestPolygon;
@@ -164,7 +132,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       } else {
         // No polygon hovered anymore
         if (hoveredEntity) {
-          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = is3D ? geojsonColor : CesiumColor.TRANSPARENT;
           hoveredEntity = null;
           (mapViewer.container as HTMLElement).style.cursor = 'default';
         }
@@ -188,7 +156,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           : Math.min(10, baseConcurrency);
   };
 
-  const updateMetadata = (items: number, total: number): void => {
+  const updateMetadata = (items: number = -1, total: number = -1): void => {
     setMetadata((prev) => ({
       ...prev,
       ...meta,
@@ -257,7 +225,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const fetchWfsData = async (body: string): Promise<any> => {
     const response = await fetch(url, { method: 'POST', body });
-    return await response.json();
+    if (response.status === 200) {
+      return await response.json();
+    }
+    return undefined;
   };
 
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
@@ -316,7 +287,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     let bboxKey = '';
     let newFeatures: Feature[] = [];
 
-    if (wfsResponse.numberReturned !== 0) {
+    if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
       if (wfsResponse.bbox) {
         bboxKey = wfsResponse.bbox.join(',');
         if (!fetchMetadata.current.has(bboxKey)) {
@@ -340,7 +311,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     updateMetadata(wfsResponse.numberReturned !== 0 ? offset + wfsResponse.numberReturned : wfsResponse.numberMatched, wfsResponse.numberMatched);
 
     if (newFeatures.length === 0) {
-      if (wfsResponse.numberReturned !== 0) {
+      if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
@@ -354,10 +325,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       features: newFeatures,
     };
 
-    await wfsDataSource.process(newGeoJson, loadOptions);
+    await wfsDataSource.process(newGeoJson);
     mapViewer.scene.requestRender();
 
-    if (wfsResponse.numberReturned !== 0) {
+    visualizationHandler(mapViewer, mapViewer.dataSources.get(0) as GeoJsonDataSource);
+
+    if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
       fetchAndUpdateWfs(page.current++ * pageSize);
     } else {
       page.current = 0;
@@ -428,7 +401,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   }, [metadata]);
 
   useEffect(() => { // Happens when layersManager is initialized by parent map component
-    mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata } });
+    mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata }, visualizationHandler });
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
@@ -444,7 +417,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     // Hover event
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
     handleMouseHover(handler);
-    
+
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
