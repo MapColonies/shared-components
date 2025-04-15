@@ -65,77 +65,84 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
-      // const pickedObject = mapViewer.scene.pick(movement.endPosition);
-      // if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
-      //   if (hoveredEntity !== pickedObject.id) {
-      //     if (hoveredEntity) { // Resetting previous entity
-      //       hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
-      //     }
-      //     hoveredEntity = pickedObject.id;
-      //     hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
-      //   }
-      // } else { // No entity was picked thus the mouse is outside of any entity
-      //   if (hoveredEntity) { // Resetting previous entity
-      //     hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
-      //     hoveredEntity = null;
-      //   }
-      // }
 
-      // Pick all objects under the mouse
-      const pickedObjects = mapViewer.scene.drillPick(movement.endPosition);
-      
       const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
-      let closestPolygon: any = null;
-      let minDistance = Number.MAX_VALUE;
+      if (!is3D) {
 
-      // Loop over picked objects
-      for (const picked of pickedObjects) {
-        if (picked.id && (picked.id.polyline || picked.id.polygon)) {
-          let position: Cartesian3 | undefined;
-
-          // Try getting a position to measure distance
-          if (picked.id.position) {
-            // If entity has a position property
-            position = picked.id.position.getValue(JulianDate.now());
-          } else if (picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy) {
-            // Else, try to get first vertex from polygon hierarchy
-            const hierarchy = picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy.getValue(JulianDate.now());
-            if (hierarchy && hierarchy.positions && hierarchy.positions.length > 0) {
-              position = hierarchy.positions[0];
+        const pickedObject = mapViewer.scene.pick(movement.endPosition);
+        if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
+          if (hoveredEntity !== pickedObject.id) {
+            if (hoveredEntity) { // Resetting previous entity
+              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;;
             }
+            hoveredEntity = pickedObject.id;
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
           }
+        } else { // No entity was picked thus the mouse is outside of any entity
+          if (hoveredEntity) { // Resetting previous entity
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;;
+            hoveredEntity = null;
+          }
+        }
 
-          // If we found a position
-          if (position) {
-            const distance = Cartesian3.distance(mapViewer.camera.positionWC, position);
-            if (distance < minDistance) {
-              minDistance = distance;
-              closestPolygon = picked.id;
+      } else { // 3D
+
+        // Pick all objects under the mouse
+        const pickedObjects = mapViewer.scene.drillPick(movement.endPosition);
+
+        let closestPolygon: any = null;
+        let minDistance = Number.MAX_VALUE;
+
+        // Loop over picked objects
+        for (const picked of pickedObjects) {
+          if (picked.id && (picked.id.polyline || picked.id.polygon)) {
+            let position: Cartesian3 | undefined;
+
+            // Try getting a position to measure distance
+            if (picked.id.position) {
+              // If entity has a position property
+              position = picked.id.position.getValue(JulianDate.now());
+            } else if (picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy) {
+              // Else, try to get first vertex from polygon hierarchy
+              const hierarchy = picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy.getValue(JulianDate.now());
+              if (hierarchy && hierarchy.positions && hierarchy.positions.length > 0) {
+                position = hierarchy.positions[0];
+              }
+            }
+
+            // If we found a position
+            if (position) {
+              const distance = Cartesian3.distance(mapViewer.camera.positionWC, position);
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestPolygon = picked.id;
+              }
             }
           }
         }
-      }
 
-      if (closestPolygon) {
-        // If new polygon is different from current hovered
-        if (hoveredEntity !== closestPolygon) {
-          // Reset previous hovered polygon
+        if (closestPolygon) {
+          // If new polygon is different from current hovered
+          if (hoveredEntity !== closestPolygon) {
+            // Reset previous hovered polygon
+            if (hoveredEntity) {
+              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+            }
+            // Highlight new hovered polygon
+            hoveredEntity = closestPolygon;
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+            (mapViewer.container as HTMLElement).style.cursor = 'pointer';
+          }
+        } else {
+          // No polygon hovered anymore
           if (hoveredEntity) {
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = is3D ? geojsonColor : CesiumColor.TRANSPARENT;
+            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+            hoveredEntity = null;
+            (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
-          // Highlight new hovered polygon
-          hoveredEntity = closestPolygon;
-          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
-          (mapViewer.container as HTMLElement).style.cursor = 'pointer';
         }
-      } else {
-        // No polygon hovered anymore
-        if (hoveredEntity) {
-          hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = is3D ? geojsonColor : CesiumColor.TRANSPARENT;
-          hoveredEntity = null;
-          (mapViewer.container as HTMLElement).style.cursor = 'default';
-        }
+
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
   };
