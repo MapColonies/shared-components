@@ -12,6 +12,7 @@ import {
   HorizontalOrigin,
   LabelStyle,
   PolylineDashMaterialProperty,
+  PolylineGraphics,
   Rectangle,
   Resource,
   VerticalOrigin,
@@ -44,6 +45,8 @@ export class CesiumEllipsoidTerrainProvider extends EllipsoidTerrainProvider {}
 
 export class CesiumCesiumTerrainProvider extends CesiumTerrainProvider {}
 
+export class CesiumCesiumPolylineGraphics extends PolylineGraphics {}
+
 // PROXIED ENUMS
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumVerticalOrigin = VerticalOrigin;
@@ -53,4 +56,10 @@ export const CesiumHorizontalOrigin = HorizontalOrigin;
 export const CesiumLabelStyle = LabelStyle;
 
 // PROXIED FUNCTIONS
-export { sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed, Math as CesiumMath } from 'cesium';
+export {
+  Entity as CesiumCesiumEntity,
+  GeoJsonDataSource as CesiumGeoJsonDataSource,
+  Math as CesiumMath,
+  PolygonGraphics as CesiumCesiumPolygonGraphics,
+  sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed,
+} from 'cesium';
