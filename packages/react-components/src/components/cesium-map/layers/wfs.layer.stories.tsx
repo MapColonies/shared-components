@@ -10,6 +10,7 @@ import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumViewer } from '../map';
 import { LayerType } from '../layers-manager';
 import { CesiumWFSLayer } from './wfs.layer';
+import { Cesium3DTileset } from './3d.tileset';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -220,6 +221,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={SceneMode.SCENE2D}>
+        <Cesium3DTileset isZoomTo={true} url="/assets/models/afula/tileset.json" />
         <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualization} />
         {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} visualizationHandler={handleVisualization} />
         <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualization} />
