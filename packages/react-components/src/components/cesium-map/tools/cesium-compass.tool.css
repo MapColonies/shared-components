@@ -1,9 +1,9 @@
 .compass.rtl {
   right: unset;
-  left: 20px;
+  left: 24px;
 }
 
 .compass.ltr {
   left: unset;
-  right: 20px;
+  right: 24px;
 }

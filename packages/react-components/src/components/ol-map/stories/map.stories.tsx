@@ -19,7 +19,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export const BaseMap: Story = (args: unknown) => (
+export const BaseMap: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <Map {...args}>
       <TileLayer>
