@@ -202,7 +202,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
         outlineWidth: 2,
-        extrudedHeight: is3D ? undefined : 100
+        height: is3D ? undefined : 100
       });
     }
     if (entity.polyline) {
@@ -221,12 +221,12 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={SceneMode.SCENE2D}>
         <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualization} />
-        {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} />
-        <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} />
-        <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} />
-        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} />
-        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} />
-        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} /> */}
+        {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} visualizationHandler={handleVisualization} />
+        <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualization} />
+        <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualization} />
+        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualization} />
+        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualization} />
+        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualization} /> */}
       </CesiumMap>
     </div>);
 };
