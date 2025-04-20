@@ -203,7 +203,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
         outlineWidth: 2,
-        height: is3D ? undefined : Number.MAX_SAFE_INTEGER
+        height: is3D ? undefined : 11000
       });
     }
     if (entity.polyline) {
