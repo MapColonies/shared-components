@@ -246,6 +246,7 @@ class LayerManager {
       if (index > -1) {
         this.dataLayers.splice(index, 1);
       }
+      this.dataLayerUpdated.raiseEvent(this.dataLayers);
     }
   }
 

@@ -203,7 +203,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
         outlineWidth: 2,
-        height: is3D ? undefined : 11000
+        height: is3D ? undefined : 10000 // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
       });
     }
     if (entity.polyline) {

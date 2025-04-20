@@ -237,10 +237,10 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   deltaLon *= tiltFactor;
 
   // Calculate the new boundaries for the green rectangle
-  let minLat = centerCartographic.latitude - deltaLat;
+  /*let minLat = centerCartographic.latitude - deltaLat;
   let maxLat = centerCartographic.latitude + deltaLat;
   const minLon = centerCartographic.longitude - deltaLon;
-  const maxLon = centerCartographic.longitude + deltaLon;
+  const maxLon = centerCartographic.longitude + deltaLon;*/
 
   // Apply a minimum size threshold to prevent the green rectangle from becoming invisible
   const minSize = 0.0005; // This threshold value prevents the rectangle from shrinking too much

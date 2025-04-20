@@ -1,5 +1,3 @@
-// WFS.tsx
-
 import { get } from 'lodash';
 import React, { useEffect, useState, useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
@@ -38,8 +36,8 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
 
     const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], LayerId?: string | undefined): void => {
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
-        if (LayerId !== undefined) {
-          if (LayerId !== layer.meta.id) return;
+        if (LayerId !== undefined && LayerId !== layer.meta.id) {
+          return;
         }
 
         const { options, meta } = layer;
@@ -60,6 +58,12 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
           return prevFeatureTypes;
         });
       });
+
+      const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map(layer => layer.meta.id));
+
+      setFeatureTypes(prevFeatureTypes => 
+        prevFeatureTypes.filter(type => activeDataLayerIds.has(type.id))
+      );
     };
 
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
@@ -67,7 +71,7 @@ export const WFS: React.FC<IWFSProps> = ({ locale }) => {
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
-  }, [mapViewer.layersManager]);
+  }, [mapViewer.layersManager?.dataLayerList]);
 
   return (
     <Box className="wfsContainer">

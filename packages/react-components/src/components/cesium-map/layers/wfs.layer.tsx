@@ -75,7 +75,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
         const pickedObject = mapViewer.scene.pick(movement.endPosition);
         if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
-          if (hoveredEntity !== pickedObject.id) {
+          if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
             if (hoveredEntity) { // Resetting previous entity
               hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;
             }
@@ -434,6 +434,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
+        wfsCache.current.clear();
+        fetchMetadata.current.clear();
+        mapViewer.dataSources.remove(wfsDataSource, true);
+        mapViewer.layersManager?.removeDataLayer(meta.id as string);
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
