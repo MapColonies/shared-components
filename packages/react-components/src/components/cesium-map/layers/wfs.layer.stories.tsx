@@ -199,7 +199,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString('#01FF1F') : CesiumColor.TRANSPARENT, 
+        material: is3D ? CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5) : CesiumColor.TRANSPARENT, 
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
         outlineWidth: 2,
@@ -209,7 +209,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
     if (entity.polyline) {
       entity.polyline = new PolylineGraphics({
         positions: entity.polyline.positions,
-        material: CesiumColor.fromCssColorString('#01FF1F'), 
+        material: CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5), 
         clampToGround: true,
         width: 2,
       });

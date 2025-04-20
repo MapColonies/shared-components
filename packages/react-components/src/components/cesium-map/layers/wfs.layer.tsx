@@ -53,7 +53,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
-  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F'), [color]);
+  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F').withAlpha(0.5), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
 
