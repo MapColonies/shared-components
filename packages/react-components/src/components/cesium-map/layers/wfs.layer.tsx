@@ -4,8 +4,6 @@ import {
   Color as CesiumColor,
   Entity,
   GeoJsonDataSource,
-  Math as CesiumMath,
-  Rectangle,
   SceneMode,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
@@ -187,54 +185,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     updateMetadata(0, 0);
   };
 
-  /*const buildFilterSection = (bbox: Rectangle): string => {
-    return `
-      <fes:Filter>
-        <fes:And>
-          <fes:Intersects>
-            <fes:ValueReference>geom</fes:ValueReference>
-            <gml:Polygon srsName="EPSG:4326">
-              <gml:exterior>
-                <gml:LinearRing>
-                  <gml:posList>
-                    ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)}
-                  </gml:posList>
-                </gml:LinearRing>
-              </gml:exterior>
-            </gml:Polygon>
-          </fes:Intersects>
-        </fes:And>
-      </fes:Filter>`;
-  };*/
-
-  /*const buildRequestBody = (filterSection: string, offset: number): string => {
-    return `<wfs:GetFeature
-      xmlns:wfs="http://www.opengis.net/wfs/2.0"
-      xmlns:fes="http://www.opengis.net/fes/2.0"
-      xmlns:gml="http://www.opengis.net/gml/3.2"
-      xmlns:sf="http://www.openplans.org/spearfish"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      service="WFS" 
-      version="2.0.0"
-      xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-      http://schemas.opengis.net/wfs/2.0/wfs.xsd 
-      http://www.opengis.net/gml/3.2 
-      http://schemas.opengis.net/gml/3.2.1/gml.xsd" 
-      outputFormat="application/json">
-      <wfs:Query typeNames="${featureType}">
-        ${filterSection}
-        <wfs:SortBy>
-          <wfs:SortProperty>
-            <wfs:ValueReference>${sortBy}</wfs:ValueReference>
-            <wfs:SortOrder>ASC</wfs:SortOrder>
-          </wfs:SortProperty>
-        </wfs:SortBy>
-      </wfs:Query>
-      <wfs:Count>${pageSize}</wfs:Count>
-      <wfs:StartIndex>${offset}</wfs:StartIndex>
-    </wfs:GetFeature>`;
-  };*/
-
   const fetchWfsData = async (wfsDataUrl: string, method: string = 'GET', body?: string): Promise<any> => {
     const options: RequestInit = { method };
     if (body !== undefined) {
@@ -373,11 +323,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const position: Feature<Point> = center(bbox);
 
     try {
-      // #region hard-coded
-      /*const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
-      const requestBodyXml = buildRequestBody(filterSection, offset);*/
-      // #endregion
-
       // #region WfsClient
       /*const wfsClient = new WfsClient('2.0.0', url);
       const requestBody = wfsClient.GetFeatureRequest({
@@ -394,12 +339,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       } else if (requestBody.body.includes('<Query')) {
         requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
       }
-      const requestBodyXml = requestBody.body;*/
-      // #endregion
-
+      const requestBodyXml = requestBody.body;
       // console.log('requestBodyXml', requestBodyXml);
-
-      // const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);
+      const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
+      // #endregion
 
       const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
       const wfsResponse = await fetchWfsData(wfsDataUrl);
