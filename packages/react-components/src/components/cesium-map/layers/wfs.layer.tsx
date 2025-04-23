@@ -15,6 +15,8 @@ import {
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+// import { WfsClient, Filter, Geom } from '@map-colonies/wfs-client';
+// import bboxPolygon from '@turf/bbox-polygon';
 import { pMap } from '../helpers/pMap';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
@@ -233,8 +235,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     </wfs:GetFeature>`;
   };
 
-  const fetchWfsData = async (body: string): Promise<any> => {
-    const response = await fetch(url, { method: 'POST', body });
+  const fetchWfsData = async (wfsDataUrl: string, method: string = 'GET', body?: string): Promise<any> => {
+    const options: RequestInit = { method };
+    if (body !== undefined) {
+      options.body = body;
+    }
+    const response = await fetch(wfsDataUrl, options);
     if (response.status === 200) {
       return await response.json();
     }
@@ -365,11 +371,38 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     wfsDataSource.show = true;
     const extent: BBox = rectangle2bbox(bbox);
     const position: Feature<Point> = center(bbox);
-    const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
-    const requestBodyXml = buildRequestBody(filterSection, offset);
 
     try {
-      const wfsResponse = await fetchWfsData(requestBodyXml);
+      // #region hard-coded
+      /*const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
+      const requestBodyXml = buildRequestBody(filterSection, offset);*/
+      // #endregion
+
+      // #region WfsClient
+      /*const wfsClient = new WfsClient('2.0.0', url);
+      const requestBody = wfsClient.GetFeatureRequest({
+        featureNS: 'core',
+        featurePrefix: 'core',
+        featureTypes: [featureType],
+        startIndex: offset,
+        count: pageSize,
+        filter: shouldFilter ? Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84') : undefined,
+      });
+      const sortByBlock = `<SortBy><SortProperty><ValueReference>${sortBy}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
+      if (requestBody.body.includes('<\/Query>')) {
+        requestBody.body = requestBody.body.replace('<\/Query>', `${sortByBlock}<\/Query>`);
+      } else if (requestBody.body.includes('<Query')) {
+        requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
+      }
+      const requestBodyXml = requestBody.body;*/
+      // #endregion
+
+      // console.log('requestBodyXml', requestBodyXml);
+
+      // const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);
+
+      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
+      const wfsResponse = await fetchWfsData(wfsDataUrl);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {
           "coordinates": [

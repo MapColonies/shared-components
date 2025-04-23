@@ -55,12 +55,18 @@ const DEBUG_PANEL = {
   wfs: {}
 };
 
+
+// #region buildings
+
+const BRIGHT_GREEN = '#01FF1F';
+const LIGHT_BLUE = '#24AEE9';
+
 const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings',
   style: {
-    color: '#01FF1F',
-    hover: '#24AEE9',
+    color: BRIGHT_GREEN,
+    hover: LIGHT_BLUE,
   },
   pageSize: 300,
   zoomLevel: 14,
@@ -123,12 +129,44 @@ const metaBuildings = {
   }
 };
 
-/*const optionsBuildingsDates = {
+const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
+  const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
+  dataSource?.entities.values.forEach((entity: Entity) => {
+    if (entity.polygon) {
+      entity.polygon = new PolygonGraphics({
+        hierarchy: entity.polygon.hierarchy,
+        material: is3D ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5) : CesiumColor.TRANSPARENT, 
+        outline: true,
+        outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
+        outlineWidth: 2,
+        height: is3D ? undefined : 10000 // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+      });
+    }
+    if (entity.polyline) {
+      entity.polyline = new PolylineGraphics({
+        positions: entity.polyline.positions,
+        material: CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5), 
+        clampToGround: true,
+        width: 2,
+      });
+    }
+  });
+};
+
+// #endregion
+
+
+// #region buildings_dates
+
+const GREEN = '#00FF00';
+const BLUE = '#0000FF';
+
+const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
   style: {
-    color: '#00ff00',
-    hover: '#0000ff'
+    color: GREEN,
+    hover: BLUE
   },
   pageSize: 300,
   zoomLevel: 14,
@@ -191,17 +229,17 @@ const metaBuildingsDates = {
       }
     ]
   }
-};*/
+};
 
-const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
+const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5) : CesiumColor.TRANSPARENT, 
+        material: is3D ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.5) : CesiumColor.TRANSPARENT, 
         outline: true,
-        outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
+        outlineColor: CesiumColor.fromCssColorString(GREEN),
         outlineWidth: 2,
         height: is3D ? undefined : 10000 // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
       });
@@ -209,7 +247,7 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
     if (entity.polyline) {
       entity.polyline = new PolylineGraphics({
         positions: entity.polyline.positions,
-        material: CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5), 
+        material: CesiumColor.fromCssColorString(GREEN).withAlpha(0.5), 
         clampToGround: true,
         width: 2,
       });
@@ -217,18 +255,21 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
   });
 };
 
+// #endregion
+
+
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={SceneMode.SCENE2D}>
         <Cesium3DTileset isZoomTo={true} url="/assets/models/afula/tileset.json" />
-        <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualization} />
-        {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} visualizationHandler={handleVisualization} />
-        <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualization} />
-        <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualization} />
-        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualization} />
-        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualization} />
-        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualization} /> */}
+        <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualizationBuildings} />
+        {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualizationBuildings} /> */}
+        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} />
       </CesiumMap>
     </div>);
 };
