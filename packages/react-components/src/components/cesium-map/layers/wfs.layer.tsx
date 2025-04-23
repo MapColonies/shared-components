@@ -187,7 +187,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     updateMetadata(0, 0);
   };
 
-  const buildFilterSection = (bbox: Rectangle): string => {
+  /*const buildFilterSection = (bbox: Rectangle): string => {
     return `
       <fes:Filter>
         <fes:And>
@@ -205,9 +205,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           </fes:Intersects>
         </fes:And>
       </fes:Filter>`;
-  };
+  };*/
 
-  const buildRequestBody = (filterSection: string, offset: number): string => {
+  /*const buildRequestBody = (filterSection: string, offset: number): string => {
     return `<wfs:GetFeature
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
       xmlns:fes="http://www.opengis.net/fes/2.0"
@@ -233,7 +233,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       <wfs:Count>${pageSize}</wfs:Count>
       <wfs:StartIndex>${offset}</wfs:StartIndex>
     </wfs:GetFeature>`;
-  };
+  };*/
 
   const fetchWfsData = async (wfsDataUrl: string, method: string = 'GET', body?: string): Promise<any> => {
     const options: RequestInit = { method };
