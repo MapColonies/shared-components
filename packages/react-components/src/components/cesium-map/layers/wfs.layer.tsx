@@ -4,8 +4,6 @@ import {
   Color as CesiumColor,
   Entity,
   GeoJsonDataSource,
-  Math as CesiumMath,
-  Rectangle,
   SceneMode,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
@@ -17,6 +15,8 @@ import {
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+// import { WfsClient, Filter, Geom } from '@map-colonies/wfs-client';
+// import bboxPolygon from '@turf/bbox-polygon';
 import { pMap } from '../helpers/pMap';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
@@ -199,60 +199,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     updateMetadata(0, 0);
   };
 
-  const buildFilterSection = (bbox: Rectangle): string => {
-    return `
-      <fes:Filter>
-        <fes:And>
-          <fes:Intersects>
-            <fes:ValueReference>geom</fes:ValueReference>
-            <gml:Polygon srsName="EPSG:4326">
-              <gml:exterior>
-                <gml:LinearRing>
-                  <gml:posList>
-                    ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(
-      bbox.north
-    )} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(
-      bbox.south
-    )} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)}
-                  </gml:posList>
-                </gml:LinearRing>
-              </gml:exterior>
-            </gml:Polygon>
-          </fes:Intersects>
-        </fes:And>
-      </fes:Filter>`;
-  };
-
-  const buildRequestBody = (filterSection: string, offset: number): string => {
-    return `<wfs:GetFeature
-      xmlns:wfs="http://www.opengis.net/wfs/2.0"
-      xmlns:fes="http://www.opengis.net/fes/2.0"
-      xmlns:gml="http://www.opengis.net/gml/3.2"
-      xmlns:sf="http://www.openplans.org/spearfish"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      service="WFS" 
-      version="2.0.0"
-      xsi:schemaLocation="http://www.opengis.net/wfs/2.0
-      http://schemas.opengis.net/wfs/2.0/wfs.xsd 
-      http://www.opengis.net/gml/3.2 
-      http://schemas.opengis.net/gml/3.2.1/gml.xsd" 
-      outputFormat="application/json">
-      <wfs:Query typeNames="${featureType}">
-        ${filterSection}
-        <wfs:SortBy>
-          <wfs:SortProperty>
-            <wfs:ValueReference>${sortBy}</wfs:ValueReference>
-            <wfs:SortOrder>ASC</wfs:SortOrder>
-          </wfs:SortProperty>
-        </wfs:SortBy>
-      </wfs:Query>
-      <wfs:Count>${pageSize}</wfs:Count>
-      <wfs:StartIndex>${offset}</wfs:StartIndex>
-    </wfs:GetFeature>`;
-  };
-
-  const fetchWfsData = async (body: string): Promise<any> => {
-    const response = await fetch(url, { method: 'POST', body });
+  const fetchWfsData = async (wfsDataUrl: string, method: string = 'GET', body?: string): Promise<any> => {
+    const options: RequestInit = { method };
+    if (body !== undefined) {
+      options.body = body;
+    }
+    const response = await fetch(wfsDataUrl, options);
     if (response.status === 200) {
       return await response.json();
     }
@@ -400,11 +352,33 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     wfsDataSource.show = true;
     const extent: BBox = rectangle2bbox(bbox);
     const position: Feature<Point> = center(bbox);
-    const filterSection = shouldFilter ? buildFilterSection(bbox) : '';
-    const requestBodyXml = buildRequestBody(filterSection, offset);
 
     try {
-      const wfsResponse = await fetchWfsData(requestBodyXml);
+      // #region WfsClient
+      /*const wfsClient = new WfsClient('2.0.0', url);
+      const requestBody = wfsClient.GetFeatureRequest({
+        featureNS: 'core',
+        featurePrefix: 'core',
+        featureTypes: [featureType],
+        startIndex: offset,
+        count: pageSize,
+        filter: shouldFilter ? Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84') : undefined,
+      });
+      const sortByBlock = `<SortBy><SortProperty><ValueReference>${sortBy}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
+      if (requestBody.body.includes('<\/Query>')) {
+        requestBody.body = requestBody.body.replace('<\/Query>', `${sortByBlock}<\/Query>`);
+      } else if (requestBody.body.includes('<Query')) {
+        requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
+      }
+      const requestBodyXml = requestBody.body;
+      // console.log('requestBodyXml', requestBodyXml);
+      const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
+      // #endregion
+
+      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
+        ','
+      )},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
+      const wfsResponse = await fetchWfsData(wfsDataUrl);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {
           coordinates: [35.28895116556291, 32.61102641988899],
@@ -414,9 +388,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       if (wfsResponse?.features[1]?.geometry) {
         wfsResponse.features[1].geometry = {
           coordinates: [
-            [35.287724347487654, 32.61110591282352],
-            [35.28885679494161, 32.6097677723582],
-            [35.291750827322375, 32.60860185149416],
+            [35.4690255709979, 33.09229606234996],
+            [35.471490042224076, 33.09184494707435],
+            [35.47664679294357, 33.08964138919352],
+            [35.478593518115474, 33.08866972407918],
+            [35.47902842480198, 33.08790626538486],
+            [35.47890416574867, 33.087264260898436],
+            [35.47888345590599, 33.08707339379575],
+            [35.48507569873726, 33.084973828323044],
+            [35.48760229949167, 33.08521675581805],
           ],
           type: 'LineString',
         };
@@ -461,6 +441,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
+        wfsCache.current.clear();
+        fetchMetadata.current.clear();
+        mapViewer.dataSources.remove(wfsDataSource, true);
+        mapViewer.layersManager?.removeDataLayer(meta.id as string);
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }

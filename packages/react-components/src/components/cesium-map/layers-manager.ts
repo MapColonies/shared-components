@@ -130,7 +130,7 @@ class LayerManager {
   }
 
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
-    this.dataLayers.push({...dataLayer});
+    this.dataLayers.push({ ...dataLayer });
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
   }
 
@@ -246,6 +246,7 @@ class LayerManager {
       if (index > -1) {
         this.dataLayers.splice(index, 1);
       }
+      this.dataLayerUpdated.raiseEvent(this.dataLayers);
     }
   }
 

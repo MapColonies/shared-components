@@ -144,7 +144,7 @@ export const rectangle2bbox = (bbox: Rectangle): BBox => [
   CesiumMath.toDegrees(bbox.west),
   CesiumMath.toDegrees(bbox.south),
   CesiumMath.toDegrees(bbox.east),
-  CesiumMath.toDegrees(bbox.north)
+  CesiumMath.toDegrees(bbox.north),
 ];
 
 /**
@@ -163,7 +163,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
 
   // Check if fullRect is valid before proceeding
   if (!defined(fullRect) || !fullRect) {
-    console.error("computeViewRectangle returned invalid rectangle.");
+    console.error('computeViewRectangle returned invalid rectangle.');
     return undefined;
   }
 
@@ -176,7 +176,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const centerCartographic = camera.positionCartographic;
 
   if (!defined(centerCartographic)) {
-    console.error("Camera position is undefined in 3D mode.");
+    console.error('Camera position is undefined in 3D mode.');
     return undefined;
   }
 
@@ -184,9 +184,8 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const lon = centerCartographic.longitude;
 
   // Validate latitude and longitude to ensure they are within expected ranges
-  if (lat < -CesiumMath.PI_OVER_TWO || lat > CesiumMath.PI_OVER_TWO ||
-    lon < -CesiumMath.PI || lon > CesiumMath.PI) {
-    console.error("Invalid latitude or longitude values.");
+  if (lat < -CesiumMath.PI_OVER_TWO || lat > CesiumMath.PI_OVER_TWO || lon < -CesiumMath.PI || lon > CesiumMath.PI) {
+    console.error('Invalid latitude or longitude values.');
     return undefined;
   }
 
@@ -202,10 +201,11 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const cameraHeight = Cartesian3.magnitude(camera.positionWC);
 
   // If the camera is at a very high altitude (showing the whole world), cap the green rectangle size
-  if (cameraHeight > 10000000) { // Arbitrary threshold for high altitude
+  if (cameraHeight > 10000000) {
+    // Arbitrary threshold for high altitude
     // Cap the rectangle size to cover a reasonable portion of the Earth
-    deltaLat = 10;  // Limit to a 10-degree latitude span (roughly 1110 km)
-    deltaLon = 10;  // Limit to a 10-degree longitude span (roughly 1110 km)
+    deltaLat = 10; // Limit to a 10-degree latitude span (roughly 1110 km)
+    deltaLon = 10; // Limit to a 10-degree longitude span (roughly 1110 km)
   }
 
   // Calculate the Field of View (FOV) of the camera
@@ -221,8 +221,8 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   }
 
   // Apply zoom factor based on the camera's FOV and height to reduce large areas
-  deltaLat *= zoomFactor * (fov / Math.PI);  // FOV scaling adjusts the rectangle size
-  deltaLon *= zoomFactor * (fov / Math.PI);  // Apply similar scaling to longitude
+  deltaLat *= zoomFactor * (fov / Math.PI); // FOV scaling adjusts the rectangle size
+  deltaLon *= zoomFactor * (fov / Math.PI); // Apply similar scaling to longitude
 
   // Factor in the tilt angle to scale the rectangle
   const cameraPitch = camera.pitch; // The pitch (tilt) of the camera
@@ -230,17 +230,17 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
     return undefined;
   }
   const maxTiltAngle = Math.PI / 4; // Example of max tilt threshold (45 degrees)
-  const tiltFactor = Math.max(0, 1 - (Math.abs(cameraPitch) / maxTiltAngle));
+  const tiltFactor = Math.max(0, 1 - Math.abs(cameraPitch) / maxTiltAngle);
 
   // Apply the tilt factor to reduce the green rectangle size at sharp tilt angles
   deltaLat *= tiltFactor;
   deltaLon *= tiltFactor;
 
   // Calculate the new boundaries for the green rectangle
-  let minLat = centerCartographic.latitude - deltaLat;
+  /*let minLat = centerCartographic.latitude - deltaLat;
   let maxLat = centerCartographic.latitude + deltaLat;
   const minLon = centerCartographic.longitude - deltaLon;
-  const maxLon = centerCartographic.longitude + deltaLon;
+  const maxLon = centerCartographic.longitude + deltaLon;*/
 
   // Apply a minimum size threshold to prevent the green rectangle from becoming invisible
   const minSize = 0.0005; // This threshold value prevents the rectangle from shrinking too much
