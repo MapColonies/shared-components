@@ -262,7 +262,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={SceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url="/mock/afula/tileset.json" />
+        <Cesium3DTileset isZoomTo={true} url="/mock/afula.zip/afula/tileset.json" />
         <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualizationBuildings} />
         {/* <CesiumWFSLayer key={'2222222'} options={optionsBuildings} meta={{...metaBuildings, id: '2222222'}} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualizationBuildings} />
