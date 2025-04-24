@@ -11,6 +11,8 @@ import {
   ScreenSpaceEventType,
   JulianDate,
   Cartesian3,
+  BoundingSphere,
+  SceneTransforms,
 } from 'cesium';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
@@ -53,8 +55,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
-  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString(color as string ?? '#01FF1F').withAlpha(0.5), [color]);
-  const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString(hover as string ?? '#24AEE9').withAlpha(0.5), [hover]);
+  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.5), [color]);
+  const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
@@ -66,86 +68,98 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   }, [mapViewer.scene.mode]);
 
+  const getEntityEnteriorGeometry = (entity: Entity): string => {
+    if (entity) {
+      return entity.polyline ? 'polyline' : 'polygon';
+    }
+    return '';
+  };
+
+  const getEntityCenter = (entity: Entity): Cartesian3 | null => {
+    const hierarchy = entity?.polygon?.hierarchy?.getValue(JulianDate.now());
+    if (!hierarchy) return null;
+
+    const positions = hierarchy.positions;
+    return BoundingSphere.fromPoints(positions).center;
+  };
+
+  const getClosestPolygonEntityUnderMouse = (viewer: CesiumViewer, screenPosition: Cartesian2) => {
+    const drill = viewer.scene.drillPick(screenPosition);
+    const candidates = drill.map((p) => p.id).filter((id) => id && id.polygon);
+
+    if (candidates.length === 0) return null;
+
+    const scored = candidates.map((entity) => {
+      const worldPos = getEntityCenter(entity);
+      if (!worldPos) return { entity, distance: Number.MAX_VALUE };
+
+      const screenPos = SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, worldPos);
+      if (!screenPos) return { entity, distance: Number.MAX_VALUE };
+
+      const dx = screenPosition.x - screenPos.x;
+      const dy = screenPosition.y - screenPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      return { entity, distance };
+    });
+
+    scored.sort((a, b) => b.distance - a.distance);
+
+    return scored[0].entity;
+  };
+
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
+    let entityMaterial: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
       const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
-
       if (!is3D) {
-
         const pickedObject = mapViewer.scene.pick(movement.endPosition);
         if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
-          if (hoveredEntity !== pickedObject.id) {
-            if (hoveredEntity) { // Resetting previous entity
-              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;
+          if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
+            if (hoveredEntity) {
+              // Resetting previous entity
+              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = entityMaterial;
+              (mapViewer.container as HTMLElement).style.cursor = 'default';
             }
             hoveredEntity = pickedObject.id;
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+            entityMaterial = pickedObject.id[getEntityEnteriorGeometry(hoveredEntity)].material;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonHoveredColor;
+            (mapViewer.container as HTMLElement).style.cursor = 'pointer';
           }
-        } else { // No entity was picked thus the mouse is outside of any entity
-          if (hoveredEntity) { // Resetting previous entity
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = CesiumColor.TRANSPARENT;
+        } else {
+          // No entity was picked thus the mouse is outside of any entity
+          if (hoveredEntity) {
+            // Resetting previous entity
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = entityMaterial;
             hoveredEntity = null;
+            (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
         }
-
-      } else { // 3D
-
-        // Pick all objects under the mouse
-        const pickedObjects = mapViewer.scene.drillPick(movement.endPosition);
-
-        let closestPolygon: any = null;
-        let minDistance = Number.MAX_VALUE;
-
-        // Loop over picked objects
-        for (const picked of pickedObjects) {
-          if (picked.id && (picked.id.polyline || picked.id.polygon)) {
-            let position: Cartesian3 | undefined;
-
-            // Try getting a position to measure distance
-            if (picked.id.position) {
-              // If entity has a position property
-              position = picked.id.position.getValue(JulianDate.now());
-            } else if (picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy) {
-              // Else, try to get first vertex from polygon hierarchy
-              const hierarchy = picked.id[picked.id.polyline ? 'polyline' : 'polygon'].hierarchy.getValue(JulianDate.now());
-              if (hierarchy && hierarchy.positions && hierarchy.positions.length > 0) {
-                position = hierarchy.positions[0];
-              }
-            }
-
-            // If we found a position
-            if (position) {
-              const distance = Cartesian3.distance(mapViewer.camera.positionWC, position);
-              if (distance < minDistance) {
-                minDistance = distance;
-                closestPolygon = picked.id;
-              }
-            }
-          }
-        }
+      } else {
+        // 3D
+        const closestPolygon = getClosestPolygonEntityUnderMouse(mapViewer, movement.endPosition);
 
         if (closestPolygon) {
           // If new polygon is different from current hovered
-          if (hoveredEntity !== closestPolygon) {
+          if (get(hoveredEntity, 'id') !== get(closestPolygon, 'id')) {
             // Reset previous hovered polygon
             if (hoveredEntity) {
-              hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
             }
             // Highlight new hovered polygon
             hoveredEntity = closestPolygon;
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonHoveredColor;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonHoveredColor;
             (mapViewer.container as HTMLElement).style.cursor = 'pointer';
           }
         } else {
           // No polygon hovered anymore
           if (hoveredEntity) {
-            hoveredEntity[hoveredEntity.polyline ? 'polyline' : 'polygon'].material = geojsonColor;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
             hoveredEntity = null;
             (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
         }
-
       }
     }, ScreenSpaceEventType.MOUSE_MOVE);
   };
@@ -160,10 +174,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     return arraySize >= maxCacheSize
       ? Math.min(200, baseConcurrency * 4)
       : arraySize > 1000
-        ? Math.min(100, baseConcurrency * 2)
-        : arraySize > 300
-          ? Math.min(50, baseConcurrency)
-          : Math.min(10, baseConcurrency);
+      ? Math.min(100, baseConcurrency * 2)
+      : arraySize > 300
+      ? Math.min(50, baseConcurrency)
+      : Math.min(10, baseConcurrency);
   };
 
   const updateMetadata = (items: number = -1, total: number = -1): void => {
@@ -195,7 +209,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
               <gml:exterior>
                 <gml:LinearRing>
                   <gml:posList>
-                    ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)}
+                    ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(
+      bbox.north
+    )} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(bbox.north)} ${CesiumMath.toDegrees(bbox.east)} ${CesiumMath.toDegrees(
+      bbox.south
+    )} ${CesiumMath.toDegrees(bbox.west)} ${CesiumMath.toDegrees(bbox.south)}
                   </gml:posList>
                 </gml:LinearRing>
               </gml:exterior>
@@ -244,14 +262,18 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
     const newFeatures: Feature[] = [];
     if (features.length > 0) {
-      await pMap(features, (f: Feature): void => {
-        const osmId = f.properties?.osm_id;
-        if (!wfsCache.current.has(osmId)) {
-          wfsCache.current.add(osmId);
-          (f.properties as any).fetch_id = fetchId;
-          newFeatures.push(f);
-        }
-      }, { concurrency: getOptimalConcurrency(features.length, 'cpu') });
+      await pMap(
+        features,
+        (f: Feature): void => {
+          const osmId = f.properties?.osm_id;
+          if (!wfsCache.current.has(osmId)) {
+            wfsCache.current.add(osmId);
+            (f.properties as any).fetch_id = fetchId;
+            newFeatures.push(f);
+          }
+        },
+        { concurrency: getOptimalConcurrency(features.length, 'cpu') }
+      );
     }
     return newFeatures;
   };
@@ -259,32 +281,45 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const findFarthestFetchMetadata = (extent: BBox, position: Feature<Point>): { id: string; key: string; distance: number } => {
     return Array.from(fetchMetadata.current.values())
       .filter((item: IFetchMetadata) => JSON.stringify(item.parentBBox) !== JSON.stringify(extent))
-      .reduce((farthest: { id: string; key: string; distance: number }, fetched: IFetchMetadata) => {
-        const dist = distance(position, fetched.bbox);
-        return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
-      }, { id: '', key: '', distance: -Infinity });
+      .reduce(
+        (farthest: { id: string; key: string; distance: number }, fetched: IFetchMetadata) => {
+          const dist = distance(position, fetched.bbox);
+          return dist > farthest.distance ? { id: fetched.id, key: fetched.bbox.join(','), distance: dist } : farthest;
+        },
+        { id: '', key: '', distance: -Infinity }
+      );
   };
 
   const removeEntitiesByFetchId = async (fetchIdToRemove: string): Promise<void> => {
     const entitiesToDelete: Entity[] = [];
-    await pMap(wfsDataSource.entities.values, (entity: Entity): void => {
-      if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-        const osmId = entity.properties.osm_id.getValue();
-        wfsCache.current.delete(osmId);
-        entitiesToDelete.push(entity);
-      }
-    }, { concurrency: getOptimalConcurrency(wfsDataSource.entities.values.length, 'cpu') });
+    await pMap(
+      wfsDataSource.entities.values,
+      (entity: Entity): void => {
+        if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
+          const osmId = entity.properties.osm_id.getValue();
+          wfsCache.current.delete(osmId);
+          entitiesToDelete.push(entity);
+        }
+      },
+      { concurrency: getOptimalConcurrency(wfsDataSource.entities.values.length, 'cpu') }
+    );
     if (entitiesToDelete.length > 0) {
-      await pMap(entitiesToDelete, (entity: Entity): void => {
-        wfsDataSource.entities.remove(entity);
-      }, { concurrency: getOptimalConcurrency(entitiesToDelete.length, 'cpu') });
+      await pMap(
+        entitiesToDelete,
+        (entity: Entity): void => {
+          wfsDataSource.entities.remove(entity);
+        },
+        { concurrency: getOptimalConcurrency(entitiesToDelete.length, 'cpu') }
+      );
     }
   };
 
   const manageCache = async (extent: BBox, position: Feature<Point>): Promise<void> => {
     while (wfsCache.current.size > maxCacheSize) {
       const farthest = findFarthestFetchMetadata(extent, position);
-      if (farthest.id === '') { break; }
+      if (farthest.id === '') {
+        break;
+      }
       await removeEntitiesByFetchId(farthest.id);
       if (farthest.key) {
         fetchMetadata.current.delete(farthest.key);
@@ -372,30 +407,18 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const wfsResponse = await fetchWfsData(requestBodyXml);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {
-          "coordinates": [
-            35.28895116556291,
-            32.61102641988899
-          ],
-          "type": "Point"
+          coordinates: [35.28895116556291, 32.61102641988899],
+          type: 'Point',
         };
       }
       if (wfsResponse?.features[1]?.geometry) {
         wfsResponse.features[1].geometry = {
-          "coordinates": [
-            [
-              35.287724347487654,
-              32.61110591282352
-            ],
-            [
-              35.28885679494161,
-              32.6097677723582
-            ],
-            [
-              35.291750827322375,
-              32.60860185149416
-            ]
+          coordinates: [
+            [35.287724347487654, 32.61110591282352],
+            [35.28885679494161, 32.6097677723582],
+            [35.291750827322375, 32.60860185149416],
           ],
-          "type": "LineString"
+          type: 'LineString',
         };
       }
       await handleWfsResponse(wfsResponse, extent, offset, position);
@@ -405,15 +428,19 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   }, []);
 
-  useEffect(() => { // Happens each time the metadata from STATE changes
-    if (mapViewer.layersManager &&
+  useEffect(() => {
+    // Happens each time the metadata from STATE changes
+    if (
+      mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
-      mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined) {
+      mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined
+    ) {
       mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
   }, [metadata]);
 
-  useEffect(() => { // Happens when layersManager is initialized by parent map component
+  useEffect(() => {
+    // Happens when layersManager is initialized by parent map component
     mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata }, visualizationHandler });
   }, [mapViewer.layersManager]);
 

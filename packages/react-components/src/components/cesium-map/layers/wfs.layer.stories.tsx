@@ -1,11 +1,4 @@
-import {
-  Color as CesiumColor,
-  Entity,
-  GeoJsonDataSource,
-  PolygonGraphics,
-  PolylineGraphics,
-  SceneMode
-} from 'cesium';
+import { Color as CesiumColor, Entity, GeoJsonDataSource, PolygonGraphics, PolylineGraphics, SceneMode } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumViewer } from '../map';
 import { LayerType } from '../layers-manager';
@@ -52,7 +45,7 @@ const BASE_MAPS = {
 };
 
 const DEBUG_PANEL = {
-  wfs: {}
+  wfs: {},
 };
 
 const optionsBuildings = {
@@ -64,7 +57,7 @@ const optionsBuildings = {
   },
   pageSize: 300,
   zoomLevel: 14,
-  maxCacheSize: 6000
+  maxCacheSize: 6000,
 };
 
 const metaBuildings = {
@@ -87,40 +80,40 @@ const metaBuildings = {
       {
         fieldName: 'OSM_ID',
         aliasFieldName: 'מזהה OSM',
-        type: 'String'
+        type: 'String',
       },
       {
         fieldName: 'ID',
         aliasFieldName: 'מזהה',
-        type: 'String'
+        type: 'String',
       },
       {
         fieldName: 'BUILDING_TYPE',
         aliasFieldName: 'סוג',
-        type: 'String'
+        type: 'String',
       },
       {
         fieldName: 'SENSITIVITY',
         aliasFieldName: 'רגישות',
-        type: 'String'
+        type: 'String',
       },
       {
         fieldName: 'ENTITY_ID',
         aliasFieldName: 'מזהה יישות',
-        type: 'String'
+        type: 'String',
       },
       {
         fieldName: 'IS_SENSITIVE',
         aliasFieldName: 'רגיש',
-        type: 'Boolean'
+        type: 'Boolean',
       },
       {
         fieldName: 'DATE',
         aliasFieldName: 'תאריך',
-        type: 'Date'
-      }
-    ]
-  }
+        type: 'Date',
+      },
+    ],
+  },
 };
 
 /*const optionsBuildingsDates = {
@@ -199,19 +192,22 @@ const handleVisualization = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSou
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5) : CesiumColor.TRANSPARENT, 
+        material: is3D
+          ? CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5)
+          : CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.2) /*CesiumColor.TRANSPARENT*/,
         outline: true,
         outlineColor: CesiumColor.fromCssColorString('#01FF1F'),
-        outlineWidth: 2,
-        height: is3D ? undefined : 11000
+        outlineWidth: 3,
+        height: is3D ? undefined : 11000,
+        perPositionHeight: false,
       });
     }
     if (entity.polyline) {
       entity.polyline = new PolylineGraphics({
         positions: entity.polyline.positions,
-        material: CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5), 
+        material: CesiumColor.fromCssColorString('#01FF1F').withAlpha(0.5),
         clampToGround: true,
-        width: 2,
+        width: 4,
       });
     }
   });
@@ -230,7 +226,8 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
         <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualization} />
         <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualization} /> */}
       </CesiumMap>
-    </div>);
+    </div>
+  );
 };
 
 MapWithWFSLayer.argTypes = {
