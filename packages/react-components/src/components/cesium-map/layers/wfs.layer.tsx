@@ -55,6 +55,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.5), [color]);
+  const geojsonColor2D = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.2), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
 
@@ -102,7 +103,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
-    let entityMaterial: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
       const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
       if (!is3D) {
@@ -111,11 +111,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
             if (hoveredEntity) {
               // Resetting previous entity
-              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = entityMaterial;
+              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor2D;
               (mapViewer.container as HTMLElement).style.cursor = 'default';
             }
             hoveredEntity = pickedObject.id;
-            entityMaterial = pickedObject.id[getEntityEnteriorGeometry(hoveredEntity)].material;
             hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonHoveredColor;
             (mapViewer.container as HTMLElement).style.cursor = 'pointer';
           }
@@ -123,7 +122,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           // No entity was picked thus the mouse is outside of any entity
           if (hoveredEntity) {
             // Resetting previous entity
-            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = entityMaterial;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor2D;
             hoveredEntity = null;
             (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
