@@ -121,9 +121,20 @@ const metaBuildings = {
   },
 };
 
-const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
+const handleVisualizationBuildings = (
+  mapViewer: CesiumViewer,
+  dataSource: GeoJsonDataSource,
+  processedEntityIds: Set<string>
+): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
+
   dataSource?.entities.values.forEach((entity: Entity) => {
+    const entityId = entity.id;
+
+    if (processedEntityIds.has(entityId)) {
+      return;
+    }
+
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
@@ -145,6 +156,8 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
         width: 4,
       });
     }
+
+    processedEntityIds.add(entityId);
   });
 };
 
@@ -224,9 +237,20 @@ const metaBuildingsDates = {
   },
 };
 
-const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource): void => {
+const handleVisualizationBuildingsDates = (
+  mapViewer: CesiumViewer,
+  dataSource: GeoJsonDataSource,
+  processedEntityIds: Set<string>
+): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
+
   dataSource?.entities.values.forEach((entity: Entity) => {
+    const entityId = entity.id;
+
+    if (processedEntityIds.has(entityId)) {
+      return;
+    }
+
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
@@ -236,7 +260,7 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(GREEN),
         outlineWidth: 3,
-        height: is3D ? undefined : 11000,
+        height: is3D ? undefined : 10000, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
         perPositionHeight: false,
       });
     }
@@ -248,6 +272,8 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
         width: 4,
       });
     }
+
+    processedEntityIds.add(entityId);
   });
 };
 

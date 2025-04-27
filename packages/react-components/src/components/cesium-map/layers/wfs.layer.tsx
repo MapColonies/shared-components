@@ -34,7 +34,7 @@ export interface ICesiumWFSLayerOptions {
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
-  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource) => void;
+  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processedEntityIds: Set<string>) => void;
 }
 
 interface IFetchMetadata {
@@ -53,6 +53,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
+  const processedEntityIds = useRef<Set<string>>(new Set());
   const [metadata, setMetadata] = useState(meta);
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.5), [color]);
   const geojsonColor2D = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.2), [color]);
@@ -60,6 +61,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
+
+  const resetProcessedEntities = () => {
+    processedEntityIds.current.clear();
+  };
 
   const getEntityEnteriorGeometry = (entity: Entity): string => {
     if (entity) {
@@ -319,7 +324,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource);
+      visualizationHandler(mapViewer, dataSource, processedEntityIds.current);
     }
 
     if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
@@ -401,7 +406,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   useEffect((): void => {
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource);
+      resetProcessedEntities();
+      visualizationHandler(mapViewer, dataSource, processedEntityIds.current);
     }
   }, [mapViewer.scene.mode]);
 
