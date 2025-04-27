@@ -375,9 +375,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
       // #endregion
 
-      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
-        ','
-      )},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
+      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
       const wfsResponse = await fetchWfsData(wfsDataUrl);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {

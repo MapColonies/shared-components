@@ -127,17 +127,20 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5) : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2),
+        material: is3D
+          ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5)
+          : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
         outlineWidth: 3,
         height: is3D ? undefined : 10000, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+        perPositionHeight: false,
       });
     }
     if (entity.polyline) {
       entity.polyline = new PolylineGraphics({
         positions: entity.polyline.positions,
-        material: CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5),
+        material: CesiumColor.fromCssColorString(GREEN).withAlpha(0.5),
         clampToGround: true,
         width: 4,
       });
@@ -230,7 +233,7 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
         hierarchy: entity.polygon.hierarchy,
         material: is3D
           ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.5)
-          : CesiumColor.fromCssColorString(GREEN).withAlpha(0.2) /*CesiumColor.TRANSPARENT*/,
+          : CesiumColor.fromCssColorString(GREEN).withAlpha(0.2),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(GREEN),
         outlineWidth: 3,
@@ -264,8 +267,8 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
         <CesiumWFSLayer key={'3333333'} options={optionsBuildings} meta={{...metaBuildings, id: '3333333'}} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualizationBuildings} />
-        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualizationBuildings} /> */}
-        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} />
+        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} /> */}
       </CesiumMap>
     </div>
   );
