@@ -61,13 +61,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
-  useEffect((): void => {
-    const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
-    if (dataSource) {
-      visualizationHandler(mapViewer, dataSource);
-    }
-  }, [mapViewer.scene.mode]);
-
   const getEntityEnteriorGeometry = (entity: Entity): string => {
     if (entity) {
       return entity.polyline ? 'polyline' : 'polygon';
@@ -405,6 +398,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       updateMetadata(-1, -1);
     }
   }, []);
+
+  useEffect((): void => {
+    const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
+    if (dataSource) {
+      visualizationHandler(mapViewer, dataSource);
+    }
+  }, [mapViewer.scene.mode]);
 
   useEffect(() => {
     // Happens each time the metadata from STATE changes
