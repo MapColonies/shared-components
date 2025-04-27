@@ -166,7 +166,6 @@ const optionsBuildingsDates = {
   zoomLevel: 14,
   maxCacheSize: 6000,
   sortBy: 'year_day_numeric',
-  shouldFilter: false,
 };
 
 const metaBuildingsDates = {

@@ -29,7 +29,6 @@ export interface ICesiumWFSLayerOptions {
   zoomLevel: number;
   maxCacheSize: number;
   sortBy?: string;
-  shouldFilter?: boolean;
 }
 
 export interface ICesiumWFSLayer extends React.Attributes {
@@ -48,7 +47,7 @@ interface IFetchMetadata {
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id', shouldFilter = true } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -355,7 +354,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         featureTypes: [featureType],
         startIndex: offset,
         count: pageSize,
-        filter: shouldFilter ? Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84') : undefined,
+        filter: Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84'),
       });
       const sortByBlock = `<SortBy><SortProperty><ValueReference>${sortBy}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
       if (requestBody.body.includes('<\/Query>')) {
