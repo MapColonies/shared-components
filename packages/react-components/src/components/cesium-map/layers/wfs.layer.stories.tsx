@@ -140,7 +140,7 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
     if (entity.polyline) {
       entity.polyline = new PolylineGraphics({
         positions: entity.polyline.positions,
-        material: CesiumColor.fromCssColorString(GREEN).withAlpha(0.5),
+        material: CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5),
         clampToGround: true,
         width: 4,
       });
