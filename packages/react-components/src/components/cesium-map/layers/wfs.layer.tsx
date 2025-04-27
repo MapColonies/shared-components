@@ -71,13 +71,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const getEntityCenter = (entity: Entity): Cartesian3 | null => {
     const hierarchy = entity?.polygon?.hierarchy?.getValue(JulianDate.now());
     if (!hierarchy) return null;
-
     const positions = hierarchy.positions;
     return BoundingSphere.fromPoints(positions).center;
   };
 
-  const getClosestPolygonEntityUnderMouse = (viewer: CesiumViewer, screenPosition: Cartesian2) => {
-    const drill = viewer.scene.drillPick(screenPosition);
+  const getClosestPolygonEntityUnderMouse = (screenPosition: Cartesian2) => {
+    const drill = mapViewer.scene.drillPick(screenPosition);
     const candidates = drill.map((p) => p.id).filter((id) => id && id.polygon);
 
     if (candidates.length === 0) return null;
@@ -86,7 +85,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const worldPos = getEntityCenter(entity);
       if (!worldPos) return { entity, distance: Number.MAX_VALUE };
 
-      const screenPos = SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, worldPos);
+      const screenPos = SceneTransforms.wgs84ToWindowCoordinates(mapViewer.scene, worldPos);
       if (!screenPos) return { entity, distance: Number.MAX_VALUE };
 
       const dx = screenPosition.x - screenPos.x;
@@ -129,14 +128,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         }
       } else {
         // 3D
-        const closestPolygon = getClosestPolygonEntityUnderMouse(mapViewer, movement.endPosition);
+        const closestPolygon = getClosestPolygonEntityUnderMouse(movement.endPosition);
 
         if (closestPolygon) {
           // If new polygon is different from current hovered
           if (get(hoveredEntity, 'id') !== get(closestPolygon, 'id')) {
-            // Reset previous hovered polygon
+            // Resetting previous hovered polygon
             if (hoveredEntity) {
               hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
+              (mapViewer.container as HTMLElement).style.cursor = 'default';
             }
             // Highlight new hovered polygon
             hoveredEntity = closestPolygon;
@@ -146,6 +146,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         } else {
           // No polygon hovered anymore
           if (hoveredEntity) {
+            // Resetting previous hovered polygon
             hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
             hoveredEntity = null;
             (mapViewer.container as HTMLElement).style.cursor = 'default';
