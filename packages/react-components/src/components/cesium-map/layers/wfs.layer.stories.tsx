@@ -138,12 +138,9 @@ const handleVisualizationBuildings = (
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    const entityId = entity.id;
-
-    if (processedEntityIds.has(entityId)) {
+    if (!processedEntityIds.has(entity.id)) {
       return;
     }
-
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
@@ -182,8 +179,6 @@ const handleVisualizationBuildings = (
         heightReference: HeightReference.CLAMP_TO_GROUND,
       });
     }
-
-    processedEntityIds.add(entityId);
   });
 };
 
@@ -271,12 +266,9 @@ const handleVisualizationBuildingsDates = (
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    const entityId = entity.id;
-
-    if (processedEntityIds.has(entityId)) {
+    if (!processedEntityIds.has(entity.id)) {
       return;
     }
-
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
@@ -298,8 +290,6 @@ const handleVisualizationBuildingsDates = (
         width: 4,
       });
     }
-
-    processedEntityIds.add(entityId);
   });
 };
 
