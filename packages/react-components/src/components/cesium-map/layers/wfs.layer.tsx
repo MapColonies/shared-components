@@ -374,6 +374,86 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
       const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
       const wfsResponse = await fetchWfsData(wfsDataUrl);
+      if (wfsResponse?.features[0]?.geometry) {
+        wfsResponse.features[0].geometry = {
+          coordinates: [35.47117272860845, 33.09099957271394],
+          type: 'Point',
+        };
+      }
+      if (wfsResponse?.features[1]?.geometry) {
+        wfsResponse.features[1].geometry = {
+          coordinates: [
+            [35.4690255709979, 33.09229606234996],
+            [35.471490042224076, 33.09184494707435],
+            [35.47664679294357, 33.08964138919352],
+            [35.478593518115474, 33.08866972407918],
+            [35.47902842480198, 33.08790626538486],
+            [35.47890416574867, 33.087264260898436],
+            [35.47888345590599, 33.08707339379575],
+            [35.48507569873726, 33.084973828323044],
+            [35.48760229949167, 33.08521675581805],
+          ],
+          type: 'LineString',
+        };
+      }
+      if (wfsResponse?.features[2]?.geometry) {
+        wfsResponse.features[2].geometry = {
+          "coordinates": [[
+            [
+              [
+                35.476344634437226,
+                33.09081127029634
+              ],
+              [
+                35.47590759909494,
+                33.09040204180434
+              ],
+              [
+                35.476781669779456,
+                33.090423580193274
+              ],
+              [
+                35.47773286434801,
+                33.09044511857691
+              ],
+              [
+                35.47775857230897,
+                33.09109126764133
+              ],
+              [
+                35.476344634437226,
+                33.09081127029634
+              ]
+            ]
+          ],
+           [
+            [
+              [
+                35.47755290861892,
+                33.09007896533265
+              ],
+              [
+                35.47786140415516,
+                33.08958357910531
+              ],
+              [
+                35.47870976687756,
+                33.08979896476484
+              ],
+              [
+                35.4790182624138,
+                33.090423580193274
+              ],
+              [
+                35.47755290861892,
+                33.09007896533265
+              ]
+            ]
+          ]              
+                         ],
+          "type": "MultiPolygon"
+        };
+      }
       await handleWfsResponse(wfsResponse, extent, offset, position);
     } catch (error) {
       console.error('Error fetching WFS data:', error);

@@ -1,4 +1,13 @@
-import { Color as CesiumColor, Entity, GeoJsonDataSource, PolygonGraphics, PolylineGraphics, SceneMode } from 'cesium';
+import {
+  Color as CesiumColor,
+  Entity,
+  GeoJsonDataSource,
+  HeightReference,
+  PointGraphics,
+  PolygonGraphics,
+  PolylineGraphics,
+  SceneMode
+} from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumViewer } from '../map';
 import { LayerType } from '../layers-manager';
@@ -156,6 +165,23 @@ const handleVisualizationBuildings = (
         width: 4,
       });
     }
+    if (entity.billboard) {
+      entity.billboard = undefined;
+      entity.position = {
+        // @ts-ignore
+        ...entity._position._value,
+        // @ts-ignore
+        z: entity._position._value.z + 10000
+      };
+
+      entity.point = new PointGraphics({
+        pixelSize: 10,
+        color: CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5),
+        outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
+        outlineWidth: 3,
+        heightReference: HeightReference.CLAMP_TO_GROUND,
+      });
+    }
 
     processedEntityIds.add(entityId);
   });
@@ -293,7 +319,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
         <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualizationBuildings} /> */}
-        <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} />
+        {/* <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} /> */}
       </CesiumMap>
     </div>
   );
