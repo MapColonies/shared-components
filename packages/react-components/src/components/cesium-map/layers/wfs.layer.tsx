@@ -34,7 +34,7 @@ export interface ICesiumWFSLayerOptions {
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
-  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processedEntityIds: Set<string>) => void;
+  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[]) => void;
 }
 
 interface IFetchMetadata {
@@ -319,7 +319,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource, new Set(newFeatures.map((feature) => feature.id as string)));
+      visualizationHandler(mapViewer, dataSource, newFeatures.map((feature) => feature.id as string));
     }
 
     if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
@@ -427,7 +427,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   useEffect((): void => {
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource, new Set());
+      visualizationHandler(mapViewer, dataSource, []);
     }
   }, [mapViewer.scene.mode]);
 

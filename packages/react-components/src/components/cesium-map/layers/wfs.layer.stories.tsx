@@ -133,12 +133,12 @@ const metaBuildings = {
 const handleVisualizationBuildings = (
   mapViewer: CesiumViewer,
   dataSource: GeoJsonDataSource,
-  processEntityIds: Set<string>
+  processEntityIds: string[]
 ): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    if (!processEntityIds.has(entity.id)) {
+    if (processEntityIds.length > 0 && !processEntityIds.some(validId => entity.id.startsWith(validId))) {
       return;
     }
     if (entity.polygon) {
@@ -261,12 +261,12 @@ const metaBuildingsDates = {
 const handleVisualizationBuildingsDates = (
   mapViewer: CesiumViewer,
   dataSource: GeoJsonDataSource,
-  processEntityIds: Set<string>
+  processEntityIds: string[]
 ): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    if (!processEntityIds.has(entity.id)) {
+    if (processEntityIds.length > 0 && !processEntityIds.some(validId => entity.id.startsWith(validId))) {
       return;
     }
     if (entity.polygon) {
