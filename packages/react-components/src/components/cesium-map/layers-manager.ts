@@ -62,6 +62,7 @@ class LayerManager {
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
   public dataLayerUpdated: Event;
+  public isLoadingDataLayer: boolean;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
@@ -81,6 +82,7 @@ class LayerManager {
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
+    this.isLoadingDataLayer = false;
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
 
     if (onLayersUpdate) {

@@ -54,6 +54,7 @@ interface ICameraState {
   transform?: Matrix4;
   frustum?: PerspectiveFrustum | PerspectiveOffCenterFrustum | OrthographicFrustum;
 }
+
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
   public currentZoomLevel?: number;
@@ -366,7 +367,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       });
       if (showLoadingProgress) {
         mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
-          if (mapViewRef.scene.globe.tilesLoaded === true) {
+          if (mapViewRef.scene.globe.tilesLoaded || mapViewRef.layersManager?.isLoadingDataLayer) {
             setIsLoading(false);
           } else {
             setIsLoading(true);
