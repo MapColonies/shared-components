@@ -69,8 +69,8 @@ const LIGHT_BLUE = '#24AEE9';
 
 const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
-  keyField: 'osm_id',
   featureType: 'buildings',
+  keyField: 'id',
   style: {
     color: BRIGHT_GREEN,
     hover: LIGHT_BLUE,
@@ -202,8 +202,8 @@ const BLUE = '#0000FF';
 
 const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
-  keyField: 'year_day_numeric',
   featureType: 'buildings_dates',
+  keyField: 'year_day_numeric',
   style: {
     color: GREEN,
     hover: BLUE,
@@ -215,7 +215,7 @@ const optionsBuildingsDates = {
 };
 
 const metaBuildingsDates = {
-  id: '7777777',
+  id: '2222222',
   keywords: 'buildings_dates, osm',
   links: 'buildings_dates,,WFS,http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   type: 'RECORD_VECTOR',
@@ -309,23 +309,30 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
           isZoomTo={true}
           url="https://tiles.mapcolonies.net/api/3d/v1/b3dm/32d542c1-b956-4579-91df-2a43b183d8b3/data/vricon.3dtiles/tileset.json?token=eyJhbGciOiJSUzI1NiIsImtpZCI6Im1hcC1jb2xvbmllcy1pbnQifQ.eyJhbyI6WyJodHRwczovL2FwcC1pbnQtY2xpZW50LXJvdXRlLWludGVncmF0aW9uLmFwcHMuajFsazNuanAuZWFzdHVzLmFyb2FwcC5pbyIsImh0dHBzOi8vYXBwLWludC1jbGllbnQtdG9vbHMtcm91dGUtaW50ZWdyYXRpb24uYXBwcy5qMWxrM25qcC5lYXN0dXMuYXJvYXBwLmlvIiwiaHR0cDovL2xvY2FsaG9zdDozMDAwIl0sImQiOlsicmFzdGVyIiwicmFzdGVyV21zIiwicmFzdGVyRXhwb3J0IiwiZGVtIiwidmVjdG9yIiwiM2QiXSwiaWF0IjoxNjc0NjMyMzQ2LCJzdWIiOiJtYXBjb2xvbmllcy1hcHAiLCJpc3MiOiJtYXBjb2xvbmllcy10b2tlbi1jbGkifQ.e-4SmHNOE8FwpcJoHdp-3Dh6D8GqCwM5wZfZIPrivGhfeKdihcsjEj_WN2jWN-ULha_ytZN5gRusLjwikNwgbF6hvb-QTDe3bEHPAjtgpZmF4HaJze8e6VPDF1tTC52CHDzNnwkUGAH1tnVGq10SnyhsGDezUChTVeBeVu-swTI58qCjemUQRw7-Q03uSEH24AkbX2CC1_rNwulo7ChglyTdn01tTWPsPjIuDjeixxm2CUmUHpfZzroaSzwof7ByQe22o3tFddje6ItNLBUC_VN7UfNLa_QPSVbIuNac-iMGFbK-RIyXUK8mp1AwddvSGsBUYcDs8fWMLzKhItljnw"
         />
-        <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualizationBuildings} />
         <CesiumWFSLayer
-          key={metaBuildings.id + '_2222222'}
+          key={metaBuildings.id}
           options={optionsBuildings}
-          meta={{ ...metaBuildings, id: metaBuildings.id + '_2222222' }}
+          meta={metaBuildings}
           visualizationHandler={handleVisualizationBuildings}
         />
         <CesiumWFSLayer
-          key={metaBuildings.id + '_3333333'}
+          key={metaBuildings.id + '_2'}
           options={optionsBuildings}
-          meta={{ ...metaBuildings, id: metaBuildings.id + '_3333333' }}
+          meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
           visualizationHandler={handleVisualizationBuildings}
         />
-        {/* <CesiumWFSLayer key={'4444444'} options={optionsBuildings} meta={{...metaBuildings, id: '4444444'}} visualizationHandler={handleVisualizationBuildings} />
-        <CesiumWFSLayer key={'5555555'} options={optionsBuildings} meta={{...metaBuildings, id: '5555555'}} visualizationHandler={handleVisualizationBuildings} />
-        <CesiumWFSLayer key={'6666666'} options={optionsBuildings} meta={{...metaBuildings, id: '6666666'}} visualizationHandler={handleVisualizationBuildings} /> */}
-        {/* <CesiumWFSLayer key={metaBuildingsDates.id} options={optionsBuildingsDates} meta={metaBuildingsDates} visualizationHandler={handleVisualizationBuildingsDates} /> */}
+        <CesiumWFSLayer
+          key={metaBuildings.id + '_3'}
+          options={optionsBuildings}
+          meta={{ ...metaBuildings, id: metaBuildings.id + '_3' }}
+          visualizationHandler={handleVisualizationBuildings}
+        />
+        <CesiumWFSLayer
+          key={metaBuildingsDates.id}
+          options={optionsBuildingsDates}
+          meta={metaBuildingsDates}
+          visualizationHandler={handleVisualizationBuildingsDates}
+        />
       </CesiumMap>
     </div>
   );

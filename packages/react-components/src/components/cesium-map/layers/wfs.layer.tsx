@@ -23,8 +23,8 @@ import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface ICesiumWFSLayerOptions {
   url: string;
-  keyField: string;
   featureType: string;
+  keyField: string;
   style: Record<string, unknown>;
   pageSize: number;
   zoomLevel: number;
@@ -48,7 +48,7 @@ interface IFetchMetadata {
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
-  const { url, keyField, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
+  const { url, featureType, keyField, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -211,9 +211,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         features,
         (f: Feature): void => {
           if (f.properties) {
-            const osmId = f.properties[keyField];
-            if (!wfsCache.current.has(osmId)) {
-              wfsCache.current.add(osmId);
+            const keyFieldValue = f.properties[keyField];
+            if (!wfsCache.current.has(keyFieldValue)) {
+              wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
               newFeatures.push(f);
             }
@@ -243,8 +243,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       wfsDataSource.entities.values,
       (entity: Entity): void => {
         if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-          const osmId = entity.properties[keyField].getValue();
-          wfsCache.current.delete(osmId);
+          const keyFieldValue = entity.properties[keyField].getValue();
+          wfsCache.current.delete(keyFieldValue);
           entitiesToDelete.push(entity);
         }
       },
