@@ -70,7 +70,6 @@ const LIGHT_BLUE = '#24AEE9';
 const optionsBuildings = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings',
-  keyField: 'id',
   style: {
     color: BRIGHT_GREEN,
     hover: LIGHT_BLUE,
@@ -78,6 +77,7 @@ const optionsBuildings = {
   pageSize: 300,
   zoomLevel: 14,
   maxCacheSize: 6000,
+  keyField: 'id',
 };
 
 const metaBuildings = {
@@ -203,7 +203,6 @@ const BLUE = '#0000FF';
 const optionsBuildingsDates = {
   url: 'http://geoserver-vector-dev.apps.j1lk3njp.eastus.aroapp.io/geoserver/core/ows',
   featureType: 'buildings_dates',
-  keyField: 'year_day_numeric',
   style: {
     color: GREEN,
     hover: BLUE,
@@ -211,7 +210,7 @@ const optionsBuildingsDates = {
   pageSize: 300,
   zoomLevel: 14,
   maxCacheSize: 6000,
-  sortBy: 'year_day_numeric',
+  keyField: 'year_day_numeric',
 };
 
 const metaBuildingsDates = {

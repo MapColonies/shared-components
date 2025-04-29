@@ -24,12 +24,11 @@ import { CesiumViewer, useCesiumMap } from '../map';
 export interface ICesiumWFSLayerOptions {
   url: string;
   featureType: string;
-  keyField: string;
   style: Record<string, unknown>;
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
-  sortBy?: string;
+  keyField?: string; // if PK is not defined, or is different from 'id', or sortBy should be used
 }
 
 export interface ICesiumWFSLayer extends React.Attributes {
@@ -48,7 +47,7 @@ interface IFetchMetadata {
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
-  const { url, featureType, keyField, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -211,7 +210,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         features,
         (f: Feature): void => {
           if (f.properties) {
-            const keyFieldValue = f.properties[keyField];
+            const keyFieldValue = f.properties[keyField ?? 'id'];
             if (!wfsCache.current.has(keyFieldValue)) {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
@@ -243,7 +242,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       wfsDataSource.entities.values,
       (entity: Entity): void => {
         if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-          const keyFieldValue = entity.properties[keyField].getValue();
+          const keyFieldValue = entity.properties[keyField ?? 'id'].getValue();
           wfsCache.current.delete(keyFieldValue);
           entitiesToDelete.push(entity);
         }
@@ -375,20 +374,23 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         count: pageSize,
         filter: Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84'),
       });
-      const sortByBlock = `<SortBy><SortProperty><ValueReference>${sortBy}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
-      if (requestBody.body.includes('<\/Query>')) {
-        requestBody.body = requestBody.body.replace('<\/Query>', `${sortByBlock}<\/Query>`);
-      } else if (requestBody.body.includes('<Query')) {
-        requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
+      const sortByBlock = `<SortBy><SortProperty><ValueReference>${keyField}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
+      if (keyField) {
+        if (requestBody.body.includes('<\/Query>')) {
+          requestBody.body = requestBody.body.replace('<\/Query>', `${sortByBlock}<\/Query>`);
+        } else if (requestBody.body.includes('<Query')) {
+          requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
+        }
       }
       const requestBodyXml = requestBody.body;
       // console.log('requestBodyXml', requestBodyXml);
       const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
       // #endregion
 
-      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
-        ','
-      )},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
+      let wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
+      if (keyField) {
+        wfsDataUrl += `&sortBy=${keyField}%20ASC`;
+      }
       const wfsResponse = await fetchWfsData(wfsDataUrl);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {
