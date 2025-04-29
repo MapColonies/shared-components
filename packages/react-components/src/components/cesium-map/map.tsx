@@ -178,7 +178,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   const isLoadingProgress = useMemo(() => {
     // console.log('isLoadingTiles', isLoadingTiles, 'isLoadingDataLayer', mapViewRef?.layersManager?.isLoadingDataLayer);
-    return isLoadingTiles || mapViewRef?.layersManager?.isLoadingDataLayer;
+    return isLoadingTiles/* || mapViewRef?.layersManager?.isLoadingDataLayer*/;
   }, [isLoadingTiles, mapViewRef]);
 
   const viewerProps: ViewerProps = {

@@ -306,7 +306,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
-        setLoading(false);
       }
       return;
     }
@@ -333,34 +332,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       fetchAndUpdateWfs(page.current++ * pageSize);
     } else {
       page.current = 0;
-      setLoading(false);
-    }
-  };
-
-  const setLoading = (isLoading: boolean): void => {
-    if (mapViewer.layersManager) {
-      mapViewer.layersManager.isLoadingDataLayer = isLoading;
-      // console.log(`${dataSourceName} ->`, mapViewer.layersManager.isLoadingDataLayer);
     }
   };
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
     if (!mapViewer || mapViewer.scene.mode === SceneMode.MORPHING) return;
 
-    if (offset === 0) {
-      setLoading(true);
-    }
-
     // const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     const bbox = computeLimitedViewRectangle(mapViewer);
     if (!bbox) {
-      setLoading(false);
       return;
     }
 
     if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
       hideEntities();
-      setLoading(false);
       return;
     }
 
@@ -449,7 +434,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     } catch (error) {
       console.error('Error fetching WFS data:', error);
       updateMetadata(-1, -1);
-      setLoading(false);
     }
   }, []);
 
