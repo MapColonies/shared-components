@@ -296,6 +296,34 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
         width: 4,
       });
     }
+    if (entity.billboard) {
+      const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
+      const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+      const correctedCarto = new Cartographic(
+        worlPosCartographic.longitude,
+        worlPosCartographic.latitude,
+        is3D ? mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos)) : 500
+      );
+
+      // Convert back to Cartesian3
+      const correctedCartesian = Cartesian3.fromRadians(correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height);
+
+      entity.position = correctedCartesian as unknown as PositionProperty;
+
+      entity.billboard = new BillboardGraphics({
+        image:
+          'data:image/svg+xml;base64,' +
+          btoa(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <circle cx="8" cy="8" r="6" fill="${GREEN}33" stroke="#FFFF0080" stroke-width="2"/>
+          </svg>
+        `), //${GREEN}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
+        verticalOrigin: VerticalOrigin.BOTTOM,
+        heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+        scale: 1.0,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      });
+    }
   });
 };
 
