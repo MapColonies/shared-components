@@ -1,12 +1,17 @@
 import {
+  BillboardGraphics,
+  Cartesian3,
+  Cartographic,
   Color as CesiumColor,
   Entity,
   GeoJsonDataSource,
   HeightReference,
-  PointGraphics,
+  JulianDate,
   PolygonGraphics,
   PolylineGraphics,
-  SceneMode
+  PositionProperty,
+  SceneMode,
+  VerticalOrigin,
 } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumViewer } from '../map';
@@ -130,23 +135,17 @@ const metaBuildings = {
   },
 };
 
-const handleVisualizationBuildings = (
-  mapViewer: CesiumViewer,
-  dataSource: GeoJsonDataSource,
-  processEntityIds: string[]
-): void => {
+const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[]): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    if (processEntityIds.length > 0 && !processEntityIds.some(validId => entity.id.startsWith(validId))) {
+    if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
       return;
     }
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D
-          ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5)
-          : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2),
+        material: is3D ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5) : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
         outlineWidth: 3,
@@ -163,20 +162,31 @@ const handleVisualizationBuildings = (
       });
     }
     if (entity.billboard) {
-      entity.billboard = undefined;
-      entity.position = {
-        // @ts-ignore
-        ...entity._position._value,
-        // @ts-ignore
-        z: entity._position._value.z + 10000
-      };
+      const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
+      const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+      const correctedCarto = new Cartographic(
+        worlPosCartographic.longitude,
+        worlPosCartographic.latitude,
+        is3D ? mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos)) : 500
+      );
 
-      entity.point = new PointGraphics({
-        pixelSize: 10,
-        color: CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5),
-        outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
-        outlineWidth: 3,
-        heightReference: HeightReference.CLAMP_TO_GROUND,
+      // Convert back to Cartesian3
+      const correctedCartesian = Cartesian3.fromRadians(correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height);
+
+      entity.position = correctedCartesian as unknown as PositionProperty;
+
+      entity.billboard = new BillboardGraphics({
+        image:
+          'data:image/svg+xml;base64,' +
+          btoa(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <circle cx="8" cy="8" r="6" fill="${BRIGHT_GREEN}33" stroke="#FFFF0080" stroke-width="2"/>
+          </svg>
+        `), //${BRIGHT_GREEN}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
+        verticalOrigin: VerticalOrigin.BOTTOM,
+        heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+        scale: 1.0,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
       });
     }
   });
@@ -258,23 +268,17 @@ const metaBuildingsDates = {
   },
 };
 
-const handleVisualizationBuildingsDates = (
-  mapViewer: CesiumViewer,
-  dataSource: GeoJsonDataSource,
-  processEntityIds: string[]
-): void => {
+const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[]): void => {
   const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
-    if (processEntityIds.length > 0 && !processEntityIds.some(validId => entity.id.startsWith(validId))) {
+    if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
       return;
     }
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D
-          ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.5)
-          : CesiumColor.fromCssColorString(GREEN).withAlpha(0.2),
+        material: is3D ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.5) : CesiumColor.fromCssColorString(GREEN).withAlpha(0.2),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(GREEN),
         outlineWidth: 3,
