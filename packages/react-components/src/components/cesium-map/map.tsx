@@ -160,6 +160,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showCompass, setShowCompass] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
+  const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
@@ -177,9 +178,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
 
   const isLoadingProgress = useMemo(() => {
-    // console.log('isLoadingTiles', isLoadingTiles, 'isLoadingDataLayer', mapViewRef?.layersManager?.isLoadingDataLayer);
-    return isLoadingTiles/* || mapViewRef?.layersManager?.isLoadingDataLayer*/;
-  }, [isLoadingTiles, mapViewRef]);
+    return isLoadingTiles || isLoadingDataLayer;
+  }, [isLoadingTiles, isLoadingDataLayer]);
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -387,6 +387,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           } else {
             setIsLoadingTiles(true);
           }
+        });
+        mapViewRef.layersManager?.addDataLayerUpdatedListener(() => {
+          let loading = false;
+          mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
+            if (
+              typeof dataLayer.meta.items === 'number' && 
+              typeof dataLayer.meta.total === 'number' && 
+              dataLayer.meta.items > 0 && 
+              dataLayer.meta.items < dataLayer.meta.total) {
+              loading = true;
+              return;
+            }
+          });
+          setIsLoadingDataLayer(loading);
         });
       }
     }
