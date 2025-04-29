@@ -1,4 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, MouseEventHandler } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  ComponentProps,
+  MouseEvent,
+  useMemo
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -149,7 +159,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
@@ -165,6 +175,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
   const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
+
+  const isLoadingProgress = useMemo(() => {
+    // console.log('isLoadingTiles', isLoadingTiles, 'isLoadingDataLayer', mapViewRef?.layersManager?.isLoadingDataLayer);
+    return isLoadingTiles || mapViewRef?.layersManager?.isLoadingDataLayer;
+  }, [isLoadingTiles, mapViewRef]);
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -367,10 +382,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       });
       if (showLoadingProgress) {
         mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
-          if (mapViewRef.scene.globe.tilesLoaded || mapViewRef.layersManager?.isLoadingDataLayer) {
-            setIsLoading(false);
+          if (mapViewRef.scene.globe.tilesLoaded) {
+            setIsLoadingTiles(false);
           } else {
-            setIsLoading(true);
+            setIsLoadingTiles(true);
           }
         });
       }
@@ -421,7 +436,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          {showLoadingProgress && isLoading && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
+          {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
             {
               debugPanel &&
@@ -443,7 +458,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoading]);
+  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
     <Viewer className="viewer" full ref={ref} {...viewerProps}>

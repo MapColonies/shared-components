@@ -306,6 +306,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
+        setLoading(false);
       }
       return;
     }
@@ -332,19 +333,23 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       fetchAndUpdateWfs(page.current++ * pageSize);
     } else {
       page.current = 0;
+      setLoading(false);
     }
   };
 
   const setLoading = (isLoading: boolean): void => {
     if (mapViewer.layersManager) {
       mapViewer.layersManager.isLoadingDataLayer = isLoading;
+      // console.log(`${dataSourceName} ->`, mapViewer.layersManager.isLoadingDataLayer);
     }
   };
 
   const fetchAndUpdateWfs = useCallback(async (offset = 0) => {
     if (!mapViewer || mapViewer.scene.mode === SceneMode.MORPHING) return;
 
-    setLoading(true);
+    if (offset === 0) {
+      setLoading(true);
+    }
 
     // const bbox = mapViewer.camera.computeViewRectangle(Ellipsoid.WGS84);
     const bbox = computeLimitedViewRectangle(mapViewer);
@@ -444,7 +449,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     } catch (error) {
       console.error('Error fetching WFS data:', error);
       updateMetadata(-1, -1);
-    } finally {
       setLoading(false);
     }
   }, []);
