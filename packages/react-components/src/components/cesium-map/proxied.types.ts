@@ -1,4 +1,5 @@
 import {
+  BillboardGraphics,
   BoundingSphere,
   Cartesian2,
   Cartesian3,
@@ -9,10 +10,13 @@ import {
   Ellipsoid,
   EllipsoidTerrainProvider,
   GeographicTilingScheme,
+  HeightReference,
   HorizontalOrigin,
+  JulianDate,
   LabelStyle,
   PolylineDashMaterialProperty,
   PolylineGraphics,
+  PositionProperty,
   Rectangle,
   Resource,
   VerticalOrigin,
@@ -47,6 +51,12 @@ export class CesiumCesiumTerrainProvider extends CesiumTerrainProvider {}
 
 export class CesiumCesiumPolylineGraphics extends PolylineGraphics {}
 
+export class CesiumJulianDate extends JulianDate {}
+
+export class CesiumPositionProperty extends PositionProperty {}
+
+export class CesiumCesiumBillboardGraphics extends BillboardGraphics {}
+
 // PROXIED ENUMS
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumVerticalOrigin = VerticalOrigin;
@@ -54,6 +64,8 @@ export const CesiumHorizontalOrigin = HorizontalOrigin;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumLabelStyle = LabelStyle;
+
+export const CesiumHeightReference = HeightReference;
 
 // PROXIED FUNCTIONS
 export {
