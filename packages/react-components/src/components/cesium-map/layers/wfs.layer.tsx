@@ -23,6 +23,7 @@ import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface ICesiumWFSLayerOptions {
   url: string;
+  keyField: string;
   featureType: string;
   style: Record<string, unknown>;
   pageSize: number;
@@ -47,7 +48,7 @@ interface IFetchMetadata {
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
+  const { url, keyField, featureType, style, pageSize, zoomLevel, maxCacheSize, sortBy = 'id' } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
@@ -57,7 +58,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const geojsonColor = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.5), [color]);
   const geojsonColor2D = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.2), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
-  const dataSourceName = useMemo(() => `wfs_${featureType}`, [featureType]);
+  const dataSourceName = useMemo(() => `wfs_${featureType}_${uuidv4()}`, [featureType]);
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
@@ -77,7 +78,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const getClosestPolygonEntityUnderMouse = (screenPosition: Cartesian2) => {
     const drill = mapViewer.scene.drillPick(screenPosition);
-    const candidates = drill.map((p) => p.id).filter((id) => id && id.polygon);
+    const candidates = drill.map((p) => p.id).filter((id) => id && id.polygon && id.entityCollection.owner.name === dataSourceName);
 
     if (candidates.length === 0) return null;
 
@@ -209,11 +210,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       await pMap(
         features,
         (f: Feature): void => {
-          const osmId = f.properties?.osm_id;
-          if (!wfsCache.current.has(osmId)) {
-            wfsCache.current.add(osmId);
-            (f.properties as any).fetch_id = fetchId;
-            newFeatures.push(f);
+          if (f.properties) {
+            const osmId = f.properties[keyField];
+            if (!wfsCache.current.has(osmId)) {
+              wfsCache.current.add(osmId);
+              (f.properties as any).fetch_id = fetchId;
+              newFeatures.push(f);
+            }
           }
         },
         { concurrency: getOptimalConcurrency(features.length, 'cpu') }
@@ -240,7 +243,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       wfsDataSource.entities.values,
       (entity: Entity): void => {
         if (entity.properties && entity.properties.fetch_id.getValue() === fetchIdToRemove) {
-          const osmId = entity.properties.osm_id.getValue();
+          const osmId = entity.properties[keyField].getValue();
           wfsCache.current.delete(osmId);
           entitiesToDelete.push(entity);
         }
@@ -319,7 +322,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource, newFeatures.map((feature) => feature.id as string));
+      visualizationHandler(
+        mapViewer,
+        dataSource,
+        newFeatures.map((feature) => feature.id as string)
+      );
     }
 
     if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
@@ -379,7 +386,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
       // #endregion
 
-      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
+      const wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
+        ','
+      )},EPSG:4326&startIndex=${offset}&count=${pageSize}&sortBy=${sortBy}%20ASC`;
       const wfsResponse = await fetchWfsData(wfsDataUrl);
       if (wfsResponse?.features[0]?.geometry) {
         wfsResponse.features[0].geometry = {
@@ -405,28 +414,28 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       }
       if (wfsResponse?.features[2]?.geometry) {
         wfsResponse.features[2].geometry = {
-          "coordinates": [
+          coordinates: [
             [
               [
-                [35.476344634437226,33.09081127029634],
-                [35.47590759909494,33.09040204180434],
-                [35.476781669779456,33.090423580193274],
-                [35.47773286434801,33.09044511857691],
-                [35.47775857230897,33.09109126764133],
-                [35.476344634437226,33.09081127029634]
-              ]
+                [35.476344634437226, 33.09081127029634],
+                [35.47590759909494, 33.09040204180434],
+                [35.476781669779456, 33.090423580193274],
+                [35.47773286434801, 33.09044511857691],
+                [35.47775857230897, 33.09109126764133],
+                [35.476344634437226, 33.09081127029634],
+              ],
             ],
             [
               [
-                [35.47755290861892,33.09007896533265],
-                [35.47786140415516,33.08958357910531],
-                [35.47870976687756,33.08979896476484],
-                [35.4790182624138,33.090423580193274],
-                [35.47755290861892,33.09007896533265]
-              ]
-            ]
+                [35.47755290861892, 33.09007896533265],
+                [35.47786140415516, 33.08958357910531],
+                [35.47870976687756, 33.08979896476484],
+                [35.4790182624138, 33.090423580193274],
+                [35.47755290861892, 33.09007896533265],
+              ],
+            ],
           ],
-          "type": "MultiPolygon"
+          type: 'MultiPolygon',
         };
       }
       await handleWfsResponse(wfsResponse, extent, offset, position);
