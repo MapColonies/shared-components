@@ -61,8 +61,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
-  const describe = (properties: Record<string, any>) => {
-    const rows = [];
+  const describe = (properties: Record<string, any>): string => {
+    const rows: string[] = [];
     const featureStructure = meta.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
     if (featureStructure && featureStructure.fields) {
       for (const field of featureStructure.fields) {
