@@ -61,6 +61,32 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
+  const describe = (properties: Record<string, any>) => {
+    const rows = [];
+    const featureStructure = meta.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
+    if (featureStructure && featureStructure.fields) {
+      for (const field of featureStructure.fields) {
+        const { fieldName, aliasFieldName } = field;
+        const key = aliasFieldName;
+        const value = properties[fieldName.toLowerCase()] ?? 'N/A';
+        rows.push(`
+          <tr>
+            <td><strong>${key}:</strong></td>
+            <td>${value}</td>
+          </tr>
+        `);
+      }
+    }
+    const isRightToLeft = featureStructure.fields.some(field => field.aliasFieldName !== field.fieldName);
+    return `
+      <table style="direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+      </table>
+    `;
+  };
+
   const getEntityEnteriorGeometry = (entity: Entity): string => {
     if (entity) {
       return entity.polyline ? 'polyline' : 'polygon';
@@ -316,7 +342,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       features: newFeatures,
     };
 
-    await wfsDataSource.process(newGeoJson);
+    await wfsDataSource.process(newGeoJson, { describe });
     mapViewer.scene.requestRender();
 
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
