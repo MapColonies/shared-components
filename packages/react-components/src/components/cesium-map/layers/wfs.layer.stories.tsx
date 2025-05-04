@@ -62,6 +62,8 @@ const DEBUG_PANEL = {
   wfs: {},
 };
 
+const POINT_STROKE = '#FFFF00';
+
 // #region buildings
 
 const BRIGHT_GREEN = '#01FF1F';
@@ -181,7 +183,7 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
           'data:image/svg+xml;base64,' +
           btoa(`
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-            <circle cx="8" cy="8" r="6" fill="${BRIGHT_GREEN}33" stroke="#FFFF0080" stroke-width="2"/>
+            <circle cx="8" cy="8" r="6" fill="${BRIGHT_GREEN}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
           </svg>
         `), //${BRIGHT_GREEN}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
         verticalOrigin: VerticalOrigin.BOTTOM,
@@ -314,7 +316,7 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
           'data:image/svg+xml;base64,' +
           btoa(`
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-            <circle cx="8" cy="8" r="6" fill="${GREEN}33" stroke="#FFFF0080" stroke-width="2"/>
+            <circle cx="8" cy="8" r="6" fill="${GREEN}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
           </svg>
         `), //${GREEN}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
         verticalOrigin: VerticalOrigin.BOTTOM,
