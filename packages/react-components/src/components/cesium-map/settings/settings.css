@@ -4,7 +4,8 @@
 }
 
 .settingsIconContainer,
-.mapLegendToggleContainer {
+.mapLegendToggleContainer,
+.debugPanelIconContainer {
   fill: #fff;
   width: 40px;
   height: 40px;
@@ -14,7 +15,8 @@
 }
 
 .settingsIconContainer:hover,
-.mapLegendToggleContainer:hover {
+.mapLegendToggleContainer:hover,
+.debugPanelIconContainer:hover {
   background: #48b;
   border-color: #aef;
 }
@@ -30,8 +32,11 @@
   max-height: 460px;
   width: 280px;
   position: absolute;
-  top: 40px;
-  right: 80px;
+  top: 44px;
+  right: 12px;
+  /* color: #AFBFDA;
+  background: #2D3748;
+  padding: 20px 24px; */
 }
 
 .settingsDialogPortal .mdc-dialog__container {
@@ -43,7 +48,7 @@
 }
 
 body[dir='rtl'] .settingsDialogPortal {
-  left: 80px;
+  left: 12px;
   right: unset;
 }
 

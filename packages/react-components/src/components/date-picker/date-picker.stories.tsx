@@ -84,7 +84,7 @@ DateMinMaxLimitTimeWithOnBlur.story = {
   name: 'Date time with OnBlur ',
 };
 
-export const DateTimeWithControlArgs: Story = (args: unknown) => {
+export const DateTimeWithControlArgs: Story = (args: Record<string, unknown>) => {
   return <DateTimePicker {...args} value={TODAY} onChange={action('date changed')} />;
 };
 
@@ -98,7 +98,7 @@ DateTimeWithControlArgs.argTypes = {
   },
 };
 
-export const DateTimeHebrewLocalized: Story = (args: unknown) => {
+export const DateTimeHebrewLocalized: Story = (args: Record<string, unknown>) => {
   const local = {
     placeHolderText: 'הכנס תאריך',
     calendarLocale: SupportedLocales.HE,

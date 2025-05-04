@@ -122,6 +122,10 @@ LocalizedMap.argTypes = {
       MAP_SETTINGS_BASE_MAP_TITLE: 'מפות בסיס',
       MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
+      DEBUG_PANEL_TITLE: 'דיבאגר',
+      WFS_TITLE: 'שכבות מידע',
+      WFS_CACHE: 'בזכרון',
+      WFS_EXTENT: 'בתצוגה',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },

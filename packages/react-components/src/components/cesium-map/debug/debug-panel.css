@@ -1,0 +1,30 @@
+.debugPanel {
+  transform: translateZ(0);
+  height: calc(100vh - 220px);
+  max-height: 460px;
+  width: 280px;
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  /* color: #AFBFDA;
+  background: #2D3748;
+  padding: 20px 24px; */
+}
+
+.debugPanel .mdc-dialog__container {
+  align-items: unset;
+}
+
+.debugPanel .mdc-dialog .mdc-dialog__surface {
+  max-height: unset;
+}
+
+body[dir='rtl'] .debugPanel {
+  left: 12px;
+  right: unset;
+}
+
+.debugPanel .title {
+  text-align: center;
+  font-size: 16px;
+}

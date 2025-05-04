@@ -23,6 +23,7 @@ import {
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
 import { cesiumRectangleContained } from './helpers/utils';
+import { ICesiumWFSLayer } from './layers/wfs.layer';
 import { CesiumCartesian2 } from './proxied.types';
 
 const INC = 1;
@@ -60,7 +61,9 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
+  public dataLayerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
+  private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
 
@@ -73,16 +76,18 @@ class LayerManager {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
+    this.dataLayers = [];
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
+    this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
 
     if (onLayersUpdate) {
       this.layerUpdated.addEventListener(onLayersUpdate, this);
     }
 
-    // Binding layer's relevancy check to cesium lifecycle if optimized tile requests enabled.
+    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
     if (this.mapViewer.shouldOptimizedTileRequests) {
       this.layerUpdated.addEventListener((meta: Record<string, unknown>) => {
         const newMetaKeys = Object.keys(meta);
@@ -120,11 +125,20 @@ class LayerManager {
     return this.layers;
   }
 
-  // It's a general place to extend layer's data. Should be done when all providers(different types) are initialized
-  public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const laeyrsReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
+  public get dataLayerList(): ICesiumWFSLayer[] {
+    return this.dataLayers;
+  }
 
-    Promise.all(laeyrsReadyPromises).then((data) => {
+  public addDataLayer(dataLayer: ICesiumWFSLayer): void {
+    this.dataLayers.push({ ...dataLayer });
+    this.dataLayerUpdated.raiseEvent(this.dataLayers);
+  }
+
+  // A general place to extend layer's data. Should be done when all providers(different types) are initialized
+  public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
+    const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
+
+    Promise.all(layersReadyPromises).then((data) => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -132,6 +146,14 @@ class LayerManager {
         this.layerUpdated.raiseEvent(meta);
       }
     });
+  }
+
+  public addMetaToDataLayer(meta: any): void {
+    const dataLayer = this.findDataLayerById(meta.id);
+    if (dataLayer) {
+      dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
+      this.dataLayerUpdated.raiseEvent(this.dataLayers, meta.id);
+    }
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
@@ -217,6 +239,17 @@ class LayerManager {
     }
   }
 
+  public removeDataLayer(dataLayerId: string): void {
+    const dataLayer = this.findDataLayerById(dataLayerId);
+    if (dataLayer) {
+      const index = this.dataLayers.indexOf(dataLayer);
+      if (index > -1) {
+        this.dataLayers.splice(index, 1);
+      }
+      this.dataLayerUpdated.raiseEvent(this.dataLayers);
+    }
+  }
+
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
       const parentId = get(layer.meta, 'parentBasetMapId') as string;
@@ -228,7 +261,6 @@ class LayerManager {
     // TODO: remove vector layers
   }
 
-  // Remove all non base layers
   public removeNotBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
       const parentId = get(layer.meta, 'parentBasetMapId') as string;
@@ -394,6 +426,20 @@ class LayerManager {
       skipRelevancyCheck: true,
       parentBasetMapId: 'TRANSPARENT_LAYER',
     };
+  }
+
+  public addDataLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.dataLayerUpdated.addEventListener(callback, this);
+  }
+
+  public removeDataLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.dataLayerUpdated.removeEventListener(callback, this);
+  }
+
+  public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
+    return this.dataLayers.find((dataLayer) => {
+      return dataLayer.meta.id === dataLayerId;
+    });
   }
 
   private setLegends(): void {

@@ -132,7 +132,7 @@ const data = {
 
 const onLoadAction = action('onLoad');
 
-export const MapWithGeojsonLayer: Story = (args: unknown) => (
+export const MapWithGeojsonLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <CesiumGeojsonLayer

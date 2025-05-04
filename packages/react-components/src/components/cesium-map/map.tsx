@@ -1,4 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, MouseEventHandler } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  ComponentProps,
+  MouseEvent,
+  useMemo
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -10,10 +20,8 @@ import {
   PerspectiveFrustum,
   PerspectiveOffCenterFrustum,
   OrthographicFrustum,
-  ScreenSpaceEventType,
   TerrainProvider,
   Ray,
-  ScreenSpaceEventHandler,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { LinearProgress } from '@map-colonies/react-core';
@@ -29,10 +37,12 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import CesiumCompassTool from './tools/cesium-compass.tool';
+import { DebugPanel } from './debug/debug-panel';
+import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
-import CesiumCompassTool from './tools/cesium-compass.tool';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -54,6 +64,7 @@ interface ICameraState {
   transform?: Matrix4;
   frustum?: PerspectiveFrustum | PerspectiveOffCenterFrustum | OrthographicFrustum;
 }
+
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
   public currentZoomLevel?: number;
@@ -99,6 +110,10 @@ interface ILegends {
   mapLegendsExtractor?: LegendExtractor;
 }
 
+export interface IDebugPanel {
+  wfs?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -122,6 +137,7 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
+  debugPanel?: IDebugPanel;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -143,7 +159,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
+  const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
@@ -158,6 +175,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
+  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
+
+  const isLoadingProgress = useMemo(() => {
+    return isLoadingTiles || isLoadingDataLayer;
+  }, [isLoadingTiles, isLoadingDataLayer]);
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -285,6 +307,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showLoadingProgress]);
 
   useEffect(() => {
+    setDebugPanel(props.debugPanel);
+  }, [props.debugPanel]);
+
+  useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
       if (mapViewRef === undefined) {
         return {
@@ -356,11 +382,25 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       });
       if (showLoadingProgress) {
         mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
-          if (mapViewRef.scene.globe.tilesLoaded === true) {
-            setIsLoading(false);
+          if (mapViewRef.scene.globe.tilesLoaded) {
+            setIsLoadingTiles(false);
           } else {
-            setIsLoading(true);
+            setIsLoadingTiles(true);
           }
+        });
+        mapViewRef.layersManager?.addDataLayerUpdatedListener(() => {
+          let loading = false;
+          mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
+            if (
+              typeof dataLayer.meta.items === 'number' && 
+              typeof dataLayer.meta.total === 'number' && 
+              dataLayer.meta.items > 0 && 
+              dataLayer.meta.items < dataLayer.meta.total) {
+              loading = true;
+              return;
+            }
+          });
+          setIsLoadingDataLayer(loading);
         });
       }
     }
@@ -410,10 +450,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          {showLoadingProgress && isLoading && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
+          {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
+            {
+              debugPanel &&
+              <DebugPanel locale={locale}>
+                {debugPanel.wfs && <WFS locale={locale} />}
+              </DebugPanel>
+            }
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
-
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
@@ -427,7 +472,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoading]);
+  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
     <Viewer className="viewer" full ref={ref} {...viewerProps}>

@@ -6,6 +6,7 @@ import { IRasterLayer, IVectorLayer } from '../layers-manager';
 import { CesiumSceneModeEnum } from '../map.types';
 import { CesiumSceneModes } from './scene-modes';
 import { CesiumBaseMaps } from './base-maps';
+
 import './settings.css';
 
 export interface IBaseMap {
@@ -77,8 +78,9 @@ export const CesiumSettings: React.FC<RCesiumMapProps> = (props) => {
           setIsOpen(!isOpen);
         }}
       />
-      {isOpen && (
-        <div id="dialog-portal-example" className="settingsDialogPortal" ref={dialogPortalRef}>
+      {
+        isOpen && (
+        <div className="settingsDialogPortal" ref={dialogPortalRef}>
           <Dialog
             open={isOpen}
             onClosed={(): void => {
@@ -93,7 +95,8 @@ export const CesiumSettings: React.FC<RCesiumMapProps> = (props) => {
               </Box>
 
               <Box className="baseMapsContainer">
-                {baseMaps && (
+                {
+                  baseMaps && (
                   <>
                     <h4 className="sectionLabel">{baseMapTitle}</h4>
                     <CesiumBaseMaps baseMaps={baseMaps}></CesiumBaseMaps>
