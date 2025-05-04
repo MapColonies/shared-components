@@ -16,8 +16,6 @@ import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import pMap from 'p-map';
-// import { WfsClient, Filter, Geom } from '@map-colonies/wfs-client';
-// import bboxPolygon from '@turf/bbox-polygon';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
 
@@ -380,29 +378,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const position: Feature<Point> = center(bbox);
 
     try {
-      // #region WfsClient
-      /*const wfsClient = new WfsClient('2.0.0', url);
-      const requestBody = wfsClient.GetFeatureRequest({
-        featureNS: 'core',
-        featurePrefix: 'core',
-        featureTypes: [featureType],
-        startIndex: offset,
-        count: pageSize,
-        filter: Filter.intersects('geom', new Geom.Polygon(bboxPolygon(extent).geometry.coordinates), 'CRS:84'),
-      });
-      const sortByBlock = `<SortBy><SortProperty><ValueReference>${keyField}</ValueReference><SortOrder>ASC</SortOrder></SortProperty></SortBy>`;
-      if (keyField) {
-        if (requestBody.body.includes('<\/Query>')) {
-          requestBody.body = requestBody.body.replace('<\/Query>', `${sortByBlock}<\/Query>`);
-        } else if (requestBody.body.includes('<Query')) {
-          requestBody.body = requestBody.body.replace('\/>', `>${sortByBlock}<\/Query>`);
-        }
-      }
-      const requestBodyXml = requestBody.body;
-      // console.log('requestBodyXml', requestBodyXml);
-      const wfsResponse = await fetchWfsData(url, 'POST', requestBodyXml);*/
-      // #endregion
-
       let wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
       if (keyField) {
         wfsDataUrl += `&sortBy=${keyField}%20ASC`;
