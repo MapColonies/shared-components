@@ -15,9 +15,9 @@ import {
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import pMap from 'p-map';
 // import { WfsClient, Filter, Geom } from '@map-colonies/wfs-client';
 // import bboxPolygon from '@turf/bbox-polygon';
-import { pMap } from '../helpers/pMap';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
 
