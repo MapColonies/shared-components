@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.8.1...@map-colonies/react-components@4.9.0) (2025-05-05)
+
+
+### Bug Fixes
+
+* custom dialog ([15c0d95](https://github.com/MapColonies/shared-components/commit/15c0d95699b69410b2c1c8acda5662a9d5371aa0))
+* for code review ([a786987](https://github.com/MapColonies/shared-components/commit/a786987e4766531ca1c9741b94c3ed9ca09b0131))
+* hovering adn remove model ([de30a97](https://github.com/MapColonies/shared-components/commit/de30a97d0fb18145a9fd51152989cb05d9722beb))
+* hovering on polygons improvement ([c14a8ee](https://github.com/MapColonies/shared-components/commit/c14a8ee44db29a98f6751a59ec3d5b711d625bf3))
+* multipolygon after datasource.process becomes two polygons with simillar ids ([3c62ae6](https://github.com/MapColonies/shared-components/commit/3c62ae65e62c7bbdafdf42aeea57471f8214d076))
+* point geometry as billboard presentation ([9d88a16](https://github.com/MapColonies/shared-components/commit/9d88a16acfa93b8e528c219254607e13c82f0044))
+* remove token ([3861f9c](https://github.com/MapColonies/shared-components/commit/3861f9c4140ca9ea1ea24a34714938ab682409e5))
+* return value error ([6d30d1a](https://github.com/MapColonies/shared-components/commit/6d30d1a2e0fc3e77d488c8ec62727e25050efc3c))
+* support point stroke ([9bf4453](https://github.com/MapColonies/shared-components/commit/9bf44539e04562a89ddc9499116a3e9bd87de44c))
+* uniqueness issue ([1f32e23](https://github.com/MapColonies/shared-components/commit/1f32e23d64de91ffa6b85907fd92ce038204bf66))
+* update polygon graphics to newly added entities and when changing mode do it for all ([0a685c6](https://github.com/MapColonies/shared-components/commit/0a685c6cbbc87af6259c7aef564f792d6b26b3a6))
+* use pMap 6.0.0 instead of local latest which requires node version 18 ([018a25f](https://github.com/MapColonies/shared-components/commit/018a25f61ad56f7fca0c7b8e80f312326aeb6d29))
+* visualization process without extra set ([4c11634](https://github.com/MapColonies/shared-components/commit/4c116341181f577e1b61fee059ef68637ce99567))
+* wfs data layer loading indicator ([6fad351](https://github.com/MapColonies/shared-components/commit/6fad35141c39d64243facd1e7102530d5c8c2e69))
+
+
+### Features
+
+* pMap ([d8e2856](https://github.com/MapColonies/shared-components/commit/d8e28565e1cec4ecd8d2a7e8ed499bc2fbd0ecb8))
+* wfs layer ([deeccde](https://github.com/MapColonies/shared-components/commit/deeccdecaa0ac5bc3eb998577f0bcdae2a5ea1bd))
+
+
+
+
+
+
 ## [4.8.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.8.0...@map-colonies/react-components@4.8.1) (2025-04-06)
 
 **Note:** Version bump only for package @map-colonies/react-components
