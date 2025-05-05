@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.0...@map-colonies/react-components@4.9.1) (2025-05-05)
+
+
+### Bug Fixes
+
+* wfs layer for columbus mode ([fb28e75](https://github.com/MapColonies/shared-components/commit/fb28e75335d4eea4e645a953568cd264be139add))
+
+
+
+
+
 # [4.9.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.8.1...@map-colonies/react-components@4.9.0) (2025-05-05)
 
 
