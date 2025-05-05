@@ -168,7 +168,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   }
 
   // In 2D mode, just return the computed view rectangle directly
-  if (mode !== SceneMode.SCENE3D) {
+  if (mode === SceneMode.SCENE2D) {
     return fullRect;
   }
 

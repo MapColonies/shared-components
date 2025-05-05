@@ -344,7 +344,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
           meta={metaBuildings}
           visualizationHandler={handleVisualizationBuildings}
         />
-        <CesiumWFSLayer
+        {/* <CesiumWFSLayer
           key={metaBuildings.id + '_2'}
           options={optionsBuildings}
           meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
@@ -361,7 +361,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
           options={optionsBuildingsDates}
           meta={metaBuildingsDates}
           visualizationHandler={handleVisualizationBuildingsDates}
-        />
+        /> */}
       </CesiumMap>
     </div>
   );
