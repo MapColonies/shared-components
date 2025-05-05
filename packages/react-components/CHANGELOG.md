@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.1...@map-colonies/react-components@4.9.2) (2025-05-05)
+
+
+### Bug Fixes
+
+* wfs layer util and lookup tables ([8b650bd](https://github.com/MapColonies/shared-components/commit/8b650bd311750b35af1607d94d07e75cac0a230a))
+
+
+
+
+
 ## [4.9.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.0...@map-colonies/react-components@4.9.1) (2025-05-05)
 
 
