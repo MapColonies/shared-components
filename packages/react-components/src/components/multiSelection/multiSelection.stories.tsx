@@ -1,6 +1,6 @@
-import MultiSelection from './multiSelection';
-import { CSFStory } from '../utils/story';
 import { useState } from 'react';
+import { MultiSelection } from './multiSelection';
+import { CSFStory } from '../utils/story';
 
 const colourOptions = [
   { value: 'ocean', label: 'Ocean', color: '#00B8D9' },
