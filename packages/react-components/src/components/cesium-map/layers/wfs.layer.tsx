@@ -127,8 +127,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
-      const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
-      if (!is3D) {
+      const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
+      if (is2D) {
         const pickedObject = mapViewer.scene.pick(movement.endPosition);
         if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
           if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
@@ -151,7 +151,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           }
         }
       } else {
-        // 3D
+        // 3D or Columbus mode
         const closestPolygon = getClosestPolygonEntityUnderMouse(movement.endPosition);
 
         if (closestPolygon) {
