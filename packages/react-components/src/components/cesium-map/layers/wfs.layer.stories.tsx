@@ -139,7 +139,7 @@ const metaBuildings = {
 };
 
 const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[]): void => {
-  const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
+  const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
@@ -148,11 +148,11 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5) : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2),
+        material: is2D ? CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.2) : CesiumColor.fromCssColorString(BRIGHT_GREEN).withAlpha(0.5),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(BRIGHT_GREEN),
         outlineWidth: 3,
-        height: is3D ? undefined : 10000, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+        height: is2D ? 10000 : undefined, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
         perPositionHeight: false,
       });
     }
@@ -170,7 +170,7 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: GeoJs
       const correctedCarto = new Cartographic(
         worlPosCartographic.longitude,
         worlPosCartographic.latitude,
-        is3D ? mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos)) : 500
+        is2D ? 500 : mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
       );
 
       // Convert back to Cartesian3
@@ -272,7 +272,7 @@ const metaBuildingsDates = {
 };
 
 const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[]): void => {
-  const is3D = mapViewer.scene.mode === SceneMode.SCENE3D;
+  const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
 
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
@@ -281,11 +281,11 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
     if (entity.polygon) {
       entity.polygon = new PolygonGraphics({
         hierarchy: entity.polygon.hierarchy,
-        material: is3D ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.5) : CesiumColor.fromCssColorString(GREEN).withAlpha(0.2),
+        material: is2D ? CesiumColor.fromCssColorString(GREEN).withAlpha(0.2) : CesiumColor.fromCssColorString(GREEN).withAlpha(0.5),
         outline: true,
         outlineColor: CesiumColor.fromCssColorString(GREEN),
         outlineWidth: 3,
-        height: is3D ? undefined : 10000, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+        height: is2D ? 10000 : undefined, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
         perPositionHeight: false,
       });
     }
@@ -303,7 +303,7 @@ const handleVisualizationBuildingsDates = (mapViewer: CesiumViewer, dataSource: 
       const correctedCarto = new Cartographic(
         worlPosCartographic.longitude,
         worlPosCartographic.latitude,
-        is3D ? mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos)) : 500
+        is2D ? 500 : mapViewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
       );
 
       // Convert back to Cartesian3
