@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.2...@map-colonies/react-components@4.9.3) (2025-05-06)
+
+
+### Bug Fixes
+
+* debug panel hides compass ([3ef173d](https://github.com/MapColonies/shared-components/commit/3ef173dc85b12f93fb9edfd4d35e2249424d45a2))
+
+
+
+
+
 ## [4.9.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.1...@map-colonies/react-components@4.9.2) (2025-05-05)
 
 
