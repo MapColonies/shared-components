@@ -54,7 +54,7 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
     <CesiumMap {...args}>
       <Cesium3DTileset
         isZoomTo={true}
-        url="/mock/tileset_1/tileset.json"
+        url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json"
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -91,7 +91,7 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
       <Cesium3DTileset
         isZoomTo={false}
         heightFromGround={-10}
-        url="/mock/tileset_1/tileset.json"
+        url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json"
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -128,7 +128,7 @@ Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction 
 export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <Cesium3DTileset isZoomTo={true} url="/mock/tileset_2/L16_31023/L16_31023.json" />
+      <Cesium3DTileset isZoomTo={true} url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" />
     </CesiumMap>
   </div>
 );

@@ -32,7 +32,7 @@ import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
-import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
+import { IBaseMap, IBaseMaps } from './settings/settings';
 import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
@@ -40,9 +40,11 @@ import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 import CesiumCompassTool from './tools/cesium-compass.tool';
 import { DebugPanel } from './debug/debug-panel';
 import { WFS } from './debug/wfs';
+import { BaseMapPickerMixin } from './toolbar/base-map-picker-mixin';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import { DebugPanelMixin } from './toolbar/debug-panel-mixin';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -185,11 +187,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     fullscreenButton: true,
     timeline: false,
     animation: false,
-    baseLayerPicker: false,
-    geocoder: false,
+    baseLayerPicker: true,
+    geocoder: true,
     navigationHelpButton: false,
-    homeButton: false,
-    sceneModePicker: false,
+    homeButton: true,
+    sceneModePicker: true,
     imageryProvider: false,
     ...(props as ViewerProps),
   };
@@ -271,7 +273,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
-
+    mapViewRef?.extend(BaseMapPickerMixin, {
+      baseMaps: props.baseMaps,
+      terrains: [props.terrainProvider],
+    });
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
@@ -308,6 +313,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setDebugPanel(props.debugPanel);
+    mapViewRef?.extend(DebugPanelMixin, {
+      // debugPanel: props.debugPanel,
+      // locale: props.locale,
+    });
   }, [props.debugPanel]);
 
   useEffect(() => {
@@ -452,13 +461,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {
+            {/* {
               debugPanel &&
               <DebugPanel locale={locale}>
                 {debugPanel.wfs && <WFS locale={locale} />}
               </DebugPanel>
-            }
-            <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
+            } */}
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">

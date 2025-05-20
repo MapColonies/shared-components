@@ -13,13 +13,41 @@ body[dir='rtl'] .cesium-viewer-fullscreenContainer {
   right: unset;
 }
 
+.cesium-button.cesium-fullscreenButton {
+  border-radius: 14%;
+}
+
+.cesium-viewer-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  top: 104px;;
+}
+
 body[dir='rtl'] .cesium-viewer-toolbar {
   left: 5px;
   right: unset;
 }
 
-.cesium-button.cesium-fullscreenButton {
-  border-radius: 14%;
+.cesium-button {
+  border-radius: 50%;
+}
+
+.cesium-baseLayerPicker-dropDown {
+  right: 40px;
+  margin-top: 0;
+}
+
+span.cesium-sceneModePicker-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  column-gap: 4px;
+}
+
+body[dir='rtl'] span.cesium-sceneModePicker-wrapper {
+  flex-direction: unset;
 }
 
 .toolsContainer {

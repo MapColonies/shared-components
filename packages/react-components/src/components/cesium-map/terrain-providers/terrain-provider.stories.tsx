@@ -162,7 +162,7 @@ export const QuantizedMeshProviders: Story = () => {
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
       >
-        <Cesium3DTileset isZoomTo={true} url="/mock/tileset_2/L16_31023/L16_31023.json" />
+        <Cesium3DTileset isZoomTo={true} url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
         <InspectorTool />
       </CesiumMap>
