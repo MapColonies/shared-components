@@ -39,9 +39,9 @@ const BASE_MAPS = {
   maps: [
     {
       id: '1st',
-      title: '1st Map Title',
+      title: '1st Map',
       isCurrent: true,
-      thumbnail: '/./assets/img/1st.png',
+      thumbnail: 'assets/img/1st.png',
       baseRasteLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -74,8 +74,8 @@ const BASE_MAPS = {
     },
     {
       id: '2nd',
-      title: '2nd Map Title',
-      thumbnail: '/./assets/img/2nd.png',
+      title: '2nd Map',
+      thumbnail: 'assets/img/2nd.png',
       baseRasteLayers: [
         {
           id: 'RADAR_RASTER',
@@ -119,8 +119,8 @@ const BASE_MAPS = {
     },
     {
       id: '3rd',
-      title: '3rd Map Title',
-      thumbnail: '/./assets/img/3rd.png',
+      title: '3rd Map',
+      thumbnail: 'assets/img/3rd.png',
       baseRasteLayers: [
         {
           id: 'VECTOR_TILES',

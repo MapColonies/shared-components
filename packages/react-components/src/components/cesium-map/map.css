@@ -29,10 +29,6 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   right: unset;
 }
 
-.cesium-button {
-  border-radius: 50%;
-}
-
 .cesium-baseLayerPicker-dropDown {
   right: 40px;
   margin-top: 0;

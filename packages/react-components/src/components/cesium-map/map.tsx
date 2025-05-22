@@ -37,14 +37,14 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
-import CesiumCompassTool from './tools/cesium-compass.tool';
-import { DebugPanel } from './debug/debug-panel';
-import { WFS } from './debug/wfs';
 import { BaseMapPickerMixin } from './toolbar/base-map-picker-mixin';
+import { DebugPanelMixin } from './toolbar/debug-panel-mixin';
+import CesiumCompassTool from './tools/cesium-compass.tool';
+// import { DebugPanel } from './debug/debug-panel';
+// import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
-import { DebugPanelMixin } from './toolbar/debug-panel-mixin';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -187,7 +187,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     fullscreenButton: true,
     timeline: false,
     animation: false,
-    baseLayerPicker: true,
+    baseLayerPicker: false,
     geocoder: true,
     navigationHelpButton: false,
     homeButton: true,
@@ -317,7 +317,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       // debugPanel: props.debugPanel,
       // locale: props.locale,
     });
-  }, [props.debugPanel]);
+  }, [props.debugPanel, mapViewRef]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {

@@ -58,15 +58,13 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
         return providerModel;
       });
 
-      const terrainProviders = this.options.terrains.map((terrainUrl: string) => {
+      const terrainProviders = this.options.terrains.map((terrain: Cesium.CesiumTerrainProvider) => {
         return new Cesium.ProviderViewModel({
-          name: 'Default Terrain',
+          name: 'Terrain',
           tooltip: 'Default Terrain',
-          iconUrl: '/assets/img/3rd.png',
+          iconUrl: 'cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
           creationFunction: () => {
-            return new Cesium.CesiumTerrainProvider({
-              url: terrainUrl
-            });
+            return terrain;
           }
         });
       });
@@ -76,8 +74,8 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
           globe: viewer.scene.globe,
           imageryProviderViewModels: baseMapsImageryProviders,
           selectedImageryProviderViewModel: currentModel,
-          // terrainProviderViewModels: terrainProviders,
-          // selectedTerrainProviderViewModel: terrainProviders[0],
+          terrainProviderViewModels: terrainProviders,
+          selectedTerrainProviderViewModel: terrainProviders[0],
         }
       );
 
