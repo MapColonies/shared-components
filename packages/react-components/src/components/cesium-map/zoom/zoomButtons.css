@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 2px;
   --full-screen-button-offset: 8px;
-  --full-screen-button-size: 29px;
+  --full-screen-button-size: 32px;
   --full-screen-button-bottom: 8px;
   position: absolute;
   bottom: calc(var(--full-screen-button-offset) + var(--full-screen-button-size) + var(--full-screen-button-bottom));
@@ -18,8 +18,8 @@ body[dir='rtl'] .zoom-buttons-container {
 
 .zoom-button {
   cursor: pointer;
-  width: 29px;
-  height: 29px;
+  width: 32px;
+  height: 32px;
   background: #303336;
   border: 1px solid #444;
   border-radius: 4px;

@@ -22,8 +22,8 @@ export const ZoomButtons: React.FC = () => {
             <div className="zoom-button">
               <svg
                 fill="#fff"
-                width="10px"
-                height="10px"
+                width="12px"
+                height="12px"
                 viewBox="0 -20 50 50"
                 version="1.2"
                 baseProfile="tiny"

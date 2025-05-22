@@ -16,11 +16,10 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
       this.options = options;
       this.contentDiv = null;
 
-      this.createToggleButton();
-      this.createContentDiv();
+      this.createToggleButtonAndDiv();
     }
 
-    createToggleButton() {
+    createToggleButtonAndDiv() {
       const buttonContainer = document.createElement('div');
       buttonContainer.className = 'cesium-toolbar-button cesium-button';
       const icon = `
@@ -28,27 +27,20 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
           <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
         </svg>`;
       buttonContainer.innerHTML = icon;
-
       buttonContainer.onclick = () => {
         this.toggleContent();
-        console.log('#############', InspectorShared);
       };
 
-      // Append the button to the Cesium viewer toolbar
-      const toolbar = document.querySelector('.cesium-viewer-toolbar');
-      if (toolbar) {
-        toolbar.appendChild(buttonContainer);
-      }
-    }
-
-    createContentDiv() {
       this.contentDiv = document.createElement('div');
       this.contentDiv.className = 'cesium-baseLayerPicker-dropDown cesium-baseLayerPicker-dropDown-visible';
       this.contentDiv.style.display = 'none';
-
       this.populateContent();
 
-      document.body.appendChild(this.contentDiv);
+      const toolbar = document.querySelector('.cesium-viewer-toolbar');
+      if (toolbar) {
+        toolbar.appendChild(buttonContainer);
+        toolbar.appendChild(this.contentDiv);
+      }
     }
 
     populateContent() {
