@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import bbox from '@turf/bbox';
-import { Story, Meta } from '@storybook/react';
 import { Rectangle } from 'cesium';
+import { Story, Meta } from '@storybook/react';
+import bbox from '@turf/bbox';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../map.types';
 import { IBaseMaps } from '../settings/settings';
@@ -32,12 +32,12 @@ const BASE_MAPS = {
   maps: [
     {
       id: '3rd',
-      title: '3rd Map Title',
+      title: '3rd Map',
       isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png',
+      thumbnail: 'assets/img/3rd.png',
       baseRasteLayers: [
         {
-          id: 'Opaque Base world wide layer',
+          id: 'VECTOR_TILES',
           type: 'XYZ_LAYER',
           opacity: 1,
           zIndex: 0,
@@ -48,7 +48,7 @@ const BASE_MAPS = {
           },
         },
         {
-          id: 'Transparent Base Roads world wide layer ',
+          id: 'VECTOR_TILES_GPS',
           type: 'XYZ_LAYER',
           opacity: 1,
           zIndex: 1,

@@ -58,8 +58,16 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
     }
 
     destroy() {
-      if (this.contentDiv && this.contentDiv.parentNode) {
-        document.body.removeChild(this.contentDiv);
+      if (this.contentDiv) {
+        try {
+          if (this.contentDiv.parentNode) {
+            document.body.removeChild(this.contentDiv);
+          }
+        } catch (error) {
+          console.error('Error removing debug panel:', error);
+        } finally {
+          this.contentDiv = null;
+        }
       }
     }
   }
