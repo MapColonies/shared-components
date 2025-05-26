@@ -1,4 +1,5 @@
 import * as Cesium from 'cesium';
+import { get } from 'lodash';
 
 export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
   const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
@@ -95,10 +96,10 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
 
       const titles = document.querySelectorAll('.cesium-baseLayerPicker-sectionTitle');
       if (titles.length > 0) {
-        titles[0].innerHTML = 'מפות בסיס'; // Imagery
+        titles[0].innerHTML = get(this.options.locale, 'MAP_SETTINGS_BASE_MAP_TITLE') ?? 'Base Map';
       }
       if (titles.length > 1) {
-        titles[1].innerHTML = 'פני השטח'; // Terrain
+        titles[1].innerHTML = get(this.options.locale, 'MAP_SETTINGS_TERRAIN_TITLE') ?? 'Terrain';
       }
     }
 

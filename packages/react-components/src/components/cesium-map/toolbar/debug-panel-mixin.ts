@@ -1,8 +1,9 @@
 import * as Cesium from 'cesium';
-import InspectorShared from '@cesium/widgets/Source/InspectorShared.js';
+import { get } from 'lodash';
+// import InspectorShared from '@cesium/widgets/Source/InspectorShared.js';
 
 export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
-  const DEFAULT_OPTIONS = { jsonData: {} };
+  const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
   
   options = { ...DEFAULT_OPTIONS, ...options };
 
@@ -36,7 +37,7 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
       this.contentDiv.style.display = 'none';
       this.populateContent();
 
-      const toolbar = document.querySelector('.cesium-viewer-toolbar');
+      const toolbar = document.querySelector(this.options.containerSelector);
       if (toolbar) {
         toolbar.appendChild(buttonContainer);
         toolbar.appendChild(this.contentDiv);
@@ -45,7 +46,8 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
 
     populateContent() {
       if (this.contentDiv) {
-        this.contentDiv.innerHTML = `<pre>${JSON.stringify(this.options.jsonData, null, 2)}</pre>`;
+        this.contentDiv.innerHTML = `<div class="cesium-baseLayerPicker-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
+        this.contentDiv.innerHTML += `<WFS locale={${this.options.locale}} />`;
       }
     }
 
@@ -56,7 +58,7 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
     }
 
     destroy() {
-      if (this.contentDiv) {
+      if (this.contentDiv && this.contentDiv.parentNode) {
         document.body.removeChild(this.contentDiv);
       }
     }

@@ -1,7 +1,8 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { BASE_MAPS } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
 import { CesiumSceneMode } from './map.types';
-import { LayerType, Proj } from '.';
+import { Proj } from '.';
 
 export default {
   title: 'Cesium Map',
@@ -15,31 +16,6 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
-};
-
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
 };
 
 export const BaseMap: Story = (args: CesiumMapProps) => (
@@ -162,6 +138,7 @@ LocalizedMap.argTypes = {
       MAP_SETTINGS_DIALOG_TITLE: 'הגדרות מפה',
       MAP_SETTINGS_SCENE_MODE_TITLE: 'תצורה',
       MAP_SETTINGS_BASE_MAP_TITLE: 'מפות בסיס',
+      MAP_SETTINGS_TERRAIN_TITLE: 'פני השטח',
       MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',

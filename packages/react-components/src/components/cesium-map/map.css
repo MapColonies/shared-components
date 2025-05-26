@@ -36,16 +36,21 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   margin-top: 0;
 }
 
+body[dir='rtl'] .cesium-baseLayerPicker-dropDown {
+  right: unset;
+  left: 40px;
+}
+
+body[dir='rtl'] .cesium-baseLayerPicker-sectionTitle {
+  text-align: right;
+}
+
 span.cesium-sceneModePicker-wrapper {
   width: 100%;
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
   column-gap: 4px;
-}
-
-body[dir='rtl'] span.cesium-sceneModePicker-wrapper {
-  flex-direction: unset;
 }
 
 .toolsContainer {

@@ -274,8 +274,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setBaseMaps(props.baseMaps);
     mapViewRef?.extend(BaseMapPickerMixin, {
+      locale: props.locale,
       baseMaps: props.baseMaps,
-      terrains: [props.terrainProvider],
+      terrains: [ props.terrainProvider ],
     });
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
@@ -314,8 +315,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setDebugPanel(props.debugPanel);
     mapViewRef?.extend(DebugPanelMixin, {
-      // debugPanel: props.debugPanel,
-      // locale: props.locale,
+      locale: props.locale,
+      debugPanel: props.debugPanel,
     });
   }, [props.debugPanel, mapViewRef]);
 
