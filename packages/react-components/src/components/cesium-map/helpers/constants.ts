@@ -7,7 +7,7 @@ export const BASE_MAPS: IBaseMaps = {
       title: '1st Map',
       isCurrent: true,
       thumbnail: 'assets/img/1st.png',
-      baseRasteLayers: [
+      baseRasterLayers: [
         {
           id: 'GOOGLE_TERRAIN',
           type: 'XYZ_LAYER',
@@ -41,7 +41,7 @@ export const BASE_MAPS: IBaseMaps = {
       id: '2nd',
       title: '2nd Map',
       thumbnail: 'assets/img/2nd.png',
-      baseRasteLayers: [
+      baseRasterLayers: [
         {
           id: 'RADAR_RASTER',
           type: 'WMS_LAYER',
@@ -86,7 +86,7 @@ export const BASE_MAPS: IBaseMaps = {
       id: '3rd',
       title: '3rd Map',
       thumbnail: 'assets/img/3rd.png',
-      baseRasteLayers: [
+      baseRasterLayers: [
         {
           id: 'VECTOR_TILES',
           type: 'XYZ_LAYER',
