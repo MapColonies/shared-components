@@ -15,7 +15,7 @@ export interface IBaseMap {
   thumbnail?: string;
   isCurrent?: boolean;
   isForPreview?: boolean;
-  baseRasteLayers: IRasterLayer[];
+  baseRasterLayers: IRasterLayer[];
   baseVectorLayers: IVectorLayer[];
 }
 

@@ -157,7 +157,7 @@ class LayerManager {
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
-    const sortedBaseMapLayers = baseMap.baseRasteLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
+    const sortedBaseMapLayers = baseMap.baseRasterLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });

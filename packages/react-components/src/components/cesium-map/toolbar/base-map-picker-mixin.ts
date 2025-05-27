@@ -21,7 +21,7 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
       const baseMapsImageryProviders = this.options.baseMaps.maps.map((baseMapLayer: any) => {
         const providers: Cesium.ImageryProvider[] = [];
         
-        baseMapLayer.baseRasteLayers.sort((a: any, b: any) => a.zIndex - b.zIndex).forEach((layer: any) => {
+        baseMapLayer.baseRasterLayers.sort((a: any, b: any) => a.zIndex - b.zIndex).forEach((layer: any) => {
           switch (layer.type) {
             case 'WMS_LAYER':
               const wmsProvider = new Cesium.WebMapServiceImageryProvider(layer.options);
@@ -49,7 +49,14 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
           name: baseMapLayer.title,
           tooltip: baseMapLayer.title,
           iconUrl: baseMapLayer.thumbnail,
-          creationFunction: () => providers
+          // creationFunction: function() {
+          //   return new Cesium.OpenStreetMapImageryProvider({
+          //       url: "https://tile.openstreetmap.org/"
+          //   });
+          // }});
+          creationFunction: () => {
+            return providers[0];
+          }
         });
 
         if (baseMapLayer.isCurrent) {
