@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { useCesiumMap } from '../map';
+import { CesiumViewer, useCesiumMap } from '../map';
 
 import './wfs.css';
 
@@ -21,11 +21,12 @@ type IActiveFeatureTypes = IFeatureTypeMetadata & {
 };
 
 interface IWFSProps {
+  viewer?: CesiumViewer
   locale?: { [key: string]: string };
 }
 
-export const WFS: React.FC<IWFSProps> = ({ locale }) => {
-  const mapViewer = useCesiumMap();
+export const WFS: React.FC<IWFSProps> = ({ locale, viewer }) => {
+  const mapViewer = viewer ?? useCesiumMap();
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);
   const cacheLabel = useMemo(() => get(locale, 'WFS_CACHE') ?? 'Cache', [locale]);

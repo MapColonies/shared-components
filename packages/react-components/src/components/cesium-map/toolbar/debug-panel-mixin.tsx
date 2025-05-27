@@ -1,6 +1,7 @@
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
-// import InspectorShared from '@cesium/widgets/Source/InspectorShared.js';
+import { createRoot } from 'react-dom/client';
+import { WFS } from '../debug/wfs';
 
 export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
   const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
@@ -33,21 +34,25 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
       };
 
       this.contentDiv = document.createElement('div');
-      this.contentDiv.className = 'cesium-baseLayerPicker-dropDown cesium-baseLayerPicker-dropDown-visible';
+      this.contentDiv.className = 'cesium-mcMixin-dropDown cesium-mcMixin-dropDown-visible';
       this.contentDiv.style.display = 'none';
-      this.populateContent();
 
       const toolbar = document.querySelector(this.options.containerSelector);
       if (toolbar) {
         toolbar.appendChild(buttonContainer);
         toolbar.appendChild(this.contentDiv);
       }
+      this.populateContent();
     }
 
     populateContent() {
       if (this.contentDiv) {
-        this.contentDiv.innerHTML = `<div class="cesium-baseLayerPicker-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
-        this.contentDiv.innerHTML += `<WFS locale={${this.options.locale}} />`;
+        this.contentDiv.innerHTML = `<div class="cesium-mcMixin-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
+
+        const wfsContainer = document.createElement('div');
+        const root = createRoot(wfsContainer);
+        this.contentDiv.appendChild(wfsContainer);
+        root.render(<WFS locale={this.options.locale} viewer={this.viewer as any} />);
       }
     }
 
