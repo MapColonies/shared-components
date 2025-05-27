@@ -2,13 +2,14 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Rectangle } from 'cesium';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
+import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../map.types';
 import { IBaseMaps } from '../settings/settings';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
-  title: 'Cesium Map/Map Optimizations',
+  title: 'Cesium Map',
   component: CesiumMap,
   parameters: {
     layout: 'fullscreen',
@@ -27,42 +28,6 @@ export default {
     },
   },
 } as Meta;
-
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '3rd',
-      title: '3rd Map',
-      isCurrent: true,
-      thumbnail: 'assets/img/3rd.png',
-      baseRasteLayers: [
-        {
-          id: 'VECTOR_TILES',
-          type: 'XYZ_LAYER',
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
-            layers: '',
-            credit: 'thunderforest',
-          },
-        },
-        {
-          id: 'VECTOR_TILES_GPS',
-          type: 'XYZ_LAYER',
-          opacity: 1,
-          zIndex: 1,
-          options: {
-            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
-            layers: '',
-            credit: 'openstreetmap',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
-};
 
 const mapDivStyle = {
   height: '100%',

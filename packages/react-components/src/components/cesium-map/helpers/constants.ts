@@ -1,4 +1,6 @@
-export const BASE_MAPS = {
+import { IBaseMaps } from '../settings/settings';
+
+export const BASE_MAPS: IBaseMaps = {
   maps: [
     {
       id: '1st',
