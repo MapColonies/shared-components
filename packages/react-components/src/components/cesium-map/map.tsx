@@ -32,12 +32,12 @@ import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
-import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
+import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { ZoomButtons } from './zoom/zoomButtons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
-// import { BaseMapPickerMixin } from './toolbar/base-map-picker-mixin';
+import { BaseMapPickerMixin } from './toolbar/base-map-picker-mixin';
 import { DebugPanelMixin } from './toolbar/debug-panel-mixin';
 import CesiumCompassTool from './tools/cesium-compass.tool';
 // import { DebugPanel } from './debug/debug-panel';
@@ -273,11 +273,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
-    // mapViewRef?.extend(BaseMapPickerMixin, {
-    //   locale: props.locale,
-    //   baseMaps: props.baseMaps,
-    //   terrains: [ props.terrainProvider ],
-    // });
+    mapViewRef?.extend(BaseMapPickerMixin, {
+      locale: props.locale,
+      baseMaps: props.baseMaps,
+      terrains: [ props.terrainProvider ],
+    });
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
@@ -468,7 +468,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 {debugPanel.wfs && <WFS locale={locale} />}
               </DebugPanel>
             } */}
-            <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
+            {/* <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} /> */}
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
