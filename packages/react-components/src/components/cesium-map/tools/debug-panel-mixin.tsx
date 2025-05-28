@@ -1,3 +1,4 @@
+import React from 'react'; // <- Important: import React to use JSX syntax (in order to fix error: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.)
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
 import { createRoot } from 'react-dom/client';
@@ -48,11 +49,12 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
     populateContent() {
       if (this.contentDiv) {
         this.contentDiv.innerHTML = `<div class="cesium-mcMixin-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
-
-        const wfsContainer = document.createElement('div');
-        const root = createRoot(wfsContainer);
-        this.contentDiv.appendChild(wfsContainer);
-        root.render(<WFS locale={this.options.locale} viewer={this.viewer as any} />);
+        if (this.options.debugPanel?.wfs) {
+          const wfsContainer = document.createElement('div');
+          const root = createRoot(wfsContainer);
+          this.contentDiv.appendChild(wfsContainer);
+          root.render(<WFS locale={this.options.locale} viewer={this.viewer as any} />);
+        }
       }
     }
 

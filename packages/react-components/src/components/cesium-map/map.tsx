@@ -37,9 +37,9 @@ import { ZoomButtons } from './tools/zoom-buttons';
 import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
-import { BaseMapPickerMixin } from './tools/base-map-picker-mixin';
-import { DebugPanelMixin } from './tools/debug-panel-mixin';
+import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import CesiumCompassTool from './tools/cesium-compass.tool';
+import { DebugPanelTool } from './tools/debug-panel.tool';
 // import { DebugPanel } from './debug/debug-panel';
 // import { WFS } from './debug/wfs';
 
@@ -273,11 +273,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
-    mapViewRef?.extend(BaseMapPickerMixin, {
-      locale: props.locale,
-      baseMaps: props.baseMaps,
-      terrains: [ props.terrainProvider ],
-    });
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
@@ -314,10 +309,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setDebugPanel(props.debugPanel);
-    mapViewRef?.extend(DebugPanelMixin, {
-      locale: props.locale,
-      debugPanel: props.debugPanel,
-    });
   }, [props.debugPanel, mapViewRef]);
 
   useEffect(() => {
@@ -477,6 +468,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 content={<BaseMapPickerMixin />}  
               </CesiumToolbarWidget>
             } */}
+            <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
+            <DebugPanelTool debugPanel={debugPanel} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">

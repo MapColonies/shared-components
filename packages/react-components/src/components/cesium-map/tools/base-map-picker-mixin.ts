@@ -65,7 +65,7 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
         return new Cesium.ProviderViewModel({
           name: 'Terrain',
           tooltip: 'Default Terrain',
-          iconUrl: 'cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+          iconUrl: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
           creationFunction: () => {
             return terrain;
           }

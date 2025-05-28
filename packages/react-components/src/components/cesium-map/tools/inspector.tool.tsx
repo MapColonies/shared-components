@@ -2,14 +2,12 @@ import React, { useEffect } from 'react';
 import { viewerCesiumInspectorMixin } from 'cesium';
 import { CesiumViewer, useCesiumMap } from '../map';
 
-export interface InspectorProps {}
-
-export const InspectorTool: React.FC<InspectorProps> = (props) => {
+export const InspectorTool: React.FC = () => {
   const mapViewer: CesiumViewer = useCesiumMap();
 
   useEffect(() => {
     mapViewer.extend(viewerCesiumInspectorMixin);
   }, [mapViewer]);
 
-  return <></>;
+  return null;
 };
