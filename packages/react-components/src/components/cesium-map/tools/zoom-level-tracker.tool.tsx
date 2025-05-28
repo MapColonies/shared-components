@@ -4,7 +4,7 @@ import { PerspectiveOffCenterFrustum } from 'cesium';
 import { CesiumViewer, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../map.types';
 
-import './zoom_level-tracker.tool.css';
+import './zoom-level-tracker.tool.css';
 
 type ValueBy = 'CALCULATION' | 'RENDERED_TILES'
 export interface RZoomLevelTrackerToolProps {

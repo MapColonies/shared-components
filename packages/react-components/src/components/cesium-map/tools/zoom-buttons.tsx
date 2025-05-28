@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@map-colonies/react-core';
 import { useCesiumMap } from '../map';
 
-import './zoomButtons.css';
+import './zoom-buttons.css';
 
 export const ZoomButtons: React.FC = () => {
   const viewer = useCesiumMap();

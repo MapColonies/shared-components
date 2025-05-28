@@ -14,7 +14,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import { CesiumViewer } from './map';
 import { IBaseMap } from './settings/settings';
-import { pointToGeoJSON } from './tools/geojson/point.geojson';
+import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { IMapLegend } from './map-legend';
 import {
   CustomUrlTemplateImageryProvider,

@@ -8,10 +8,10 @@ import { CesiumPolygonGraphics } from '../entities/graphics/polygon.graphics';
 import { CesiumRectangleGraphics } from '../entities/graphics/rectangle.graphics';
 import { CesiumPolylineGraphics } from '../entities/graphics/polyline.graphics';
 import { CesiumViewer, useCesiumMap } from '../map';
-import { DrawHelper } from '../tools/draw/drawHelper';
-import { geoJSONToPrimitive } from '../tools/geojson/geojson-to-primitive';
-import { rectangleToGeoJSON, polygonToGeoJSON } from '../tools/geojson';
-import { rectangleToPositions } from '../tools/cesium/primitives-conversions.cesium';
+import { DrawHelper } from '../helpers/draw/drawHelper';
+import { geoJSONToPrimitive } from '../helpers/geojson/geojsonToPrimitive';
+import { rectangleToGeoJSON, polygonToGeoJSON } from '../helpers/geojson';
+import { rectangleToPositions } from '../helpers/primitivesConversionsCesium';
 import { CesiumCustomDataSource, RCesiumCustomDataSourceProps } from './custom.data-source';
 
 export class CesiumColor extends Color {}
