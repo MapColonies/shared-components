@@ -469,6 +469,14 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               </DebugPanel>
             } */}
             {/* <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} /> */}
+            {/* {
+              showBasemaps &&
+              <CesiumToolbarWidget 
+                header={<kuku/>} 
+                icon={<icon src={'https://example.com/icon.png'}/></icon>}
+                content={<BaseMapPickerMixin />}  
+              </CesiumToolbarWidget>
+            } */}
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">

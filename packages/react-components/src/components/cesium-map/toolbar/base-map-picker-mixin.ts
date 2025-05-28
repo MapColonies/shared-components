@@ -49,13 +49,8 @@ export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
           name: baseMapLayer.title,
           tooltip: baseMapLayer.title,
           iconUrl: baseMapLayer.thumbnail,
-          // creationFunction: function() {
-          //   return new Cesium.OpenStreetMapImageryProvider({
-          //       url: "https://tile.openstreetmap.org/"
-          //   });
-          // }});
           creationFunction: () => {
-            return providers[0];
+            return providers;
           }
         });
 

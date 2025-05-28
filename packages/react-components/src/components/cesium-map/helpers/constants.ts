@@ -8,17 +8,17 @@ export const BASE_MAPS: IBaseMaps = {
       isCurrent: true,
       thumbnail: 'assets/img/1st.png',
       baseRasterLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER',
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
+        // {
+        //   id: 'GOOGLE_TERRAIN',
+        //   type: 'XYZ_LAYER',
+        //   opacity: 1,
+        //   zIndex: 0,
+        //   options: {
+        //     url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        //     layers: '',
+        //     credit: 'GOOGLE',
+        //   },
+        // },
         {
           id: 'INFRARED_RASTER',
           type: 'WMS_LAYER',
