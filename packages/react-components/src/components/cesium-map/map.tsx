@@ -34,8 +34,9 @@ import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { ZoomButtons } from './tools/zoom-buttons';
-import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
+import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
+import { LegendTool } from './legend/legend.tool';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import CesiumCompassTool from './tools/cesium-compass.tool';
@@ -460,6 +461,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               </DebugPanel>
             } */}
             {/* <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} /> */}
+            {/* <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} /> */}
             {/* {
               showBasemaps &&
               <CesiumToolbarWidget 
@@ -470,7 +472,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
             <DebugPanelTool debugPanel={debugPanel} locale={locale} />
-            <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
+            <LegendTool onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}

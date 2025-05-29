@@ -1,13 +1,15 @@
 .scalePosition {
   background-color: var(--mdc-theme-surface);
-  padding: 1px 1px;
+  padding: 2px 1px;
   border-radius: 2px;
   font-size: 12px;
   width: 110px;
 }
+
 .scale-tracker-label {
   text-align: center;
 }
+
 .scale-tracker-bar {
   background: var(--mdc-theme-on-surface);
   margin: 0 auto;

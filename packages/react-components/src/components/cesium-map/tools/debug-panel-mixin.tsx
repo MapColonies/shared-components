@@ -3,10 +3,16 @@ import * as Cesium from 'cesium';
 import { get } from 'lodash';
 import { createRoot } from 'react-dom/client';
 import { WFS } from '../debug/wfs';
+import { IDebugPanel } from '../map';
 
-export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
+interface DebugPanelMixinOptions {
+  debugPanel: IDebugPanel;
+  locale?: { [key: string]: string };
+  containerSelector?: string;
+}
+
+export function DebugPanelMixin(viewer: Cesium.Viewer, options: DebugPanelMixinOptions) {
   const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
-  
   options = { ...DEFAULT_OPTIONS, ...options };
 
   class DebugPanel {
@@ -49,7 +55,7 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: any = {}) {
     populateContent() {
       if (this.contentDiv) {
         this.contentDiv.innerHTML = `<div class="cesium-mcMixin-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
-        if (this.options.debugPanel?.wfs) {
+        if (this.options.debugPanel.wfs) {
           const wfsContainer = document.createElement('div');
           const root = createRoot(wfsContainer);
           this.contentDiv.appendChild(wfsContainer);

@@ -1,9 +1,16 @@
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
+import { IBaseMaps } from '../settings/settings';
 
-export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: any = {}) {
+interface BaseMapPickerMixinOptions {
+  baseMaps: IBaseMaps;
+  terrains: Cesium.CesiumTerrainProvider[];
+  locale?: { [key: string]: string };
+  containerSelector?: string;
+}
+
+export function BaseMapPickerMixin(viewer: Cesium.Viewer, options: BaseMapPickerMixinOptions) {
   const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
-  
   options = { ...DEFAULT_OPTIONS, ...options };
 
   class BaseMapPicker {

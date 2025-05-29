@@ -2,17 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  --full-screen-button-offset: 8px;
-  --full-screen-button-size: 32px;
-  --full-screen-button-bottom: 8px;
   position: absolute;
-  bottom: calc(var(--full-screen-button-offset) + var(--full-screen-button-size) + var(--full-screen-button-bottom));
-  right: var(--full-screen-button-offset);
+  bottom: 48px;
+  right: 28px;
   left: unset;
 }
 
 body[dir='rtl'] .zoom-buttons-container {
-  left: var(--full-screen-button-offset);
+  left: 28px;
   right: unset;
 }
 

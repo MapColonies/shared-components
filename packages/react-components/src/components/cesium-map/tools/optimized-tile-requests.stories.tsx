@@ -3,10 +3,10 @@ import { Rectangle } from 'cesium';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
+import { CesiumXYZLayer } from '../layers/xyz.layer';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../map.types';
 import { IBaseMaps } from '../settings/settings';
-import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
   title: 'Cesium Map',

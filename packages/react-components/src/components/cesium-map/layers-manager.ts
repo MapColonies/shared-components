@@ -15,7 +15,7 @@ import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions
 import { CesiumViewer } from './map';
 import { IBaseMap } from './settings/settings';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
-import { IMapLegend } from './map-legend';
+import { IMapLegend } from './legend';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
