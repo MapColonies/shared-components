@@ -38,6 +38,7 @@ import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { LegendTool } from './legend/legend.tool';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import { ActiveLayersTool } from './tools/active-layers.tool';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import CesiumCompassTool from './tools/cesium-compass.tool';
 import { DebugPanelTool } from './tools/debug-panel.tool';
@@ -472,6 +473,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
             <DebugPanelTool debugPanel={debugPanel} locale={locale} />
+            <ActiveLayersTool locale={locale} />
             <LegendTool toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">

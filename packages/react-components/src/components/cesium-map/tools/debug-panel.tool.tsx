@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
+import { isEmpty } from 'lodash';
 import { CesiumViewer, IDebugPanel, useCesiumMap } from '../map';
 import { DebugPanelMixin } from './debug-panel-mixin';
-import { isEmpty } from 'lodash';
 
 export interface DebugPanelToolProps {
   debugPanel?: IDebugPanel;

@@ -145,6 +145,7 @@ LocalizedMap.argTypes = {
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
+      ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
