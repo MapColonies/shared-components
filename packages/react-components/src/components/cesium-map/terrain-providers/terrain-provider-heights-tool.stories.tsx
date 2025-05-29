@@ -11,7 +11,7 @@ import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, CesiumViewer, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumSceneMode } from '../proxied.types';
 import { InspectorTool } from '../tools/inspector.tool';
 import { TerrainianHeightTool } from '../tools/terranian-height.tool';
 

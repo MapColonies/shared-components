@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { PerspectiveOffCenterFrustum } from 'cesium';
 import { CesiumViewer, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumSceneMode } from '../proxied.types';
 
 import './zoom-level-tracker.tool.css';
 

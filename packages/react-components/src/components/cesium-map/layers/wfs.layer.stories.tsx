@@ -2,7 +2,6 @@ import {
   BillboardGraphics,
   Cartesian3,
   Cartographic,
-  Color as CesiumColor,
   CesiumTerrainProvider,
   Entity,
   GeoJsonDataSource,
@@ -17,6 +16,7 @@ import {
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap, CesiumViewer } from '../map';
+import { CesiumColor } from '../proxied.types';
 import { CesiumWFSLayer } from './wfs.layer';
 import { Cesium3DTileset } from './3d.tileset';
 

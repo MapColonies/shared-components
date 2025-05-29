@@ -37,7 +37,7 @@ import { ZoomButtons } from './tools/zoom-buttons';
 import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { LegendTool } from './legend/legend.tool';
-import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
+import { CesiumSceneMode, CesiumSceneModeEnum } from './proxied.types';
 import { ActiveLayersTool } from './tools/active-layers.tool';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import CesiumCompassTool from './tools/cesium-compass.tool';

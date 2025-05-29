@@ -3,7 +3,7 @@ import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
 import { CesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumSceneMode } from '../proxied.types';
 
 export default {
   title: 'Cesium Map',

@@ -5,7 +5,7 @@ import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { IRasterLayer, LayerType } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumSceneMode } from '../proxied.types';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {

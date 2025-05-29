@@ -20,6 +20,10 @@ import {
   Rectangle,
   Resource,
   VerticalOrigin,
+  SceneMode,
+  Scene,
+  Color,
+  PolygonHierarchy,
 } from 'cesium';
 
 // PROXIED CLASSES
@@ -57,10 +61,17 @@ export class CesiumPositionProperty extends PositionProperty {}
 
 export class CesiumCesiumBillboardGraphics extends BillboardGraphics {}
 
+export class CesiumColor extends Color {}
+
+export class CesiumPolygonHierarchy extends PolygonHierarchy {}
+
+export class CesiumScene extends Scene {}
+
 // PROXIED ENUMS
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumVerticalOrigin = VerticalOrigin;
 export const CesiumHorizontalOrigin = HorizontalOrigin;
+export const CesiumSceneMode = SceneMode;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const CesiumLabelStyle = LabelStyle;
@@ -72,6 +83,10 @@ export {
   Entity as CesiumCesiumEntity,
   GeoJsonDataSource as CesiumGeoJsonDataSource,
   Math as CesiumMath,
+  SceneTransforms as CesiumSceneTransforms,
   PolygonGraphics as CesiumCesiumPolygonGraphics,
   sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed,
 } from 'cesium';
+
+// TYPES
+export type CesiumSceneModeEnum = SceneMode;

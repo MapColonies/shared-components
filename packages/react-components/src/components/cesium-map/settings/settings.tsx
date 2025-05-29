@@ -3,9 +3,9 @@ import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-co
 import { get } from 'lodash';
 import { Box } from '../../box';
 import { IRasterLayer, IVectorLayer } from '../layers-manager';
-import { CesiumSceneModeEnum } from '../map.types';
-import { CesiumSceneModes } from './scene-modes';
+import { CesiumSceneModeEnum } from '../proxied.types';
 import { CesiumBaseMaps } from './base-maps';
+import { CesiumSceneModes } from './scene-modes';
 
 import './settings.css';
 

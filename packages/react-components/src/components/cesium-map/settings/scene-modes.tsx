@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@map-colonies/react-core';
-
-import { CesiumSceneMode, CesiumSceneModeEnum } from '../map.types';
 import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumSceneMode, CesiumSceneModeEnum } from '../proxied.types';
 
 import './scene-modes.css';
 

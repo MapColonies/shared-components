@@ -156,8 +156,3 @@ body[dir='rtl'] .sideToolsContainer {
 .viewer .mdc-linear-progress__bar-inner {
   border-top-width: 10px;
 }
-
-.center {
-  display: table;
-  margin: auto;
-}

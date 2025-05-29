@@ -5,8 +5,7 @@ import { Box } from '../box';
 import { BASE_MAPS } from './helpers/constants';
 import { ICesiumImageryLayer, IRasterLayer } from './layers-manager';
 import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
-import { CesiumSceneMode } from './map.types';
-import { CesiumCartesian2 } from './proxied.types';
+import { CesiumCartesian2, CesiumSceneMode } from './proxied.types';
 import { IBaseMaps } from './settings/settings';
 
 export default {
