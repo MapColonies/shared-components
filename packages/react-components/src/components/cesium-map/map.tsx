@@ -472,7 +472,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
             <DebugPanelTool debugPanel={debugPanel} locale={locale} />
-            <LegendTool onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
+            <LegendTool toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}

@@ -3,16 +3,16 @@ import { CesiumViewer, useCesiumMap } from '../map';
 import { LegendMixin } from './legend-mixin';
 
 export interface LegendToolProps {
-  onClick: () => void;
+  toggleSidebar: () => void;
   locale?: { [key: string]: string };
 }
 
-export const LegendTool: React.FC<LegendToolProps> = ({ onClick, locale }) => {
+export const LegendTool: React.FC<LegendToolProps> = ({ toggleSidebar, locale }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
 
   useEffect(() => {
     mapViewer?.extend(LegendMixin, {
-      onClick: onClick,
+      toggleSidebar: toggleSidebar,
       locale: locale,
     });
   }, [mapViewer]);
