@@ -11,28 +11,70 @@ import {
   Cartesian3,
   BoundingSphere,
   SceneTransforms,
+  HeightReference,
+  Scene,
+  Ellipsoid,
+  PolygonHierarchy,
+  Cartographic,
+  PolygonGraphics,
+  PolylineGraphics,
+  PositionProperty,
+  VerticalOrigin,
+  BillboardGraphics,
 } from 'cesium';
-import { BBox, Feature, Point } from 'geojson';
+import { BBox, Feature, Point, Polygon } from 'geojson';
 import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import pMap from 'p-map';
+import { format as formatDateFns } from 'date-fns';
+import area from '@turf/area';
+import intersect from '@turf/intersect';
+import centroid from '@turf/centroid';
+import bboxPolygon from '@turf/bbox-polygon';
+import * as turf from '@turf/helpers';
+import { Properties } from '@turf/helpers';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumMath } from '../proxied.types';
+
+export interface ICesiumWFSLayerLabelTextField {
+  name: string;
+  type: 'number' | 'string' | 'boolean' | 'date';
+  format?: string;
+  predicate?: (value: any) => any;
+}
+export interface ICesiumWFSLayerLabelingOptions {
+  dataSourcePrefix: string;
+  text: {
+    pattern: string;
+    fields: ICesiumWFSLayerLabelTextField[];
+  };
+  fontName: string;
+  fontSize: number;
+  padding: number;
+  fillStyle: string | CanvasGradient | CanvasPattern;
+  strokeStyle: string | CanvasGradient | CanvasPattern;
+  lineWidth: number;
+}
 
 export interface ICesiumWFSLayerOptions {
   url: string;
   featureType: string;
-  style: Record<string, unknown>;
+  style: {
+    color: string;
+    hover: string;
+  };
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
   keyField?: string; // if PK is not defined, or is different from 'id', or sortBy should be used
+  labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
-  visualizationHandler: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[]) => void;
+  visualizationHandler?: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox) => void;
 }
 
 interface IFetchMetadata {
@@ -43,17 +85,17 @@ interface IFetchMetadata {
   items?: number;
 }
 
+const POINT_STROKE = '#FFFF00';
+
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField } = options;
+  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
-  const geojsonColor = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.5), [color]);
-  const geojsonColor2D = useMemo(() => CesiumColor.fromCssColorString((color as string) ?? '#01FF1F').withAlpha(0.2), [color]);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}_${uuidv4()}`, [featureType]);
 
@@ -66,7 +108,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       for (const field of featureStructure.fields) {
         const { fieldName, aliasFieldName } = field;
         const key = aliasFieldName;
-        const value = properties[fieldName.toLowerCase()] ?? 'N/A';
+        const value = properties[fieldName] ?? 'N/A';
         rows.push(`
           <tr>
             <td><strong>${key}:</strong></td>
@@ -75,7 +117,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         `);
       }
     }
-    const isRightToLeft = featureStructure.fields.some(field => field.aliasFieldName !== field.fieldName);
+    const isRightToLeft = featureStructure.fields.some((field) => field.aliasFieldName !== field.fieldName);
     return `
       <table style="direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
         <tbody>
@@ -126,6 +168,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
     let hoveredEntity: any = null;
+    let hoveredEntityInitiaMaterial: any = null;
     handler.setInputAction((movement: { endPosition: Cartesian2 }): void => {
       const is2D = mapViewer.scene.mode === SceneMode.SCENE2D;
       if (is2D) {
@@ -134,10 +177,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
             if (hoveredEntity) {
               // Resetting previous entity
-              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor2D;
+              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = hoveredEntityInitiaMaterial;
               (mapViewer.container as HTMLElement).style.cursor = 'default';
             }
             hoveredEntity = pickedObject.id;
+            hoveredEntityInitiaMaterial = hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material;
             hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonHoveredColor;
             (mapViewer.container as HTMLElement).style.cursor = 'pointer';
           }
@@ -145,7 +189,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           // No entity was picked thus the mouse is outside of any entity
           if (hoveredEntity) {
             // Resetting previous entity
-            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor2D;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = hoveredEntityInitiaMaterial;
             hoveredEntity = null;
             (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
@@ -159,11 +203,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           if (get(hoveredEntity, 'id') !== get(closestPolygon, 'id')) {
             // Resetting previous hovered polygon
             if (hoveredEntity) {
-              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
+              hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = hoveredEntityInitiaMaterial;
               (mapViewer.container as HTMLElement).style.cursor = 'default';
             }
             // Highlight new hovered polygon
             hoveredEntity = closestPolygon;
+            hoveredEntityInitiaMaterial = hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material;
             hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonHoveredColor;
             (mapViewer.container as HTMLElement).style.cursor = 'pointer';
           }
@@ -171,7 +216,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
           // No polygon hovered anymore
           if (hoveredEntity) {
             // Resetting previous hovered polygon
-            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = geojsonColor;
+            hoveredEntity[getEntityEnteriorGeometry(hoveredEntity)].material = hoveredEntityInitiaMaterial;
             hoveredEntity = null;
             (mapViewer.container as HTMLElement).style.cursor = 'default';
           }
@@ -211,6 +256,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     if (wfsDataSource.entities && wfsDataSource.entities.values.length > 0) {
       wfsDataSource.show = false;
       page.current = 0;
+
+      mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
     }
     updateMetadata(0, 0);
   };
@@ -227,6 +274,77 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     return undefined;
   };
 
+  // Create a temporary canvas to measure max width
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
+
+  const createTextBillboard = (text: string) => {
+    const DEFAULT_LABELING = {
+      fontName: 'sans-serif',
+      fontSize: 14,
+      padding: 4,
+      fillStyle: 'white',
+      strokeStyle: 'black',
+      lineWidth: 3,
+    };
+
+    const lines = text.split('\n');
+    const fontSize = labeling?.fontSize ?? DEFAULT_LABELING.fontSize;
+    const padding = labeling?.padding ?? DEFAULT_LABELING.padding;
+    const lineHeight = fontSize + 2;
+
+    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tempCtx.font = `${fontSize}px ${labeling?.fontName ?? DEFAULT_LABELING.fontName}`;
+
+    const maxLineWidth = Math.max(...lines.map((line) => tempCtx.measureText(line).width));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = maxLineWidth + padding * 2;
+    canvas.height = lineHeight * lines.length + padding * 2;
+
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.font = `${fontSize}px ${labeling?.fontName ?? DEFAULT_LABELING.fontName}`;
+    ctx.fillStyle = labeling?.fillStyle ?? DEFAULT_LABELING.fillStyle;
+    ctx.strokeStyle = labeling?.strokeStyle ?? DEFAULT_LABELING.strokeStyle;
+    ctx.lineWidth = labeling?.lineWidth ?? DEFAULT_LABELING.lineWidth;
+
+    lines.forEach((line, index) => {
+      const y = padding + (index + 1) * lineHeight - 4;
+      ctx.strokeText(line, padding, y);
+      ctx.fillText(line, padding, y);
+    });
+
+    return {
+      dataURL: canvas.toDataURL(),
+      width: canvas.width,
+      height: canvas.height,
+    };
+  };
+
+  const buildLabelText = (feature: Feature): string => {
+    const result = labeling?.text.pattern.replace(/\$\{([^}]+)\}/g, (_, key) => {
+      const textField = labeling.text.fields.find((field) => field.name === key);
+      let textFieldValue = '';
+      if (textField) {
+        if (textField.predicate) {
+          textFieldValue = textField.predicate((feature.properties as any)[key]);
+        } else {
+          switch (textField.type) {
+            case 'date':
+              textFieldValue = formatDateFns(new Date((feature.properties as any)[key]), textField.format ?? 'dd/MM/yyyy');
+              break;
+            default:
+              textFieldValue = (feature.properties as any)[key];
+              break;
+          }
+        }
+      }
+      return textFieldValue;
+    });
+
+    return result as string;
+  };
+
   const processFeatures = async (features: Feature[], fetchId: string): Promise<Feature[]> => {
     const newFeatures: Feature[] = [];
     if (features.length > 0) {
@@ -238,6 +356,27 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
             if (!wfsCache.current.has(keyFieldValue)) {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
+
+              // IMPORTANT FOR DESCRIBE WINDOW,  DESCRIPTION field MUST BE UNDEFIEND
+              const descriptionValue = (f.properties as any).description;
+              (f.properties as any).description = undefined;
+              (f.properties as any)._description = descriptionValue;
+
+              if (labeling) {
+                const billboardImage = createTextBillboard(buildLabelText(f));
+                (f.properties as any).label = billboardImage;
+              }
+
+              // mapViewer.entities.add({
+              //   position:  Cartesian3.fromDegrees(35.47150, 33.08731, 500),
+              //   billboard: {
+              //     image: billboardImage,
+              //     heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+              //     scale: 1.0,
+              //     disableDepthTestDistance: Number.POSITIVE_INFINITY,
+              //   },
+              // });
+
               newFeatures.push(f);
             }
           }
@@ -330,6 +469,16 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         fetchAndUpdateWfs(page.current++ * pageSize);
       } else {
         page.current = 0;
+
+        const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
+        if (dataSource) {
+          applyVisulization(
+            mapViewer,
+            dataSource,
+            dataSource.entities.values.map((entities) => entities.id as string),
+            extent
+          );
+        }
       }
       return;
     }
@@ -345,10 +494,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(
+      applyVisulization(
         mapViewer,
         dataSource,
-        newFeatures.map((feature) => feature.id as string)
+        newFeatures.map((feature) => feature.id as string),
+        extent
       );
     }
 
@@ -378,7 +528,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const position: Feature<Point> = center(bbox);
 
     try {
-      let wfsDataUrl = `${url}?service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(',')},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
+      const urlSeparator = url.includes('?') ? '&' : '?';
+      let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
+        ','
+      )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
       if (keyField) {
         wfsDataUrl += `&sortBy=${keyField}%20ASC`;
       }
@@ -390,10 +543,215 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   }, []);
 
+  const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
+    const is2D = viewer.scene.mode === SceneMode.SCENE2D;
+
+    const getGeoJsonFromEntity = (entity: Entity): Polygon | undefined => {
+      if (entity.polygon) {
+        // Polygon
+        const polygonData = entity.polygon.hierarchy?.getValue(JulianDate.now()) as PolygonHierarchy;
+        const positions = polygonData.positions.map((position) => {
+          const worlPosCartographic = Cartographic.fromCartesian(position);
+          const correctedCarto = new Cartographic(
+            CesiumMath.toDegrees(worlPosCartographic.longitude),
+            CesiumMath.toDegrees(worlPosCartographic.latitude),
+            is2D ? 500 : undefined //viewer.scene.sampleHeight(Cartographic.fromCartesian(position))
+          );
+          return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
+        });
+
+        // return turf.polygon(positions);
+        return {
+          type: 'Polygon',
+          coordinates: [positions],
+        };
+      }
+    };
+
+    const pixelSizeInMeters = (
+      scene: Scene,
+      position: Cartesian3,
+      pixelWidth: number,
+      pixelHeight: number
+    ): { widthMeters: number; heightMeters: number } | null => {
+      const screenPosition = SceneTransforms.wgs84ToWindowCoordinates(scene, position);
+
+      if (!screenPosition) return null;
+
+      const xRight = screenPosition.x + pixelWidth;
+      const yBottom = screenPosition.y + pixelHeight;
+
+      const screenRight = new Cartesian2(xRight, screenPosition.y);
+      const screenBottom = new Cartesian2(screenPosition.x, yBottom);
+
+      const worldRight = scene.camera.pickEllipsoid(screenRight, scene.globe.ellipsoid);
+      const worldBottom = scene.camera.pickEllipsoid(screenBottom, scene.globe.ellipsoid);
+
+      if (!worldRight || !worldBottom) return null;
+
+      const widthMeters = Cartesian3.distance(position, worldRight);
+      const heightMeters = Cartesian3.distance(position, worldBottom);
+
+      return { widthMeters, heightMeters };
+    };
+
+    const createRectangleAround = (
+      centerCartographic: { longitude: number; latitude: number },
+      widthMeters: number,
+      heightMeters: number
+    ): Polygon => {
+      const ellipsoid = Ellipsoid.WGS84;
+      const lat = centerCartographic.latitude;
+      const lon = centerCartographic.longitude;
+
+      const metersPerDegreeLat = (Math.PI / 180) * ellipsoid.maximumRadius;
+      const metersPerDegreeLon = (Math.PI / 180) * ellipsoid.maximumRadius; /** Math.cos(lat)*/
+
+      const dLat = heightMeters / 2 / metersPerDegreeLat;
+      const dLon = widthMeters / 2 / metersPerDegreeLon;
+
+      const north = lat + dLat;
+      const south = lat - dLat;
+      const east = lon + dLon;
+      const west = lon - dLon;
+
+      return {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+            [west, north], // close the ring
+          ],
+        ],
+      };
+    };
+
+    const calcIntersectionRation = (polygon1: turf.Geometry, polygon2: turf.Geometry) => {
+      return area(polygon1) / area(polygon2);
+    };
+
+    const labelPos = [] as turf.Feature<turf.Point>[];
+    dataSource?.entities.values.forEach((entity: Entity) => {
+      if (extent && labeling && is2D) {
+        try {
+          const extentPolygon = bboxPolygon(extent);
+          const featureClippedPolygon = intersect(getGeoJsonFromEntity(entity) as Polygon, extentPolygon) as Feature<Polygon, Properties>;
+          if (featureClippedPolygon) {
+            const labelValue = entity.properties?.label.getValue(JulianDate.now());
+            const featureClippedPolygonCenter = centroid(featureClippedPolygon as unknown as Polygon, {
+              properties: {
+                label: labelValue,
+              },
+            });
+
+            const labelPixelSize = { width: labelValue.width, height: labelValue.height };
+            const [longitude, latitude, height = 0] = featureClippedPolygonCenter.geometry.coordinates;
+            const cartesian = Cartesian3.fromDegrees(longitude, latitude, height);
+            const sizeMeters = pixelSizeInMeters(viewer.scene, cartesian, labelPixelSize.width, labelPixelSize.height);
+
+            if (sizeMeters) {
+              const labelRect = createRectangleAround({ longitude, latitude }, sizeMeters.widthMeters, sizeMeters.heightMeters);
+
+              const labelIntersection = intersect(featureClippedPolygon, {
+                type: 'Feature',
+                properties: {},
+                geometry: labelRect,
+              });
+              const intersectionRatio = calcIntersectionRation(labelIntersection?.geometry as turf.Geometry, labelRect);
+              if (intersectionRatio > 0.7) {
+                labelPos.push(featureClippedPolygonCenter);
+              }
+            }
+          }
+        } catch (e) {
+          console.log('*** Label placement failed: turf.intersect() failed ***', 'entity -->', entity, 'extent -->', extent);
+        }
+      }
+      if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
+        return;
+      }
+      if (entity.polygon) {
+        entity.polygon = new PolygonGraphics({
+          hierarchy: entity.polygon.hierarchy,
+          material: is2D ? CesiumColor.fromCssColorString(color).withAlpha(0.2) : CesiumColor.fromCssColorString(color).withAlpha(0.5),
+          outline: true,
+          outlineColor: CesiumColor.fromCssColorString(color),
+          outlineWidth: 3,
+          height: is2D ? 10000 : undefined, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+          perPositionHeight: false,
+        });
+      }
+      if (entity.polyline) {
+        entity.polyline = new PolylineGraphics({
+          positions: entity.polyline.positions,
+          material: CesiumColor.fromCssColorString(color).withAlpha(0.5),
+          clampToGround: true,
+          width: 4,
+        });
+      }
+      if (entity.billboard) {
+        const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
+        const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+        const correctedCarto = new Cartographic(
+          worlPosCartographic.longitude,
+          worlPosCartographic.latitude,
+          is2D ? 500 : viewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
+        );
+
+        const correctedCartesian = Cartesian3.fromRadians(correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height);
+
+        entity.position = correctedCartesian as unknown as PositionProperty;
+        entity.billboard = new BillboardGraphics({
+          image:
+            'data:image/svg+xml;base64,' +
+            btoa(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+              <circle cx="8" cy="8" r="6" fill="${color}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
+            </svg>
+          `), //${color}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
+          verticalOrigin: VerticalOrigin.BOTTOM,
+          heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+          scale: 1.0,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        });
+      }
+    });
+
+    viewer.dataSources.remove(viewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${dataSource.name}`)[0]);
+    if (labeling && is2D) {
+      const labelsGeoJsonDataSource = new GeoJsonDataSource(`${labeling?.dataSourcePrefix}${dataSource.name}`);
+      viewer.dataSources.add(labelsGeoJsonDataSource);
+      labelsGeoJsonDataSource
+        .load({
+          type: 'FeatureCollection',
+          features: labelPos,
+        })
+        .then((dataSource) => {
+          dataSource?.entities.values.forEach((entity: Entity) => {
+            entity.billboard = new BillboardGraphics({
+              image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
+              heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+              scale: 1.0,
+              disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            });
+          });
+        });
+    }
+  };
+
+  const applyVisulization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
+    visualizationHandler
+      ? visualizationHandler(viewer, dataSource, processEntityIds, extent)
+      : defaultVisualizationHandler(viewer, dataSource, processEntityIds, extent);
+  };
+
   useEffect((): void => {
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      visualizationHandler(mapViewer, dataSource, []);
+      applyVisulization(mapViewer, dataSource, [], undefined);
     }
   }, [mapViewer.scene.mode]);
 
