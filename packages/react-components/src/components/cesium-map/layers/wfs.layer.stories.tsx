@@ -29,6 +29,7 @@ import {
   CesiumScene,
   CesiumSceneTransforms,
   CesiumEllipsoid,
+  CesiumCesiumTerrainProvider,
 } from '../proxied.types';
 import { getValue } from '../../utils/config';
 import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
@@ -91,6 +92,9 @@ MapWithPPWFSLayer.argTypes = {
   debugPanel: {
     defaultValue: DEBUG_PANEL,
   },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
+  },
 };
 
 MapWithPPWFSLayer.storyName = 'WFS PP layer';
@@ -134,6 +138,9 @@ MapWithWFSLayer.argTypes = {
   debugPanel: {
     defaultValue: DEBUG_PANEL,
   },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
+  },
 };
 
 MapWithWFSLayer.storyName = 'WFS Vector layer';
@@ -165,6 +172,9 @@ MapWithWFSLayerWithVisualizer.argTypes = {
   },
   debugPanel: {
     defaultValue: DEBUG_PANEL,
+  },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
   },
 };
 
