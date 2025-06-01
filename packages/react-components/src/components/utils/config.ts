@@ -1,4 +1,5 @@
-// stories-data.json is a dynamic, gitignored file and may not always exist.
+// import CONFIG from '../../../stories-data.json';
+// IMPORTANT: stories-data.json is a dynamic, gitignored file and may not always exist.
 // To avoid import errors, use a try-catch dynamic require or fallback to an empty object.
 
 let CONFIG: any = {};

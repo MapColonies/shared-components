@@ -43,6 +43,26 @@ export interface ICesiumWFSLayerLabelTextField {
   format?: string;
   predicate?: (value: any) => any;
 }
+export interface ICesiumWFSLayerLabelingOptions {
+  dataSourcePrefix: string;
+  text: {
+    pattern: string;
+    fields: ICesiumWFSLayerLabelTextField[];
+  };
+  fontName: string;
+  fontSize: number;
+  padding: number;
+  fillStyle: string | CanvasGradient | CanvasPattern;
+  strokeStyle: string | CanvasGradient | CanvasPattern;
+  lineWidth: number;
+}
+
+export interface ICesiumWFSLayerLabelTextField {
+  name: string;
+  type: 'number' | 'string' | 'boolean' | 'date';
+  format?: string;
+  predicate?: (value: any) => any;
+}
 
 export interface ICesiumWFSLayerLabelingOptions {
   dataSourcePrefix: string;

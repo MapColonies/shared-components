@@ -1,4 +1,3 @@
-
 import { BBox } from 'geojson';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
@@ -7,6 +6,7 @@ import { Feature, Polygon, Properties } from '@turf/helpers';
 import * as turf from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap, CesiumViewer } from '../map';
 import {
@@ -31,7 +31,6 @@ import {
   CesiumEllipsoid,
   CesiumCesiumTerrainProvider,
 } from '../proxied.types';
-import { getValue } from '../../utils/config';
 import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
 import { Cesium3DTileset } from './3d.tileset';
 
@@ -537,10 +536,10 @@ const handleVisualizationPolygonParts = (
       // Polygon
       const polygonData = entity.polygon.hierarchy?.getValue(CesiumJulianDate.now()) as CesiumPolygonHierarchy;
       const positions = polygonData.positions.map((position) => {
-        const worlPosCartographic = CesiumCartographic.fromCartesian(position);
+        const worldPosCartographic = CesiumCartographic.fromCartesian(position);
         const correctedCarto = new CesiumCartographic(
-          CesiumMath.toDegrees(worlPosCartographic.longitude),
-          CesiumMath.toDegrees(worlPosCartographic.latitude),
+          CesiumMath.toDegrees(worldPosCartographic.longitude),
+          CesiumMath.toDegrees(worldPosCartographic.latitude),
           is2D ? 500 : undefined //mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(position))
         );
         return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
@@ -703,10 +702,10 @@ const handleVisualizationPolygonParts = (
     }
     if (entity.billboard) {
       const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-      const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+      const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
       const correctedCarto = new CesiumCartographic(
-        worlPosCartographic.longitude,
-        worlPosCartographic.latitude,
+        worldPosCartographic.longitude,
+        worldPosCartographic.latitude,
         is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
       );
 
@@ -756,10 +755,10 @@ const handleVisualizationPolygonParts = (
       .then((dataSource) => {
         dataSource?.entities.values.forEach((entity: CesiumCesiumEntity) => {
           const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-          const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+          const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
           const correctedCarto = new CesiumCartographic(
-            worlPosCartographic.longitude,
-            worlPosCartographic.latitude,
+            worldPosCartographic.longitude,
+            worldPosCartographic.latitude,
             is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
           );
 
@@ -879,10 +878,10 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: Cesiu
     }
     if (entity.billboard) {
       const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-      const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+      const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
       const correctedCarto = new CesiumCartographic(
-        worlPosCartographic.longitude,
-        worlPosCartographic.latitude,
+        worldPosCartographic.longitude,
+        worldPosCartographic.latitude,
         is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
       );
 
