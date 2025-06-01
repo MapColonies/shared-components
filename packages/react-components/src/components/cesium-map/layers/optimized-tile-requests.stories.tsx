@@ -3,7 +3,7 @@ import { Rectangle } from 'cesium';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { CesiumXYZLayer } from '../layers/xyz.layer';
+import { CesiumXYZLayer } from './xyz.layer';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
 import { IBaseMaps } from '../settings/settings';
