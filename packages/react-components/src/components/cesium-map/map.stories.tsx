@@ -123,6 +123,10 @@ LocalizedMap.argTypes = {
       MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
+      SHOW_FEATURE_ON_MAP: "הראה פיצ'ר במפה",
+      IN_MAP_EXTENT: "חפש בגבולות המפה הנראית",
+      SEARCH_PLACEHOLDER: "חיפוש...",
+      NO_RESULTS: "אין תוצאות",
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
@@ -143,6 +147,9 @@ LocalizedMap.argTypes = {
       min: 0,
       max: 20,
     },
+  },
+  geocoderPanel: {
+    defaultValue: true,
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';

@@ -39,12 +39,14 @@ import LayerManager, { LegendExtractor } from './layers-manager';
 import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
 import CesiumCompassTool from './tools/cesium-compass.tool';
 import { DebugPanel } from './debug/debug-panel';
+import { GeocoderPanel } from './geocoder/geocoder-panel';
 import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import '@map-colonies/react-core/dist/checkbox/styles';
 
-interface ViewerProps extends ComponentProps<typeof Viewer> {}
+interface ViewerProps extends ComponentProps<typeof Viewer> { }
 
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
@@ -138,6 +140,7 @@ export interface CesiumMapProps extends ViewerProps {
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
   debugPanel?: IDebugPanel;
+  geocoderPanel?: boolean;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -354,10 +357,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return pickPositionCartographic !== undefined
           ? {
-              longitude: toDegrees(pickPositionCartographic.longitude),
-              latitude: toDegrees(pickPositionCartographic.latitude),
-              height: mapViewRef.scene.camera.positionCartographic.height,
-            }
+            longitude: toDegrees(pickPositionCartographic.longitude),
+            latitude: toDegrees(pickPositionCartographic.latitude),
+            height: mapViewRef.scene.camera.positionCartographic.height,
+          }
           : getCameraPositionCartographic();
       } else {
         return getCameraPositionCartographic();
@@ -392,9 +395,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           let loading = false;
           mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
             if (
-              typeof dataLayer.meta.items === 'number' && 
-              typeof dataLayer.meta.total === 'number' && 
-              dataLayer.meta.items > 0 && 
+              typeof dataLayer.meta.items === 'number' &&
+              typeof dataLayer.meta.total === 'number' &&
+              dataLayer.meta.items > 0 &&
               dataLayer.meta.items < dataLayer.meta.total) {
               loading = true;
               return;
@@ -457,6 +460,84 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               <DebugPanel locale={locale}>
                 {debugPanel.wfs && <WFS locale={locale} />}
               </DebugPanel>
+            }
+            {
+              props.geocoderPanel &&
+              <GeocoderPanel
+                locale={locale}
+                configs={
+                  [
+                    {
+                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+                      endPoint: '/search/location/query',
+                      method: 'GET',
+                      params: {
+                        dynamic: {
+                          queryText: 'query',
+                          geoContext: 'geo_context'
+                        },
+                        static: {
+                          "limit": 6,
+                          "disable_fuzziness": false,
+                          "geo_context_mode": "filter"
+                        }
+                      },
+                      icon: '',
+                      title: ''
+                    },
+                    {
+                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+                      endPoint: '/search/control/tiles',
+                      method: 'GET',
+                      params: {
+                        dynamic: {
+                          queryText: 'tile',
+                          geoContext: 'geo_context'
+                        },
+                        static: {
+                          "geo_context_mode": "filter"
+                        }
+                      },
+                      icon: '',
+                      title: ''
+                    },
+                    {
+                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+                      endPoint: '/search/control/items',
+                      method: 'GET',
+                      params: {
+                        dynamic: {
+                          queryText: 'command_name',
+                          geoContext: 'geo_context'
+                        },
+                        static: {
+                          "geo_context_mode": "filter"
+                        }
+                      },
+                      icon: '',
+                      title: ''
+                    },
+                    {
+                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+                      endPoint: '/search/control/routes',
+                      method: 'GET',
+                      params: {
+                        dynamic: {
+                          queryText: 'command_name',
+                          geoContext: 'geo_context',
+                        },
+                        static: {
+                          // "geo_context": { "bbox": [-180, -90, 180, 90] },
+                          "geo_context_mode": "filter"
+                        },
+                      },
+                      icon: '',
+                      title: ''
+                    },
+                  ]
+                }
+              >
+              </GeocoderPanel>
             }
             <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />

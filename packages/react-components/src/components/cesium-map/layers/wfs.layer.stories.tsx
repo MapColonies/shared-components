@@ -156,6 +156,9 @@ MapWithWFSLayer.argTypes = {
   debugPanel: {
     defaultValue: DEBUG_PANEL,
   },
+  geocoderPanel: {
+    defaultValue: true,
+  },
 };
 
 MapWithWFSLayer.storyName = 'WFS Vector layer';
