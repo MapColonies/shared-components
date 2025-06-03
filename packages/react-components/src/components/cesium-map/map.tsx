@@ -454,6 +454,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
+          <Box>
+            {showCompass && <CesiumCompassTool locale={locale} />}
+          </Box>
           <Box className="sideToolsContainer">
             {/* {
               debugPanel &&
@@ -476,11 +479,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             <ActiveLayersTool locale={locale} />
             <LegendTool toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
-          <Box className="toolsContainer">
+          <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
             {showScale && <ScaleTrackerTool locale={locale} />}
-            {showCompass && <CesiumCompassTool locale={locale} />}
           </Box>
           {displayZoomButtons && <ZoomButtons />}
         </>,

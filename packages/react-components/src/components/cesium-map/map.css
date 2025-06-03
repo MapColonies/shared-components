@@ -112,7 +112,7 @@ span.cesium-sceneModePicker-wrapper {
   column-gap: 4px;
 }
 
-.toolsContainer {
+.bottomToolsContainer {
   color: var(--mdc-theme-on-surface);
   display: flex;
   gap: 8px;
@@ -123,12 +123,12 @@ span.cesium-sceneModePicker-wrapper {
   opacity: 0.7;
 }
 
-body[dir='rtl'] .toolsContainer {
+body[dir='rtl'] .bottomToolsContainer {
   left: 68px;
   right: unset;
 }
 
-.toolsContainer > * {
+.bottomToolsContainer > * {
   height: 26px;
   line-height: 26px;
 }

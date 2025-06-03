@@ -8,6 +8,7 @@ import {
   TerrainProvider,
 } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, CesiumViewer, useCesiumMap } from '../map';
@@ -122,7 +123,7 @@ export const QuantizedMeshHeightsTool: Story = () => {
         sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
         baseMaps={BASE_MAPS}
       >
-        <Cesium3DTileset url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" isZoomTo={true} />
+        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} isZoomTo={true} />
         <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
         <TerrainianHeightTool />
         <InspectorTool />

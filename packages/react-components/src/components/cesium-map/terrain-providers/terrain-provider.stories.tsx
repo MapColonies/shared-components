@@ -10,6 +10,7 @@ import {
   WebMercatorTilingScheme,
 } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, useCesiumMap } from '../map';
@@ -137,7 +138,7 @@ export const QuantizedMeshProviders: Story = () => {
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
       >
-        <Cesium3DTileset isZoomTo={true} url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" />
+        <Cesium3DTileset isZoomTo={true} url={getValue('GLOBAL', '3D_MODEL')} />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
         <InspectorTool />
       </CesiumMap>

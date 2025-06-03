@@ -1,3 +1,4 @@
+import { getValue } from '../../utils/config';
 import { IBaseMaps } from '../settings/settings';
 
 export const BASE_MAPS: IBaseMaps = {
@@ -25,7 +26,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
+            url: getValue('GLOBAL', 'BM-INFRARED_RASTER-WMS_LAYER'),
             layers: 'goes_conus_ir',
             credit: 'Infrared data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -48,7 +49,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 0.6,
           zIndex: 1,
           options: {
-            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            url: getValue('GLOBAL', 'BM-RADAR_RASTER-WMS_LAYER'),
             layers: 'nexrad-n0r',
             credit: 'Radar data courtesy Iowa Environmental Mesonet',
             parameters: {
@@ -63,7 +64,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
             layers: '',
             credit: 'GOOGLE',
           },
@@ -74,7 +75,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 1,
           zIndex: 2,
           options: {
-            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            url: getValue('GLOBAL', 'BM-VECTOR_TILES_GPS-XYZ_LAYER'),
             layers: '',
             credit: 'openstreetmap',
           },
@@ -93,7 +94,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 1,
           zIndex: 0,
           options: {
-            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            url: getValue('GLOBAL', 'BM-VECTOR_TILES-XYZ_LAYER'),
             layers: '',
             credit: 'thunderforest',
           },
@@ -104,7 +105,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 1,
           zIndex: 1,
           options: {
-            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            url: getValue('GLOBAL', 'BM-VECTOR_TILES_GPS-XYZ_LAYER'),
             layers: '',
             credit: 'openstreetmap',
           },
@@ -115,7 +116,7 @@ export const BASE_MAPS: IBaseMaps = {
           opacity: 0.4,
           zIndex: 2,
           options: {
-            url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
+            url: getValue('GLOBAL', 'BM-WMTS_POPULATION_TILES-WMTS_LAYER'),
             layer: 'USGSShadedReliefOnly',
             style: 'default',
             format: 'image/jpeg',

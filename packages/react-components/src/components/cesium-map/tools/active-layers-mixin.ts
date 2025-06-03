@@ -63,8 +63,9 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
     destroy() {
       if (this.contentDiv) {
         try {
-          if (this.contentDiv.parentNode) {
-            document.body.removeChild(this.contentDiv);
+          const parentNode = this.contentDiv.parentNode;
+          if (parentNode) {
+            parentNode.removeChild(this.contentDiv);
           }
         } catch (error) {
           console.error('Error removing active layers:', error);

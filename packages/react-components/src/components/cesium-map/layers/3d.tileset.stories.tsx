@@ -1,6 +1,7 @@
 import { ArcGISTiledElevationTerrainProvider } from 'cesium';
 import { Story, Meta } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
+import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { Cesium3DTileset } from './3d.tileset';
@@ -28,7 +29,7 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
     <CesiumMap {...args}>
       <Cesium3DTileset
         isZoomTo={true}
-        url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json"
+        url={getValue('GLOBAL', '3D_MODEL')}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -65,7 +66,7 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
       <Cesium3DTileset
         isZoomTo={false}
         heightFromGround={-10}
-        url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json"
+        url={getValue('GLOBAL', '3D_MODEL')}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -102,7 +103,7 @@ Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction 
 export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <Cesium3DTileset isZoomTo={true} url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" />
+      <Cesium3DTileset isZoomTo={true} url={getValue('GLOBAL', '3D_MODEL')} />
     </CesiumMap>
   </div>
 );
