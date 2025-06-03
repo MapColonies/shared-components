@@ -460,6 +460,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box>
             {showCompass && <CesiumCompassTool locale={locale} />}
+            <ActiveLayersTool locale={locale} />
           </Box>
           <Box className="sideToolsContainer">
             {/* {
@@ -480,7 +481,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
             <DebugPanelTool debugPanel={debugPanel} locale={locale} />
-            <ActiveLayersTool locale={locale} />
             <LegendTool toggleSidebar={updateLegendToggle} />
           </Box>
           <Box className="bottomToolsContainer">

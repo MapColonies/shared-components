@@ -7,7 +7,7 @@ interface ActiveLayersMixinOptions {
 }
 
 export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMixinOptions) {
-  const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar' };
+  const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar', viewerSelector: 'cesium-viewer' };
   options = { ...DEFAULT_OPTIONS, ...options };
 
   class ActiveLayers {
@@ -25,32 +25,34 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
 
     createToggleButtonAndDiv() {
       const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'cesium-toolbar-button cesium-button';
-      const icon = `
-        <svg width="100%" height="100%" viewBox="0 0 24 24">
-          <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
-        </svg>`;
-      buttonContainer.innerHTML = icon;
+      buttonContainer.className = 'cesium-cesiumInspector-button cesium-button';
+      buttonContainer.innerHTML = get(this.options.locale, 'ACTIVE_LAYERS_TITLE') ?? 'Active Layers';
       buttonContainer.onclick = () => {
         this.toggleContent();
       };
 
       this.contentDiv = document.createElement('div');
-      this.contentDiv.className = 'cesium-mcMixin-dropDown cesium-mcMixin-dropDown-visible';
+      this.contentDiv.className = 'cesium-cesiumInspector-dropDown';
       this.contentDiv.style.display = 'none';
 
-      const toolbar = document.querySelector(this.options.containerSelector);
-      if (toolbar) {
-        toolbar.appendChild(buttonContainer);
-        toolbar.appendChild(this.contentDiv);
-      }
+      const tool = document.createElement('div');
+      tool.className = 'cesium-cesiumInspector cesium-3DTilesInspector cesium-cesiumInspector-visible';
+      tool.appendChild(buttonContainer);
+      tool.appendChild(this.contentDiv);
+
+      const container = document.createElement('div');
+      container.className = 'cesium-viewer-cesium3DTilesInspectorContainer';
+      container.appendChild(tool);
+
+      const viewer = document.querySelector(this.options.viewerSelector);
+      viewer?.insertAdjacentElement('afterend', container);
+
       this.populateContent();
     }
 
     populateContent() {
       if (this.contentDiv) {
-        this.contentDiv.innerHTML = `<div class="cesium-mcMixin-sectionTitle">${get(this.options.locale, 'ACTIVE_LAYERS_TITLE') ?? 'Active Layers'}</div>`;
-        // TODO
+        this.contentDiv.innerHTML = `bla bla bla\n bla1 bla2\n bla3 bla4`;
       }
     }
 
