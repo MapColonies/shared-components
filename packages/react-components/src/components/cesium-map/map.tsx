@@ -448,6 +448,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setDisplayZoomButtons(props.displayZoomButtons ?? true);
   }, [props.displayZoomButtons]);
 
+  const updateLegendToggle = () => {
+    setIsLegendsSidebarOpen(prev => !prev);
+  };
+
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
     return (
       mapViewRef &&
@@ -477,7 +481,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
             <DebugPanelTool debugPanel={debugPanel} locale={locale} />
             <ActiveLayersTool locale={locale} />
-            <LegendTool toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
+            <LegendTool toggleSidebar={updateLegendToggle} />
           </Box>
           <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
@@ -497,7 +501,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <MapLegendSidebar
           title={props.legends?.title}
           isOpen={isLegendsSidebarOpen}
-          toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)}
+          toggleSidebar={updateLegendToggle}
           noLegendsText={props.legends?.emptyText}
           legends={props.legends?.legendsList ?? legendsList}
           actionsTexts={props.legends?.actionsTexts}
