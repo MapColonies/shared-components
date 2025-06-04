@@ -1,5 +1,5 @@
-import React, { useLayoutEffect } from 'react';
 import { Rectangle } from 'cesium';
+import React, { useLayoutEffect } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';

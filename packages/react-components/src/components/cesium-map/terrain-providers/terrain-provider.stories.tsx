@@ -1,4 +1,3 @@
-import React, { ChangeEvent, useState } from 'react';
 import {
   ArcGISTiledElevationTerrainProvider,
   EllipsoidTerrainProvider,
@@ -9,6 +8,7 @@ import {
   Resource,
   WebMercatorTilingScheme,
 } from 'cesium';
+import React, { ChangeEvent, useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';

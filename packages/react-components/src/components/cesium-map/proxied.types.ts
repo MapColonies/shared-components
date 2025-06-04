@@ -87,6 +87,3 @@ export {
   PolygonGraphics as CesiumCesiumPolygonGraphics,
   sampleTerrainMostDetailed as cesiumSampleTerrainMostDetailed,
 } from 'cesium';
-
-// TYPES
-export type CesiumSceneModeEnum = SceneMode;

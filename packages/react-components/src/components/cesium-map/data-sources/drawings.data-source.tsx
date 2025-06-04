@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Cartesian3, Rectangle, PolygonHierarchy } from 'cesium';
+import { Cartesian3, Color as CesiumColor, Rectangle, PolygonHierarchy } from 'cesium';
 import { FeatureCollection, GeoJSON } from 'geojson';
+import React, { useEffect, useState } from 'react';
 import { DrawType } from '../../models';
 import { CesiumEntity } from '../entities/entity';
 import { CesiumEntityStaticDescription } from '../entities/entity.description';
 import { CesiumPolygonGraphics } from '../entities/graphics/polygon.graphics';
-import { CesiumRectangleGraphics } from '../entities/graphics/rectangle.graphics';
 import { CesiumPolylineGraphics } from '../entities/graphics/polyline.graphics';
-import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumRectangleGraphics } from '../entities/graphics/rectangle.graphics';
 import { DrawHelper } from '../helpers/draw/drawHelper';
-import { geoJSONToPrimitive } from '../helpers/geojson/geojsonToPrimitive';
 import { rectangleToGeoJSON, polygonToGeoJSON } from '../helpers/geojson';
+import { geoJSONToPrimitive } from '../helpers/geojson/geojsonToPrimitive';
 import { rectangleToPositions } from '../helpers/primitivesConversionsCesium';
-import { CesiumColor } from '../proxied.types';
+import { CesiumViewer, useCesiumMap } from '../map';
 import { CesiumCustomDataSource, RCesiumCustomDataSourceProps } from './custom.data-source';
 
 export type PrimitiveCoordinates = Cartesian3[] | Rectangle | undefined;

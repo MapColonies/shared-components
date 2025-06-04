@@ -14,7 +14,7 @@ interface CesiumCompassToolProps {
   locale?: { [key: string]: string };
 }
 
-const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
+export const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
   const mapViewer = useCesiumMap();
 
   const { enableCompass = true, enableZoomControls = false, lockCompassNavigation = false, locale = { DIRECTION: 'ltr' } } = props;
@@ -39,5 +39,3 @@ const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
 
   return null;
 };
-
-export default CesiumCompassTool;

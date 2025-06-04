@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import React, { useState } from 'react';
 import {
   ArcGISTiledElevationTerrainProvider,
   EllipsoidTerrainProvider,
@@ -7,6 +5,7 @@ import {
   // Resource,
   TerrainProvider,
 } from 'cesium';
+import React, { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
