@@ -1,7 +1,8 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { Proj } from '../utils/projections';
 import { BASE_MAPS } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
-import { CesiumSceneMode, Proj } from '.';
+import { CesiumSceneMode } from './proxied.types';
 
 export default {
   title: 'Cesium Map',
