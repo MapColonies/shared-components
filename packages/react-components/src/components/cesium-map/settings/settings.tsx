@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { IRasterLayer, IVectorLayer } from '../layers-manager';
-import { CesiumSceneModeEnum } from '../proxied.types';
+import { CesiumSceneMode } from '../proxied.types';
 import { CesiumBaseMaps } from './base-maps';
 import { CesiumSceneModes } from './scene-modes';
 
@@ -24,7 +24,7 @@ export interface IBaseMaps {
 }
 
 export interface RCesiumMapProps {
-  sceneModes: CesiumSceneModeEnum[];
+  sceneModes: typeof CesiumSceneMode[];
   baseMaps?: IBaseMaps;
   locale?: { [key: string]: string };
 }

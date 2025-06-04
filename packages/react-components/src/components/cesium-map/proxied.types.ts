@@ -89,4 +89,3 @@ export {
 } from 'cesium';
 
 // TYPES
-export type CesiumSceneModeEnum = SceneMode;
