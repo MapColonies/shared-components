@@ -61,6 +61,16 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
     toggleContent() {
       if (this.contentDiv) {
         this.contentDiv.style.display = this.contentDiv.style.display === 'none' ? 'block' : 'none';
+        const inspector = this.contentDiv.parentElement;
+        if (inspector) {
+          if (inspector.classList.contains('cesium-cesiumInspector-hidden')) {
+            inspector.classList.remove('cesium-cesiumInspector-hidden');
+            inspector.classList.add('cesium-cesiumInspector-visible');
+          } else {
+            inspector.classList.remove('cesium-cesiumInspector-visible');
+            inspector.classList.add('cesium-cesiumInspector-hidden');
+          }
+        }
       }
     }
 
