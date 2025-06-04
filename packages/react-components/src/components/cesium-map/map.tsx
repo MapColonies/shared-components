@@ -461,7 +461,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 {debugPanel.wfs && <WFS locale={locale} />}
               </DebugPanel>
             }
-            <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
             {
               props.geocoderPanel &&
               <GeocoderPanel
