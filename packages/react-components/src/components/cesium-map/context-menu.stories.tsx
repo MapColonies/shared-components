@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Story, Meta } from '@storybook/react';
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import { Box } from '../box';
-import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
-import { CesiumSceneMode } from './map.types';
 import { ICesiumImageryLayer, IRasterLayer } from './layers-manager';
+import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
+import { CesiumCartesian2, CesiumSceneMode } from './proxied.types';
 import { IBaseMaps } from './settings/settings';
-import { CesiumCartesian2 } from './proxied.types';
 
 export default {
   title: 'Cesium Map',

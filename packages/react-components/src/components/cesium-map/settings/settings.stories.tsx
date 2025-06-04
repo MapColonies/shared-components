@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
-import { CesiumMap } from '../map';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumMap } from '../map';
+import { CesiumSceneMode } from '../proxied.types';
 
 export default {
   title: 'Cesium Map',

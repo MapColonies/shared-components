@@ -1,3 +1,4 @@
+//@ts-ignore
 import CONFIG from '../../../stories-data.json';
 
 export const getValue = (storyName: string, key: string): string => {

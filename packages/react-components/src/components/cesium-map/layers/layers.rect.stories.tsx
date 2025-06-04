@@ -3,10 +3,10 @@ import { Rectangle } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import bbox from '@turf/bbox';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
 import { IRasterLayer, LayerType } from '../layers-manager';
 import { IBaseMaps } from '../settings/settings';
 import { CesiumXYZLayer } from './xyz.layer';
+import { CesiumSceneMode } from '../proxied.types';
 
 export default {
   title: 'Cesium Map/Layers/LayersRect',

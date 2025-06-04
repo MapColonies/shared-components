@@ -19,7 +19,6 @@ import pMap from 'p-map';
 import { format as formatDateFns } from 'date-fns';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
-import { CesiumMath } from '../proxied.types';
 
 export interface ICesiumWFSLayerLabelTextField {
   name: string;
