@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BboxCorner, DrawType } from '../../models';
-import { CesiumSceneMode } from '../map.types';
 import { CesiumMap } from '../map';
-import { CesiumDrawingsDataSource, IDrawing, IDrawingEvent, CesiumColor } from './drawings.data-source';
+import { CesiumColor, CesiumSceneMode } from '../proxied.types';
+import { CesiumDrawingsDataSource, IDrawing, IDrawingEvent } from './drawings.data-source';
 
 export default {
   title: 'Cesium Map/Entity/Drawing',

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Cartesian3, Color, Rectangle, PolygonHierarchy } from 'cesium';
+import { Cartesian3, Color as CesiumColor, Rectangle, PolygonHierarchy } from 'cesium';
 import { FeatureCollection, GeoJSON } from 'geojson';
 import { DrawType } from '../../models';
 import { CesiumEntity } from '../entities/entity';
@@ -13,8 +13,6 @@ import { geoJSONToPrimitive } from '../tools/geojson/geojson-to-primitive';
 import { rectangleToGeoJSON, polygonToGeoJSON } from '../tools/geojson';
 import { rectangleToPositions } from '../tools/cesium/primitives-conversions.cesium';
 import { CesiumCustomDataSource, RCesiumCustomDataSourceProps } from './custom.data-source';
-
-export class CesiumColor extends Color {}
 
 export type PrimitiveCoordinates = Cartesian3[] | Rectangle | undefined;
 

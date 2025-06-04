@@ -1,8 +1,6 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumMapProps } from './map';
-import { CesiumSceneMode } from './map.types';
-import { Proj } from '.';
+import { CesiumSceneMode, Proj } from '.';
 
 export default {
   title: 'Cesium Map',

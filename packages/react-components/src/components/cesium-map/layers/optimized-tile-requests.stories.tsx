@@ -1,9 +1,9 @@
+import { Rectangle } from 'cesium';
 import React, { ReactNode, useEffect, useState } from 'react';
 import bbox from '@turf/bbox';
 import { Story, Meta } from '@storybook/react';
-import { Rectangle } from 'cesium';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
+import { CesiumSceneMode } from '../proxied.types';
 import { IBaseMaps } from '../settings/settings';
 import { CesiumXYZLayer } from './xyz.layer';
 

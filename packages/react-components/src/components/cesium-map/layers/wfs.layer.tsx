@@ -21,6 +21,7 @@ import {
   PositionProperty,
   VerticalOrigin,
   BillboardGraphics,
+  Math as CesiumMath,
 } from 'cesium';
 import { BBox, Feature, Point, Polygon } from 'geojson';
 import { get } from 'lodash';
@@ -35,7 +36,6 @@ import * as turf from '@turf/helpers';
 import { Properties } from '@turf/helpers';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap } from '../map';
-import { CesiumMath } from '../proxied.types';
 
 export interface ICesiumWFSLayerLabelTextField {
   name: string;
