@@ -1,11 +1,11 @@
+import { get } from 'lodash';
 import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
-import { get } from 'lodash';
 import { Box } from '../../box';
 import { IRasterLayer, IVectorLayer } from '../layers-manager';
-import { CesiumSceneModeEnum } from '../map.types';
-import { CesiumSceneModes } from './scene-modes';
+import { CesiumSceneMode } from '../proxied.types';
 import { CesiumBaseMaps } from './base-maps';
+import { CesiumSceneModes } from './scene-modes';
 
 import './settings.css';
 
@@ -24,7 +24,7 @@ export interface IBaseMaps {
 }
 
 export interface RCesiumMapProps {
-  sceneModes: CesiumSceneModeEnum[];
+  sceneModes: typeof CesiumSceneMode[];
   baseMaps?: IBaseMaps;
   locale?: { [key: string]: string };
 }

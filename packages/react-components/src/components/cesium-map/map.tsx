@@ -25,21 +25,21 @@ import {
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
 import { LinearProgress } from '@map-colonies/react-core';
-import { getAltitude, toDegrees } from '../utils/map';
 import { Box } from '../box';
+import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
+import { DebugPanel } from './debug/debug-panel';
+import { WFS } from './debug/wfs';
+import LayerManager, { LegendExtractor } from './layers-manager';
+import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
+import { CesiumSceneMode } from './proxied.types';
+import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
+import CesiumCompassTool from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
-import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
 import { ZoomButtons } from './zoom/zoomButtons';
-import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
-import LayerManager, { LegendExtractor } from './layers-manager';
-import { CesiumSceneMode, CesiumSceneModeEnum } from './map.types';
-import CesiumCompassTool from './tools/cesium-compass.tool';
-import { DebugPanel } from './debug/debug-panel';
-import { WFS } from './debug/wfs';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
@@ -124,7 +124,7 @@ export interface CesiumMapProps extends ViewerProps {
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
-  sceneModes?: CesiumSceneModeEnum[];
+  sceneModes?: typeof CesiumSceneMode[];
   baseMaps?: IBaseMaps;
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
@@ -163,7 +163,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<CesiumSceneModeEnum[] | undefined>();
+  const [sceneModes, setSceneModes] = useState<typeof CesiumSceneMode[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
@@ -266,7 +266,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.useOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
-    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]);
+    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as typeof CesiumSceneMode[]);
   }, [props.sceneModes]);
 
   useEffect(() => {
@@ -458,7 +458,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 {debugPanel.wfs && <WFS locale={locale} />}
               </DebugPanel>
             }
-            <CesiumSettings sceneModes={sceneModes as CesiumSceneModeEnum[]} baseMaps={baseMaps} locale={locale} />
+            <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">

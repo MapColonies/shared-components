@@ -10,10 +10,10 @@ import {
   WebMercatorTilingScheme,
 } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
-import { CesiumMap, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../map.types';
 import { Cesium3DTileset } from '../layers';
 import { LayerType } from '../layers-manager';
+import { CesiumMap, useCesiumMap } from '../map';
+import { CesiumSceneMode } from '../proxied.types';
 import { InspectorTool } from '../tools/inspector.tool';
 import QuantizedMeshTerrainProvider from './custom/quantized-mesh-terrain-provider';
 
