@@ -7,7 +7,7 @@ interface ActiveLayersMixinOptions {
 }
 
 export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMixinOptions) {
-  const DEFAULT_OPTIONS = { containerSelector: '.cesium-viewer-toolbar', viewerSelector: 'cesium-viewer' };
+  const DEFAULT_OPTIONS = { containerSelector: '.cesium-widget' };
   options = { ...DEFAULT_OPTIONS, ...options };
 
   class ActiveLayers {
@@ -35,17 +35,19 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
       this.contentDiv.className = 'cesium-cesiumInspector-dropDown';
       this.contentDiv.style.display = 'none';
 
-      const tool = document.createElement('div');
-      tool.className = 'cesium-cesiumInspector cesium-3DTilesInspector cesium-cesiumInspector-visible';
-      tool.appendChild(buttonContainer);
-      tool.appendChild(this.contentDiv);
+      const inspector = document.createElement('div');
+      inspector.className = 'cesium-cesiumInspector cesium-mcMixin-cesiumInspector cesium-cesiumInspector-visible';
+      inspector.appendChild(buttonContainer);
+      inspector.appendChild(this.contentDiv);
 
       const container = document.createElement('div');
-      container.className = 'cesium-viewer-cesium3DTilesInspectorContainer';
-      container.appendChild(tool);
+      container.className = 'cesium-mcMixin-cesiumInspectorContainer';
+      container.appendChild(inspector);
 
-      const viewer = document.querySelector(this.options.viewerSelector);
-      viewer?.insertAdjacentElement('afterend', container);
+      const widget = document.querySelector(this.options.containerSelector);
+      if (widget) {
+        widget.appendChild(container);
+      }
 
       this.populateContent();
     }

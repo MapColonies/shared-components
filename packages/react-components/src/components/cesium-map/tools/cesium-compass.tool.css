@@ -1,7 +1,6 @@
 .compass {
-  left: unset;
-  right: 0px;
   top: 20px;
+  right: 0px;
 }
 
 body[dir='rtl'] .compass {

@@ -112,15 +112,54 @@ span.cesium-sceneModePicker-wrapper {
   column-gap: 4px;
 }
 
-.cesium-viewer-cesium3DTilesInspectorContainer {
+.cesium-mcMixin-cesiumInspectorContainer {
   display: block;
   position: absolute;
-  top: 50px;
-  right: 10px;
+  top: 24px;
+  left: 10px;
   max-height: calc(100% - 120px);
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+body[dir='rtl'] .cesium-mcMixin-cesiumInspectorContainer {
+  left: unset;
+  right: 10px;
+}
+
+.cesium-mcMixin-cesiumInspector {
+  width: 300px;
+  pointer-events: all;
+}
+
+.cesium-mcMixin-cesiumInspector-statistics {
+  font-size: 11px;
+}
+
+.cesium-mcMixin-cesiumInspector-disabledElementsInfo {
+  margin: 5px 0 0 0;
+  padding: 0 0 0 20px;
+  color: #eed202;
+}
+
+.cesium-mcMixin-cesiumInspector div,
+.cesium-mcMixin-cesiumInspector input[type=range] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cesium-cesiumInspector-error {
+  color: #ff9e9e;
+  overflow: auto;
+}
+
+.cesium-mcMixin-cesiumInspector .cesium-cesiumInspector-section {
+  margin-top: 3px;
+}
+
+.cesium-mcMixin-cesiumInspector .cesium-cesiumInspector-sectionHeader + .cesium-cesiumInspector-show {
+  border-top: 1px solid white;
 }
 
 .cesium-cesiumInspector {
