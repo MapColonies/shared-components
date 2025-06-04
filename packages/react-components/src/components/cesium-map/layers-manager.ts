@@ -428,6 +428,14 @@ class LayerManager {
     };
   }
 
+  public addLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.layerUpdated.addEventListener(callback, this);
+  }
+
+  public removeLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.layerUpdated.removeEventListener(callback, this);
+  }
+
   public addDataLayerUpdatedListener(callback: (meta: any) => void): void {
     this.dataLayerUpdated.addEventListener(callback, this);
   }

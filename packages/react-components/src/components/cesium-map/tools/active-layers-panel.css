@@ -1,0 +1,34 @@
+.activeLayersContainer {
+  font-family: sans-serif;
+  text-align: left;
+  color: #edffff;
+}
+
+body[dir='rtl'] .activeLayersContainer {
+  text-align: right;
+}
+
+.activeLayersContainer .title {
+  font-size: 12pt;
+  margin: 12px 0;
+  width: 260px;
+}
+
+.activeLayersContainer .layer {
+  font-size: 12px;
+  margin-bottom: 12px;
+  direction: ltr;
+}
+
+body[dir='rtl'] .activeLayersContainer .layer {
+  direction: rtl;
+}
+
+.activeLayersContainer .name {
+  color: #AEF;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 260px;
+}

@@ -25,7 +25,7 @@ interface IWFSProps {
   locale?: { [key: string]: string };
 }
 
-export const WFS: React.FC<IWFSProps> = ({ locale, viewer }) => {
+export const WFS: React.FC<IWFSProps> = ({ viewer, locale }) => {
   const mapViewer = viewer ?? useCesiumMap();
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);

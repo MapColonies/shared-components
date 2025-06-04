@@ -1,5 +1,8 @@
+import React from 'react'; // <- Important: import React to use JSX syntax (in order to fix error: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.)
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
+import { createRoot } from 'react-dom/client';
+import { ActiveLayersPanel } from './active-layers-panel';
 
 interface ActiveLayersMixinOptions {
   locale?: { [key: string]: string };
@@ -54,7 +57,10 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
 
     populateContent() {
       if (this.contentDiv) {
-        this.contentDiv.innerHTML = `bla bla bla\n bla1 bla2\n bla3 bla4<br/>kuku muku kuku muku`;
+        const content = document.createElement('div');
+        const root = createRoot(content);
+        this.contentDiv.appendChild(content);
+        root.render(<ActiveLayersPanel viewer={this.viewer as any} locale={this.options.locale} />);
       }
     }
 
@@ -66,7 +72,7 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
           if (inspector.classList.contains('cesium-cesiumInspector-hidden')) {
             inspector.classList.remove('cesium-cesiumInspector-hidden');
             inspector.classList.add('cesium-cesiumInspector-visible');
-          } else {
+          } else if (inspector.classList.contains('cesium-cesiumInspector-visible')) {
             inspector.classList.remove('cesium-cesiumInspector-visible');
             inspector.classList.add('cesium-cesiumInspector-hidden');
           }

@@ -56,10 +56,10 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: DebugPanelMixinO
       if (this.contentDiv) {
         this.contentDiv.innerHTML = `<div class="cesium-mcMixin-sectionTitle">${get(this.options.locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool'}</div>`;
         if (this.options.debugPanel.wfs) {
-          const wfsContainer = document.createElement('div');
-          const root = createRoot(wfsContainer);
-          this.contentDiv.appendChild(wfsContainer);
-          root.render(<WFS locale={this.options.locale} viewer={this.viewer as any} />);
+          const content = document.createElement('div');
+          const root = createRoot(content);
+          this.contentDiv.appendChild(content);
+          root.render(<WFS viewer={this.viewer as any} locale={this.options.locale} />);
         }
       }
     }
