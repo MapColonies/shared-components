@@ -39,7 +39,7 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
       this.contentDiv.style.display = 'none';
 
       const inspector = document.createElement('div');
-      inspector.className = 'cesium-cesiumInspector cesium-cesiumInspector-hidden';
+      inspector.className = 'cesium-cesiumInspector';
       inspector.appendChild(buttonContainer);
       inspector.appendChild(this.contentDiv);
 
@@ -69,12 +69,10 @@ export function ActiveLayersMixin(viewer: Cesium.Viewer, options: ActiveLayersMi
         this.contentDiv.style.display = this.contentDiv.style.display === 'none' ? 'block' : 'none';
         const inspector = this.contentDiv.parentElement;
         if (inspector) {
-          if (inspector.classList.contains('cesium-cesiumInspector-hidden')) {
-            inspector.classList.remove('cesium-cesiumInspector-hidden');
+          if (this.contentDiv.style.display === 'block' && !inspector.classList.contains('cesium-cesiumInspector-visible')) {
             inspector.classList.add('cesium-cesiumInspector-visible');
-          } else if (inspector.classList.contains('cesium-cesiumInspector-visible')) {
+          } else if (this.contentDiv.style.display === 'none' && inspector.classList.contains('cesium-cesiumInspector-visible')) {
             inspector.classList.remove('cesium-cesiumInspector-visible');
-            inspector.classList.add('cesium-cesiumInspector-hidden');
           }
         }
       }
