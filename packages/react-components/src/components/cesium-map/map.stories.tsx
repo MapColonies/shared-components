@@ -146,6 +146,10 @@ LocalizedMap.argTypes = {
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
       ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
+      RASTER_SECTION: 'ראסטר',
+      '3D_SECTION': 'תלת-מימד',
+      DEM_SECTION: 'גבהים',
+      VECTOR_SECTION: 'וקטור',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
