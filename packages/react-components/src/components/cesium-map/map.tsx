@@ -474,15 +474,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                       params: {
                         dynamic: {
                           queryText: 'query',
-                          geoContext: 'geo_context'
+                          geoContext: {
+                            name: 'geo_context',
+                            relatedParams: [["geo_context_mode", 'filter']]
+                          }
                         },
-                        static: {
-                          "limit": 6,
-                          "disable_fuzziness": false,
-                          "geo_context_mode": "filter"
-                        }
-                      },
-                      title: ''
+                        static: [["limit", 6], ["disable_fuzziness", false]],
+                      }
                     },
                     {
                       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -491,13 +489,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                       params: {
                         dynamic: {
                           queryText: 'tile',
-                          geoContext: 'geo_context'
+                          geoContext: {
+                            name: 'geo_context',
+                            relatedParams: [['geo_context_mode', 'filter']],
+                          }
                         },
-                        static: {
-                          "geo_context_mode": "filter"
-                        }
+                        static: [["limit", 6], ["disable_fuzziness", false]],
                       },
-                      title: ''
                     },
                     {
                       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -506,13 +504,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                       params: {
                         dynamic: {
                           queryText: 'command_name',
-                          geoContext: 'geo_context'
+                          geoContext: {
+                            name: 'geo_context',
+                            relatedParams: [['geo_context_mode', 'filter']],
+                          }
                         },
-                        static: {
-                          "geo_context_mode": "filter"
-                        }
+                        static: [["limit", 6], ["disable_fuzziness", false]],
                       },
-                      title: ''
                     },
                     {
                       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -521,14 +519,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                       params: {
                         dynamic: {
                           queryText: 'command_name',
-                          geoContext: 'geo_context',
+                          geoContext: {
+                            name: 'geo_context',
+                            relatedParams: [['geo_context_mode', 'filter']],
+                          }
                         },
-                        static: {
-                          // "geo_context": { "bbox": [-180, -90, 180, 90] },
-                          "geo_context_mode": "filter"
-                        },
+                        // "geo_context": { "bbox": [-180, -90, 180, 90] },
                       },
-                      title: ''
                     },
                   ]
                 }
@@ -537,7 +534,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             }
             <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-          </Box>
+          </Box >
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}

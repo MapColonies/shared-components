@@ -30,17 +30,21 @@ type UrlGroup =
   | { baseUrl: string; endPoint: string; url?: string }
   | { baseUrl?: string; endPoint?: string; url: string }
 
+type relatedParamsType = {
+  name: string,
+  relatedParams: [string, any][]
+}
+
 export type CesiumGeocodingPropsPayload = UrlGroup & {
   method: Method,
   headers?: Record<string, string>,
   params: {
     dynamic: {
-      queryText: string,
-      geoContext?: string
+      queryText: string | relatedParamsType,
+      geoContext?: string | relatedParamsType,
     },
-    static: Record<string, unknown>
+    static?: [string, any][],
   },
-  title: string
 }
 
 export type GeocoderPanelProps = {
@@ -202,14 +206,27 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
 
   const buildUrlParams = (url: string, params: CesiumGeocodingPropsPayload['params'], text: string, isInMapExtent: boolean) => {
     const dynamicParams = () => {
-      url = addParamToUrl(url, params.dynamic.queryText, text);
+      const queryText = params.dynamic.queryText;
+      const queryTextName = typeof queryText === 'string' ? queryText : queryText.name;
+      const queryTextAdditionalParams = typeof queryText === 'string' ? undefined : queryText.relatedParams;
+
+      url = addParamToUrl(url, queryTextName, text);
+
+      if (queryTextAdditionalParams) {
+        queryTextAdditionalParams.forEach((tuple) => {
+          url = addParamToUrl(url, tuple[0], tuple[1]);
+        })
+      }
 
       if (isInMapExtent) {
         const rectangle = getAccurateViewRectangle(mapViewer);
 
         // const rectangle = computeLimitedViewRectangle(mapViewer);
 
-        if (rectangle && params?.dynamic?.geoContext) {
+        const geoContext = params.dynamic.geoContext;
+        const geoContextName = typeof geoContext === 'string' ? geoContext : geoContext?.name;
+
+        if (rectangle && geoContextName) {
           const rectangle2bboxVal = rectangle2bbox(rectangle);
           const bbox = {
             bbox: [
@@ -220,21 +237,23 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
             ]
           };
 
-          url = addParamToUrl(url, params.dynamic.geoContext, bbox);
+          url = addParamToUrl(url, geoContextName, bbox);
+
+          const geoContextAdditionalParams = typeof geoContext === 'string' ? undefined : geoContext?.relatedParams;
+
+          if (geoContextAdditionalParams) {
+            geoContextAdditionalParams.forEach((tuple) => {
+              url = addParamToUrl(url, tuple[0], tuple[1]);
+            })
+          }
         }
       }
     }
 
     const staticParams = () => {
-      for (const [key, value] of Object.entries(params.static)) {
-        if (key === 'geo_context_mode' &&
-          (!isInMapExtent || params.dynamic.geoContext === undefined || !url.includes(params.dynamic.geoContext))) {
-          continue;
-        }
-        url = addParamToUrl(url, key, value);
-      }
-
-      return url;
+      params.static?.forEach((tuple) => {
+        url = addParamToUrl(url, tuple[0], tuple[1]);
+      })
     }
 
     url += '?';
