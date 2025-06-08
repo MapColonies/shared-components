@@ -15,7 +15,7 @@ export const BASE_MAPS: IBaseMaps = {
         //   opacity: 1,
         //   zIndex: 0,
         //   options: {
-        //     url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        //     url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
         //     layers: '',
         //     credit: 'GOOGLE',
         //   },
