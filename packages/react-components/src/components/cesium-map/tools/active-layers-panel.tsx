@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { ICesiumImageryLayer } from '../layers-manager';
@@ -9,24 +9,54 @@ import './active-layers-panel.css';
 
 interface ISection {
   id: string;
-  labelKey: string;
-  content: JSX.Element | string;
+  content: string[];
 }
 
 interface IActiveLayersPanelProps {
   viewer?: CesiumViewer;
   locale?: { [key: string]: string };
-  sections: ISection[];
 }
 
-export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ viewer, locale, sections }) => {
+export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ viewer, locale }) => {
   const mapViewer = viewer ?? useCesiumMap();
   const [active, setActive] = useState<ICesiumImageryLayer[]>([]);
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>(
-    sections.reduce((acc, section) => ({ ...acc, [section.id]: true }), {})
-  );
+  const [sections, setSections] = useState<ISection[]>([]);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
-  const getLabel = (key: string) => useMemo(() => get(locale, key) ?? key, [locale]);
+  const getLabel = (key: string) => {
+    return get(locale, `${key.toUpperCase()}_SECTION`) ?? key;
+  };
+
+  useEffect(() => {
+    const updateSections = () => {
+      const newSections = [
+        {
+          id: 'Raster',
+          content: [
+            'Bla bla bla',
+            'Kuku',
+            'Muku'
+          ],
+        },
+        {
+          id: '3D',
+          content: [],
+        },
+        {
+          id: 'DEM',
+          content: [],
+        },
+        {
+          id: 'Vector',
+          content: [],
+        },
+      ];
+      setSections(newSections);
+      setCollapsedSections(newSections.reduce((acc, section) => ({ ...acc, [section.id]: true }), {}));
+    };
+
+    updateSections();
+  }, []);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -76,10 +106,12 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ viewer, l
             onClick={() => toggleSection(section.id)}
           >
             <Typography tag="h3" className="cesium-cesiumInspector-sectionHeader">
-              {getLabel(section.labelKey)}
+              {getLabel(section.id)}
             </Typography>
             <Box className="cesium-cesiumInspector-sectionContent">
-              {section.content}
+              {
+                section.content.map((item: string) => <Box key={item}>{item}</Box>)
+              }
             </Box>
           </Box>
         ))
