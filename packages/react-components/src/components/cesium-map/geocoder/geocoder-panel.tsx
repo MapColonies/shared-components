@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useCesiumMap } from '../map';
 import {
   Cartesian2,
@@ -13,7 +13,7 @@ import {
 
 } from 'cesium';
 import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
-import { computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
+import { applyFactor, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { debounce, get } from 'lodash';
 import bbox from '@turf/bbox';
 import { getType } from '@turf/invariant';
@@ -36,6 +36,8 @@ type relatedParamsType = {
 }
 
 export type CesiumGeocodingPropsPayload = UrlGroup & {
+  title?: string,
+  geometryIconClassName?: string,
   method: Method,
   headers?: Record<string, string>,
   params: {
@@ -54,7 +56,8 @@ export type GeocoderPanelProps = {
 
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale }) => {
   const mapViewer = useCesiumMap();
-  const dataSourceRef = useRef<GeoJsonDataSource | null>(null);
+  const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
@@ -74,7 +77,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
     return true;
   }, [mapViewer.scene.mode]);
 
-  const DEFAULT_DEBOUNCE = 400;
+  const DEFAULT_DEBOUNCE = 300;
 
   const UncheckedIcon = (
     <svg width="16" height="16" viewBox="0 0 16 16">
@@ -133,6 +136,12 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
   }, [configs]);
 
   useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen])
+
+  useEffect(() => {
     if (!mapViewer) return;
 
     if (!dataSourceRef.current) {
@@ -156,8 +165,10 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
       };
 
       drawFeature();
+    } else {
+      dataSource.entities.removeAll();
     }
-  }, [showFeatureOnMap, featureToShow])
+  }, [mapViewer, showFeatureOnMap, featureToShow])
 
   const addParamToUrl = (url: string, key: string, value: unknown): string => {
     const stringValue = valueToString(value);
@@ -219,9 +230,9 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
       }
 
       if (isInMapExtent) {
-        const rectangle = getAccurateViewRectangle(mapViewer);
+        // const rectangle = getAccurateViewRectangle(mapViewer);
 
-        // const rectangle = computeLimitedViewRectangle(mapViewer);
+        const rectangle = computeLimitedViewRectangle(mapViewer);
 
         const geoContext = params.dynamic.geoContext;
         const geoContextName = typeof geoContext === 'string' ? geoContext : geoContext?.name;
@@ -334,22 +345,28 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
     fetchData(searchValue, isInMapExtent);
   }, [isInMapExtent])
 
-  const getIconByFeatureType = (geometry: any) => {
+  const getIconByFeatureType = (geometry: any, className?: string) => {
     const geometryType = getType(geometry);
     let typedIcon;
 
     switch (geometryType) {
-      case 'Polygon':
-        typedIcon = '🟪';
-        break;
       case 'Point':
-        typedIcon = '🟢';
+        typedIcon =
+          <svg className={`geometrysSvgIcons ${className}`} width="50px" height="20px" viewBox="0 0 24 24">
+            <path d="M5 14.2864C3.14864 15.1031 2 16.2412 2 17.5C2 19.9853 6.47715 22 12 22C17.5228 22 22 19.9853 22 17.5C22 16.2412 20.8514 15.1031 19 14.2864M18 8C18 12.0637 13.5 14 12 17C10.5 14 6 12.0637 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8ZM13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8Z" />
+          </svg>;
         break;
       case 'LineString':
-        typedIcon = '📏';
+        typedIcon =
+          <svg className={`geometrysSvgIcons ${className}`} width="50px" height="25px" viewBox="0 0 24 24">
+            <path d="M3 16.5L9 10L13 16L21 6.5" />
+          </svg>;
         break;
       default:
-        typedIcon = '❓';
+        typedIcon =
+          <svg className={`geometrysSvgIcons ${className}`} width="50px" height="20px" viewBox="0 0 24 24">
+            <path d="M20.9485 11.0195C21.2909 11.6283 21.2909 12.3717 20.9485 12.9805L17.5735 18.9805C17.2192 19.6103 16.5529 20 15.8303 20H8.16969C7.44715 20 6.78078 19.6103 6.42654 18.9805L3.05154 12.9805C2.70908 12.3717 2.70908 11.6283 3.05154 11.0195L6.42654 5.01948C6.78078 4.38972 7.44715 4 8.16969 4H15.8303C16.5529 4 17.2192 4.38972 17.5735 5.01948L20.9485 11.0195Z" />
+          </svg>;
         break;
     }
 
@@ -364,9 +381,10 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
 
   return (
     <Box className='geocoderContainer'>
-      <IconButton className='iconButtonSearch' icon={SearchIcon} onClick={() => setIsOpen(!isOpen)} />
+      <IconButton className='iconButtonSearch' icon={SearchIcon} onClick={() => setIsOpen(prev => !prev)} />
       {isOpen && (
         <TextField
+          ref={inputRef}
           outlined
           onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
           placeholder={searchPlaceholder}
@@ -390,7 +408,13 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
             />
 
             <Checkbox
-              label={inMapExtentLabel}
+              label={
+                <Typography
+                  tag='span'
+                  className={isNotIn2DMode ? 'disabledInMapExtent' : ''}>
+                  {inMapExtentLabel}
+                </Typography>
+              }
               checked={isInMapExtent}
               icon={UncheckedIcon}
               checkedIcon={CheckedIcon}
@@ -404,56 +428,52 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
           {configs.map((config, index) => (
             <List>
               <Typography tag="span">
-                {config.endPoint}
+                {config.title ?? config.endPoint}
               </Typography>
               <Box className='resultsContainer'>
                 {(() => {
                   const features = responses?.[index]?.resultObj?.features;
-                  const featuresLength = responses?.[index]?.resultObj?.features?.length;
-                  const message = responses?.[index]?.resultObj?.message;
+                  const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
+                  const message: string = responses?.[index]?.resultObj?.message;
 
                   if (featuresLength) {
                     return features.map((feature: any, i: number) => (
-                      <ListItem key={`feature-${i}`} onClick={() => {
+                      <ListItem key={`feature-${i}`} className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''} onClick={() => {
                         mapViewer.camera.flyTo({
-                          destination: CesiumRectangle.fromDegrees(...bbox(feature.geometry))
+                          destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry)))
                         });
 
                         setFeatureToShow(feature);
                       }}>
                         <Box className='itemResult'>
-                          <>
-                            <Tooltip content={feature?.properties?.names?.display}>
-                              <Box>
-                                {feature?.properties?.names?.default?.[0]}
-                              </Box>
-                            </Tooltip>
-                            {getIconByFeatureType(feature)}
-                          </>
+                          <Tooltip content={feature?.properties?.names?.display}>
+                            <Box>
+                              {feature?.properties?.names?.default?.[0]}
+                            </Box>
+                          </Tooltip>
+                          {getIconByFeatureType(feature, config.geometryIconClassName)}
                         </Box>
                       </ListItem>
                     ));
                   } else if (featuresLength === 0) {
                     return (
-                      <ListItemSecondaryText className='itemResult'>
+                      <Box className='itemResult'>
                         {noResults}
-                      </ListItemSecondaryText>
+                      </Box>
                     );
                   } else if (message) {
-                    return <Tooltip content={
-                      <ListItemSecondaryText className='itemResult'>
-                        {message}
-                      </ListItemSecondaryText>
-                    }>
-                      <ListItemSecondaryText className='itemResult'>
-                        {message}
-                      </ListItemSecondaryText>
-                    </Tooltip>
+                    return (
+                      <Tooltip content={message}>
+                        <Box className='itemResult'>
+                          {message}
+                        </Box>
+                      </Tooltip>
+                    );
                   } else {
                     return (
-                      <ListItemSecondaryText className='itemResult'>
+                      <Box className='itemResult'>
                         {noResults}
-                      </ListItemSecondaryText>
+                      </Box>
                     );
                   }
                 })()}

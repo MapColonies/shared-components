@@ -44,7 +44,7 @@ import { ZoomButtons } from './zoom/zoomButtons';
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
 import '@map-colonies/react-core/dist/checkbox/styles';
-import { GeocoderPanel } from './geocoder/geocoder-panel';
+import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> { }
 
@@ -116,6 +116,10 @@ export interface IDebugPanel {
   wfs?: Record<string, unknown>;
 }
 
+export interface IGeocoderPanel {
+  options?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -140,7 +144,7 @@ export interface CesiumMapProps extends ViewerProps {
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
   debugPanel?: IDebugPanel;
-  geocoderPanel?: boolean;
+  geocoderPanel?: GeocoderPanelProps['configs'];
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -466,71 +470,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               <GeocoderPanel
                 locale={locale}
                 configs={
-                  [
-                    {
-                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
-                      endPoint: '/search/location/query',
-                      method: 'GET',
-                      params: {
-                        dynamic: {
-                          queryText: 'query',
-                          geoContext: {
-                            name: 'geo_context',
-                            relatedParams: [["geo_context_mode", 'filter']]
-                          }
-                        },
-                        static: [["limit", 6], ["disable_fuzziness", false]],
-                      }
-                    },
-                    {
-                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
-                      endPoint: '/search/control/tiles',
-                      method: 'GET',
-                      params: {
-                        dynamic: {
-                          queryText: 'tile',
-                          geoContext: {
-                            name: 'geo_context',
-                            relatedParams: [['geo_context_mode', 'filter']],
-                          }
-                        },
-                        static: [["limit", 6], ["disable_fuzziness", false]],
-                      },
-                    },
-                    {
-                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
-                      endPoint: '/search/control/items',
-                      method: 'GET',
-                      params: {
-                        dynamic: {
-                          queryText: 'command_name',
-                          geoContext: {
-                            name: 'geo_context',
-                            relatedParams: [['geo_context_mode', 'filter']],
-                          }
-                        },
-                        static: [["limit", 6], ["disable_fuzziness", false]],
-                      },
-                    },
-                    {
-                      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
-                      endPoint: '/search/control/routes',
-                      method: 'GET',
-                      params: {
-                        dynamic: {
-                          queryText: 'command_name',
-                          geoContext: {
-                            name: 'geo_context',
-                            relatedParams: [['geo_context_mode', 'filter']],
-                          }
-                        },
-                        // "geo_context": { "bbox": [-180, -90, 180, 90] },
-                      },
-                    },
-                  ]
+                  [...props.geocoderPanel]
                 }
-              >
-              </GeocoderPanel>
+              />
             }
             <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />

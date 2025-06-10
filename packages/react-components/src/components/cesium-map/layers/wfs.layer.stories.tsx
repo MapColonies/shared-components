@@ -1,6 +1,5 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap, CesiumViewer } from '../map';
-import { LayerType } from '../layers-manager';
 import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
 import { Cesium3DTileset } from './3d.tileset';
 import { BBox } from 'geojson';
@@ -32,6 +31,7 @@ import {
   CesiumEllipsoid,
 } from '../proxied.types';
 import { getValue } from '../../utils/config';
+import { BASE_MAPS } from '../map.stories';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -45,31 +45,6 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
-};
-
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
 };
 
 const DEBUG_PANEL = {
@@ -155,9 +130,6 @@ MapWithWFSLayer.argTypes = {
   },
   debugPanel: {
     defaultValue: DEBUG_PANEL,
-  },
-  geocoderPanel: {
-    defaultValue: true,
   },
 };
 

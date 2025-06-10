@@ -33,7 +33,7 @@ import * as turf from '@turf/helpers';
 import intersect from '@turf/intersect';
 import centroid from '@turf/centroid';
 import { ICesiumWFSLayerLabelingOptions } from '../layers';
-import { CesiumMath } from '../proxied.types';
+import { CesiumMath, CesiumRectangle } from '../proxied.types';
 
 const canvasElem = document.createElement('canvas');
 const canvasCtx = canvasElem.getContext('2d');
@@ -306,6 +306,40 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   );
 };
 
+export const createRectangleAround = (
+  centerCartographic: { longitude: number; latitude: number },
+  widthMeters: number,
+  heightMeters: number,
+): Polygon => {
+  const ellipsoid = Ellipsoid.WGS84;
+  const lat = centerCartographic.latitude;
+  const lon = centerCartographic.longitude;
+
+  const metersPerDegreeLat = (Math.PI / 180) * ellipsoid.maximumRadius;
+  const metersPerDegreeLon = (Math.PI / 180) * ellipsoid.maximumRadius; /** Math.cos(lat)*/
+
+  const dLat = heightMeters / 2 / metersPerDegreeLat;
+  const dLon = widthMeters / 2 / metersPerDegreeLon;
+
+  const north = lat + dLat;
+  const south = lat - dLat;
+  const east = lon + dLon;
+  const west = lon - dLon;
+
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [west, north],
+        [east, north],
+        [east, south],
+        [west, south],
+        [west, north], // close the ring
+      ],
+    ],
+  };
+};
+
 export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], color: string, extent?: BBox, labeling?: ICesiumWFSLayerLabelingOptions): void => {
   const is2D = viewer.scene.mode === SceneMode.SCENE2D;
 
@@ -356,40 +390,6 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
     const heightMeters = Cartesian3.distance(position, worldBottom);
 
     return { widthMeters, heightMeters };
-  };
-
-  const createRectangleAround = (
-    centerCartographic: { longitude: number; latitude: number },
-    widthMeters: number,
-    heightMeters: number,
-  ): Polygon => {
-    const ellipsoid = Ellipsoid.WGS84;
-    const lat = centerCartographic.latitude;
-    const lon = centerCartographic.longitude;
-
-    const metersPerDegreeLat = (Math.PI / 180) * ellipsoid.maximumRadius;
-    const metersPerDegreeLon = (Math.PI / 180) * ellipsoid.maximumRadius; /** Math.cos(lat)*/
-
-    const dLat = heightMeters / 2 / metersPerDegreeLat;
-    const dLon = widthMeters / 2 / metersPerDegreeLon;
-
-    const north = lat + dLat;
-    const south = lat - dLat;
-    const east = lon + dLon;
-    const west = lon - dLon;
-
-    return {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [west, north],
-          [east, north],
-          [east, south],
-          [west, south],
-          [west, north], // close the ring
-        ],
-      ],
-    };
   };
 
   const calcIntersectionRation = (polygon1: turf.Geometry, polygon2: turf.Geometry) => {
@@ -506,3 +506,22 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
       });
   }
 };
+
+const DEFAULT_RECTANGLE_FACTOR = 0.2;
+
+export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FACTOR): CesiumRectangle => {
+  if (rect.width === 0) {
+    rect.east = rect.east +   0.0001 * factor;
+    rect.west = rect.west - 0.0001 * factor;
+    rect.south = rect.south - 0.0001 * factor;
+    rect.north = rect.north + 0.0001 * factor;
+
+    return rect;
+  }
+  rect.east = rect.east + rect.width * factor;
+  rect.west = rect.west - rect.width * factor;
+  rect.south = rect.south - rect.height * factor;
+  rect.north = rect.north + rect.height * factor;
+
+  return rect;
+}
