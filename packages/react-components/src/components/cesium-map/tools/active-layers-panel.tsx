@@ -105,6 +105,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ viewer, l
             className={`cesium-cesiumInspector-section ${collapsedSections[section.id] ? 'cesium-cesiumInspector-section-collapsed' : ''}`}
             onClick={() => toggleSection(section.id)}
           >
+          <Box
+            key={section.id}
+            className={`cesium-cesiumInspector-section ${collapsedSections[section.id] ? 'cesium-cesiumInspector-section-collapsed' : ''}`}
+            onClick={() => toggleSection(section.id)}
+          >
             <Typography tag="h3" className="cesium-cesiumInspector-sectionHeader">
               {getLabel(section.id)}
             </Typography>
