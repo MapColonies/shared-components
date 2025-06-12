@@ -14,7 +14,7 @@ body[dir='rtl'] .cesium-viewer-fullscreenContainer {
 }
 
 body[dir='rtl'] .cesium-viewer-toolbar {
-  left: 5px;
+  left: 4px;
   right: unset;
 }
 
@@ -60,4 +60,56 @@ body[dir='rtl'] .sideToolsContainer {
 
 .viewer .mdc-linear-progress__bar-inner {
   border-top-width: 10px;
+}
+
+/* #region FOR NATIVE CONTROLS -- START */
+#cesiumTheme input[type="checkbox"] {
+  accent-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+/* #endregion FOR NATIVE CONTROLS -- END */
+
+/* #region FOR MDC-CHECKBOX -- START*/
+#cesiumTheme .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control[data-indeterminate=true]:enabled~.mdc-checkbox__background {
+  border-color: var(--mdc-theme-cesium-checkbox-color);
+  background-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+#cesiumTheme .mdc-checkbox--upgraded {
+  --mdc-checkbox-checked-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+#cesiumTheme .mdc-checkbox {
+  /* transform: scale(0.7); */
+  width: 12px;
+  height: 12px;
+}
+
+#cesiumTheme .mdc-checkbox__background {
+  width: 12px;
+  height: 12px;
+}
+
+/* #endregion FOR MDC-CHECKBOX -- END*/
+
+#cesiumTheme .mdc-ripple-upgraded--unbounded {
+  --mdc-ripple-fg-size: 0px !important;
+}
+
+#cesiumTheme .mdc-list {
+  font-size: 11pt;
+  padding: 1px;
+  color: unset;
+}
+
+#cesiumTheme .mdc-text-field__input {
+  box-sizing: border-box;
+  height: 32px;
+  border: unset;
+}
+
+#cesiumTheme .mdc-form-field {
+  color: unset;
 }
