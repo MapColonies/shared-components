@@ -12,7 +12,7 @@ import {
   Viewer,
 
 } from 'cesium';
-import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
+import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip, ThemeProvider } from '@map-colonies/react-core';
 import { applyFactor, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { debounce, get } from 'lodash';
 import bbox from '@turf/bbox';
@@ -58,14 +58,15 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const geocoderPanelRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(false);
   const [responses, setSearchResults] = useState<{ resultObj: any; url: string; }[]>();
   const [featureToShow, setFeatureToShow] = useState();
-  const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show feature on map', [locale]);
-  const inMapExtentLabel = useMemo(() => get(locale, 'IN_MAP_EXTENT') ?? 'Search in map extent', [locale]);
+  const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show on map', [locale]);
+  const inMapExtentLabel = useMemo(() => get(locale, 'IN_MAP_EXTENT') ?? 'Search in extent', [locale]);
   const searchPlaceholder = useMemo(() => get(locale, 'SEARCH_PLACEHOLDER') ?? 'Search...', [locale]);
   const noResults = useMemo(() => get(locale, 'NO_RESULTS') ?? 'No Results', [locale]);
   const isNotIn2DMode = useMemo(() => {
@@ -126,6 +127,22 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
     </svg>
   );
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      const target = event.target;
+      const geocoderDlgRef = get(geocoderPanelRef, 'current');
+      if (geocoderDlgRef && !geocoderDlgRef.contains(target as Node)) {
+        document.removeEventListener('click', handleClickOutside, false);
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside, false);
+
+    return (): void => {
+      document.removeEventListener('click', handleClickOutside, false);
+    };
+  });
 
   useEffect(() => {
     configs.forEach((config: CesiumGeocodingPropsPayload) => {
@@ -371,117 +388,118 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
     }
 
     return (
-      <Tooltip content={geometryType}>
-        <Box>
-          {typedIcon}
-        </Box>
-      </Tooltip>
+      <Box>
+        {typedIcon}
+      </Box>
     )
   }
 
   return (
-    <Box className='geocoderContainer'>
-      <IconButton className='iconButtonSearch' icon={SearchIcon} onClick={() => setIsOpen(prev => !prev)} />
-      {isOpen && (
-        <TextField
-          ref={inputRef}
-          outlined
-          onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
-          placeholder={searchPlaceholder}
-          value={searchValue}
-        />
-      )}
+    <ThemeProvider options={{ primary: '#007bff' }}>
+      <div ref={geocoderPanelRef} className='geocoderContainer'>
+        <IconButton className='cesium-geocoder-searchButton' icon={SearchIcon} onClick={() => setIsOpen(prev => !prev)} />
 
-      {isOpen && (
-        <Box
-          className='geocoderForm'
-        >
-          <Box className='geocoderCheckboxContainer'>
-            <Checkbox
-              label={showFeatureOnMapLabel}
-              icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
-              checked={showFeatureOnMap}
-              onClick={() => {
-                setShowFeatureOnMap(!showFeatureOnMap);
-              }}
+        {isOpen && (
+          <Box className='geocoderForm'>
+            <TextField
+              className='cesium-geocoder-input'
+              ref={inputRef}
+              outlined
+              onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
+              placeholder={searchPlaceholder}
+              value={searchValue}
             />
+            <Box
+              className='search-results'
+            >
+              <Box>
+                <Checkbox
+                  label={showFeatureOnMapLabel}
+                  icon={UncheckedIcon}
+                  checkedIcon={CheckedIcon}
+                  checked={showFeatureOnMap}
+                  onClick={() => {
+                    setShowFeatureOnMap(!showFeatureOnMap);
+                  }}
+                />
 
-            <Checkbox
-              label={
-                <Typography
-                  tag='span'
-                  className={isNotIn2DMode ? 'disabledInMapExtent' : ''}>
-                  {inMapExtentLabel}
-                </Typography>
-              }
-              checked={isInMapExtent}
-              icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
-              disabled={isNotIn2DMode}
-              onClick={() => {
-                setIsInMapExtent(!isInMapExtent);
-              }}
-            />
-          </Box>
-
-          {configs.map((config, index) => (
-            <List>
-              <Typography tag="span">
-                {config.title ?? config.endPoint}
-              </Typography>
-              <Box className='resultsContainer'>
-                {(() => {
-                  const features = responses?.[index]?.resultObj?.features;
-                  const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
-                  const message: string = responses?.[index]?.resultObj?.message;
-
-                  if (featuresLength) {
-                    return features.map((feature: any, i: number) => (
-                      <ListItem key={`feature-${i}`} className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''} onClick={() => {
-                        mapViewer.camera.flyTo({
-                          destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry)))
-                        });
-
-                        setFeatureToShow(feature);
-                      }}>
-                        <Box className='itemResult'>
-                          <Tooltip content={feature?.properties?.names?.display}>
-                            <Box>
-                              {feature?.properties?.names?.default?.[0]}
-                            </Box>
-                          </Tooltip>
-                          {getIconByFeatureType(feature, config.geometryIconClassName)}
-                        </Box>
-                      </ListItem>
-                    ));
-                  } else if (featuresLength === 0) {
-                    return (
-                      <Box className='itemResult'>
-                        {noResults}
-                      </Box>
-                    );
-                  } else if (message) {
-                    return (
-                      <Tooltip content={message}>
-                        <Box className='itemResult'>
-                          {message}
-                        </Box>
-                      </Tooltip>
-                    );
-                  } else {
-                    return (
-                      <Box className='itemResult'>
-                        {noResults}
-                      </Box>
-                    );
+                <Checkbox
+                  label={
+                    <Typography
+                      tag='span'
+                      className={isNotIn2DMode ? 'disabledInMapExtent' : ''}>
+                      {inMapExtentLabel}
+                    </Typography>
                   }
-                })()}
+                  checked={isInMapExtent}
+                  icon={UncheckedIcon}
+                  checkedIcon={CheckedIcon}
+                  disabled={isNotIn2DMode}
+                  onClick={() => {
+                    setIsInMapExtent(!isInMapExtent);
+                  }}
+                />
               </Box>
-            </List>
-          ))}
-        </Box>
-      )}
-    </Box>
+
+              {configs.map((config, index) => (
+                <List>
+                  <Typography tag="span">
+                    {config.title ?? config.endPoint}
+                  </Typography>
+                  <Box className='resultsContainer'>
+                    {(() => {
+                      const features = responses?.[index]?.resultObj?.features;
+                      const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
+                      const message: string = responses?.[index]?.resultObj?.message;
+
+                      const noResultsJSX = (
+                        <ListItemSecondaryText className='itemResult noResults'>
+                          {noResults}
+                        </ListItemSecondaryText>
+                      )
+
+                      if (featuresLength) {
+                        return features.map((feature: any, i: number) => (
+                          <ListItem key={`feature-${i}`} className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''} onClick={() => {
+                            mapViewer.camera.flyTo({
+                              destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry)))
+                            });
+
+                            setFeatureToShow(feature);
+                          }}>
+                            <Box className='itemResult'>
+                              <Tooltip content={feature?.properties?.names?.display}>
+                                <Box>
+                                  {feature?.properties?.names?.default?.[0]}
+                                </Box>
+                              </Tooltip>
+                              {getIconByFeatureType(feature, config.geometryIconClassName)}
+                            </Box>
+                          </ListItem>
+                        ));
+                      } else if (featuresLength === 0) {
+                        return (
+                          noResultsJSX
+                        );
+                      } else if (message) {
+                        return (
+                          <ListItemSecondaryText className="query-service-error">
+                            {message}
+                          </ListItemSecondaryText>
+                        );
+                      } else {
+                        return (
+                          noResultsJSX
+                        );
+                      }
+                    })()}
+                  </Box>
+                </List>
+              ))}
+            </Box>
+          </Box>
+        )}
+      </div>
+    </ThemeProvider>
   );
 };
