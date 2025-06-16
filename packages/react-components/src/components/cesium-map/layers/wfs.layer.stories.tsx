@@ -32,6 +32,7 @@ import {
   CesiumEllipsoid,
 } from '../proxied.types';
 import { getValue } from '../../utils/config';
+import { useRef, useState } from 'react';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -120,16 +121,38 @@ MapWithPPWFSLayer.storyName = 'WFS PP layer';
 
 // #region STORY VECTOR component (NO VISUALIZER)
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
+  const show = useRef(false);
+
+  function MyWFSLayer() {
+    const [show, setShow] = useState(false);
+    return (
+      <>
+        <input
+          type="button"
+          onClick={() => {
+            setShow(!show);
+          }}
+          value={`SHOW WFS LAYER (${show})`}
+          style={{ zIndex: '2', position: 'absolute' }}
+        ></input>
+        {/* <input type='button' onClick={()=>{ show.current = !show.current;}} value={`SHOW WFS LAYER (${show.current})`} style={{zIndex: "2", position: "absolute"}}></input> */}
+        {show && (
+          <CesiumWFSLayer
+            key={metaBuildings.id}
+            options={optionsBuildings}
+            meta={metaBuildings}
+            // visualizationHandler={handleVisualizationBuildings}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
-        <CesiumWFSLayer
-          key={metaBuildings.id}
-          options={optionsBuildings}
-          meta={metaBuildings}
-          // visualizationHandler={handleVisualizationBuildings}
-        />
+      <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
+        <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+        <MyWFSLayer></MyWFSLayer>
         {/* <CesiumWFSLayer
           key={metaBuildings.id + '_2'}
           options={optionsBuildings}
