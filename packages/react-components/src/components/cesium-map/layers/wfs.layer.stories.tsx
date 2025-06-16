@@ -121,6 +121,49 @@ MapWithPPWFSLayer.storyName = 'WFS PP layer';
 
 // #region STORY VECTOR component (NO VISUALIZER)
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
+  return (
+    <div style={mapDivStyle}>
+      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
+        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+        <CesiumWFSLayer
+          key={metaBuildings.id}
+          options={optionsBuildings}
+          meta={metaBuildings}
+          // visualizationHandler={handleVisualizationBuildings}
+        />
+        {/* <CesiumWFSLayer
+          key={metaBuildings.id + '_2'}
+          options={optionsBuildings}
+          meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
+          visualizationHandler={handleVisualizationBuildings}
+        /> */}
+      </CesiumMap>
+    </div>
+  );
+};
+
+MapWithWFSLayer.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
+  zoom: {
+    defaultValue: 17,
+    control: {
+      type: 'range',
+      min: 0,
+      max: 20,
+    },
+  },
+  debugPanel: {
+    defaultValue: DEBUG_PANEL,
+  },
+};
+
+MapWithWFSLayer.storyName = 'WFS Vector layer';
+// #endregion
+
+// #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
+export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
   const show = useRef(false);
 
   function MyWFSLayer() {
@@ -153,18 +196,12 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
       <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
         <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
         <MyWFSLayer></MyWFSLayer>
-        {/* <CesiumWFSLayer
-          key={metaBuildings.id + '_2'}
-          options={optionsBuildings}
-          meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
-          visualizationHandler={handleVisualizationBuildings}
-        /> */}
       </CesiumMap>
     </div>
   );
 };
 
-MapWithWFSLayer.argTypes = {
+MapWithWFSLayerAPPScenario.argTypes = {
   baseMaps: {
     defaultValue: BASE_MAPS,
   },
@@ -181,7 +218,7 @@ MapWithWFSLayer.argTypes = {
   },
 };
 
-MapWithWFSLayer.storyName = 'WFS Vector layer';
+MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';
 // #endregion
 
 // #region STORY VECTOR component (CUSTOM VISUALIZER)
