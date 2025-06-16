@@ -178,7 +178,6 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
           value={`SHOW WFS LAYER (${show})`}
           style={{ zIndex: '2', position: 'absolute' }}
         ></input>
-        {/* <input type='button' onClick={()=>{ show.current = !show.current;}} value={`SHOW WFS LAYER (${show.current})`} style={{zIndex: "2", position: "absolute"}}></input> */}
         {show && (
           <CesiumWFSLayer
             key={metaBuildings.id}
