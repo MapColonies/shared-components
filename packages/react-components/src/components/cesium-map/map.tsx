@@ -57,23 +57,14 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
-  private useOptimizedTileRequests?: boolean;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
   }
-
-  public get shouldOptimizedTileRequests(): boolean {
-    return this.useOptimizedTileRequests ?? false;
-  }
-
-  public set shouldOptimizedTileRequests(useOptimizedTileRequests: boolean) {
-    this.useOptimizedTileRequests = useOptimizedTileRequests;
-  }
 }
 
 export type MapViewState = {
-  CZL: number;
+  currentZoomLevel: number;
   shouldOptimizedTileRequests: boolean;
 };
 
@@ -199,7 +190,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setViewState({
-      CZL: -1,
+      currentZoomLevel: -1,
       shouldOptimizedTileRequests: props.useOptimizedTileRequests ?? false,
     });
   }, []);
@@ -277,7 +268,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             () => {
               setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
             },
-            props.layerManagerFootprintMetaFieldPath
+            props.layerManagerFootprintMetaFieldPath,
+            viewState?.shouldOptimizedTileRequests
           ),
         }),
         viewState,

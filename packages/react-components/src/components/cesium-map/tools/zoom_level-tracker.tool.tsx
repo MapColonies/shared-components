@@ -107,7 +107,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
 
       setZoomLevel(closestZoom.level);
       if (mapViewState.setViewState) {
-        mapViewState.setViewState((prev) => ({ ...prev, CZL: closestZoom.level }));
+        mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: closestZoom.level }));
       }
     }
   }, [mapViewer, zoomLevelHeights]);
@@ -122,7 +122,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
 
     setZoomLevel(maxZoom);
     if (mapViewState.setViewState) {
-      mapViewState.setViewState((prev) => ({ ...prev, CZL: maxZoom }));
+      mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: maxZoom }));
     }
   }, [mapViewer]);
 

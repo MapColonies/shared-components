@@ -104,15 +104,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   useEffect(() => {
     viewStateRef.current = mapViewState.viewState;
-    console.log('UPDATED ZOOMLEVEL:', viewStateRef.current.CZL);
+    console.log('UPDATED ZOOMLEVEL:', viewStateRef.current.currentZoomLevel);
   }, [mapViewState.viewState]);
 
   // useEffect(() => {
-  //   if (viewStateRef.current.CZL > 0 && !hasRunFetchRef.current) {
+  //   if (viewStateRef.current.currentZoomLevel > 0 && !hasRunFetchRef.current) {
   //     fetchAndUpdateWfs();
   //     hasRunFetchRef.current = true;
   //   }
-  // }, [viewStateRef.current.CZL]);
+  // }, [viewStateRef.current.currentZoomLevel]);
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
@@ -263,7 +263,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       cache: wfsCache.current.size,
       items,
       total,
-      currentZoomLevel: viewStateRef.current.CZL,
+      currentZoomLevel: viewStateRef.current.currentZoomLevel,
     }));
   };
 
@@ -533,14 +533,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     await waitForTilesLoaded();
 
-    if (viewStateRef.current.CZL > 0 && viewStateRef.current.CZL < zoomLevel && wfsDataSource?.entities.values.length > 0) {
-      console.log('hideEntities at CZL-->', viewStateRef.current.CZL, 'entities', wfsDataSource?.entities.values.length);
+    if (viewStateRef.current.currentZoomLevel > 0 && viewStateRef.current.currentZoomLevel < zoomLevel && wfsDataSource?.entities.values.length > 0) {
+      console.log('hideEntities at currentZoomLevel-->', viewStateRef.current.currentZoomLevel, 'entities', wfsDataSource?.entities.values.length);
       hideEntities();
       return;
     }
 
-    console.log('BEFORE FETCH at CZL-->', viewStateRef.current.CZL, 'entities', wfsDataSource?.entities.values.length);
-    if (viewStateRef.current.CZL >= zoomLevel) {
+    console.log('BEFORE FETCH at currentZoomLevel-->', viewStateRef.current.currentZoomLevel, 'entities', wfsDataSource?.entities.values.length);
+    if (viewStateRef.current.currentZoomLevel >= zoomLevel) {
       wfsDataSource.show = true;
       const extent: BBox = rectangle2bbox(bbox);
       const position: Feature<Point> = center(bbox);
@@ -815,7 +815,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     handleMouseHover(handler);
 
     // Initial call, effective when map already exists and not in initialization state
-    if (viewStateRef.current.CZL > 0) {
+    if (viewStateRef.current.currentZoomLevel > 0) {
       fetchAndUpdateWfs();
       hasRunFetchRef.current = true;
     }
