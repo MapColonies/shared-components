@@ -62,17 +62,17 @@ body[dir='rtl'] .sideToolsContainer {
   border-top-width: 10px;
 }
 
-/* #region FOR NATIVE CONTROLS -- START */
-#cesiumTheme input[type="checkbox"] {
+/* #region for NATIVE CONTROLS */
+#cesiumTheme input[type='checkbox'] {
   accent-color: var(--mdc-theme-cesium-checkbox-color);
 }
 
-/* #endregion FOR NATIVE CONTROLS -- END */
+/* #endregion for NATIVE CONTROLS */
 
-/* #region FOR MDC-CHECKBOX -- START*/
-#cesiumTheme .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
-.mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background,
-.mdc-checkbox .mdc-checkbox__native-control[data-indeterminate=true]:enabled~.mdc-checkbox__background {
+/* #region for mdc-checkbox */
+#cesiumTheme .mdc-checkbox .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control[data-indeterminate='true']:enabled ~ .mdc-checkbox__background {
   border-color: var(--mdc-theme-cesium-checkbox-color);
   background-color: var(--mdc-theme-cesium-checkbox-color);
 }
@@ -82,9 +82,8 @@ body[dir='rtl'] .sideToolsContainer {
 }
 
 #cesiumTheme .mdc-checkbox {
-  /* transform: scale(0.7); */
-  width: 12px;
-  height: 12px;
+  width: var(--mdc-theme-cesium-checkbox-width);
+  height: var(--mdc-theme-cesium-checkbox-width);
 }
 
 #cesiumTheme .mdc-checkbox__background {
@@ -92,24 +91,53 @@ body[dir='rtl'] .sideToolsContainer {
   height: 12px;
 }
 
-/* #endregion FOR MDC-CHECKBOX -- END*/
+#cesiumTheme .mdc-form-field {
+  color: unset;
+  margin: -2%;
+  margin-bottom: -4%;
+}
 
 #cesiumTheme .mdc-ripple-upgraded--unbounded {
   --mdc-ripple-fg-size: 0px !important;
 }
 
+/* #endregion mdc-checkbox */
+
+/* #region mdc-list */
 #cesiumTheme .mdc-list {
   font-size: 11pt;
   padding: 1px;
   color: unset;
 }
 
+#cesiumTheme .mdc-list-item {
+  padding: unset;
+  padding-right: 4px;
+  padding-left: 4px;
+  height: 24px;
+}
+
+/* #endregion mdc-list */
+
+/* #region mdc-TextField */
 #cesiumTheme .mdc-text-field__input {
   box-sizing: border-box;
   height: 32px;
   border: unset;
 }
 
-#cesiumTheme .mdc-form-field {
-  color: unset;
+#cesiumTheme .mdc-text-field--outlined {
+  height: 8%;
+}
+
+/* #endregion mdc-TextField */
+
+#cesiumTheme .disabled {
+  opacity: 0.6;
+  cursor: initial;
+}
+
+/* cesium class */
+#cesiumTheme .search-results {
+  padding: 4px;
 }

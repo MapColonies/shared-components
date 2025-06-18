@@ -1,14 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  ComponentProps,
-  MouseEvent,
-  useMemo
-} from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -47,8 +37,7 @@ import '@map-colonies/react-core/dist/checkbox/styles';
 import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { ThemeProvider } from '@map-colonies/react-core';
 
-
-interface ViewerProps extends ComponentProps<typeof Viewer> { }
+interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
@@ -132,7 +121,7 @@ export interface CesiumMapProps extends ViewerProps {
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
-  sceneModes?: typeof CesiumSceneMode[];
+  sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
@@ -172,7 +161,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<typeof CesiumSceneMode[] | undefined>();
+  const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
@@ -275,7 +264,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.useOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
-    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as typeof CesiumSceneMode[]);
+    setSceneModes(
+      props.sceneModes ?? ([CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as (typeof CesiumSceneMode)[])
+    );
   }, [props.sceneModes]);
 
   useEffect(() => {
@@ -363,10 +354,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return pickPositionCartographic !== undefined
           ? {
-            longitude: toDegrees(pickPositionCartographic.longitude),
-            latitude: toDegrees(pickPositionCartographic.latitude),
-            height: mapViewRef.scene.camera.positionCartographic.height,
-          }
+              longitude: toDegrees(pickPositionCartographic.longitude),
+              latitude: toDegrees(pickPositionCartographic.latitude),
+              height: mapViewRef.scene.camera.positionCartographic.height,
+            }
           : getCameraPositionCartographic();
       } else {
         return getCameraPositionCartographic();
@@ -404,7 +395,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               typeof dataLayer.meta.items === 'number' &&
               typeof dataLayer.meta.total === 'number' &&
               dataLayer.meta.items > 0 &&
-              dataLayer.meta.items < dataLayer.meta.total) {
+              dataLayer.meta.items < dataLayer.meta.total
+            ) {
               loading = true;
               return;
             }
@@ -461,22 +453,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {
-              debugPanel &&
-              <DebugPanel locale={locale}>
-                {debugPanel.wfs && <WFS locale={locale} />}
-              </DebugPanel>
-            }
-            {
-              props.geocoderPanel &&
-              <GeocoderPanel
-                locale={locale}
-                configs={[...props.geocoderPanel]}
-              />
-            }
-            <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
+            {debugPanel && <DebugPanel locale={locale}>{debugPanel.wfs && <WFS locale={locale} />}</DebugPanel>}
+            {props.geocoderPanel && <GeocoderPanel locale={locale} configs={[...props.geocoderPanel]} />}
+            <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-          </Box >
+          </Box>
           <Box className="toolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
@@ -491,12 +472,18 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
-    <ThemeProvider id="cesiumTheme" options={{
-      //  primary: '#FF0000',
-      "cesium-checkbox-color": "#0000FF",
-      "cesium-error": "#FF0000",
-      "cesium-service-error": "#ec3713"
-    }}>
+    <ThemeProvider
+      id="cesiumTheme"
+      options={{
+        //  primary: '#FF0000',
+        'cesium-checkbox-color': '#0000FF',
+        'cesium-error': '#FF0000',
+        'cesium-service-error': '#ec3713',
+        'cesium-checkbox-width': '12px',
+        'cesium-checkbox-height': '12px',
+        'cesium-container-border-radius': '4px',
+      }}
+    >
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
         <MapViewProvider value={mapViewRef as CesiumViewer}>
           <MapLegendSidebar
