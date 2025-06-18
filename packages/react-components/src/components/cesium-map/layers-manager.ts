@@ -66,12 +66,14 @@ class LayerManager {
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
+  private readonly shouldOptimizedTileRequests?: boolean;
 
   public constructor(
     mapViewer: CesiumViewer,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
-    layerManagerFootprintMetaFieldPath?: string
+    layerManagerFootprintMetaFieldPath?: string,
+    shouldOptimizedTileRequests?: boolean
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
@@ -82,13 +84,14 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
+    this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
 
     if (onLayersUpdate) {
       this.layerUpdated.addEventListener(onLayersUpdate, this);
     }
 
     // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
-    if (this.mapViewer.shouldOptimizedTileRequests) {
+    if (this.shouldOptimizedTileRequests) {
       this.layerUpdated.addEventListener((meta: Record<string, unknown>) => {
         const newMetaKeys = Object.keys(meta);
         const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
@@ -175,7 +178,7 @@ class LayerManager {
      *  so that we ensure the rectangle will always be affective.
      */
 
-    if (this.mapViewer.shouldOptimizedTileRequests) {
+    if (this.shouldOptimizedTileRequests) {
       this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
     }
@@ -187,7 +190,7 @@ class LayerManager {
       case 'XYZ_LAYER': {
         const options = layer.options as UrlTemplateImageryProvider.ConstructorOptions;
 
-        const providerInstance = this.mapViewer.shouldOptimizedTileRequests
+        const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
           : new UrlTemplateImageryProvider(options);
 
@@ -198,7 +201,7 @@ class LayerManager {
       case 'WMS_LAYER': {
         const options = layer.options as WebMapServiceImageryProvider.ConstructorOptions;
 
-        const providerInstance = this.mapViewer.shouldOptimizedTileRequests
+        const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
           : new WebMapServiceImageryProvider(options);
 
@@ -208,7 +211,7 @@ class LayerManager {
       case 'WMTS_LAYER': {
         const options = layer.options as WebMapTileServiceImageryProvider.ConstructorOptions;
 
-        const providerInstance = this.mapViewer.shouldOptimizedTileRequests
+        const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)
           : new WebMapTileServiceImageryProvider(options);
 

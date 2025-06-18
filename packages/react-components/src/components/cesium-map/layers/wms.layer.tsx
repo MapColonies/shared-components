@@ -1,7 +1,7 @@
 import React from 'react';
 import { WebMapServiceImageryProvider } from 'cesium';
 import { CustomWebMapServiceImageryProvider } from '../helpers/customImageryProviders';
-import { useCesiumMap } from '../map';
+import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
 export interface RCesiumWMSLayerOptions extends WebMapServiceImageryProvider.ConstructorOptions {}
@@ -13,8 +13,9 @@ export interface RCesiumWMSLayerProps extends Partial<RCesiumImageryLayerProps> 
 export const CesiumWMSLayer: React.FC<RCesiumWMSLayerProps> = (props) => {
   const { options, ...restProps } = props;
   const mapViewer = useCesiumMap();
+  const { viewState } = useCesiumMapViewstate();
 
-  const providerInstance = mapViewer.shouldOptimizedTileRequests
+  const providerInstance = viewState.shouldOptimizedTileRequests
     ? new CustomWebMapServiceImageryProvider(options, mapViewer)
     : new WebMapServiceImageryProvider(options);
 
