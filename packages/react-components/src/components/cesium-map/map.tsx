@@ -1,14 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  ComponentProps,
-  MouseEvent,
-  useMemo
-} from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -43,6 +33,9 @@ import { ZoomButtons } from './zoom/zoomButtons';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import '@map-colonies/react-core/dist/checkbox/styles';
+import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
+import { ThemeProvider } from '@map-colonies/react-core';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -114,6 +107,10 @@ export interface IDebugPanel {
   wfs?: Record<string, unknown>;
 }
 
+export interface IGeocoderPanel {
+  options?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -124,7 +121,7 @@ export interface CesiumMapProps extends ViewerProps {
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
-  sceneModes?: typeof CesiumSceneMode[];
+  sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
@@ -138,6 +135,7 @@ export interface CesiumMapProps extends ViewerProps {
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
   debugPanel?: IDebugPanel;
+  geocoderPanel?: GeocoderPanelProps['configs'];
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -163,7 +161,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<typeof CesiumSceneMode[] | undefined>();
+  const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
@@ -266,7 +264,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.useOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
-    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as typeof CesiumSceneMode[]);
+    setSceneModes(
+      props.sceneModes ?? ([CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as (typeof CesiumSceneMode)[])
+    );
   }, [props.sceneModes]);
 
   useEffect(() => {
@@ -392,10 +392,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           let loading = false;
           mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
             if (
-              typeof dataLayer.meta.items === 'number' && 
-              typeof dataLayer.meta.total === 'number' && 
-              dataLayer.meta.items > 0 && 
-              dataLayer.meta.items < dataLayer.meta.total) {
+              typeof dataLayer.meta.items === 'number' &&
+              typeof dataLayer.meta.total === 'number' &&
+              dataLayer.meta.items > 0 &&
+              dataLayer.meta.items < dataLayer.meta.total
+            ) {
               loading = true;
               return;
             }
@@ -452,13 +453,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {
-              debugPanel &&
-              <DebugPanel locale={locale}>
-                {debugPanel.wfs && <WFS locale={locale} />}
-              </DebugPanel>
-            }
-            <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
+            {debugPanel && <DebugPanel locale={locale}>{debugPanel.wfs && <WFS locale={locale} />}</DebugPanel>}
+            {props.geocoderPanel && <GeocoderPanel locale={locale} configs={[...props.geocoderPanel]} />}
+            <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
           <Box className="toolsContainer">
@@ -475,50 +472,63 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
-    <Viewer className="viewer" full ref={ref} {...viewerProps}>
-      <MapViewProvider value={mapViewRef as CesiumViewer}>
-        <MapLegendSidebar
-          title={props.legends?.title}
-          isOpen={isLegendsSidebarOpen}
-          toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)}
-          noLegendsText={props.legends?.emptyText}
-          legends={props.legends?.legendsList ?? legendsList}
-          actionsTexts={props.legends?.actionsTexts}
-        />
-        {props.children}
-        {bindCustomToolsToViewer()}
-        {props.imageryContextMenu &&
-          showImageryMenu &&
-          imageryMenuPosition &&
-          rightClickCoordinates &&
-          React.cloneElement(props.imageryContextMenu, {
-            data: mapViewRef?.layersManager?.findLayerByPOI(
-              imageryMenuPosition.x as number,
-              imageryMenuPosition.y as number,
-              false
-            ) as unknown as Record<string, unknown>[],
-            position: {
-              x: imageryMenuPosition.x as number,
-              y: imageryMenuPosition.y as number,
-            },
-            coordinates: rightClickCoordinates,
-            style: getImageryMenuStyle(
-              imageryMenuPosition.x as number,
-              imageryMenuPosition.y as number,
-              props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
-              props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
-              props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
-            ),
-            size: props.imageryContextMenuSize ?? {
-              height: DEFAULT_HEIGHT,
-              width: DEFAULT_WIDTH,
-            },
-            handleClose: () => {
-              setShowImageryMenu(!showImageryMenu);
-            },
-            contextEvt: imageryMenuEvent.current,
-          })}
-      </MapViewProvider>
-    </Viewer>
+    <ThemeProvider
+      id="cesiumTheme"
+      options={{
+        //  primary: '#FF0000',
+        'cesium-checkbox-color': '#0000FF',
+        'cesium-error': '#FF0000',
+        'cesium-service-error': '#ec3713',
+        'cesium-checkbox-width': '12px',
+        'cesium-checkbox-height': '12px',
+        'cesium-container-border-radius': '4px',
+      }}
+    >
+      <Viewer className="viewer" full ref={ref} {...viewerProps}>
+        <MapViewProvider value={mapViewRef as CesiumViewer}>
+          <MapLegendSidebar
+            title={props.legends?.title}
+            isOpen={isLegendsSidebarOpen}
+            toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)}
+            noLegendsText={props.legends?.emptyText}
+            legends={props.legends?.legendsList ?? legendsList}
+            actionsTexts={props.legends?.actionsTexts}
+          />
+          {props.children}
+          {bindCustomToolsToViewer()}
+          {props.imageryContextMenu &&
+            showImageryMenu &&
+            imageryMenuPosition &&
+            rightClickCoordinates &&
+            React.cloneElement(props.imageryContextMenu, {
+              data: mapViewRef?.layersManager?.findLayerByPOI(
+                imageryMenuPosition.x as number,
+                imageryMenuPosition.y as number,
+                false
+              ) as unknown as Record<string, unknown>[],
+              position: {
+                x: imageryMenuPosition.x as number,
+                y: imageryMenuPosition.y as number,
+              },
+              coordinates: rightClickCoordinates,
+              style: getImageryMenuStyle(
+                imageryMenuPosition.x as number,
+                imageryMenuPosition.y as number,
+                props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
+                props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
+                props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
+              ),
+              size: props.imageryContextMenuSize ?? {
+                height: DEFAULT_HEIGHT,
+                width: DEFAULT_WIDTH,
+              },
+              handleClose: () => {
+                setShowImageryMenu(!showImageryMenu);
+              },
+              contextEvt: imageryMenuEvent.current,
+            })}
+        </MapViewProvider>
+      </Viewer>
+    </ThemeProvider>
   );
 };
