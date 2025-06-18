@@ -134,7 +134,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
     const isRightToLeft = featureStructure.fields.some((field) => field.aliasFieldName !== field.fieldName);
     return `
-      <table style="direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
+      <table style="width: 100%; direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
         <tbody>
           ${rows.join('')}
         </tbody>
