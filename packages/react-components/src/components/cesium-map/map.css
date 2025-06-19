@@ -67,6 +67,16 @@ body[dir='rtl'] .sideToolsContainer {
   accent-color: var(--mdc-theme-cesium-checkbox-color);
 }
 
+#cesiumTheme input::placeholder {
+  color: unset;
+}
+
+#cesiumTheme input {
+  font-size: var(--mdc-theme-cesium-font-size);
+  color: unset;
+  font-weight: bold;
+}
+
 /* #endregion for NATIVE CONTROLS */
 
 /* #region for mdc-checkbox */
@@ -105,7 +115,8 @@ body[dir='rtl'] .sideToolsContainer {
 
 /* #region mdc-list */
 #cesiumTheme .mdc-list {
-  font-size: 11pt;
+  font-size: var(--mdc-theme-cesium-font-size);
+  font-family: sans-serif;
   padding: 1px;
   color: unset;
 }
@@ -115,6 +126,11 @@ body[dir='rtl'] .sideToolsContainer {
   padding-right: 4px;
   padding-left: 4px;
   height: 24px;
+  font-weight: bold;
+}
+
+#cesiumTheme .mdc-text-field--filled {
+  height: 32px;
 }
 
 /* #endregion mdc-list */
@@ -122,12 +138,19 @@ body[dir='rtl'] .sideToolsContainer {
 /* #region mdc-TextField */
 #cesiumTheme .mdc-text-field__input {
   box-sizing: border-box;
-  height: 32px;
   border: unset;
 }
 
-#cesiumTheme .mdc-text-field--outlined {
-  height: 8%;
+#cesiumTheme .mdc-text-field {
+  padding: unset;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+/* Removing the purple underline in RMWC */
+#cesiumTheme .mdc-line-ripple::before,
+#cesiumTheme .mdc-line-ripple::after {
+  border-bottom: none !important;
 }
 
 /* #endregion mdc-TextField */
@@ -137,7 +160,7 @@ body[dir='rtl'] .sideToolsContainer {
   cursor: initial;
 }
 
-/* cesium class */
+/* Cesium class */
 #cesiumTheme .search-results {
   padding: 4px;
 }

@@ -476,12 +476,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       id="cesiumTheme"
       options={{
         //  primary: '#FF0000',
+        'cesium-color': 'green',
+        'cesium-background-color': 'white',
         'cesium-checkbox-color': '#0000FF',
         'cesium-error': '#FF0000',
         'cesium-service-error': '#ec3713',
         'cesium-checkbox-width': '12px',
         'cesium-checkbox-height': '12px',
         'cesium-container-border-radius': '4px',
+        'cesium-font-size': '10pt',
       }}
     >
       <Viewer className="viewer" full ref={ref} {...viewerProps}>

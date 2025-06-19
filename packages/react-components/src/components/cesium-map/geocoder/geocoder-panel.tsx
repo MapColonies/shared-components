@@ -374,9 +374,9 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
       {isOpen && (
         <Box className="geocoderForm">
           <TextField
+            id="geocoderTextField"
             className="cesium-geocoder-input"
             ref={inputRef}
-            outlined
             onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
             placeholder={searchPlaceholder}
             value={searchValue}
@@ -413,7 +413,9 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
 
             {configs.map((config, index) => (
               <List>
-                <Typography tag="span">{config.title ?? config.endPoint}</Typography>
+                <Typography className="bold" tag="span">
+                  {config.title ?? config.endPoint}
+                </Typography>
                 <Box className="listContainer">
                   {(() => {
                     const features = responses?.[index]?.resultObj?.features;
