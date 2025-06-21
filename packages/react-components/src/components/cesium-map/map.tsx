@@ -447,7 +447,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} />}</DebugPanel>}
+            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
             <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
