@@ -104,7 +104,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   useEffect(() => {
     viewStateRef.current = mapViewState.viewState;
-    console.log('UPDATED ZOOMLEVEL:', viewStateRef.current.currentZoomLevel);
   }, [mapViewState.viewState]);
 
   // useEffect(() => {
@@ -534,12 +533,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     await waitForTilesLoaded();
 
     if (viewStateRef.current.currentZoomLevel > 0 && viewStateRef.current.currentZoomLevel < zoomLevel && wfsDataSource?.entities.values.length > 0) {
-      console.log('hideEntities at currentZoomLevel-->', viewStateRef.current.currentZoomLevel, 'entities', wfsDataSource?.entities.values.length);
       hideEntities();
       return;
     }
 
-    console.log('BEFORE FETCH at currentZoomLevel-->', viewStateRef.current.currentZoomLevel, 'entities', wfsDataSource?.entities.values.length);
     if (viewStateRef.current.currentZoomLevel >= zoomLevel) {
       wfsDataSource.show = true;
       const extent: BBox = rectangle2bbox(bbox);
