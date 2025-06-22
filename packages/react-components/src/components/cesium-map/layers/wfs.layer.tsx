@@ -385,16 +385,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
                 (f.properties as any).label = billboardImage;
               }
 
-              // mapViewer.entities.add({
-              //   position:  Cartesian3.fromDegrees(35.47150, 33.08731, 500),
-              //   billboard: {
-              //     image: billboardImage,
-              //     heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
-              //     scale: 1.0,
-              //     disableDepthTestDistance: Number.POSITIVE_INFINITY,
-              //   },
-              // });
-
               newFeatures.push(f);
             }
           }
