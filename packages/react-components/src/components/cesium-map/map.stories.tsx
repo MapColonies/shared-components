@@ -124,6 +124,7 @@ LocalizedMap.argTypes = {
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
+      NO_DATA_LAYERS: 'לא נמצאו שכבות',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
@@ -140,6 +141,11 @@ LocalizedMap.argTypes = {
       type: 'range',
       min: 0,
       max: 20,
+    },
+  },
+  debugPanel: {
+    defaultValue: {
+      wfs: {},
     },
   },
 };
