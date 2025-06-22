@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.10.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.3...@map-colonies/react-components@4.10.0) (2025-06-22)
+
+
+### Bug Fixes
+
+* add app scenario story ([ce5e837](https://github.com/MapColonies/shared-components/commit/ce5e837679753fd6fb77a1ebf16f8bd114833e81))
+* cesium info table style ([4046a45](https://github.com/MapColonies/shared-components/commit/4046a45839cdfd1df9b2782ad661991594aac6ba))
+* debug panel should be removed from dom on dialog close instead of hidden ([88e56f1](https://github.com/MapColonies/shared-components/commit/88e56f193122ba4725e1e3ac3872bc2446614735))
+* new interfaces implementation ([ed2c353](https://github.com/MapColonies/shared-components/commit/ed2c353ca5676343af520a471bd22c0bcf02345f))
+* remove id from wfs debug pannel ([1b3ab0d](https://github.com/MapColonies/shared-components/commit/1b3ab0dacb1c60027751062ce9c54f47bed275c7))
+
+
+### Features
+
+* default and custom visualization and links from private repo ([459f682](https://github.com/MapColonies/shared-components/commit/459f6822f97be8e12140b20b22fd114b8c2fbf90))
+* extend cesium map context ([5772e8e](https://github.com/MapColonies/shared-components/commit/5772e8eb721e837220345bbf6679d4f2d1069d5d))
+
+
+
+
+
+
 ## [4.9.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.2...@map-colonies/react-components@4.9.3) (2025-05-06)
 
 
