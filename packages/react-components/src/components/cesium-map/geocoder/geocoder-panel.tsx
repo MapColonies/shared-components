@@ -11,7 +11,7 @@ import { Box } from '../../box';
 
 import './geocoder-panel.css';
 import '@map-colonies/react-core/dist/list/styles';
-import '@map-colonies/react-core/dist/TextField/styles';
+import '@map-colonies/react-core/dist/textfield/styles';
 
 export type Method = 'GET' | 'POST';
 
