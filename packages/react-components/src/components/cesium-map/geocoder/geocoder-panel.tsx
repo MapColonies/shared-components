@@ -160,23 +160,17 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
         return value.toString();
       case 'undefined':
         return undefined;
-      case 'symbol':
-      case 'function':
-        throw new Error(`unsupported value type: ${typeof value}`);
     }
   };
 
-  const addParamToUrl = useCallback(
-    (url: string, key: string, value: unknown): string => {
-      const stringValue = valueToString(value);
-      if (stringValue) {
-        url += `&${key}=${encodeURIComponent(stringValue)}`;
-      }
+  const addParamToUrl = (url: string, key: string, value: unknown): string => {
+    const stringValue = valueToString(value);
+    if (stringValue) {
+      url += `&${key}=${encodeURIComponent(stringValue)}`;
+    }
 
-      return url;
-    },
-    [valueToString]
-  );
+    return url;
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getAccurateViewRectangle = (viewer: Viewer) => {
@@ -272,7 +266,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
 
       return url;
     },
-    [addParamToUrl, mapViewer]
+    [mapViewer]
   );
 
   const fetchData = useCallback(
