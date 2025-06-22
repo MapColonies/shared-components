@@ -275,7 +275,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         setViewState,
       };
     }
-  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
+  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState?.shouldOptimizedTileRequests]);
 
   useEffect(() => {
     setSceneModes(
