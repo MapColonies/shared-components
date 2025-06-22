@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.1...@map-colonies/react-components@4.10.2) (2025-06-22)
+
+
+### Bug Fixes
+
+* viewstate shouldoptimizedtilerequests ([59a1ff4](https://github.com/MapColonies/shared-components/commit/59a1ff4e30426e0b41afcc602e1e9273d77b1fbd))
+
+
+
+
+
 ## [4.10.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.0...@map-colonies/react-components@4.10.1) (2025-06-22)
 
 **Note:** Version bump only for package @map-colonies/react-components
