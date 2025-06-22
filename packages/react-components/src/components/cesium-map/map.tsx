@@ -180,7 +180,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
-  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
@@ -320,10 +319,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
-
-  useEffect(() => {
-    setDebugPanel(props.debugPanel);
-  }, [props.debugPanel]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -468,7 +463,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {debugPanel && <DebugPanel locale={locale}>{debugPanel.wfs && <WFS locale={locale} />}</DebugPanel>}
+            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
             <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
