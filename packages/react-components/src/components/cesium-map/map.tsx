@@ -259,23 +259,26 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   const contextValue = useMemo(() => {
     if (mapViewRef) {
+      const mv = mapViewRef.layersManager
+        ? mapViewRef
+        : Object.assign(mapViewRef, {
+            layersManager: new LayerManager(
+              mapViewRef,
+              props.legends?.mapLegendsExtractor,
+              () => {
+                setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+              },
+              props.layerManagerFootprintMetaFieldPath,
+              viewState?.shouldOptimizedTileRequests
+            ),
+          });
       return {
-        mapViewer: Object.assign(mapViewRef, {
-          layersManager: new LayerManager(
-            mapViewRef,
-            props.legends?.mapLegendsExtractor,
-            () => {
-              setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-            },
-            props.layerManagerFootprintMetaFieldPath,
-            viewState?.shouldOptimizedTileRequests
-          ),
-        }),
+        mapViewer: mv,
         viewState,
         setViewState,
       };
     }
-  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState?.shouldOptimizedTileRequests]);
+  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
 
   useEffect(() => {
     setSceneModes(
