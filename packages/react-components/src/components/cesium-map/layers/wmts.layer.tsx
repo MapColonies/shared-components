@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { WebMapTileServiceImageryProvider } from 'cesium';
 import { CustomWebMapTileServiceImageryProvider } from '../helpers/customImageryProviders';
@@ -16,9 +16,11 @@ export const CesiumWMTSLayer: React.FC<RCesiumWMTSLayerProps> = (props) => {
   const mapViewer = useCesiumMap();
   const { viewState } = useCesiumMapViewstate();
 
-  const providerInstance = viewState.shouldOptimizedTileRequests
-    ? new CustomWebMapTileServiceImageryProvider(options, mapViewer)
-    : new WebMapTileServiceImageryProvider(options);
+  const providerInstance = useMemo(() => {
+    return viewState.shouldOptimizedTileRequests
+      ? new CustomWebMapTileServiceImageryProvider(options, mapViewer)
+      : new WebMapTileServiceImageryProvider(options);
+  }, [viewState.shouldOptimizedTileRequests]);
 
   return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;
 };
