@@ -51,10 +51,10 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => 
               JSON.stringify(prevFeatureTypes[existingIndex]) !==
               JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel })
             ) {
-            const updatedFeatureTypes = [...prevFeatureTypes];
+              const updatedFeatureTypes = [...prevFeatureTypes];
               updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel };
-            return updatedFeatureTypes;
-          }
+              return updatedFeatureTypes;
+            }
           } else {
             return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel }];
           }
@@ -88,8 +88,7 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => 
           setIsOpen(!isOpen);
         }}
       />
-      {
-        isOpen &&
+      {isOpen && (
         <div className="debugPanel">
           <Dialog
             open={isOpen}
@@ -99,17 +98,13 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => 
           >
             <DialogTitle className="title">{title}</DialogTitle>
             <DialogContent>
-              {
-                React.Children.map(children, (child) => {
-                  return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child)
-                    ? React.cloneElement(child, { featureTypes })
-                    : child;
-                })
-              }
+              {React.Children.map(children, (child) => {
+                return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child) ? React.cloneElement(child, { featureTypes }) : child;
+              })}
             </DialogContent>
           </Dialog>
         </div>
-      }
+      )}
     </>
   );
 };
