@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.0...@map-colonies/react-components@4.10.1) (2025-06-22)
+
+**Note:** Version bump only for package @map-colonies/react-components
+
+
+
+
+
+
 # [4.10.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.9.3...@map-colonies/react-components@4.10.0) (2025-06-22)
 
 
