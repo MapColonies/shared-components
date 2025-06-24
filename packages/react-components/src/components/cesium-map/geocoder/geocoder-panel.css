@@ -7,9 +7,6 @@
 #geocoderContainer .geocoderForm {
   background-color: var(--mdc-theme-cesium-background-color);
   border-radius: var(--mdc-theme-cesium-container-border-radius);
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 500px;
 }
 
 #geocoderContainer .mdc-text-field__input {
@@ -22,15 +19,17 @@
   max-height: 348px;
   overflow-y: auto;
   overflow-x: hidden;
+  width: 100%;
 }
 
 #geocoderContainer .listContainer {
-  border: 1px solid black;
+  border: 1px solid var(--mdc-theme-cesium-color);
   min-height: 56px;
   width: 308px;
   max-height: 56px;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 2px;
 }
 
 #geocoderContainer .listContainer .queryItemResult {
@@ -79,6 +78,7 @@ body[dir='rtl'] #geocoderContainer .geocoderForm {
 #geocoderContainer .checkboxesContainer {
   display: flex;
   justify-content: space-between;
+  padding-bottom: 8px;
 }
 
 #geocoderContainer .checkboxElement {
@@ -98,6 +98,8 @@ body[dir='rtl'] #geocoderContainer .geocoderForm {
 
 #geocoderContainer .cesium-geocoder-input {
   width: 100%;
+  background: transparent;
+  border-color: var(--mdc-theme-cesium-color);
 }
 
 /* #endregion cesium classes */

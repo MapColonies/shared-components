@@ -3,6 +3,7 @@ import { CesiumMap, CesiumMapProps } from './map';
 import { CesiumSceneMode, LayerType, Proj } from '.';
 import { getValue } from '../utils/config';
 import { GeocoderPanelProps } from './geocoder/geocoder-panel';
+import { ThemeProvider } from '@map-colonies/react-core';
 
 export default {
   title: 'Cesium Map',
@@ -53,13 +54,16 @@ const GEOCODER_CONFIGS = [
         queryText: 'query',
         geoContext: {
           name: 'geo_context',
-          relatedParams: [["geo_context_mode", 'filter']]
-        }
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
       },
-      static: [["limit", 6], ["disable_fuzziness", false]],
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
     },
     title: 'מיקום',
-    geometryIconClassName: 'customIcon'
+    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -71,12 +75,15 @@ const GEOCODER_CONFIGS = [
         geoContext: {
           name: 'geo_context',
           relatedParams: [['geo_context_mode', 'filter']],
-        }
+        },
       },
-      static: [["limit", 6], ["disable_fuzziness", false]],
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
     },
     title: 'אריחים (tiles)',
-    geometryIconClassName: 'customIcon'
+    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -88,11 +95,14 @@ const GEOCODER_CONFIGS = [
         geoContext: {
           name: 'geo_context',
           relatedParams: [['geo_context_mode', 'filter']],
-        }
+        },
       },
-      static: [["limit", 6], ["disable_fuzziness", false]],
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
     },
-    geometryIconClassName: 'customIcon'
+    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -104,11 +114,11 @@ const GEOCODER_CONFIGS = [
         geoContext: {
           name: 'geo_context',
           relatedParams: [['geo_context_mode', 'filter']],
-        }
+        },
       },
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
-    geometryIconClassName: 'customIcon'
+    geometryIconClassName: 'customIcon',
   },
 ] satisfies GeocoderPanelProps['configs'];
 
@@ -138,10 +148,18 @@ ZoomedMap.argTypes = {
   },
 };
 
+const cesiumTheme = {
+  '--mdc-theme-on-surface': 'white',
+  '--mdc-theme-primary': 'green',
+  '--mdc-theme-error': 'blue',
+};
+
 export const GeocoderPanel: Story = (args: CesiumMapProps) => (
-  <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
-  </div>
+  <ThemeProvider options={cesiumTheme}>
+    <div style={mapDivStyle}>
+      <CesiumMap {...args}></CesiumMap>
+    </div>
+  </ThemeProvider>
 );
 
 GeocoderPanel.argTypes = {
@@ -252,9 +270,9 @@ LocalizedMap.argTypes = {
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
       SHOW_FEATURE_ON_MAP: "הראה פיצ'ר",
-      IN_MAP_EXTENT: "חיפוש בתחום המפה",
-      SEARCH_PLACEHOLDER: "חיפוש...",
-      NO_RESULTS: "אין תוצאות",
+      IN_MAP_EXTENT: 'חיפוש בתחום המפה',
+      SEARCH_PLACEHOLDER: 'חיפוש...',
+      NO_RESULTS: 'אין תוצאות',
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',

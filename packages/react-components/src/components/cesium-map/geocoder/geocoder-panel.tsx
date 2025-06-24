@@ -22,7 +22,7 @@ type relatedParamsType = {
   relatedParams: [string, any][];
 };
 
-export type CesiumGeocodingPropsPayload = UrlGroup & {
+export type CesiumGeocodingProps = UrlGroup & {
   title?: string;
   geometryIconClassName?: string;
   method: Method;
@@ -37,7 +37,7 @@ export type CesiumGeocodingPropsPayload = UrlGroup & {
 };
 
 export type GeocoderPanelProps = {
-  configs: CesiumGeocodingPropsPayload[];
+  configs: CesiumGeocodingProps[];
   locale?: { [key: string]: string };
 };
 
@@ -104,7 +104,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
   });
 
   useEffect(() => {
-    configs.forEach((config: CesiumGeocodingPropsPayload) => {
+    configs.forEach((config: CesiumGeocodingProps) => {
       if (config.baseUrl && config.endPoint && !config.url) {
         config.url = config.baseUrl + config.endPoint;
       }
@@ -210,7 +210,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
   };
 
   const buildUrlParams = useCallback(
-    (url: string, params: CesiumGeocodingPropsPayload['params'], text: string, isInMapExtent: boolean) => {
+    (url: string, params: CesiumGeocodingProps['params'], text: string, isInMapExtent: boolean) => {
       const dynamicParams = () => {
         const queryText = params.dynamic.queryText;
         const queryTextName = typeof queryText === 'string' ? queryText : queryText.name;
@@ -328,7 +328,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
 
   useEffect(() => {
     fetchData(searchValue, isInMapExtent);
-  }, [isInMapExtent, fetchData]);
+  }, [isInMapExtent]);
 
   const getIconByFeatureType = (geometry: any, className?: string) => {
     const geometryType = getType(geometry);
@@ -405,51 +405,53 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
               />
             </Box>
 
-            {configs.map((config, index) => (
-              <List>
-                <Typography className="bold" tag="span">
-                  {config.title ?? config.endPoint}
-                </Typography>
-                <Box className="listContainer">
-                  {(() => {
-                    const features = responses?.[index]?.resultObj?.features;
-                    const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
-                    const message: string = responses?.[index]?.resultObj?.message;
+            <Box className="listsContainer">
+              {configs.map((config, index) => (
+                <List>
+                  <Typography className="bold" tag="span">
+                    {config.title ?? config.endPoint}
+                  </Typography>
+                  <Box className="listContainer">
+                    {(() => {
+                      const features = responses?.[index]?.resultObj?.features;
+                      const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
+                      const message: string = responses?.[index]?.resultObj?.message;
 
-                    const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
+                      const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
 
-                    if (featuresLength) {
-                      return features.map((feature: any, i: number) => (
-                        <ListItem
-                          key={`feature-${i}`}
-                          className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''}
-                          onClick={() => {
-                            mapViewer.camera.flyTo({
-                              destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
-                            });
+                      if (featuresLength) {
+                        return features.map((feature: any, i: number) => (
+                          <ListItem
+                            key={`feature-${i}`}
+                            className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''}
+                            onClick={() => {
+                              mapViewer.camera.flyTo({
+                                destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
+                              });
 
-                            setFeatureToShow(feature);
-                          }}
-                        >
-                          <Box className="queryItemResult">
-                            <Tooltip content={feature?.properties?.names?.display}>
-                              <Box>{feature?.properties?.names?.default?.[0]}</Box>
-                            </Tooltip>
-                            {getIconByFeatureType(feature, config.geometryIconClassName)}
-                          </Box>
-                        </ListItem>
-                      ));
-                    } else if (featuresLength === 0) {
-                      return noResultsJSX;
-                    } else if (message) {
-                      return <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
-                    } else {
-                      return noResultsJSX;
-                    }
-                  })()}
-                </Box>
-              </List>
-            ))}
+                              setFeatureToShow(feature);
+                            }}
+                          >
+                            <Box className="queryItemResult">
+                              <Tooltip content={feature?.properties?.names?.display}>
+                                <Box>{feature?.properties?.names?.default?.[0]}</Box>
+                              </Tooltip>
+                              {getIconByFeatureType(feature, config.geometryIconClassName)}
+                            </Box>
+                          </ListItem>
+                        ));
+                      } else if (featuresLength === 0) {
+                        return noResultsJSX;
+                      } else if (message) {
+                        return <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
+                      } else {
+                        return noResultsJSX;
+                      }
+                    })()}
+                  </Box>
+                </List>
+              ))}
+            </Box>
           </Box>
         </Box>
       )}

@@ -33,7 +33,24 @@ const mapMcToMuiTheme = (mcTheme: { [key: string]: string }, prefersDarkMode = f
   });
 };
 
-export { useMediaQuery, useMappedMuiTheme, mapMcToMuiTheme };
+const useMappedCesiumTheme = (theme: { [key: string]: string }): any => {
+  return React.useMemo(() => {
+    return {
+      // 'cesium-color': theme["text-primary-on-background"] ?? 'green',
+      'cesium-color': theme['--mdc-theme-on-surface'] ?? 'white',
+      'cesium-checkbox-color': theme['--mdc-theme-primary'] ?? '#0000FF',
+      // 'cesium-background-color': theme.background ?? 'rgba(38, 38, 38, 0.75)',
+      'cesium-service-error': theme['--mdc-theme-error'] ?? '#ec3713',
+      'cesium-background-color': 'rgba(38, 38, 38, 0.75)',
+      'cesium-checkbox-width': '12px',
+      'cesium-checkbox-height': '12px',
+      'cesium-container-border-radius': '4px',
+      'cesium-font-size': '10pt',
+    };
+  }, []);
+};
+
+export { useMediaQuery, useMappedMuiTheme, mapMcToMuiTheme, useMappedCesiumTheme };
 /* primary: '#24aee9',
 secondary: '#e539ff',
 error: '#b00020',

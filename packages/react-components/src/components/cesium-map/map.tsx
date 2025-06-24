@@ -14,7 +14,7 @@ import {
   Ray,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
-import { LinearProgress } from '@map-colonies/react-core';
+import { LinearProgress, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
@@ -36,6 +36,7 @@ import '@map-colonies/react-core/dist/linear-progress/styles';
 import '@map-colonies/react-core/dist/checkbox/styles';
 import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { ThemeProvider } from '@map-colonies/react-core';
+import { useMappedCesiumTheme } from '../theme';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -174,6 +175,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
   const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
+  const theme = useTheme();
+  const themeCesium = useMappedCesiumTheme(theme);
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
@@ -472,21 +475,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
-    <ThemeProvider
-      id="cesiumTheme"
-      options={{
-        //  primary: '#FF0000',
-        'cesium-color': 'green',
-        'cesium-background-color': 'white',
-        'cesium-checkbox-color': '#0000FF',
-        'cesium-error': '#FF0000',
-        'cesium-service-error': '#ec3713',
-        'cesium-checkbox-width': '12px',
-        'cesium-checkbox-height': '12px',
-        'cesium-container-border-radius': '4px',
-        'cesium-font-size': '10pt',
-      }}
-    >
+    <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
         <MapViewProvider value={mapViewRef as CesiumViewer}>
           <MapLegendSidebar
