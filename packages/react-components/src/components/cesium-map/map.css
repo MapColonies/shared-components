@@ -75,6 +75,22 @@ body[dir='rtl'] .sideToolsContainer {
   font-size: var(--mdc-theme-cesium-font-size);
   color: unset;
   font-weight: bold;
+  caret-color: unset;
+}
+
+#cesiumTheme ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#cesiumTheme ::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+  border-radius: 6px;
+}
+
+#cesiumTheme ::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 6px;
 }
 
 /* #endregion for NATIVE CONTROLS */

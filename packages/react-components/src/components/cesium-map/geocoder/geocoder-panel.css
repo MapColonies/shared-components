@@ -18,6 +18,12 @@
   padding: 4px;
 }
 
+#geocoderContainer .listsContainer {
+  max-height: 348px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 #geocoderContainer .listContainer {
   border: 1px solid black;
   min-height: 56px;
