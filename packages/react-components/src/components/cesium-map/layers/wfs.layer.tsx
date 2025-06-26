@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import pMap from 'p-map';
 import { format as formatDateFns } from 'date-fns';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler } from '../helpers/utils';
-import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
 export interface ICesiumWFSLayerLabelTextField {
   name: string;
@@ -75,12 +75,26 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
+  const mapViewState = useCesiumMapViewstate();
+  const viewStateRef = useRef(mapViewState.viewState);
   const fetchMetadata = useRef<Map<string, IFetchMetadata>>(new Map());
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}_${uuidv4()}`, [featureType]);
+  const hasRunFetchRef = useRef(false);
+
+  useEffect(() => {
+    viewStateRef.current = mapViewState.viewState;
+  }, [mapViewState.viewState]);
+
+  // useEffect(() => {
+  //   if (viewStateRef.current.currentZoomLevel > 0 && !hasRunFetchRef.current) {
+  //     fetchAndUpdateWfs();
+  //     hasRunFetchRef.current = true;
+  //   }
+  // }, [viewStateRef.current.currentZoomLevel]);
 
   const wfsDataSource = new GeoJsonDataSource(dataSourceName);
 
@@ -102,7 +116,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
     const isRightToLeft = featureStructure.fields.some((field) => field.aliasFieldName !== field.fieldName);
     return `
-      <table style="direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
+      <table style="width: 100%; direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
         <tbody>
           ${rows.join('')}
         </tbody>
@@ -231,7 +245,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       cache: wfsCache.current.size,
       items,
       total,
-      currentZoomLevel: mapViewer.currentZoomLevel,
+      currentZoomLevel: viewStateRef.current.currentZoomLevel,
     }));
   };
 
@@ -240,7 +254,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       wfsDataSource.show = false;
       page.current = 0;
 
-      mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
+      const labelDatasource = mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0];
+      if (labelDatasource) {
+        labelDatasource.show = false;
+        mapViewer.dataSources.remove(labelDatasource);
+      }
     }
     updateMetadata(0, 0);
   };
@@ -350,16 +368,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
                 (f.properties as any).label = billboardImage;
               }
 
-              // mapViewer.entities.add({
-              //   position:  Cartesian3.fromDegrees(35.47150, 33.08731, 500),
-              //   billboard: {
-              //     image: billboardImage,
-              //     heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
-              //     scale: 1.0,
-              //     disableDepthTestDistance: Number.POSITIVE_INFINITY,
-              //   },
-              // });
-
               newFeatures.push(f);
             }
           }
@@ -449,19 +457,16 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     if (newFeatures.length === 0) {
       if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
-        fetchAndUpdateWfs(page.current++ * pageSize);
+        fetchAndUpdateWfs(++page.current * pageSize);
       } else {
         page.current = 0;
 
-        const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
-        if (dataSource) {
-          applyVisulization(
-            mapViewer,
-            dataSource,
-            dataSource.entities.values.map((entities) => entities.id as string),
-            extent
-          );
-        }
+        applyVisulization(
+          mapViewer,
+          wfsDataSource,
+          wfsDataSource.entities.values.map((entities) => entities.id as string),
+          extent
+        );
       }
       return;
     }
@@ -475,18 +480,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     await wfsDataSource.process(newGeoJson, { describe });
     mapViewer.scene.requestRender();
 
-    const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
-    if (dataSource) {
-      applyVisulization(
-        mapViewer,
-        dataSource,
-        newFeatures.map((feature) => feature.id as string),
-        extent
-      );
-    }
+    applyVisulization(
+      mapViewer,
+      wfsDataSource,
+      newFeatures.map((feature) => feature.id as string),
+      extent
+    );
 
     if (wfsResponse.numberReturned && wfsResponse.numberReturned !== 0) {
-      fetchAndUpdateWfs(page.current++ * pageSize);
+      fetchAndUpdateWfs(++page.current * pageSize);
     } else {
       page.current = 0;
     }
@@ -501,30 +503,243 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       return;
     }
 
-    if (!mapViewer.currentZoomLevel || mapViewer.currentZoomLevel < zoomLevel) {
+    await waitForTilesLoaded();
+
+    if (viewStateRef.current.currentZoomLevel > 0 && viewStateRef.current.currentZoomLevel < zoomLevel && wfsDataSource?.entities.values.length > 0) {
       hideEntities();
       return;
     }
 
-    wfsDataSource.show = true;
-    const extent: BBox = rectangle2bbox(bbox);
-    const position: Feature<Point> = center(bbox);
+    if (viewStateRef.current.currentZoomLevel >= zoomLevel) {
+      wfsDataSource.show = true;
+      const extent: BBox = rectangle2bbox(bbox);
+      const position: Feature<Point> = center(bbox);
 
-    try {
-      const urlSeparator = url.includes('?') ? '&' : '?';
-      let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
-        ','
-      )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-      if (keyField) {
-        wfsDataUrl += `&sortBy=${keyField}%20ASC`;
+      try {
+        const urlSeparator = url.includes('?') ? '&' : '?';
+        let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
+          ','
+        )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
+        if (keyField) {
+          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
+        }
+        const wfsResponse = await fetchWfsData(wfsDataUrl);
+        await handleWfsResponse(wfsResponse, extent, offset, position);
+      } catch (error) {
+        console.error('Error fetching WFS data:', error);
+        updateMetadata(-1, -1);
       }
-      const wfsResponse = await fetchWfsData(wfsDataUrl);
-      await handleWfsResponse(wfsResponse, extent, offset, position);
-    } catch (error) {
-      console.error('Error fetching WFS data:', error);
-      updateMetadata(-1, -1);
     }
   }, []);
+
+  const waitForTilesLoaded = () => {
+    return new Promise<void>((resolve) => {
+      const interval = setInterval(() => {
+        if (mapViewer.scene.globe.tilesLoaded) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    });
+  };
+  const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
+    const is2D = viewer.scene.mode === SceneMode.SCENE2D;
+
+    const getGeoJsonFromEntity = (entity: Entity): Polygon | undefined => {
+      if (entity.polygon) {
+        // Polygon
+        const polygonData = entity.polygon.hierarchy?.getValue(JulianDate.now()) as PolygonHierarchy;
+        const positions = polygonData.positions.map((position) => {
+          const worlPosCartographic = Cartographic.fromCartesian(position);
+          const correctedCarto = new Cartographic(
+            CesiumMath.toDegrees(worlPosCartographic.longitude),
+            CesiumMath.toDegrees(worlPosCartographic.latitude),
+            is2D ? 500 : undefined //viewer.scene.sampleHeight(Cartographic.fromCartesian(position))
+          );
+          return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
+        });
+
+        // return turf.polygon(positions);
+        return {
+          type: 'Polygon',
+          coordinates: [positions],
+        };
+      }
+    };
+
+    const pixelSizeInMeters = (
+      scene: Scene,
+      position: Cartesian3,
+      pixelWidth: number,
+      pixelHeight: number
+    ): { widthMeters: number; heightMeters: number } | null => {
+      const screenPosition = SceneTransforms.wgs84ToWindowCoordinates(scene, position);
+
+      if (!screenPosition) return null;
+
+      const xRight = screenPosition.x + pixelWidth;
+      const yBottom = screenPosition.y + pixelHeight;
+
+      const screenRight = new Cartesian2(xRight, screenPosition.y);
+      const screenBottom = new Cartesian2(screenPosition.x, yBottom);
+
+      const worldRight = scene.camera.pickEllipsoid(screenRight, scene.globe.ellipsoid);
+      const worldBottom = scene.camera.pickEllipsoid(screenBottom, scene.globe.ellipsoid);
+
+      if (!worldRight || !worldBottom) return null;
+
+      const widthMeters = Cartesian3.distance(position, worldRight);
+      const heightMeters = Cartesian3.distance(position, worldBottom);
+
+      return { widthMeters, heightMeters };
+    };
+
+    const createRectangleAround = (
+      centerCartographic: { longitude: number; latitude: number },
+      widthMeters: number,
+      heightMeters: number
+    ): Polygon => {
+      const ellipsoid = Ellipsoid.WGS84;
+      const lat = centerCartographic.latitude;
+      const lon = centerCartographic.longitude;
+
+      const metersPerDegreeLat = (Math.PI / 180) * ellipsoid.maximumRadius;
+      const metersPerDegreeLon = (Math.PI / 180) * ellipsoid.maximumRadius; /** Math.cos(lat)*/
+
+      const dLat = heightMeters / 2 / metersPerDegreeLat;
+      const dLon = widthMeters / 2 / metersPerDegreeLon;
+
+      const north = lat + dLat;
+      const south = lat - dLat;
+      const east = lon + dLon;
+      const west = lon - dLon;
+
+      return {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+            [west, north], // close the ring
+          ],
+        ],
+      };
+    };
+
+    const calcIntersectionRation = (polygon1: turf.Geometry, polygon2: turf.Geometry) => {
+      return area(polygon1) / area(polygon2);
+    };
+
+    const labelPos = [] as turf.Feature<turf.Point>[];
+    dataSource?.entities.values.forEach((entity: Entity) => {
+      if (extent && labeling && is2D) {
+        try {
+          const extentPolygon = bboxPolygon(extent);
+          const featureClippedPolygon = intersect(getGeoJsonFromEntity(entity) as Polygon, extentPolygon) as Feature<Polygon, Properties>;
+          if (featureClippedPolygon) {
+            const labelValue = entity.properties?.label.getValue(JulianDate.now());
+            const featureClippedPolygonCenter = centroid(featureClippedPolygon as unknown as Polygon, {
+              properties: {
+                label: labelValue,
+              },
+            });
+
+            const labelPixelSize = { width: labelValue.width, height: labelValue.height };
+            const [longitude, latitude, height = 0] = featureClippedPolygonCenter.geometry.coordinates;
+            const cartesian = Cartesian3.fromDegrees(longitude, latitude, height);
+            const sizeMeters = pixelSizeInMeters(viewer.scene, cartesian, labelPixelSize.width, labelPixelSize.height);
+
+            if (sizeMeters) {
+              const labelRect = createRectangleAround({ longitude, latitude }, sizeMeters.widthMeters, sizeMeters.heightMeters);
+
+              const labelIntersection = intersect(featureClippedPolygon, {
+                type: 'Feature',
+                properties: {},
+                geometry: labelRect,
+              });
+              const intersectionRatio = calcIntersectionRation(labelIntersection?.geometry as turf.Geometry, labelRect);
+              if (intersectionRatio > 0.7) {
+                labelPos.push(featureClippedPolygonCenter);
+              }
+            }
+          }
+        } catch (e) {
+          console.log('*** Label placement failed: turf.intersect() failed ***', 'entity -->', entity, 'extent -->', extent);
+        }
+      }
+      if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
+        return;
+      }
+      if (entity.polygon) {
+        entity.polygon = new PolygonGraphics({
+          hierarchy: entity.polygon.hierarchy,
+          material: is2D ? CesiumColor.fromCssColorString(color).withAlpha(0.2) : CesiumColor.fromCssColorString(color).withAlpha(0.5),
+          outline: true,
+          outlineColor: CesiumColor.fromCssColorString(color),
+          outlineWidth: 3,
+          height: is2D ? 10000 : undefined, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
+          perPositionHeight: false,
+        });
+      }
+      if (entity.polyline) {
+        entity.polyline = new PolylineGraphics({
+          positions: entity.polyline.positions,
+          material: CesiumColor.fromCssColorString(color).withAlpha(0.5),
+          clampToGround: true,
+          width: 4,
+        });
+      }
+      if (entity.billboard) {
+        const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
+        const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+        const correctedCarto = new Cartographic(
+          worlPosCartographic.longitude,
+          worlPosCartographic.latitude,
+          is2D ? 500 : viewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
+        );
+
+        const correctedCartesian = Cartesian3.fromRadians(correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height);
+
+        entity.position = correctedCartesian as unknown as PositionProperty;
+        entity.billboard = new BillboardGraphics({
+          image:
+            'data:image/svg+xml;base64,' +
+            btoa(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+              <circle cx="8" cy="8" r="6" fill="${color}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
+            </svg>
+          `), //${color}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
+          verticalOrigin: VerticalOrigin.BOTTOM,
+          heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+          scale: 1.0,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        });
+      }
+    });
+
+    viewer.dataSources.remove(viewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${dataSource.name}`)[0]);
+    if (labeling && is2D) {
+      const labelsGeoJsonDataSource = new GeoJsonDataSource(`${labeling?.dataSourcePrefix}${dataSource.name}`);
+      viewer.dataSources.add(labelsGeoJsonDataSource);
+      labelsGeoJsonDataSource
+        .load({
+          type: 'FeatureCollection',
+          features: labelPos,
+        })
+        .then((dataSource) => {
+          dataSource?.entities.values.forEach((entity: Entity) => {
+            entity.billboard = new BillboardGraphics({
+              image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
+              heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+              scale: 1.0,
+              disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            });
+          });
+        });
+    }
+  };
 
   const applyVisulization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
     visualizationHandler
@@ -569,11 +784,18 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     const handler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
     handleMouseHover(handler);
 
+    // Initial call, effective when map already exists and not in initialization state
+    if (viewStateRef.current.currentZoomLevel > 0) {
+      fetchAndUpdateWfs();
+      hasRunFetchRef.current = true;
+    }
+
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
         wfsCache.current.clear();
         fetchMetadata.current.clear();
+        mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
         mapViewer.dataSources.remove(wfsDataSource, true);
         mapViewer.layersManager?.removeDataLayer(meta.id as string);
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);

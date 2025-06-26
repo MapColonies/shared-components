@@ -276,6 +276,7 @@ LocalizedMap.argTypes = {
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
+      NO_DATA_LAYERS: 'לא נמצאו שכבות',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
@@ -296,6 +297,11 @@ LocalizedMap.argTypes = {
   },
   geocoderPanel: {
     defaultValue: GEOCODER_CONFIGS,
+  },
+  debugPanel: {
+    defaultValue: {
+      wfs: {},
+    },
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';

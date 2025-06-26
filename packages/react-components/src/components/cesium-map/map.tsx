@@ -61,23 +61,27 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
-  public currentZoomLevel?: number;
-  private useOptimizedTileRequests?: boolean;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
   }
-
-  public get shouldOptimizedTileRequests(): boolean {
-    return this.useOptimizedTileRequests ?? false;
-  }
-
-  public set shouldOptimizedTileRequests(useOptimizedTileRequests: boolean) {
-    this.useOptimizedTileRequests = useOptimizedTileRequests;
-  }
 }
 
-const mapContext = createContext<CesiumViewer | null>(null);
+export type MapViewState = {
+  currentZoomLevel: number;
+  shouldOptimizedTileRequests: boolean;
+};
+
+interface IMapViewState {
+  viewState: MapViewState;
+  setViewState: React.Dispatch<React.SetStateAction<MapViewState>>;
+}
+
+interface IMapContext extends IMapViewState {
+  mapViewer: CesiumViewer;
+}
+
+const mapContext = createContext<IMapContext | null>(null);
 const MapViewProvider = mapContext.Provider;
 
 export interface IContextMenuData {
@@ -146,7 +150,18 @@ export const useCesiumMap = (): CesiumViewer => {
     throw new Error('map context is null, please check the provider');
   }
 
-  return mapViewer;
+  return mapViewer.mapViewer;
+};
+
+export const useCesiumMapViewstate = (): IMapViewState => {
+  // @ts-ignore
+  const { mapViewer, ...rest } = useContext<IMapContext | null>(mapContext);
+
+  if (rest === null) {
+    throw new Error('map context viewstate is null, please check the provider');
+  }
+
+  return rest;
 };
 
 export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
@@ -174,13 +189,21 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
-  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
   const theme = useTheme();
   const themeCesium = useMappedCesiumTheme(theme);
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
   }, [isLoadingTiles, isLoadingDataLayer]);
+
+  const [viewState, setViewState] = useState<MapViewState>();
+
+  useEffect(() => {
+    setViewState({
+      currentZoomLevel: -1,
+      shouldOptimizedTileRequests: props.useOptimizedTileRequests ?? false,
+    });
+  }, []);
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -245,26 +268,28 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setMapViewRef(ref.current?.cesiumElement);
   }, [ref, props.imageryContextMenu]);
 
-  useEffect(() => {
+  const contextValue = useMemo(() => {
     if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
-
-      mapViewRef.layersManager = new LayerManager(
-        mapViewRef,
-        props.legends?.mapLegendsExtractor,
-        () => {
-          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-        },
-        props.layerManagerFootprintMetaFieldPath
-      );
+      const mv = mapViewRef.layersManager
+        ? mapViewRef
+        : Object.assign(mapViewRef, {
+            layersManager: new LayerManager(
+              mapViewRef,
+              props.legends?.mapLegendsExtractor,
+              () => {
+                setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+              },
+              props.layerManagerFootprintMetaFieldPath,
+              viewState?.shouldOptimizedTileRequests
+            ),
+          });
+      return {
+        mapViewer: mv,
+        viewState,
+        setViewState,
+      };
     }
-  }, [mapViewRef]);
-
-  useEffect(() => {
-    if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
-    }
-  }, [props.useOptimizedTileRequests, mapViewRef]);
+  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
 
   useEffect(() => {
     setSceneModes(
@@ -308,10 +333,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
-
-  useEffect(() => {
-    setDebugPanel(props.debugPanel);
-  }, [props.debugPanel]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -456,8 +477,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box className="sideToolsContainer">
-            {debugPanel && <DebugPanel locale={locale}>{debugPanel.wfs && <WFS locale={locale} />}</DebugPanel>}
             {props.geocoderPanel && <GeocoderPanel locale={locale} configs={[...props.geocoderPanel]} />}
+            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
             <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} />
             <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
           </Box>
@@ -477,7 +498,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
-        <MapViewProvider value={mapViewRef as CesiumViewer}>
+        <MapViewProvider value={contextValue as IMapContext}>
           <MapLegendSidebar
             title={props.legends?.title}
             isOpen={isLegendsSidebarOpen}

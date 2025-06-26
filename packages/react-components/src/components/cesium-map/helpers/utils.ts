@@ -176,6 +176,28 @@ export const rectangle2bbox = (bbox: Rectangle): BBox => [
   CesiumMath.toDegrees(bbox.north),
 ];
 
+export const customComputeViewRectangle = (mapViewer: CesiumViewer) => {
+  const scene = mapViewer.scene;
+  const camera = mapViewer.camera;
+
+  let viewRect = camera.computeViewRectangle(scene.globe.ellipsoid);
+
+  if (!defined(viewRect) || !viewRect) {
+    console.error('cesium native computeViewRectangle returned invalid rectangle, fallback to custom calculation ');
+    const cl2 = new Cartesian2(0, 0);
+    const leftTop = scene.camera.pickEllipsoid(cl2, scene.globe.ellipsoid);
+
+    const cr2 = new Cartesian2(scene.canvas.width, scene.canvas.height);
+    const rightDown = scene.camera.pickEllipsoid(cr2, scene.globe.ellipsoid);
+
+    const cartoLeftTop = scene.globe.ellipsoid.cartesianToCartographic(leftTop as Cartesian3);
+    const cartoRightDown = scene.globe.ellipsoid.cartesianToCartographic(rightDown as Cartesian3);
+    viewRect = new Rectangle(cartoLeftTop.longitude, cartoRightDown.latitude, cartoRightDown.longitude, cartoLeftTop.latitude);
+  }
+
+  return viewRect;
+};
+
 /**
  * Computes a limited view rectangle in case of 3D mode based on the camera position and max distance.
  * @param mapViewer Cesium Viewer instance
@@ -188,11 +210,11 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const mode = scene.mode;
 
   // Get the full rectangle in 2D or 3D mode
-  const fullRect = camera.computeViewRectangle(scene.globe.ellipsoid);
+  const fullRect = customComputeViewRectangle(mapViewer);
 
   // Check if fullRect is valid before proceeding
   if (!defined(fullRect) || !fullRect) {
-    console.error('computeViewRectangle returned invalid rectangle.');
+    console.error('customComputeViewRectangle returned invalid rectangle.');
     return undefined;
   }
 
