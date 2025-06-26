@@ -150,8 +150,8 @@ ZoomedMap.argTypes = {
 
 const cesiumTheme = {
   '--mdc-theme-on-surface': 'white',
-  '--mdc-theme-primary': 'green',
-  '--mdc-theme-error': 'blue',
+  '--mdc-theme-primary': 'blue',
+  '--mdc-theme-error': '#ee2400',
 };
 
 export const GeocoderPanel: Story = (args: CesiumMapProps) => (

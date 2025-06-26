@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useCesiumMap } from '../map';
 import { Cartesian2, Cartesian3, Cartographic, defined, GeoJsonDataSource, Ray, Rectangle, SceneMode, Viewer } from 'cesium';
 import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
-import { applyFactor, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
+import { applyFactor, computeLimitedViewRectangle, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { debounce, get } from 'lodash';
 import bbox from '@turf/bbox';
 import { getType } from '@turf/invariant';
@@ -227,7 +227,9 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
         if (isInMapExtent) {
           // const rectangle = getAccurateViewRectangle(mapViewer);
 
-          const rectangle = computeLimitedViewRectangle(mapViewer);
+          // const rectangle = computeLimitedViewRectangle(mapViewer);
+          
+          const rectangle = customComputeViewRectangle(mapViewer);
 
           const geoContext = params.dynamic.geoContext;
           const geoContextName = typeof geoContext === 'string' ? geoContext : geoContext?.name;
