@@ -1,6 +1,10 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { ThemeProvider } from '@map-colonies/react-core';
+import { getValue } from '../utils/config';
 import { CesiumMap, CesiumMapProps } from './map';
 import { CesiumSceneMode, Proj } from '.';
+import { GeocoderPanelProps } from './geocoder/geocoder-panel';
+import { BASE_MAPS } from './helpers/constants';
 
 export default {
   title: 'Cesium Map',
@@ -15,6 +19,84 @@ const mapDivStyle = {
   width: '100%',
   position: 'absolute' as const,
 };
+
+const GEOCODER_OPTIONS = [
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/location/query',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'query',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'מיקום',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/tiles',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'tile',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'אריחים (tiles)',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/items',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/routes',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      // "geo_context": { "bbox": [-180, -90, 180, 90] },
+    },
+    geometryIconClassName: 'customIcon',
+  },
+] satisfies GeocoderPanelProps['options'];
 
 export const BaseMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -41,6 +123,48 @@ ZoomedMap.argTypes = {
     },
   },
 };
+
+const cesiumTheme = {
+  // '--mdc-theme-primary': '#24aee9',
+  '--mdc-theme-on-surface': 'white',
+  '--mdc-theme-error': '#FF3636',
+};
+
+export const GeocoderPanel: Story = (args: CesiumMapProps) => (
+  <ThemeProvider options={cesiumTheme}>
+    <div style={mapDivStyle}>
+      <CesiumMap {...args}></CesiumMap>
+    </div>
+  </ThemeProvider>
+);
+
+GeocoderPanel.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
+  sceneMode: {
+    defaultValue: CesiumSceneMode.SCENE2D,
+  },
+  projection: {
+    defaultValue: Proj.WGS84,
+    control: {
+      type: 'radio',
+      options: [Proj.WEB_MERCATOR, Proj.WGS84],
+    },
+  },
+  zoom: {
+    defaultValue: 3,
+    control: {
+      type: 'range',
+      min: 0,
+      max: 20,
+    },
+  },
+  geocoderPanel: {
+    defaultValue: GEOCODER_OPTIONS,
+  },
+};
+GeocoderPanel.storyName = 'Geocoder Panel';
 
 export const MapWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -121,6 +245,10 @@ LocalizedMap.argTypes = {
       MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
+      SHOW_FEATURE_ON_MAP: "הראה פיצ'ר",
+      IN_MAP_EXTENT: 'חיפוש בתצוגה',
+      SEARCH_PLACEHOLDER: 'חיפוש...',
+      NO_RESULTS: 'אין תוצאות',
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
@@ -142,6 +270,9 @@ LocalizedMap.argTypes = {
       min: 0,
       max: 20,
     },
+  },
+  geocoderPanel: {
+    defaultValue: GEOCODER_OPTIONS,
   },
   debugPanel: {
     defaultValue: {
