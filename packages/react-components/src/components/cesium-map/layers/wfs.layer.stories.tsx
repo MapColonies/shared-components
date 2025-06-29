@@ -31,7 +31,7 @@ import {
   CesiumEllipsoid,
 } from '../proxied.types';
 import { getValue } from '../../utils/config';
-import { BASE_MAPS } from '../map.stories';
+import { BASE_MAPS } from '../helpers/constants';
 import { useRef, useState } from 'react';
 
 export default {

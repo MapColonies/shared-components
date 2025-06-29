@@ -1,28 +1,28 @@
-#geocoderContainer {
+.geocoderContainer {
   display: flex;
   flex-direction: row-reverse;
   color: var(--mdc-theme-cesium-color);
 }
 
-#geocoderContainer .geocoderForm {
+.geocoderContainer .geocoderForm {
   background-color: var(--mdc-theme-cesium-background-color);
   border-radius: var(--mdc-theme-cesium-container-border-radius);
 }
 
-#geocoderContainer .mdc-text-field__input {
+.geocoderContainer .mdc-text-field__input {
   width: 100%;
   border-radius: 4px;
   padding: 4px;
 }
 
-#geocoderContainer .listsContainer {
+.geocoderContainer .listsContainer {
   max-height: 348px;
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
 }
 
-#geocoderContainer .listContainer {
+.geocoderContainer .listContainer {
   border: 1px solid var(--mdc-theme-cesium-color);
   min-height: 56px;
   width: 308px;
@@ -32,13 +32,13 @@
   padding-top: 2px;
 }
 
-#geocoderContainer .listContainer .queryItemResult {
+.geocoderContainer .listContainer .queryItemResult {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-#geocoderContainer .geometrysSvgIcons {
+.geocoderContainer .geometrysSvgIcons {
   stroke: black;
   stroke-width: 2;
   stroke-linecap: round;
@@ -47,18 +47,18 @@
   fill: transparent;
 }
 
-#geocoderContainer .listContainer .queryNoResults {
+.geocoderContainer .listContainer .queryNoResults {
   justify-content: normal;
   color: unset;
 }
 
-#geocoderContainer .listContainer .queryServiceError {
+.geocoderContainer .listContainer .queryServiceError {
   color: var(--mdc-theme-cesium-service-error);
   text-wrap: unset;
   width: unset;
 }
 
-#geocoderContainer .listContainer .generalListItem {
+.geocoderContainer .listContainer .generalListItem {
   font-size: var(--mdc-theme-cesium-font-size);
   text-wrap: wrap !important;
   padding: unset;
@@ -66,38 +66,38 @@
   padding-left: 4px;
 }
 
-body[dir='ltr'] #geocoderContainer .geocoderForm {
+body[dir='ltr'] .geocoderContainer .geocoderForm {
   position: relative;
   right: 8%;
 }
 
-body[dir='rtl'] #geocoderContainer .geocoderForm {
+body[dir='rtl'] .geocoderContainer .geocoderForm {
   position: relative;
   right: 0%;
 }
 
-#geocoderContainer .checkboxesContainer {
+.geocoderContainer .checkboxesContainer {
   display: flex;
   justify-content: space-between;
   padding-bottom: 8px;
 }
 
-#geocoderContainer .checkboxElement {
+.geocoderContainer .checkboxElement {
   font-size: var(--mdc-theme-cesium-font-size);
   font-weight: bold;
   flex: 1;
 }
 
-#geocoderContainer .bold {
+.geocoderContainer .bold {
   font-weight: bold;
 }
 
 /* #region cesium classes */
-#geocoderContainer .cesium-geocoder-searchButton {
+.geocoderContainer .cesium-geocoder-searchButton {
   position: relative !important;
 }
 
-#geocoderContainer .cesium-geocoder-input {
+.geocoderContainer .cesium-geocoder-input {
   width: 100%;
   background: transparent;
   border-color: var(--mdc-theme-cesium-color);

@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCesiumMap } from '../map';
-import { Cartesian2, Cartesian3, Cartographic, defined, GeoJsonDataSource, Ray, Rectangle, SceneMode, Viewer } from 'cesium';
-import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
-import { applyFactor, computeLimitedViewRectangle, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { debounce, get } from 'lodash';
+import { Cartesian2, Cartesian3, Cartographic, defined, GeoJsonDataSource, Ray, Rectangle, SceneMode, Viewer } from 'cesium';
 import bbox from '@turf/bbox';
 import { getType } from '@turf/invariant';
-import { CesiumRectangle } from '../proxied.types';
+import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
+import { useCesiumMap } from '../map';
+import { applyFactor, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
+import { CesiumRectangle } from '../proxied.types';
 
 import './geocoder-panel.css';
 import '@map-colonies/react-core/dist/list/styles';
@@ -20,6 +20,7 @@ type UrlGroup = { baseUrl: string; endPoint: string; url?: string } | { baseUrl?
 type relatedParamsType = {
   name: string;
   relatedParams: [string, any][];
+  titles?: Array<string | undefined>;
 };
 
 export type CesiumGeocodingProps = UrlGroup & {
@@ -37,11 +38,11 @@ export type CesiumGeocodingProps = UrlGroup & {
 };
 
 export type GeocoderPanelProps = {
-  configs: CesiumGeocodingProps[];
+  options: CesiumGeocodingProps[];
   locale?: { [key: string]: string };
 };
 
-export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale }) => {
+export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, locale }) => {
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -364,14 +365,14 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ configs, locale })
   };
 
   return (
-    <div ref={geocoderPanelRef} id="geocoderContainer">
+    <div ref={geocoderPanelRef} className="geocoderContainer">
       <IconButton className="cesium-geocoder-searchButton" icon={SearchIcon} onClick={() => setIsOpen((prev) => !prev)} />
 
       {isOpen && (
         <Box className="geocoderForm">
           <TextField
             id="geocoderTextField"
-            className="cesium-geocoder-input"
+            className="cesium-geocoder-input geocoderInput"
             ref={inputRef}
             onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
             placeholder={searchPlaceholder}

@@ -36,12 +36,11 @@ const mapMcToMuiTheme = (mcTheme: { [key: string]: string }, prefersDarkMode = f
 const useMappedCesiumTheme = (theme: { [key: string]: string }): any => {
   return React.useMemo(() => {
     return {
-      // 'cesium-color': theme["text-primary-on-background"] ?? 'green',
-      'cesium-color': theme['--mdc-theme-on-surface'] ?? 'white',
-      'cesium-checkbox-color': theme['--mdc-theme-primary'] ?? '#0000FF',
-      // 'cesium-background-color': theme.background ?? 'rgba(38, 38, 38, 0.75)',
-      'cesium-service-error': theme['--mdc-theme-error'] ?? '#ec3713',
+      ...theme,
       'cesium-background-color': 'rgba(38, 38, 38, 0.75)',
+      'cesium-color': theme['--mdc-theme-on-surface'] ?? 'white',
+      'cesium-service-error': theme['--mdc-theme-error'] ?? '#ec3713',
+      'cesium-checkbox-color': '#1A73E8',
       'cesium-checkbox-width': '12px',
       'cesium-checkbox-height': '12px',
       'cesium-container-border-radius': '4px',

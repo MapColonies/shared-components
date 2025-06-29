@@ -69,6 +69,7 @@ body[dir='rtl'] .sideToolsContainer {
 
 #cesiumTheme input::placeholder {
   color: unset;
+  opacity: 0.8;
 }
 
 #cesiumTheme input {
@@ -123,6 +124,10 @@ body[dir='rtl'] .sideToolsContainer {
   margin-bottom: -4%;
 }
 
+#cesiumTheme .mdc-form-field > label {
+  color: unset;
+}
+
 #cesiumTheme .mdc-ripple-upgraded--unbounded {
   --mdc-ripple-fg-size: 0px !important;
 }
@@ -155,6 +160,10 @@ body[dir='rtl'] .sideToolsContainer {
 #cesiumTheme .mdc-text-field__input {
   box-sizing: border-box;
   border: unset;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: transparent !important;
 }
 
 #cesiumTheme .mdc-text-field {

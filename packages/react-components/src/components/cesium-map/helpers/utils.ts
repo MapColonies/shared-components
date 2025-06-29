@@ -414,6 +414,40 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
     return { widthMeters, heightMeters };
   };
 
+  const createRectangleAround = (
+    centerCartographic: { longitude: number; latitude: number },
+    widthMeters: number,
+    heightMeters: number
+  ): Polygon => {
+    const ellipsoid = Ellipsoid.WGS84;
+    const lat = centerCartographic.latitude;
+    const lon = centerCartographic.longitude;
+
+    const metersPerDegreeLat = (Math.PI / 180) * ellipsoid.maximumRadius;
+    const metersPerDegreeLon = (Math.PI / 180) * ellipsoid.maximumRadius; /** Math.cos(lat)*/
+
+    const dLat = heightMeters / 2 / metersPerDegreeLat;
+    const dLon = widthMeters / 2 / metersPerDegreeLon;
+
+    const north = lat + dLat;
+    const south = lat - dLat;
+    const east = lon + dLon;
+    const west = lon - dLon;
+
+    return {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [west, north],
+          [east, north],
+          [east, south],
+          [west, south],
+          [west, north], // close the ring
+        ],
+      ],
+    };
+  };
+
   const calcIntersectionRation = (polygon1: turf.Geometry, polygon2: turf.Geometry) => {
     return area(polygon1) / area(polygon2);
   };

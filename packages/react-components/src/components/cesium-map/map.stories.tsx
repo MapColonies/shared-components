@@ -1,9 +1,10 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
-import { CesiumMap, CesiumMapProps } from './map';
-import { CesiumSceneMode, LayerType, Proj } from '.';
-import { getValue } from '../utils/config';
-import { GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { ThemeProvider } from '@map-colonies/react-core';
+import { getValue } from '../utils/config';
+import { CesiumMap, CesiumMapProps } from './map';
+import { CesiumSceneMode, Proj } from '.';
+import { GeocoderPanelProps } from './geocoder/geocoder-panel';
+import { BASE_MAPS } from './helpers/constants';
 
 export default {
   title: 'Cesium Map',
@@ -19,32 +20,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
-};
-
-const GEOCODER_CONFIGS = [
+const GEOCODER_OPTIONS = [
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
     endPoint: '/search/location/query',
@@ -120,7 +96,7 @@ const GEOCODER_CONFIGS = [
     },
     geometryIconClassName: 'customIcon',
   },
-] satisfies GeocoderPanelProps['configs'];
+] satisfies GeocoderPanelProps['options'];
 
 export const BaseMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -149,9 +125,9 @@ ZoomedMap.argTypes = {
 };
 
 const cesiumTheme = {
+  // '--mdc-theme-primary': '#24aee9',
   '--mdc-theme-on-surface': 'white',
-  '--mdc-theme-primary': 'blue',
-  '--mdc-theme-error': '#ee2400',
+  '--mdc-theme-error': '#FF3636',
 };
 
 export const GeocoderPanel: Story = (args: CesiumMapProps) => (
@@ -185,7 +161,7 @@ GeocoderPanel.argTypes = {
     },
   },
   geocoderPanel: {
-    defaultValue: GEOCODER_CONFIGS,
+    defaultValue: GEOCODER_OPTIONS,
   },
 };
 GeocoderPanel.storyName = 'Geocoder Panel';
@@ -270,7 +246,7 @@ LocalizedMap.argTypes = {
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
       SHOW_FEATURE_ON_MAP: "הראה פיצ'ר",
-      IN_MAP_EXTENT: 'חיפוש בתחום המפה',
+      IN_MAP_EXTENT: 'חיפוש בתצוגה',
       SEARCH_PLACEHOLDER: 'חיפוש...',
       NO_RESULTS: 'אין תוצאות',
       WFS_TITLE: 'שכבות מידע',
@@ -296,7 +272,7 @@ LocalizedMap.argTypes = {
     },
   },
   geocoderPanel: {
-    defaultValue: GEOCODER_CONFIGS,
+    defaultValue: GEOCODER_OPTIONS,
   },
   debugPanel: {
     defaultValue: {
