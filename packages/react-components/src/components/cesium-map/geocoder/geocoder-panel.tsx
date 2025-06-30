@@ -42,7 +42,7 @@ export type GeocoderPanelProps = {
   locale?: { [key: string]: string };
 };
 
-export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, locale }) => {
+export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, locale }) => {
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -105,12 +105,12 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, 
   });
 
   useEffect(() => {
-    configs.forEach((config: CesiumGeocodingProps) => {
-      if (config.baseUrl && config.endPoint && !config.url) {
-        config.url = config.baseUrl + config.endPoint;
+    options.forEach((option: CesiumGeocodingProps) => {
+      if (option.baseUrl && option.endPoint && !option.url) {
+        option.url = option.baseUrl + option.endPoint;
       }
     });
-  }, [configs]);
+  }, [options]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -279,9 +279,9 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, 
         return;
       }
 
-      const queryPromises = configs.map(async (config) => {
-        if (config.url) {
-          const url = buildUrlParams(config.url, config.params, text, isInMapExtent);
+      const queryPromises = options.map(async (option) => {
+        if (option.url) {
+          const url = buildUrlParams(option.url, option.params, text, isInMapExtent);
           return fetch(url, {
             method: 'GET',
           });
@@ -309,7 +309,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, 
         setSearchResults(cleaned);
       }
     },
-    [buildUrlParams, configs]
+    [buildUrlParams, options]
   );
 
   const debouncedSearch = useMemo(
@@ -409,10 +409,10 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, 
             </Box>
 
             <Box className="listsContainer">
-              {configs.map((config, index) => (
+              {options.map((option, index) => (
                 <List>
                   <Typography className="bold" tag="span">
-                    {config.title ?? config.endPoint}
+                    {option.title ?? option.endPoint}
                   </Typography>
                   <Box className="listContainer">
                     {(() => {
@@ -439,7 +439,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: configs, 
                               <Tooltip content={feature?.properties?.names?.display}>
                                 <Box>{feature?.properties?.names?.default?.[0]}</Box>
                               </Tooltip>
-                              {getIconByFeatureType(feature, config.geometryIconClassName)}
+                              {getIconByFeatureType(feature, option.geometryIconClassName)}
                             </Box>
                           </ListItem>
                         ));
