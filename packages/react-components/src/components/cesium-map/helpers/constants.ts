@@ -1,6 +1,8 @@
 import { getValue } from '../../utils/config';
 import { IBaseMaps } from '../settings/settings';
 
+export const DEFAULT_TERRAIN_PROVIDER_URL = getValue('GLOBAL', 'DEFAULT_TERRAIN_PROVIDER_URL');
+
 export const BASE_MAPS: IBaseMaps = {
   maps: [
     {

@@ -7,7 +7,7 @@ import * as turf from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { getValue } from '../../utils/config';
-import { BASE_MAPS } from '../helpers/constants';
+import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL } from '../helpers/constants';
 import { CesiumMap, CesiumViewer } from '../map';
 import {
   CesiumMath,
@@ -47,8 +47,6 @@ const mapDivStyle = {
   width: '100%',
   position: 'absolute' as const,
 };
-
-const DEFAULT_TERRAIN_PROVIDER_URL = 'https://dem-nginx-s3-gateway-route-manual-integration.apps.j1lk3njp.eastus.aroapp.io/terrains/srtm100?token=eyJhbGciOiJSUzI1NiIsImtpZCI6Im1hcC1jb2xvbmllcy1pbnQifQ.eyJkIjpbInJhc3RlciIsInJhc3RlcldtcyIsInJhc3RlckV4cG9ydCIsImRlbSIsInZlY3RvciIsIjNkIl0sImlhdCI6MTY3NDYzMjM0Niwic3ViIjoibWFwY29sb25pZXMtYXBwIiwiaXNzIjoibWFwY29sb25pZXMtdG9rZW4tY2xpIn0.D1u28gFlxf_Z1bzIiRHZonUgrdWwhZy8DtmQj15cIzaABRUrGV2n_OJlgWTuNfrao0SbUZb_s0_qUUW6Gz_zO3ET2bVx5xQjBu0CaIWdmUPDjEYr6tw-eZx8EjFFIyq3rs-Fo0daVY9cX1B2aGW_GeJir1oMnJUURhABYRoh60azzl_utee9UdhDpnr_QElNtzJZIKogngsxCWp7tI7wkTuNCBaQM7aLEcymk0ktxlWEAt1E0nGt1R-bx-HnPeeQyZlxx4UQ1nuYTijpz7N8poaCCExOFeafj9T7megv2BzTrKWgfM1eai8srSgNa3I5wKuW0EyYnGZxdbJe8aseZg';
 
 const DEBUG_PANEL = {
   wfs: {},
