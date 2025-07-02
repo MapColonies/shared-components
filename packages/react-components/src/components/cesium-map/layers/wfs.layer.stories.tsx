@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { BBox } from 'geojson';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
@@ -141,6 +142,64 @@ MapWithWFSLayer.argTypes = {
 };
 
 MapWithWFSLayer.storyName = 'WFS Vector layer';
+// #endregion
+
+// #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
+export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
+  const show = useRef(false);
+
+  function MyWFSLayer() {
+    const [show, setShow] = useState(false);
+    return (
+      <>
+        <input
+          type="button"
+          onClick={() => {
+            setShow(!show);
+          }}
+          value={`SHOW WFS LAYER (${show})`}
+          style={{ zIndex: '2', position: 'absolute' }}
+        ></input>
+        {show && (
+          <CesiumWFSLayer
+            key={metaBuildings.id}
+            options={optionsBuildings}
+            meta={metaBuildings}
+            // visualizationHandler={handleVisualizationBuildings}
+          />
+        )}
+      </>
+    );
+  }
+
+  return (
+    <div style={mapDivStyle}>
+      <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
+        <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+        <MyWFSLayer></MyWFSLayer>
+      </CesiumMap>
+    </div>
+  );
+};
+
+MapWithWFSLayerAPPScenario.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
+  zoom: {
+    defaultValue: 17,
+    control: {
+      type: 'range',
+      min: 0,
+      max: 20,
+    },
+  },
+  debugPanel: {
+    defaultValue: DEBUG_PANEL,
+  },
+};
+
+MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';
 // #endregion
 
 // #region STORY VECTOR component (CUSTOM VISUALIZER)

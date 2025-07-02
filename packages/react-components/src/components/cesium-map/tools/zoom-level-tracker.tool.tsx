@@ -1,12 +1,13 @@
 import { PerspectiveOffCenterFrustum } from 'cesium';
 import { get } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CesiumViewer, useCesiumMap } from '../map';
+import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
 
 import './zoom-level-tracker.tool.css';
 
-type ValueBy = 'CALCULATION' | 'RENDERED_TILES'
+type ValueBy = 'CALCULATION' | 'RENDERED_TILES';
+
 export interface RZoomLevelTrackerToolProps {
   locale?: { [key: string]: string };
   valueBy?: ValueBy;
@@ -72,8 +73,9 @@ const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
 };
 /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({locale = undefined, valueBy = 'RENDERED_TILES'}) => {
+export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ locale = undefined, valueBy = 'RENDERED_TILES' }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
+  const mapViewState = useCesiumMapViewstate();
   const [zoomLevel, setZoomLevel] = useState(1);
   const zoomLevelHeights = getZoomLevelHeights(1, mapViewer);
 
@@ -105,7 +107,9 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({loca
       });
 
       setZoomLevel(closestZoom.level);
-      mapViewer.currentZoomLevel = closestZoom.level;
+      if (mapViewState.setViewState) {
+        mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: closestZoom.level }));
+      }
     }
   }, [mapViewer, zoomLevelHeights]);
 
@@ -118,31 +122,33 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({loca
     });
 
     setZoomLevel(maxZoom);
-    mapViewer.currentZoomLevel = maxZoom;
+    if (mapViewState.setViewState) {
+      mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: maxZoom }));
+    }
   }, [mapViewer]);
 
   const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(() => ({
     CALCULATION: calculateZoomLevel,
     RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles
-  }), [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]); 
+  }), [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]);
 
   const zoomExtractionMethod = extractZoomMethods[valueBy];
-  
+
   useEffect(() => {
     // Handle correct zoom since camera.moveEnd wont trigger when map first loaded.
     const removeTilesLoadedListener = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener(function () {
-      if(mapViewer.scene.globe.tilesLoaded) {
+      if (mapViewer.scene.globe.tilesLoaded) {
         zoomExtractionMethod();
       }
     });
-    
+
     mapViewer.camera.moveEnd.addEventListener(zoomExtractionMethod);
 
     return (): void => {
       try {
         /* eslint-disable @typescript-eslint/no-unnecessary-condition*/
         if (typeof get(mapViewer, '_cesiumWidget') !== 'undefined') {
-          mapViewer.camera.moveEnd.removeEventListener(zoomExtractionMethod);  
+          mapViewer.camera.moveEnd.removeEventListener(zoomExtractionMethod);
           removeTilesLoadedListener();
         }
       } catch (e) {

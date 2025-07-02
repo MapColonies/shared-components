@@ -150,6 +150,7 @@ LocalizedMap.argTypes = {
       '3D_SECTION': 'תלת-מימד',
       DEM_SECTION: 'גבהים',
       VECTOR_SECTION: 'וקטור',
+      NO_DATA_LAYERS: 'לא נמצאו שכבות',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
@@ -166,6 +167,11 @@ LocalizedMap.argTypes = {
       type: 'range',
       min: 0,
       max: 20,
+    },
+  },
+  debugPanel: {
+    defaultValue: {
+      wfs: {},
     },
   },
 };

@@ -28,8 +28,8 @@ import { LinearProgress } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-// import { DebugPanel } from './debug/debug-panel';
-// import { WFS } from './debug/wfs';
+import { DebugPanel } from './debug/debug-panel';
+import { WFS } from './debug/wfs';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
@@ -71,23 +71,27 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
-  public currentZoomLevel?: number;
-  private useOptimizedTileRequests?: boolean;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
   }
-
-  public get shouldOptimizedTileRequests(): boolean {
-    return this.useOptimizedTileRequests ?? false;
-  }
-
-  public set shouldOptimizedTileRequests(useOptimizedTileRequests: boolean) {
-    this.useOptimizedTileRequests = useOptimizedTileRequests;
-  }
 }
 
-const mapContext = createContext<CesiumViewer | null>(null);
+export type MapViewState = {
+  currentZoomLevel: number;
+  shouldOptimizedTileRequests: boolean;
+};
+
+interface IMapViewState {
+  viewState: MapViewState;
+  setViewState: React.Dispatch<React.SetStateAction<MapViewState>>;
+}
+
+interface IMapContext extends IMapViewState {
+  mapViewer: CesiumViewer;
+}
+
+const mapContext = createContext<IMapContext | null>(null);
 const MapViewProvider = mapContext.Provider;
 
 export interface IContextMenuData {
@@ -128,7 +132,7 @@ export interface CesiumMapProps extends ViewerProps {
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
-  sceneModes?: typeof CesiumSceneMode[];
+  sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
@@ -151,7 +155,18 @@ export const useCesiumMap = (): CesiumViewer => {
     throw new Error('map context is null, please check the provider');
   }
 
-  return mapViewer;
+  return mapViewer.mapViewer;
+};
+
+export const useCesiumMapViewstate = (): IMapViewState => {
+  // @ts-ignore
+  const { mapViewer, ...rest } = useContext<IMapContext | null>(mapContext);
+
+  if (rest === null) {
+    throw new Error('map context viewstate is null, please check the provider');
+  }
+
+  return rest;
 };
 
 export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
@@ -167,7 +182,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<typeof CesiumSceneMode[] | undefined>();
+  const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
@@ -180,10 +195,18 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
   const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
+  const [viewState, setViewState] = useState<MapViewState>();
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
   }, [isLoadingTiles, isLoadingDataLayer]);
+
+  useEffect(() => {
+    setViewState({
+      currentZoomLevel: -1,
+      shouldOptimizedTileRequests: props.useOptimizedTileRequests ?? false,
+    });
+  }, []);
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -248,29 +271,33 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setMapViewRef(ref.current?.cesiumElement);
   }, [ref, props.imageryContextMenu]);
 
-  useEffect(() => {
+  const contextValue = useMemo(() => {
     if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
-
-      mapViewRef.layersManager = new LayerManager(
-        mapViewRef,
-        props.legends?.mapLegendsExtractor,
-        () => {
-          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-        },
-        props.layerManagerFootprintMetaFieldPath
-      );
+      const mv = mapViewRef.layersManager
+        ? mapViewRef
+        : Object.assign(mapViewRef, {
+            layersManager: new LayerManager(
+              mapViewRef,
+              props.legends?.mapLegendsExtractor,
+              () => {
+                setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+              },
+              props.layerManagerFootprintMetaFieldPath,
+              viewState?.shouldOptimizedTileRequests
+            ),
+          });
+      return {
+        mapViewer: mv,
+        viewState,
+        setViewState,
+      };
     }
-  }, [mapViewRef]);
+  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
 
   useEffect(() => {
-    if (mapViewRef) {
-      mapViewRef.shouldOptimizedTileRequests = props.useOptimizedTileRequests ?? false;
-    }
-  }, [props.useOptimizedTileRequests, mapViewRef]);
-
-  useEffect(() => {
-    setSceneModes(props.sceneModes ?? [CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as typeof CesiumSceneMode[]);
+    setSceneModes(
+      props.sceneModes ?? ([CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as (typeof CesiumSceneMode)[])
+    );
   }, [props.sceneModes]);
 
   useEffect(() => {
@@ -395,10 +422,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           let loading = false;
           mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
             if (
-              typeof dataLayer.meta.items === 'number' && 
-              typeof dataLayer.meta.total === 'number' && 
-              dataLayer.meta.items > 0 && 
-              dataLayer.meta.items < dataLayer.meta.total) {
+              typeof dataLayer.meta.items === 'number' &&
+              typeof dataLayer.meta.total === 'number' &&
+              dataLayer.meta.items > 0 &&
+              dataLayer.meta.items < dataLayer.meta.total
+            ) {
               loading = true;
               return;
             }
@@ -463,13 +491,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             <ActiveLayersTool locale={locale} />
           </Box>
           <Box className="sideToolsContainer">
-            {/* {
-              debugPanel &&
-              <DebugPanel locale={locale}>
-                {debugPanel.wfs && <WFS locale={locale} />}
-              </DebugPanel>
-            } */}
-            {/* <CesiumSettings sceneModes={sceneModes as typeof CesiumSceneMode[]} baseMaps={baseMaps} locale={locale} /> */}
+            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
+            {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
             {/* <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} /> */}
             {/* {
               showBasemaps &&
@@ -497,7 +520,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   return (
     <Viewer className="viewer" full ref={ref} {...viewerProps}>
-      <MapViewProvider value={mapViewRef as CesiumViewer}>
+      <MapViewProvider value={contextValue as IMapContext}>
         <MapLegendSidebar
           title={props.legends?.title}
           isOpen={isLegendsSidebarOpen}
