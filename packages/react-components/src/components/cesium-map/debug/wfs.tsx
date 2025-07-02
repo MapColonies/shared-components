@@ -2,8 +2,6 @@ import { get } from 'lodash';
 import React, { useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { useCesiumMap } from '../map';
 import { IActiveFeatureTypes } from './debug-panel';
 
 import './wfs.css';
