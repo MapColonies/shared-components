@@ -38,6 +38,86 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
+    title: 'location',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/tiles',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'tile',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'tiles',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/items',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'control',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/routes',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      // "geo_context": { "bbox": [-180, -90, 180, 90] },
+    },
+    title: 'routes',
+    geometryIconClassName: 'customIcon',
+  },
+] satisfies GeocoderPanelProps['options'];
+
+const LOCALIZED_GEOCODER_OPTIONS = [
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/location/query',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'query',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
     title: 'מיקום',
     geometryIconClassName: 'customIcon',
   },
@@ -58,7 +138,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'אריחים (tiles)',
+    title: 'טיילים',
     geometryIconClassName: 'customIcon',
   },
   {
@@ -78,6 +158,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
+    title: 'שליטה',
     geometryIconClassName: 'customIcon',
   },
   {
@@ -94,6 +175,7 @@ const GEOCODER_OPTIONS = [
       },
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
+    title: 'דרכים',
     geometryIconClassName: 'customIcon',
   },
 ] satisfies GeocoderPanelProps['options'];
@@ -272,7 +354,7 @@ LocalizedMap.argTypes = {
     },
   },
   geocoderPanel: {
-    defaultValue: GEOCODER_OPTIONS,
+    defaultValue: LOCALIZED_GEOCODER_OPTIONS,
   },
   debugPanel: {
     defaultValue: {
