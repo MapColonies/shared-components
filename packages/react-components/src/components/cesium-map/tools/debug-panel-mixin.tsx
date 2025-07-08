@@ -2,8 +2,8 @@ import React from 'react'; // <- Important: import React to use JSX syntax (in o
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
 import { createRoot } from 'react-dom/client';
-import { WFS } from '../debug/wfs';
 import { IDebugPanel } from '../map';
+import { DebugPanelWFS } from './debug-panel-wfs';
 
 interface DebugPanelMixinOptions {
   debugPanel: IDebugPanel;
@@ -59,7 +59,7 @@ export function DebugPanelMixin(viewer: Cesium.Viewer, options: DebugPanelMixinO
           const content = document.createElement('div');
           const root = createRoot(content);
           this.contentDiv.appendChild(content);
-          root.render(<WFS viewer={this.viewer as any} locale={this.options.locale} />);
+          root.render(<DebugPanelWFS viewer={this.viewer as any} locale={this.options.locale} />);
         }
       }
     }

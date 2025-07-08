@@ -1,10 +1,11 @@
-import React, { useMemo, useState, ReactNode, useEffect } from 'react';
 import { get } from 'lodash';
-import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Tooltip } from '@map-colonies/react-core';
+import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { useCesiumMap } from '../map';
+import { CesiumViewer, useCesiumMap } from '../map';
 
-import './debug-panel.css';
+import './debug-panel-wfs.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -15,21 +16,22 @@ interface IFeatureTypeMetadata {
   featureStructure: Record<string, unknown>;
 }
 
-export type IActiveFeatureTypes = IFeatureTypeMetadata & {
+type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface IDebugPanelProps {
-  children: ReactNode;
+interface IDebugPanelWFSProps {
+  viewer?: CesiumViewer
   locale?: { [key: string]: string };
 }
 
-export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const DebugPanelWFS: React.FC<IDebugPanelWFSProps> = ({ viewer, locale }) => {
+  const mapViewer = viewer ?? useCesiumMap();
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
-
-  const mapViewer = useCesiumMap();
+  const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);
+  const cacheLabel = useMemo(() => get(locale, 'WFS_CACHE') ?? 'Cache', [locale]);
+  const extentLabel = useMemo(() => get(locale, 'WFS_EXTENT') ?? 'Extent', [locale]);
+  const noDataLayers = useMemo(() => get(locale, 'NO_DATA_LAYERS') ?? 'No layers found', [locale]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -75,36 +77,31 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => 
   }, [mapViewer.layersManager?.dataLayerList]);
 
   return (
-    <>
-      <Icon
-        icon={
-          <div className="debugPanelIconContainer">
-            <svg width="100%" height="100%" viewBox="0 0 24 24">
-              <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" />
-            </svg>
-          </div>
-        }
-        onClick={(): void => {
-          setIsOpen(!isOpen);
-        }}
-      />
-      {isOpen && (
-        <div className="debugPanel">
-          <Dialog
-            open={isOpen}
-            onClosed={(): void => {
-              setIsOpen(false);
-            }}
-          >
-            <DialogTitle className="title">{title}</DialogTitle>
-            <DialogContent>
-              {React.Children.map(children, (child) => {
-                return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child) ? React.cloneElement(child, { featureTypes }) : child;
-              })}
-            </DialogContent>
-          </Dialog>
-        </div>
+    <Box className="wfsContainer">
+      <Box className="title">{title}</Box>
+      {featureTypes.length > 0 ? (
+        featureTypes.map((type, index) => (
+          <Box key={index} className="featureType">
+            <Tooltip content={`${type.featureStructure.aliasLayerName as string} ${type.id} (${String(type.zoomLevel)})`}>
+              <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
+                {type.featureStructure.aliasLayerName as string} ({String(type.zoomLevel)}):
+              </Box>
+            </Tooltip>
+            <Box className="info">
+              <Box>
+                {cacheLabel}: {type.cache ?? 0}
+              </Box>
+              {type.total > 0 && (
+                <Box className="spacer">
+                  {extentLabel}: {type.items} / {type.total}
+                </Box>
+              )}
+            </Box>
+          </Box>
+        ))
+      ) : (
+        <Box>{noDataLayers}</Box>
       )}
-    </>
+    </Box>
   );
 };

@@ -28,7 +28,7 @@ import { LinearProgress } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-import { DebugPanel } from './debug/debug-panel';
+import { Debug } from './debug/debug';
 import { WFS } from './debug/wfs';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
@@ -39,8 +39,8 @@ import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { ActiveLayersTool } from './tools/active-layers.tool';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
-import { DebugPanelTool } from './tools/debug-panel.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
+import { DebugPanelTool } from './tools/debug-panel.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomButtons } from './tools/zoom-buttons';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
@@ -194,7 +194,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     latitude: number;
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
-  const [debugPanel, setDebugPanel] = useState<IDebugPanel | undefined>();
   const [viewState, setViewState] = useState<MapViewState>();
 
   const isLoadingProgress = useMemo(() => {
@@ -335,10 +334,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
-
-  useEffect(() => {
-    setDebugPanel(props.debugPanel);
-  }, [props.debugPanel, mapViewRef]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -491,7 +486,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             <ActiveLayersTool locale={locale} />
           </Box>
           <Box className="sideToolsContainer">
-            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
+            {props.debugPanel && <Debug locale={locale}>{props.debugPanel.wfs && <WFS featureTypes={[]} locale={locale} />}</Debug>}
             {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
             {/* <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} /> */}
             {/* {
@@ -503,7 +498,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               </CesiumToolbarWidget>
             } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
-            <DebugPanelTool debugPanel={debugPanel} locale={locale} />
+            <DebugPanelTool debugPanel={props.debugPanel} locale={locale} />
             <LegendTool toggleSidebar={updateLegendToggle} />
           </Box>
           <Box className="bottomToolsContainer">
