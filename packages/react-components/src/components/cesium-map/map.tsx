@@ -24,12 +24,13 @@ import {
   Ray,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
-import { LinearProgress } from '@map-colonies/react-core';
+import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
+import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-import { Debug } from './debug/debug';
-import { WFS } from './debug/wfs';
+// import { Debug } from './debug/debug';
+// import { WFS } from './debug/wfs';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
@@ -195,6 +196,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }>();
   const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
   const [viewState, setViewState] = useState<MapViewState>();
+  const theme = useTheme();
+  const themeCesium = useMappedCesiumTheme(theme);
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
@@ -514,50 +517,52 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
 
   return (
-    <Viewer className="viewer" full ref={ref} {...viewerProps}>
-      <MapViewProvider value={contextValue as IMapContext}>
-        <MapLegendSidebar
-          title={props.legends?.title}
-          isOpen={isLegendsSidebarOpen}
-          toggleSidebar={updateLegendToggle}
-          noLegendsText={props.legends?.emptyText}
-          legends={props.legends?.legendsList ?? legendsList}
-          actionsTexts={props.legends?.actionsTexts}
-        />
-        {props.children}
-        {bindCustomToolsToViewer()}
-        {props.imageryContextMenu &&
-          showImageryMenu &&
-          imageryMenuPosition &&
-          rightClickCoordinates &&
-          React.cloneElement(props.imageryContextMenu, {
-            data: mapViewRef?.layersManager?.findLayerByPOI(
-              imageryMenuPosition.x as number,
-              imageryMenuPosition.y as number,
-              false
-            ) as unknown as Record<string, unknown>[],
-            position: {
-              x: imageryMenuPosition.x as number,
-              y: imageryMenuPosition.y as number,
-            },
-            coordinates: rightClickCoordinates,
-            style: getImageryMenuStyle(
-              imageryMenuPosition.x as number,
-              imageryMenuPosition.y as number,
-              props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
-              props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
-              props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
-            ),
-            size: props.imageryContextMenuSize ?? {
-              height: DEFAULT_HEIGHT,
-              width: DEFAULT_WIDTH,
-            },
-            handleClose: () => {
-              setShowImageryMenu(!showImageryMenu);
-            },
-            contextEvt: imageryMenuEvent.current,
-          })}
-      </MapViewProvider>
-    </Viewer>
+    <ThemeProvider id="cesiumTheme" options={themeCesium}>
+      <Viewer className="viewer" full ref={ref} {...viewerProps}>
+        <MapViewProvider value={contextValue as IMapContext}>
+          <MapLegendSidebar
+            title={props.legends?.title}
+            isOpen={isLegendsSidebarOpen}
+            toggleSidebar={updateLegendToggle}
+            noLegendsText={props.legends?.emptyText}
+            legends={props.legends?.legendsList ?? legendsList}
+            actionsTexts={props.legends?.actionsTexts}
+          />
+          {props.children}
+          {bindCustomToolsToViewer()}
+          {props.imageryContextMenu &&
+            showImageryMenu &&
+            imageryMenuPosition &&
+            rightClickCoordinates &&
+            React.cloneElement(props.imageryContextMenu, {
+              data: mapViewRef?.layersManager?.findLayerByPOI(
+                imageryMenuPosition.x as number,
+                imageryMenuPosition.y as number,
+                false
+              ) as unknown as Record<string, unknown>[],
+              position: {
+                x: imageryMenuPosition.x as number,
+                y: imageryMenuPosition.y as number,
+              },
+              coordinates: rightClickCoordinates,
+              style: getImageryMenuStyle(
+                imageryMenuPosition.x as number,
+                imageryMenuPosition.y as number,
+                props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
+                props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
+                props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
+              ),
+              size: props.imageryContextMenuSize ?? {
+                height: DEFAULT_HEIGHT,
+                width: DEFAULT_WIDTH,
+              },
+              handleClose: () => {
+                setShowImageryMenu(!showImageryMenu);
+              },
+              contextEvt: imageryMenuEvent.current,
+            })}
+        </MapViewProvider>
+      </Viewer>
+    </ThemeProvider>
   );
 };
