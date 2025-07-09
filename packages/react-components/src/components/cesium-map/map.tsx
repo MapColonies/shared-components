@@ -486,7 +486,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             <ActiveLayersTool locale={locale} />
           </Box>
           <Box className="sideToolsContainer">
-            {props.debugPanel && <Debug locale={locale}>{props.debugPanel.wfs && <WFS featureTypes={[]} locale={locale} />}</Debug>}
+            {/* {props.debugPanel && <Debug locale={locale}>{props.debugPanel.wfs && <WFS featureTypes={[]} locale={locale} />}</Debug>} */}
             {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
             {/* <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} /> */}
             {/* {
