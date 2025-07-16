@@ -38,15 +38,15 @@ const useMappedCesiumTheme = (theme: { [key: string]: string }): any => {
     return {
       ...theme,
       'cesium-background-color': 'rgba(38, 38, 38, 0.75)',
-      'cesium-color': theme['--mdc-theme-on-surface'] ?? 'white',
-      'cesium-service-error': theme['--mdc-theme-error'] ?? '#ec3713',
+      'cesium-color': '#EDFFFF',
+      'cesium-service-error': theme['--mdc-theme-error'] ?? '#EC3713',
       'cesium-checkbox-color': '#1A73E8',
       'cesium-checkbox-width': '12px',
       'cesium-checkbox-height': '12px',
       'cesium-container-border-radius': '4px',
       'cesium-font-size': '10pt',
     };
-  }, []);
+  }, [theme]);
 };
 
 export { useMediaQuery, useMappedMuiTheme, mapMcToMuiTheme, useMappedCesiumTheme };

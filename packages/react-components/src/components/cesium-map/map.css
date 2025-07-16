@@ -72,11 +72,15 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   font-family: sans-serif;
   font-size: 16pt;
   text-align: left;
-  color: #edffff;
   margin-bottom: 4px;
 }
 
+body[dir='rtl'] .cesium-mcMixin-sectionTitle {
+  text-align: right;
+}
+
 .cesium-mcMixin-dropDown {
+  color: var(--mdc-theme-cesium-color);
   right: 40px;
   margin-top: 0;
 }
@@ -84,10 +88,6 @@ body[dir='rtl'] .cesium-viewer-toolbar {
 body[dir='rtl'] .cesium-mcMixin-dropDown {
   right: unset;
   left: 40px;
-}
-
-body[dir='rtl'] .cesium-mcMixin-sectionTitle {
-  text-align: right;
 }
 
 .cesium-baseLayerPicker-dropDown {
