@@ -537,9 +537,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
           ','
         )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-        if (keyField) {
-          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
-        }
         const wfsResponse = await fetchWfsData(wfsDataUrl);
         await handleWfsResponse(wfsResponse, extent, offset, position);
       } catch (error) {
