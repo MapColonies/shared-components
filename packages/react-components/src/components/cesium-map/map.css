@@ -64,7 +64,9 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   transform: translate(0, 0);
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
 }
 
 .cesium-mcMixin-sectionTitle {

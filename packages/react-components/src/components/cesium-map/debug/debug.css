@@ -11,20 +11,6 @@
   padding: 20px 24px; */
 }
 
-.debugPanelIconContainer {
-  fill: #fff;
-  width: 40px;
-  height: 40px;
-  background: #303336;
-  border: 1px solid #444;
-  border-radius: 4px;
-}
-
-.debugPanelIconContainer:hover {
-  background: #48b;
-  border-color: #aef;
-}
-
 .debugPanel .mdc-dialog__container {
   align-items: unset;
 }

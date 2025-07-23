@@ -1,6 +1,7 @@
 import React, { useMemo, useState, ReactNode, useEffect } from 'react';
 import { get } from 'lodash';
-import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
+import { Icon } from '@map-colonies/react-core';
+import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
 
@@ -78,9 +79,9 @@ export const Debug: React.FC<IDebugProps> = ({ children, locale }) => {
     <>
       <Icon
         icon={
-          <div className="debugPanelIconContainer">
+          <div className="cesium-toolbar-button cesium-button">
             <svg width="100%" height="100%" viewBox="0 0 24 24">
-              <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" />
+              <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" fill="orange" />
             </svg>
           </div>
         }
@@ -88,23 +89,21 @@ export const Debug: React.FC<IDebugProps> = ({ children, locale }) => {
           setIsOpen(!isOpen);
         }}
       />
-      {isOpen && (
-        <div className="debugPanel">
-          <Dialog
-            open={isOpen}
-            onClosed={(): void => {
-              setIsOpen(false);
-            }}
-          >
-            <DialogTitle className="title">{title}</DialogTitle>
-            <DialogContent>
-              {React.Children.map(children, (child) => {
-                return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child) ? React.cloneElement(child, { featureTypes }) : child;
-              })}
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
+      {
+        // isOpen &&
+        <Box className={`cesium-mcMixin-dropDown ${isOpen ? 'cesium-mcMixin-dropDown-visible' : ''}`}>
+          <Box className="cesium-mcMixin-sectionTitle">{title}</Box>
+          <Box>
+            {
+              React.Children.map(children, (child) => {
+                return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child) 
+                  ? React.cloneElement(child, { featureTypes }) 
+                  : child;
+              })
+            }
+          </Box>
+        </Box>
+      }
     </>
   );
 };
