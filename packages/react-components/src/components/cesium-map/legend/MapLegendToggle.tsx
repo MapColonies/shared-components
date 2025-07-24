@@ -1,7 +1,8 @@
 import React from 'react';
 import { Icon } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import './MapLegend.css';
+
+import './legend.css';
 
 interface MapLegendProps {
   onClick: () => void;

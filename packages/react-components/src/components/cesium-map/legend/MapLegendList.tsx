@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Box } from '../../box';
 import { IMapLegend, MapLegend } from './MapLegend';
 
-import './MapLegend.css';
+import './legend.css';
 
 interface MapLegendListProps {
   legends: IMapLegend[];

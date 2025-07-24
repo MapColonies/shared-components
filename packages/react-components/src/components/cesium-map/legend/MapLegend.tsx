@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 
-import './MapLegend.css';
+import './legend.css';
 
 export interface IMapLegend {
   layer?: string;

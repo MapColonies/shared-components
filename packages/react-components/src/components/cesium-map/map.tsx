@@ -29,18 +29,16 @@ import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-import { WFSDebug } from './debug/wfs-debug';
+import { WFSDebugWidget } from './debug/wfs-debug-widget';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
-import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
-import { LegendTool } from './legend/legend.tool';
+import { LegendWidget, IMapLegend, MapLegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { ActiveLayersTool } from './tools/active-layers.tool';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
-// import { DebugPanelTool } from './tools/debug-panel.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomButtons } from './tools/zoom-buttons';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
@@ -489,18 +487,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           </Box>
           <Box className="sideToolsContainer">
             {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
-            {/* <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} /> */}
-            {/* {
-              showBasemaps &&
-              <CesiumToolbarWidget 
-                header={<kuku/>} 
-                icon={<icon src={'https://example.com/icon.png'}/></icon>}
-                content={<BaseMapPickerMixin />}  
-              </CesiumToolbarWidget>
-            } */}
             <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
-            {/* <DebugPanelTool debugPanel={props.debugPanel} locale={locale} /> */}
-            <LegendTool toggleSidebar={updateLegendToggle} />
           </Box>
           <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
@@ -512,14 +499,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
+  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLoadingProgress]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
     return (
       mapViewRef &&
       createPortal(
         <>
-          {props.debugPanel?.wfs && <WFSDebug locale={locale} />}
+          {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
+          <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element
       )

@@ -3,7 +3,7 @@ import { Icon, Drawer, DrawerHeader, DrawerTitle, DrawerContent } from '@map-col
 import { IMapLegend } from './MapLegend';
 import { MapLegendList } from './MapLegendList';
 
-import './MapLegend.css';
+import './legend.css';
 
 interface MapLegendSidebarProps {
   isOpen: boolean;

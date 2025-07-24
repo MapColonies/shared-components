@@ -6,7 +6,7 @@ import { CesiumTool } from '../tools/cesium-tool';
 import { CesiumToolIcon } from '../tools/cesium-tool-icon';
 import { WFS } from './wfs';
 
-import './debug.css';
+import './wfs-debug-widget.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -25,7 +25,7 @@ export interface IDebugProps {
   locale?: { [key: string]: string };
 }
 
-export const WFSDebug: React.FC<IDebugProps> = ({ locale }) => {
+export const WFSDebugWidget: React.FC<IDebugProps> = ({ locale }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
