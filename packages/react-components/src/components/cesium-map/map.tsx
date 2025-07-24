@@ -29,8 +29,7 @@ import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-import { Debug } from './debug/debug';
-import { WFS } from './debug/wfs';
+import { WFSDebug } from './debug/wfs-debug';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { IMapLegend, MapLegendSidebar/*, MapLegendToggle*/ } from './legend';
@@ -520,7 +519,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          {props.debugPanel && <Debug locale={locale}>{props.debugPanel.wfs && <WFS featureTypes={[]} locale={locale} />}</Debug>}
+          {props.debugPanel?.wfs && <WFSDebug locale={locale} />}
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element
       )

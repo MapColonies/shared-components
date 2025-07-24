@@ -1,11 +1,12 @@
+import React, { useMemo, useState, ReactNode, useEffect } from 'react';
 import { get } from 'lodash';
-import React, { useEffect, useState, useMemo } from 'react';
-import { Tooltip } from '@map-colonies/react-core';
-import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { CesiumViewer, useCesiumMap } from '../map';
+import { useCesiumMap } from '../map';
+import { CesiumTool } from '../tools/cesium-tool';
+import { CesiumToolIcon } from '../tools/cesium-tool-icon';
+import { WFS } from './wfs';
 
-import './debug-panel-wfs.css';
+import './debug.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -16,22 +17,20 @@ interface IFeatureTypeMetadata {
   featureStructure: Record<string, unknown>;
 }
 
-type IActiveFeatureTypes = IFeatureTypeMetadata & {
+export type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-interface IDebugPanelWFSProps {
-  viewer?: CesiumViewer
+export interface IDebugProps {
   locale?: { [key: string]: string };
 }
 
-export const DebugPanelWFS: React.FC<IDebugPanelWFSProps> = ({ viewer, locale }) => {
-  const mapViewer = viewer ?? useCesiumMap();
+export const WFSDebug: React.FC<IDebugProps> = ({ locale }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);
-  const cacheLabel = useMemo(() => get(locale, 'WFS_CACHE') ?? 'Cache', [locale]);
-  const extentLabel = useMemo(() => get(locale, 'WFS_EXTENT') ?? 'Extent', [locale]);
-  const noDataLayers = useMemo(() => get(locale, 'NO_DATA_LAYERS') ?? 'No layers found', [locale]);
+  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
+
+  const mapViewer = useCesiumMap();
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -77,31 +76,15 @@ export const DebugPanelWFS: React.FC<IDebugPanelWFSProps> = ({ viewer, locale })
   }, [mapViewer.layersManager?.dataLayerList]);
 
   return (
-    <Box className="wfsContainer">
-      <Box className="title">{title}</Box>
-      {featureTypes.length > 0 ? (
-        featureTypes.map((type, index) => (
-          <Box key={index} className="featureType">
-            <Tooltip content={`${type.featureStructure.aliasLayerName as string} ${type.id} (${String(type.zoomLevel)})`}>
-              <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
-                {type.featureStructure.aliasLayerName as string} ({String(type.zoomLevel)}):
-              </Box>
-            </Tooltip>
-            <Box className="info">
-              <Box>
-                {cacheLabel}: {type.cache ?? 0}
-              </Box>
-              {type.total > 0 && (
-                <Box className="spacer">
-                  {extentLabel}: {type.items} / {type.total}
-                </Box>
-              )}
-            </Box>
-          </Box>
-        ))
-      ) : (
-        <Box>{noDataLayers}</Box>
-      )}
-    </Box>
+    <>
+      <CesiumToolIcon onClick={() => setIsOpen(!isOpen)}>
+        <svg width="100%" height="100%" viewBox="0 0 24 24">
+          <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" fill="orange" />
+        </svg>
+      </CesiumToolIcon>
+      <CesiumTool isVisible={isOpen} title={title}>
+        <WFS featureTypes={featureTypes} locale={locale} />
+      </CesiumTool>
+    </>
   );
 };
