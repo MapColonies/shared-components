@@ -38,23 +38,6 @@ body[dir='rtl'] .mapLegendCloseBtn {
   left: 0;
 }
 
-.mapLegendToggleContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  fill: #fff;
-  width: 40px;
-  height: 40px;
-  background: #303336;
-  border: 1px solid #444;
-  border-radius: 4px;
-}
-
-.mapLegendToggleContainer:hover {
-  background: #48b;
-  border-color: #aef;
-}
-
 .mapLegendIcon {
   width: 2rem;
   height: 2rem;
