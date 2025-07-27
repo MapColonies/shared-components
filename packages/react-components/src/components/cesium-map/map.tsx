@@ -32,7 +32,7 @@ import { Proj } from '../utils/projections';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
-import { LegendWidget, IMapLegend, MapLegendSidebar } from './legend';
+import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { ActiveLayersTool } from './tools/active-layers.tool';
@@ -518,7 +518,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
         <MapViewProvider value={contextValue as IMapContext}>
-          <MapLegendSidebar
+          <LegendSidebar
             title={props.legends?.title}
             isOpen={isLegendsSidebarOpen}
             toggleSidebar={updateLegendToggle}

@@ -1,4 +1,4 @@
 export * from './MapLegendToggle';
-export * from './MapLegendSidebar';
+export * from './legend-sidebar';
 export * from './legend-widget';
-export type { IMapLegend } from './MapLegend';
+export type { IMapLegend } from './legend-item';
