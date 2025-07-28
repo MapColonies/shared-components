@@ -1,5 +1,4 @@
 .zoomLevel {
-  z-index: 2000;
   background-color: var(--mdc-theme-surface);
   border-radius: 2px;
   padding: 2px;

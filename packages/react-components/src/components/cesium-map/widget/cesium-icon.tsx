@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface ICesiumToolIconProps {
+interface ICesiumIconProps {
   onClick: () => void;
   children: React.ReactNode;
 }
 
-export const CesiumToolIcon: React.FC<ICesiumToolIconProps> = ({ onClick, children }) => {
+export const CesiumIcon: React.FC<ICesiumIconProps> = ({ onClick, children }) => {
   return (
     <div className="cesium-toolbar-button cesium-button" onClick={onClick}>
       {children}

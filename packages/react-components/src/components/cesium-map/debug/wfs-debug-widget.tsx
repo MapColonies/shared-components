@@ -1,9 +1,9 @@
-import React, { useMemo, useState, ReactNode, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
-import { CesiumTool } from '../tools/cesium-tool';
-import { CesiumToolIcon } from '../tools/cesium-tool-icon';
+import { CesiumIcon } from '../widget/cesium-icon';
+import { CesiumTool } from '../widget/cesium-tool';
 import { WFS } from './wfs';
 
 import './wfs-debug-widget.css';
@@ -21,11 +21,11 @@ export type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface IDebugProps {
+export interface IWFSDebugWidgetProps {
   locale?: { [key: string]: string };
 }
 
-export const WFSDebugWidget: React.FC<IDebugProps> = ({ locale }) => {
+export const WFSDebugWidget: React.FC<IWFSDebugWidgetProps> = ({ locale }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
@@ -77,11 +77,11 @@ export const WFSDebugWidget: React.FC<IDebugProps> = ({ locale }) => {
 
   return (
     <>
-      <CesiumToolIcon onClick={() => setIsOpen(!isOpen)}>
+      <CesiumIcon onClick={() => setIsOpen(!isOpen)}>
         <svg width="100%" height="100%" viewBox="0 0 24 24">
           <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" fill="orange" />
         </svg>
-      </CesiumToolIcon>
+      </CesiumIcon>
       <CesiumTool isVisible={isOpen} title={title}>
         <WFS featureTypes={featureTypes} locale={locale} />
       </CesiumTool>

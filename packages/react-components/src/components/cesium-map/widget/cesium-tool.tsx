@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '../../box';
-import { CesiumToolTitle } from './cesium-tool-title';
+import { CesiumTitle } from './cesium-title';
 
 interface ICesiumToolProps {
   isVisible: boolean;
@@ -11,7 +11,7 @@ interface ICesiumToolProps {
 export const CesiumTool: React.FC<ICesiumToolProps> = ({ isVisible, title, children }) => {
   return (
     <Box className={`cesium-mcMixin-tool ${isVisible ? 'cesium-mcMixin-tool-visible' : ''}`}>
-      <CesiumToolTitle title={title} />
+      <CesiumTitle title={title} />
       <Box>{children}</Box>
     </Box>
   );

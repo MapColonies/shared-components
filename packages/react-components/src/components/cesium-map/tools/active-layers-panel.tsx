@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { ICesiumImageryLayer } from '../layers-manager';
-import { CesiumViewer, useCesiumMap } from '../map';
+import { useCesiumMap } from '../map';
 
 import './active-layers-panel.css';
 
@@ -13,12 +13,11 @@ interface ISection {
 }
 
 interface IActiveLayersPanelProps {
-  viewer?: CesiumViewer;
   locale?: { [key: string]: string };
 }
 
-export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ viewer, locale }) => {
-  const mapViewer = viewer ?? useCesiumMap();
+export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
+  const mapViewer = useCesiumMap();
   const [active, setActive] = useState<ICesiumImageryLayer[]>([]);
   const [sections, setSections] = useState<ISection[]>([]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});

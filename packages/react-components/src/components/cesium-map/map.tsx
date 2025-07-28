@@ -35,7 +35,7 @@ import LayerManager, { LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
-import { ActiveLayersTool } from './tools/active-layers.tool';
+import { ActiveLayersWidget } from './tools/active-layers-widget';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -483,11 +483,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
           <Box>
             {showCompass && <CesiumCompassTool locale={locale} />}
-            <ActiveLayersTool locale={locale} />
           </Box>
-          <Box className="sideToolsContainer">
-            {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
-            <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
+          <Box className="widgetsContainer">
+            <ActiveLayersWidget locale={locale} />
           </Box>
           <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
@@ -506,6 +504,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
+          {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
+          <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
           {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
@@ -529,7 +529,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {props.children}
           {bindCustomToolsToViewer()}
           {bindToolsToToolbar()}
-          {props.imageryContextMenu &&
+          {
+            props.imageryContextMenu &&
             showImageryMenu &&
             imageryMenuPosition &&
             rightClickCoordinates &&
@@ -559,7 +560,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 setShowImageryMenu(!showImageryMenu);
               },
               contextEvt: imageryMenuEvent.current,
-            })}
+            })
+          }
         </MapViewProvider>
       </Viewer>
     </ThemeProvider>
