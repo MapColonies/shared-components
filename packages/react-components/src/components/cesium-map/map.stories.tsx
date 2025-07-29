@@ -135,11 +135,6 @@ LocalizedMap.argTypes = {
     defaultValue: {
       METERS_UNIT: "מ'",
       KILOMETERS_UNIT: "קמ'",
-      MAP_SETTINGS_DIALOG_TITLE: 'הגדרות מפה',
-      MAP_SETTINGS_SCENE_MODE_TITLE: 'תצורה',
-      MAP_SETTINGS_BASE_MAP_TITLE: 'מפות בסיס',
-      MAP_SETTINGS_TERRAIN_TITLE: 'פני השטח',
-      // MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
       WFS_TITLE: 'שכבות מידע',

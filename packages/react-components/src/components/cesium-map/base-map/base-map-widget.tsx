@@ -16,7 +16,7 @@ export const BaseMapWidget: React.FC<IBaseMapWidgetProps> = ({ baseMaps, locale 
 
   return (
     <>
-      <CesiumIcon onClick={() => setIsOpen(!isOpen)}>
+      <CesiumIcon onClick={() => setIsOpen(prev => !prev)}>
         <img className="cesium-baseLayerPicker-selected" src="assets/img/1st.png" title="1st Map" />
       </CesiumIcon>
       <CesiumTool isVisible={isOpen} title={title}>
