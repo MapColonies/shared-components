@@ -12,10 +12,8 @@ export const ActiveLayersWidget: React.FC<IDebugProps> = ({ locale }) => {
   const title = useMemo(() => get(locale, 'ACTIVE_LAYERS_TITLE') ?? 'Active Layers', [locale]);
 
   return (
-    <>
-      <CesiumInspector title={title} isVisible={isOpen} onClick={() => setIsOpen(!isOpen)}>
-        <ActiveLayersPanel locale={locale} />
-      </CesiumInspector>
-    </>
+    <CesiumInspector title={title} isVisible={isOpen} onClick={() => setIsOpen(!isOpen)}>
+      <ActiveLayersPanel locale={locale} />
+    </CesiumInspector>
   );
 };

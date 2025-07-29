@@ -114,19 +114,6 @@ span.cesium-sceneModePicker-wrapper {
   column-gap: 4px;
 }
 
-.widgetsContainer {
-  display: flex;
-  position: absolute;
-  top: -3%;
-  left: 6%;
-  min-width: -webkit-fill-available;
-}
-
-body[dir='rtl'] .widgetsContainer {
-  left: unset;
-  right: 6%;
-}
-
 .bottomToolsContainer {
   color: var(--mdc-theme-on-surface);
   opacity: 0.7;
@@ -155,4 +142,14 @@ body[dir='rtl'] .bottomToolsContainer {
 
 .viewer .mdc-linear-progress__bar-inner {
   border-top-width: 10px;
+}
+
+.widgetsContainer {
+  top: 24px;
+  left: 10px;
+}
+
+body[dir='rtl'] .widgetsContainer {
+  left: unset;
+  right: 10px;
 }

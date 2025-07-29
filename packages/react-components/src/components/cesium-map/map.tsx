@@ -29,13 +29,13 @@ import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
+import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
-import { ActiveLayersWidget } from './tools/active-layers-widget';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -481,12 +481,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
-          <Box>
-            {showCompass && <CesiumCompassTool locale={locale} />}
-          </Box>
-          <Box className="widgetsContainer">
-            <ActiveLayersWidget locale={locale} />
-          </Box>
+          {showCompass && <CesiumCompassTool locale={locale} />}
           <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
@@ -514,6 +509,18 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     );
   }, [mapViewRef, locale]);
 
+  const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
+    return (
+      mapViewRef &&
+      createPortal(
+        <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
+          <ActiveLayersWidget locale={locale} />
+        </Box>,
+        document.querySelector('.cesium-widget') as Element
+      )
+    );
+  }, [mapViewRef, locale]);
+
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
@@ -529,6 +536,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {props.children}
           {bindCustomToolsToViewer()}
           {bindToolsToToolbar()}
+          {bindInspectorsToWidgets()}
           {
             props.imageryContextMenu &&
             showImageryMenu &&
