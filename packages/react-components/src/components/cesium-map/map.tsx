@@ -36,7 +36,6 @@ import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
-import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
@@ -513,7 +512,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
           <BaseMapWidget baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
           {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
