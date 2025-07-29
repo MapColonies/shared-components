@@ -147,6 +147,7 @@ LocalizedMap.argTypes = {
       VECTOR_SECTION: 'וקטור',
       NO_DATA_LAYERS: 'לא נמצאו שכבות',
       BASE_MAP_TITLE: 'מפות בסיס',
+      TERRAIN_TITLE: 'פני השטח',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },

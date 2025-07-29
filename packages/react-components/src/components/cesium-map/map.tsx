@@ -514,7 +514,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
-          <BaseMapWidget baseMaps={baseMaps} /*terrainProvider={props.terrainProvider} */locale={locale} />
+          <BaseMapWidget baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
           {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
