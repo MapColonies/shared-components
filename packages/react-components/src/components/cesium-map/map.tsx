@@ -30,12 +30,12 @@ import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
+import { BaseMapWidget } from './base-map/base-map-widget';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
-import LayerManager, { LegendExtractor } from './layers-manager';
+import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
-import { /*CesiumSettings, */IBaseMap, IBaseMaps } from './settings/settings';
 import { BaseMapPickerTool } from './tools/base-map-picker.tool';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -106,6 +106,20 @@ export interface IContextMenuData {
   };
   handleClose: () => void;
   contextEvt: MouseEvent | TouchEvent | KeyboardEvent | React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
+}
+
+export interface IBaseMap {
+  id: string;
+  title?: string;
+  thumbnail?: string;
+  isCurrent?: boolean;
+  isForPreview?: boolean;
+  baseRasterLayers: IRasterLayer[];
+  baseVectorLayers: IVectorLayer[];
+}
+
+export interface IBaseMaps {
+  maps: IBaseMap[];
 }
 
 interface ILegends {
@@ -492,22 +506,22 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLoadingProgress]);
+  }, [mapViewRef, locale, projection, sceneModes, showMousePosition, showScale, isLoadingProgress]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
     return (
       mapViewRef &&
       createPortal(
         <>
-          {/* <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} /> */}
           <BaseMapPickerTool baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
+          <BaseMapWidget baseMaps={baseMaps} /*terrainProvider={props.terrainProvider} */locale={locale} />
           {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element
       )
     );
-  }, [mapViewRef, locale]);
+  }, [mapViewRef, locale, baseMaps]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     return (

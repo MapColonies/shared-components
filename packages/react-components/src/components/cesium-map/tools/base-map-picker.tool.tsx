@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { TerrainProvider } from 'cesium';
-import { CesiumViewer, useCesiumMap } from '../map';
-import { IBaseMaps } from '../settings/settings';
+import { CesiumViewer, IBaseMaps, useCesiumMap } from '../map';
 import { BaseMapPickerMixin } from './base-map-picker-mixin';
 
 export interface BaseMapPickerToolProps {

@@ -1,5 +1,5 @@
 import { getValue } from '../../utils/config';
-import { IBaseMaps } from '../settings/settings';
+import { IBaseMaps } from '../map';
 
 export const DEFAULT_TERRAIN_PROVIDER_URL = getValue('GLOBAL', 'DEFAULT_TERRAIN_PROVIDER_URL');
 
@@ -11,17 +11,17 @@ export const BASE_MAPS: IBaseMaps = {
       isCurrent: true,
       thumbnail: 'assets/img/1st.png',
       baseRasterLayers: [
-        // {
-        //   id: 'GOOGLE_TERRAIN',
-        //   type: 'XYZ_LAYER',
-        //   opacity: 1,
-        //   zIndex: 0,
-        //   options: {
-        //     url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
-        //     layers: '',
-        //     credit: 'GOOGLE',
-        //   },
-        // },
+        {
+          id: 'GOOGLE_TERRAIN',
+          type: 'XYZ_LAYER',
+          opacity: 1,
+          zIndex: 0,
+          options: {
+            url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
+            layers: '',
+            credit: 'GOOGLE',
+          },
+        },
         {
           id: 'INFRARED_RASTER',
           type: 'WMS_LAYER',

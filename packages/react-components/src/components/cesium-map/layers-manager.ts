@@ -12,8 +12,7 @@ import { get, isEmpty } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
-import { CesiumViewer } from './map';
-import { IBaseMap } from './settings/settings';
+import { CesiumViewer, IBaseMap } from './map';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { IMapLegend } from './legend';
 import {

@@ -1,6 +1,6 @@
 import * as Cesium from 'cesium';
 import { get } from 'lodash';
-import { IBaseMaps } from '../settings/settings';
+import { IBaseMaps } from '../map';
 
 interface BaseMapPickerMixinOptions {
   baseMaps: IBaseMaps;

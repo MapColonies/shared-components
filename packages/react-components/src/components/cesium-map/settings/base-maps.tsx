@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { CesiumViewer, useCesiumMap } from '../map';
-import { IBaseMap, IBaseMaps } from './settings';
+import { CesiumViewer, IBaseMap, IBaseMaps, useCesiumMap } from '../map';
 
 import './base-maps.css';
 

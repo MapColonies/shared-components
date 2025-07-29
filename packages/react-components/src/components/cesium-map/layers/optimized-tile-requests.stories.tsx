@@ -3,9 +3,8 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
+import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
-import { IBaseMaps } from '../settings/settings';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {

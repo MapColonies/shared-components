@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { CesiumInspector } from '../widget/cesium-inspector';
 import { ActiveLayersPanel } from './active-layers-panel';
 
-export interface IDebugProps {
+interface IDebugProps {
   locale?: { [key: string]: string };
 }
 

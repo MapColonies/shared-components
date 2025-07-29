@@ -4,9 +4,8 @@ import { Story, Meta } from '@storybook/react';
 import { Box } from '../box';
 import { BASE_MAPS } from './helpers/constants';
 import { ICesiumImageryLayer, IRasterLayer } from './layers-manager';
-import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
+import { CesiumMap, IBaseMaps, IContextMenuData, useCesiumMap } from './map';
 import { CesiumCartesian2, CesiumSceneMode } from './proxied.types';
-import { IBaseMaps } from './settings/settings';
 
 export default {
   title: 'Cesium Map',
