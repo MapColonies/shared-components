@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { IBaseMaps } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
-import { CesiumBaseMaps } from './base-maps';
+import { BaseMapsPanel } from './base-maps-panel';
 
 interface IBaseMapWidgetProps {
   baseMaps?: IBaseMaps;
@@ -20,7 +20,7 @@ export const BaseMapWidget: React.FC<IBaseMapWidgetProps> = ({ baseMaps, locale 
         <img className="cesium-baseLayerPicker-selected" src="assets/img/1st.png" title="1st Map" />
       </CesiumIcon>
       <CesiumTool isVisible={isOpen} title={title}>
-        <CesiumBaseMaps baseMaps={baseMaps}></CesiumBaseMaps>
+        <BaseMapsPanel baseMaps={baseMaps}></BaseMapsPanel>
       </CesiumTool>
     </>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CesiumViewer, IBaseMap, IBaseMaps, useCesiumMap } from '../map';
 
-import './base-maps.css';
+import './base-maps-panel.css';
 
 const useStyle = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,11 +14,11 @@ const useStyle = makeStyles((theme: Theme) =>
   })
 );
 
-interface CesiumBaseMapsProps {
+interface BaseMapsPanelProps {
   baseMaps?: IBaseMaps;
 }
 
-export const CesiumBaseMaps: React.FC<CesiumBaseMapsProps> = (props) => {
+export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = (props) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const { baseMaps } = props;
   const [currentMap, setCurrentMap] = useState<string>(' ');
