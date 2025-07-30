@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { CesiumViewer, IBaseMap, IBaseMaps, useCesiumMap } from '../map';
 
 interface BaseMapsPanelProps {
+  setCurrent: (map: IBaseMap) => void;
   baseMaps?: IBaseMaps;
 }
 
-export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ baseMaps }) => {
+export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ setCurrent, baseMaps }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
-  const [currentMap, setCurrentMap] = useState<string>(' ');
   const [selectedBaseMap, setSelectedBaseMap] = useState<IBaseMap | undefined>();
 
   useEffect(() => {
     const defaultMap = baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (defaultMap) {
       setSelectedBaseMap(defaultMap);
-      setCurrentMap(defaultMap.title ?? ' ');
+      setCurrent(defaultMap);
     }
   }, [baseMaps]);
 
@@ -25,6 +25,7 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ baseMaps }) => {
       if (selectedBaseMap) {
         mapViewer.layersManager?.setBaseMapLayers(selectedBaseMap);
         setSelectedBaseMap(selectedBaseMap);
+        setCurrent(selectedBaseMap);
         baseMaps.maps.forEach((map: IBaseMap) => {
           map.isCurrent = selectedBaseMap === map;
         });
@@ -42,8 +43,6 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ baseMaps }) => {
               className={`cesium-baseLayerPicker-item ${selectedBaseMap === map ? 'cesium-baseLayerPicker-selectedItem' : ''}`}
               title={map.title}
               key={map.id}
-              onMouseOver={() => setCurrentMap(map.title ?? ' ')}
-              onMouseOut={() => setCurrentMap(selectedBaseMap?.title ?? ' ')}
               onClick={() => handleMapSection(map.id)}
             >
               <img className="cesium-baseLayerPicker-itemIcon" src={map.thumbnail} alt={map.title} />
