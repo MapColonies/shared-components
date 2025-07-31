@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Box } from '../../box';
 import { CesiumViewer, IBaseMap, IBaseMaps, useCesiumMap } from '../map';
+import { CesiumTitle } from '../widget/cesium-title';
 
 interface BaseMapsPanelProps {
+  title: string;
   setCurrent: (map: IBaseMap) => void;
   baseMaps?: IBaseMaps;
 }
 
-export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ setCurrent, baseMaps }) => {
+export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ title, setCurrent, baseMaps }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const [selectedBaseMap, setSelectedBaseMap] = useState<IBaseMap | undefined>();
 
@@ -34,23 +37,25 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ setCurrent, baseMa
   };
 
   return (
-    <div className="cesium-baseLayerPicker-section">
-      <div className="cesium-baseLayerPicker-category">
-        <div className="cesium-baseLayerPicker-categoryTitle"></div>
-        <div className="cesium-baseLayerPicker-choices">
-          {baseMaps?.maps.map((map: IBaseMap) => (
-            <div
-              className={`cesium-baseLayerPicker-item ${selectedBaseMap === map ? 'cesium-baseLayerPicker-selectedItem' : ''}`}
-              title={map.title}
-              key={map.id}
-              onClick={() => handleMapSection(map.id)}
-            >
-              <img className="cesium-baseLayerPicker-itemIcon" src={map.thumbnail} alt={map.title} />
-              <div className="cesium-baseLayerPicker-itemLabel">{map.title}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <Box className="cesium-baseLayerPicker-section">
+      <Box className="cesium-baseLayerPicker-category">
+        <CesiumTitle title={title} />
+        <Box className="cesium-baseLayerPicker-choices">
+          {
+            baseMaps?.maps.map((map: IBaseMap) => (
+              <Box
+                className={`cesium-baseLayerPicker-item ${selectedBaseMap === map ? 'cesium-baseLayerPicker-selectedItem' : ''}`}
+                title={map.title}
+                key={map.id}
+                onClick={() => handleMapSection(map.id)}
+              >
+                <img className="cesium-baseLayerPicker-itemIcon" src={map.thumbnail} alt={map.title} />
+                <Box className="cesium-baseLayerPicker-itemLabel">{map.title}</Box>
+              </Box>
+            ))
+          }
+        </Box>
+      </Box>
+    </Box>
   );
 };

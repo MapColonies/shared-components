@@ -2,24 +2,6 @@
   display: none !important;
 }
 
-.cesium-viewer-fullscreenContainer {
-  bottom: 9px;
-  right: 28px;
-  left: unset;
-  width: 32px;
-  height: 32px;
-}
-
-body[dir='rtl'] .cesium-viewer-fullscreenContainer {
-  left: 28px;
-  right: unset;
-}
-
-.cesium-button.cesium-fullscreenButton {
-  border-radius: 14%;
-  box-sizing: border-box;
-}
-
 .cesium-viewer-toolbar {
   display: flex;
   flex-direction: column;
@@ -33,7 +15,17 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   right: unset;
 }
 
-.cesium-mcMixin-tool {
+.widgetsContainer {
+  top: 24px;
+  left: 10px;
+}
+
+body[dir='rtl'] .widgetsContainer {
+  left: unset;
+  right: 10px;
+}
+
+.cesium-mc-tool {
   display: block;
   position: absolute;
   box-sizing: content-box;
@@ -60,7 +52,7 @@ body[dir='rtl'] .cesium-viewer-toolbar {
     transform 0.2s ease-in;
 }
 
-.cesium-mcMixin-tool-visible {
+.cesium-mc-tool-visible {
   transform: translate(0, 0);
   visibility: visible;
   opacity: 1;
@@ -69,7 +61,7 @@ body[dir='rtl'] .cesium-viewer-toolbar {
     transform 0.2s ease-out;
 }
 
-.cesium-mcMixin-title {
+.cesium-mc-title {
   display: block;
   font-family: sans-serif;
   font-size: 16pt;
@@ -77,17 +69,17 @@ body[dir='rtl'] .cesium-viewer-toolbar {
   margin-bottom: 4px;
 }
 
-body[dir='rtl'] .cesium-mcMixin-title {
+body[dir='rtl'] .cesium-mc-title {
   text-align: right;
 }
 
-.cesium-mcMixin-tool {
+.cesium-mc-tool {
   color: var(--mdc-theme-cesium-color);
   right: 40px;
   margin-top: 0;
 }
 
-body[dir='rtl'] .cesium-mcMixin-tool {
+body[dir='rtl'] .cesium-mc-tool {
   right: unset;
   left: 40px;
 }
@@ -114,6 +106,24 @@ span.cesium-sceneModePicker-wrapper {
   column-gap: 4px;
 }
 
+.cesium-viewer-fullscreenContainer {
+  bottom: 9px;
+  right: 28px;
+  left: unset;
+  width: 32px;
+  height: 32px;
+}
+
+body[dir='rtl'] .cesium-viewer-fullscreenContainer {
+  left: 28px;
+  right: unset;
+}
+
+.cesium-button.cesium-fullscreenButton {
+  border-radius: 14%;
+  box-sizing: border-box;
+}
+
 .bottomToolsContainer {
   color: var(--mdc-theme-on-surface);
   opacity: 0.7;
@@ -130,11 +140,6 @@ body[dir='rtl'] .bottomToolsContainer {
   right: unset;
 }
 
-.bottomToolsContainer > * {
-  height: 26px;
-  line-height: 26px;
-}
-
 .viewer {
   display: flex;
   flex-direction: row;
@@ -142,14 +147,4 @@ body[dir='rtl'] .bottomToolsContainer {
 
 .viewer .mdc-linear-progress__bar-inner {
   border-top-width: 10px;
-}
-
-.widgetsContainer {
-  top: 24px;
-  left: 10px;
-}
-
-body[dir='rtl'] .widgetsContainer {
-  left: unset;
-  right: 10px;
 }

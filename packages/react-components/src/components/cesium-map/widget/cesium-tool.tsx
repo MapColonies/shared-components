@@ -4,14 +4,14 @@ import { CesiumTitle } from './cesium-title';
 
 interface ICesiumToolProps {
   isVisible: boolean;
-  title: string;
   children: React.ReactNode;
+  title?: string;
 }
 
-export const CesiumTool: React.FC<ICesiumToolProps> = ({ isVisible, title, children }) => {
+export const CesiumTool: React.FC<ICesiumToolProps> = ({ isVisible, children, title }) => {
   return (
-    <Box className={`cesium-mcMixin-tool ${isVisible ? 'cesium-mcMixin-tool-visible' : ''}`}>
-      <CesiumTitle title={title} />
+    <Box className={`cesium-mc-tool ${isVisible ? 'cesium-mc-tool-visible' : ''}`}>
+      {title && <CesiumTitle title={title} />}
       <Box>{children}</Box>
     </Box>
   );

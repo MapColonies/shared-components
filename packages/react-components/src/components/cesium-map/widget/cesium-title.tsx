@@ -6,5 +6,5 @@ interface ICesiumTitleProps {
 }
 
 export const CesiumTitle: React.FC<ICesiumTitleProps> = ({ title }) => {
-  return <Box className="cesium-mcMixin-title">{title}</Box>;
+  return <Box className="cesium-mc-title">{title}</Box>;
 };

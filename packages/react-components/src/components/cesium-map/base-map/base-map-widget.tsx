@@ -29,11 +29,9 @@ export const BaseMapWidget: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrain
           alt="Current Map"
         />
       </CesiumIcon>
-      <CesiumTool isVisible={isOpen} title={''}>
-        <div className="cesium-baseLayerPicker-sectionTitle">{baseMapsTitle}</div>
-        <BaseMapsPanel baseMaps={baseMaps} setCurrent={setSelected} />
-        <div className="cesium-baseLayerPicker-sectionTitle">{terrainsTitle}</div>
-        <TerrainsPanel terrainProvider={terrainProvider}></TerrainsPanel>
+      <CesiumTool isVisible={isOpen}>
+        <BaseMapsPanel title={baseMapsTitle} baseMaps={baseMaps} setCurrent={setSelected} />
+        <TerrainsPanel title={terrainsTitle} terrainProvider={terrainProvider}></TerrainsPanel>
       </CesiumTool>
     </>
   );
