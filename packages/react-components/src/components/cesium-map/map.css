@@ -84,6 +84,14 @@ body[dir='rtl'] .cesium-mc-tool {
   left: 40px;
 }
 
+.cesium-mc-choices {
+  display: block;
+  border: 1px solid #888;
+  border-radius: 5px;
+  padding: 5px 0;
+  margin-bottom: 5px;
+}
+
 .cesium-baseLayerPicker-dropDown {
   right: 40px;
   margin-top: 0;

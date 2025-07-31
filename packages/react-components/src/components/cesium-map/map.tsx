@@ -121,6 +121,15 @@ export interface IBaseMaps {
   maps: IBaseMap[];
 }
 
+export interface ITerrain {
+  id: string;
+  url: string;
+  title?: string;
+  thumbnail?: string;
+  isCurrent?: boolean;
+  terrainProvider?: TerrainProvider;
+}
+
 interface ILegends {
   legendsList?: IMapLegend[];
   emptyText?: string;
@@ -145,6 +154,7 @@ export interface CesiumMapProps extends ViewerProps {
   locale?: { [key: string]: string };
   sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
+  terrains?: ITerrain[];
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
   imageryContextMenu?: React.ReactElement<IContextMenuData>;
@@ -196,6 +206,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
+  const [terrains, setTerrains] = useState<ITerrain[] | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
   const imageryMenuEvent = useRef<MouseEvent>();
   const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
@@ -319,6 +330,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
   }, [props.baseMaps, mapViewRef]);
+
+  useEffect(() => {
+    setTerrains(props.terrains);
+    //TODO: set isCurrent
+  }, [props.terrains]);
 
   useEffect(() => {
     setProjection(props.projection ?? Proj.WGS84);
@@ -512,7 +528,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
-          <BaseMapWidget baseMaps={baseMaps} terrainProvider={props.terrainProvider} locale={locale} />
+          <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
           {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
