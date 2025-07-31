@@ -32,6 +32,7 @@ import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
@@ -332,9 +333,16 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.baseMaps, mapViewRef]);
 
   useEffect(() => {
-    setTerrains(props.terrains);
-    //TODO: set isCurrent
-  }, [props.terrains]);
+    const newTerrains = props.terrains || (mapViewRef?.terrainProvider ? [{
+      id: '1',
+      url: DEFAULT_TERRAIN_PROVIDER_URL,
+      title: 'Default Terrain',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: true,
+      terrainProvider: mapViewRef.terrainProvider
+    }] : undefined);
+    setTerrains(newTerrains);
+  }, [props.terrains, mapViewRef]);
 
   useEffect(() => {
     setProjection(props.projection ?? Proj.WGS84);
