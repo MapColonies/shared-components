@@ -333,7 +333,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.baseMaps, mapViewRef]);
 
   useEffect(() => {
-    const newTerrains = props.terrains || (mapViewRef?.terrainProvider ? [{
+    const newTerrains = props.terrains || ((mapViewRef && mapViewRef.terrainProvider) ? [{
       id: '1',
       url: DEFAULT_TERRAIN_PROVIDER_URL,
       title: 'Default Terrain',
@@ -543,7 +543,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer-toolbar') as Element
       )
     );
-  }, [mapViewRef, locale, baseMaps]);
+  }, [mapViewRef, locale, baseMaps, terrains]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     return (
