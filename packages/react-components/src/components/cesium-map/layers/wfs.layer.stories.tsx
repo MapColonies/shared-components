@@ -197,6 +197,9 @@ MapWithWFSLayerAPPScenario.argTypes = {
   debugPanel: {
     defaultValue: DEBUG_PANEL,
   },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
+  },
 };
 
 MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';

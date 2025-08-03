@@ -1,8 +1,8 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { Proj } from '../utils/projections';
-import { BASE_MAPS } from './helpers/constants';
+import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
-import { CesiumSceneMode } from './proxied.types';
+import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
 
 export default {
   title: 'Cesium Map',
@@ -27,6 +27,30 @@ export const BaseMap: Story = (args: CesiumMapProps) => (
 BaseMap.argTypes = {
   baseMaps: {
     defaultValue: BASE_MAPS,
+  },
+  terrains: {
+    defaultValue: [{
+      id: '1',
+      url: DEFAULT_TERRAIN_PROVIDER_URL,
+      title: 'Default Terrain',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: true,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL })
+    },{
+      id: '2',
+      url: TERRAIN_SRTM100,
+      title: 'srtm100',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: false,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_SRTM100 })
+    },{
+      id: '3',
+      url: TERRAIN_COMBINED,
+      title: 'combined_srtm_30_100_il_ever',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: false,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_COMBINED })
+    }],
   },
 };
 
