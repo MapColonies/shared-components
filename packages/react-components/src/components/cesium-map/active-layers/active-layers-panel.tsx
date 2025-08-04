@@ -30,24 +30,12 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     const updateSections = () => {
       const newSections = [
         {
-          id: 'Raster',
-          content: [
-            'Bla bla bla',
-            'Kuku',
-            'Muku'
-          ],
+          id: 'Image',
+          content: mapViewer.layersManager?.layerList.map((layer) => layer.meta?.id as string) || [],
         },
         {
-          id: '3D',
-          content: [],
-        },
-        {
-          id: 'DEM',
-          content: [],
-        },
-        {
-          id: 'Vector',
-          content: [],
+          id: 'Data',
+          content: mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta?.productName as string) || [],
         },
       ];
       setSections(newSections);
