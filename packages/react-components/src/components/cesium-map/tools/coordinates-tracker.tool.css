@@ -1,8 +1,9 @@
-.trackerPosition {
+.coordinatesTracker {
   background-color: var(--mdc-theme-surface);
-  padding: 2px 2px;
+  padding-top: 7px;
   border-radius: 2px;
   font-size: 12px;
   text-align: center;
   white-space: nowrap;
+  min-width: 200px;
 }

@@ -529,7 +529,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [mapViewRef, locale, projection, sceneModes, showMousePosition, showScale, isLoadingProgress]);
+  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
     return (

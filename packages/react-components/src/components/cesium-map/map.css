@@ -115,16 +115,15 @@ span.cesium-sceneModePicker-wrapper {
 }
 
 .cesium-viewer-fullscreenContainer {
-  bottom: 9px;
-  right: 28px;
-  left: unset;
   width: 32px;
   height: 32px;
+  bottom: 9px;
+  right: 30px;
 }
 
 body[dir='rtl'] .cesium-viewer-fullscreenContainer {
-  left: 28px;
   right: unset;
+  left: 30px;
 }
 
 .cesium-button.cesium-fullscreenButton {
@@ -139,12 +138,12 @@ body[dir='rtl'] .cesium-viewer-fullscreenContainer {
   gap: 8px;
   position: absolute;
   bottom: 10px;
-  right: 68px;
+  right: 70px;
   z-index: 2000;
 }
 
 body[dir='rtl'] .bottomToolsContainer {
-  left: 68px;
+  left: 70px;
   right: unset;
 }
 

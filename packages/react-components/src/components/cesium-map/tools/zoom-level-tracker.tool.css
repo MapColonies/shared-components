@@ -15,4 +15,6 @@
 .zoomLevelLabel {
   font-size: 8px;
   line-height: 8px;
+  display: table;
+  margin: auto;
 }

@@ -13,15 +13,15 @@ export const ZoomButtons: React.FC = () => {
   ];
 
   return (
-    <div className={`zoom-buttons-container`}>
+    <div className="zoomButtons">
       {
         buttons.map((button: { onClick: () => void; iconPath: string }, index) => (
         <Icon
           key={index}
           icon={
-            <div className="zoom-button">
+            <div className="zoomButton">
               <svg
-                fill="#fff"
+                fill="var(--mdc-theme-cesium-color)"
                 width="12px"
                 height="12px"
                 viewBox="0 -20 50 50"

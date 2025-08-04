@@ -1,20 +1,18 @@
-.zoom-buttons-container {
+.zoomButtons {
   display: flex;
   flex-direction: column;
   gap: 2px;
   position: absolute;
   bottom: 48px;
-  right: 28px;
-  left: unset;
+  right: 30px;
 }
 
-body[dir='rtl'] .zoom-buttons-container {
-  left: 28px;
+body[dir='rtl'] .zoomButtons {
   right: unset;
+  left: 30px;
 }
 
-.zoom-button {
-  cursor: pointer;
+.zoomButton {
   width: 32px;
   height: 32px;
   background: #303336;
@@ -24,9 +22,10 @@ body[dir='rtl'] .zoom-buttons-container {
   display: flex;
   justify-content: center;
   padding: 4px;
+  cursor: pointer;
 }
 
-.zoom-button:hover {
+.zoomButton:hover {
   background: #48b;
   border-color: #aef;
 }
