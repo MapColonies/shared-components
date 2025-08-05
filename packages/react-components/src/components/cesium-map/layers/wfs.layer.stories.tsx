@@ -49,9 +49,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-const DEBUG_PANEL = {
-  wfs: {},
-};
+const DEBUG_PANEL = true;
 
 const POINT_STROKE = '#FFFF00';
 const BRIGHT_GREEN = '#01FF1F';

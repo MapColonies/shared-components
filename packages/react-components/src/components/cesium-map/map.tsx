@@ -139,10 +139,6 @@ interface ILegends {
   mapLegendsExtractor?: LegendExtractor;
 }
 
-export interface IDebugPanel {
-  wfs?: Record<string, unknown>;
-}
-
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -167,7 +163,7 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
   displayZoomButtons?: boolean;
-  debugPanel?: IDebugPanel;
+  debugPanel?: boolean;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -537,7 +533,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.debugPanel?.wfs && <WFSDebugWidget locale={locale} />}
+          {props.debugPanel && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element

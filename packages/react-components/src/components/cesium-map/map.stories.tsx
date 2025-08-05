@@ -165,10 +165,8 @@ LocalizedMap.argTypes = {
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
       ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
-      RASTER_SECTION: 'ראסטר',
-      '3D_SECTION': 'תלת-מימד',
-      DEM_SECTION: 'גבהים',
-      VECTOR_SECTION: 'וקטור',
+      IMAGERY_SECTION: 'ראסטר',
+      DATA_SECTION: 'מידע',
       NO_DATA_LAYERS: 'לא נמצאו שכבות',
       BASE_MAP_TITLE: 'מפות בסיס',
       TERRAIN_TITLE: 'פני השטח',
@@ -188,11 +186,6 @@ LocalizedMap.argTypes = {
       type: 'range',
       min: 0,
       max: 20,
-    },
-  },
-  debugPanel: {
-    defaultValue: {
-      wfs: {},
     },
   },
 };
