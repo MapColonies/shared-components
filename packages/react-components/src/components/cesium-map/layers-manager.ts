@@ -131,6 +131,10 @@ class LayerManager {
     return this.dataLayers;
   }
 
+  public isBaseMapLayer(meta: any): boolean {
+    return !!get(meta, 'parentBasetMapId');
+  }
+
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
     this.dataLayers.push({ ...dataLayer });
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
@@ -235,7 +239,6 @@ class LayerManager {
 
   public removeLayer(layerId: string): void {
     const layer = this.findLayerById(layerId);
-
     if (layer) {
       this.mapViewer.imageryLayers.remove(layer, true);
     }
@@ -254,8 +257,7 @@ class LayerManager {
 
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? true : false;
+      return this.isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);

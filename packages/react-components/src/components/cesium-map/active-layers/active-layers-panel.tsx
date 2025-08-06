@@ -47,7 +47,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
-    const handleLayerUpdated = (): void => {
+    const handleLayerEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === IMAGERY
@@ -56,15 +56,17 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         )
       );
     };
-    mapViewer.layersManager.addLayerUpdatedListener(handleLayerUpdated);
+    mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
+    mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     return () => {
-      mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerUpdated);
+      mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
+      mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
     };
   }, [mapViewer.layersManager?.layerList]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
-    const handleDataLayerUpdated = (): void => {
+    const handleDataLayerEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === DATA
@@ -73,9 +75,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         )
       );
     };
-    mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
+    mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerEvent);
     return () => {
-      mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
+      mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerEvent);
     };
   }, [mapViewer.layersManager?.dataLayerList]);
 
