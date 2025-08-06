@@ -26,7 +26,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const getLabel = (key: string) => {
-    return get(locale, `${key.toUpperCase()}_SECTION`) ?? key;
+    return get(locale, key.toUpperCase()) ?? key;
   };
 
   useEffect(() => {
