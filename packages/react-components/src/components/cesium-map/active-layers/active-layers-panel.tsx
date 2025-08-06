@@ -2,8 +2,6 @@ import _, { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { ICesiumImageryLayer } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
 import './active-layers-panel.css';
@@ -49,19 +47,16 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
-
-    const handleLayerUpdated = (layers: ICesiumImageryLayer[]): void => {
+    const handleLayerUpdated = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === IMAGERY
-            ? { ...item, content: (layers.map((layer) => layer.meta?.id) || []).map(String) }
+            ? { ...item, content: (mapViewer.layersManager?.layerList.map((layer) => get(layer,'meta.layerRecord.productName') ?? layer.meta?.id) || []).map(String) }
             : item
         )
       );
     };
-
     mapViewer.layersManager.addLayerUpdatedListener(handleLayerUpdated);
-
     return () => {
       mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerUpdated);
     };
@@ -69,19 +64,16 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
-
-    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[]): void => {
+    const handleDataLayerUpdated = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === DATA
-            ? { ...item, content: (dataLayers.map((layer) => layer.meta?.id) || []).map(String) }
+            ? { ...item, content: (mapViewer.layersManager?.dataLayerList.map((dataLayer) => dataLayer.meta?.id) || []).map(String) }
             : item
         )
       );
     };
-
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
-
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
