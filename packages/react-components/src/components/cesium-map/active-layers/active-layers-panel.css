@@ -8,7 +8,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 120px;
+  width: 80px;
+}
+
+.activeLayersPanel .name .disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .activeLayersPanel .icons {
@@ -22,4 +27,9 @@
   height: 17px;
   margin-left: 8px;
   cursor: pointer;
+}
+
+.activeLayersPanel .icon .disabled {
+  opacity: 0;
+  pointer-events: none;
 }
