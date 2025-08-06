@@ -2,6 +2,7 @@ import { Rectangle } from 'cesium';
 import { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@map-colonies/react-core';
+import bbox from '@turf/bbox';
 import { Box } from '../../box';
 import { useCesiumMap } from '../map';
 
@@ -10,9 +11,15 @@ import './active-layers-panel.css';
 const IMAGERY = 'Imagery';
 const DATA = 'Data';
 
+interface IActive {
+  id: string;
+  name: string;
+  rect: Rectangle;
+}
+
 interface ISection {
   id: string;
-  content: string[];
+  values: IActive[];
 }
 
 interface IActiveLayersPanelProps {
@@ -21,7 +28,7 @@ interface IActiveLayersPanelProps {
 
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, content: [] }, { id: DATA, content: [] } ]);
+  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, values: [] }, { id: DATA, values: [] } ]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const getLabel = (key: string) => {
@@ -33,11 +40,21 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       const newSections = [
         {
           id: IMAGERY,
-          content: mapViewer.layersManager?.layerList.map((layer) => layer.meta?.id as string) || [],
+          values: mapViewer.layersManager?.layerList.map((layer) => {
+            return {
+              id: layer.meta?.id as string,
+              name: layer.meta?.id as string,
+              rect: layer.rectangle
+            }; }) || [],
         },
         {
           id: DATA,
-          content: mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta?.productName as string) || [],
+          values: mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
+            return {
+              id: dataLayer.meta?.id as string,
+              name: (get(dataLayer.meta, 'featureStructure.aliasLayerName') ?? dataLayer.meta.productName) as string,
+              rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint))
+            }; }) || [],
         },
       ];
       setSections(newSections);
@@ -52,7 +69,15 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       setSections((prev) =>
         prev.map((item) =>
           item.id === IMAGERY
-            ? { ...item, content: (mapViewer.layersManager?.layerList.map((layer) => get(layer, 'meta.layerRecord.productName') ?? layer.meta?.id) || []).map(String) }
+            ? {
+                ...item,
+                values: (mapViewer.layersManager?.layerList.map((layer) => {
+                  return {
+                    id: layer.meta?.id as string,
+                    name: (get(layer.meta, 'layerRecord.productName') ?? layer.meta?.id) as string,
+                    rect: layer.rectangle
+                  }; }) || [])
+              }
             : item
         )
       );
@@ -71,7 +96,15 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       setSections((prev) =>
         prev.map((item) =>
           item.id === DATA
-            ? { ...item, content: (mapViewer.layersManager?.dataLayerList.map((dataLayer) => dataLayer.meta?.id) || []).map(String) }
+            ? {
+                ...item,
+                values: (mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
+                  return {
+                    id: dataLayer.meta?.id as string,
+                    name: (get(dataLayer.meta, 'featureStructure.aliasLayerName') ?? dataLayer.meta.productName) as string,
+                    rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint))
+                  }; }) || [])
+              }
             : item
         )
       );
@@ -86,14 +119,14 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleFlyTo = (/*rect: Rectangle*/) => {
+  const handleFlyTo = (rect: Rectangle) => {
     mapViewer.camera.flyTo({ destination: rect });
   };
 
   return (
     <Box className="activeLayersPanel">
       {
-        sections.filter(item => item.content.length > 0).map((section) => (
+        sections.filter(item => item.values.length > 0).map((section) => (
           <Box
             key={section.id}
             className={`cesium-cesiumInspector-section ${collapsedSections[section.id] ? 'cesium-cesiumInspector-section-collapsed' : ''}`}
@@ -104,11 +137,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             </Typography>
             <Box className="cesium-cesiumInspector-sectionContent">
               {
-                section.content.map((active: string) => (
-                  <Box key={active} className="layer">
-                    <Box>{active}</Box>
+                section.values.map((active: IActive) => (
+                  <Box key={active.id} className="layer">
+                    <Box>{active.name}</Box>
                     <Box className="icons">
-                      <Box className="icon" onClick={() => handleFlyTo()}>
+                      <Box className="icon" onClick={() => { handleFlyTo(active.rect); }}>
                         <svg fill="var(--mdc-theme-cesium-color)" width="100%" height="100%" viewBox="0 0 256 256">
                           <path d="M236,120H223.66406A96.15352,96.15352,0,0,0,136,32.33618V20a8,8,0,0,0-16,0V32.33618A96.15352,96.15352,0,0,0,32.33594,120H20a8,8,0,0,0,0,16H32.33594A96.15352,96.15352,0,0,0,120,223.66382V236a8,8,0,0,0,16,0V223.66382A96.15352,96.15352,0,0,0,223.66406,136H236a8,8,0,0,0,0-16Zm-40,16h11.59912A80.14164,80.14164,0,0,1,136,207.59912V196a8,8,0,0,0-16,0v11.59912A80.14164,80.14164,0,0,1,48.40088,136H60a8,8,0,0,0,0-16H48.40088A80.14164,80.14164,0,0,1,120,48.40088V60a8,8,0,0,0,16,0V48.40088A80.14164,80.14164,0,0,1,207.59912,120H196a8,8,0,0,0,0,16Zm-28-8a40,40,0,1,1-40-40A40.04552,40.04552,0,0,1,168,128Z"/>
                         </svg>
