@@ -1,34 +1,18 @@
-.activeLayersContainer {
-  font-family: sans-serif;
-  text-align: left;
-  color: var(--mdc-theme-cesium-color);
+.activeLayersPanel .layer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-body[dir='rtl'] .activeLayersContainer {
-  text-align: right;
+.activeLayersPanel .icons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-.activeLayersContainer .title {
-  font-size: 12pt;
-  margin: 12px 0;
-  width: 260px;
-}
-
-.activeLayersContainer .layer {
-  font-size: 12px;
-  margin-bottom: 12px;
-  direction: ltr;
-}
-
-body[dir='rtl'] .activeLayersContainer .layer {
-  direction: rtl;
-}
-
-.activeLayersContainer .name {
-  color: #AEF;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 260px;
+.activeLayersPanel .icon {
+  width: 17px;
+  height: 17px;
+  margin-left: 8px;
+  cursor: pointer;
 }

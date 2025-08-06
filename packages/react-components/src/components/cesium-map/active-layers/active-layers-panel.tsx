@@ -1,4 +1,5 @@
-import _, { get } from 'lodash';
+import { Rectangle } from 'cesium';
+import { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '../../box';
@@ -51,7 +52,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       setSections((prev) =>
         prev.map((item) =>
           item.id === IMAGERY
-            ? { ...item, content: (mapViewer.layersManager?.layerList.map((layer) => get(layer,'meta.layerRecord.productName') ?? layer.meta?.id) || []).map(String) }
+            ? { ...item, content: (mapViewer.layersManager?.layerList.map((layer) => get(layer, 'meta.layerRecord.productName') ?? layer.meta?.id) || []).map(String) }
             : item
         )
       );
@@ -59,7 +60,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     return () => {
-      mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
+      mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
       mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
     };
   }, [mapViewer.layersManager?.layerList]);
@@ -85,8 +86,12 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleFlyTo = (/*rect: Rectangle*/) => {
+    mapViewer.camera.flyTo({ destination: rect });
+  };
+
   return (
-    <Box className="activeLayersContainer">
+    <Box className="activeLayersPanel">
       {
         sections.filter(item => item.content.length > 0).map((section) => (
           <Box
@@ -99,7 +104,23 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             </Typography>
             <Box className="cesium-cesiumInspector-sectionContent">
               {
-                section.content.map((active: string) => <Box key={active}>{active}</Box>)
+                section.content.map((active: string) => (
+                  <Box key={active} className="layer">
+                    <Box>{active}</Box>
+                    <Box className="icons">
+                      <Box className="icon" onClick={() => handleFlyTo()}>
+                        <svg fill="var(--mdc-theme-cesium-color)" width="100%" height="100%" viewBox="0 0 256 256">
+                          <path d="M236,120H223.66406A96.15352,96.15352,0,0,0,136,32.33618V20a8,8,0,0,0-16,0V32.33618A96.15352,96.15352,0,0,0,32.33594,120H20a8,8,0,0,0,0,16H32.33594A96.15352,96.15352,0,0,0,120,223.66382V236a8,8,0,0,0,16,0V223.66382A96.15352,96.15352,0,0,0,223.66406,136H236a8,8,0,0,0,0-16Zm-40,16h11.59912A80.14164,80.14164,0,0,1,136,207.59912V196a8,8,0,0,0-16,0v11.59912A80.14164,80.14164,0,0,1,48.40088,136H60a8,8,0,0,0,0-16H48.40088A80.14164,80.14164,0,0,1,120,48.40088V60a8,8,0,0,0,16,0V48.40088A80.14164,80.14164,0,0,1,207.59912,120H196a8,8,0,0,0,0,16Zm-28-8a40,40,0,1,1-40-40A40.04552,40.04552,0,0,1,168,128Z"/>
+                        </svg>
+                      </Box>
+                      <Box className="icon" onClick={() => {}}>
+                        <svg width="100%" height="100%" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="var(--mdc-theme-cesium-color)">
+                          <path fillRule="evenodd" clipRule="evenodd" d="M10 3h3v1h-1v9l-1 1H4l-1-1V4H2V3h3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1zM9 2H6v1h3V2zM4 13h7V4H4v9zm2-8H5v7h1V5zm1 0h1v7H7V5zm2 0h1v7H9V5z"/>
+                        </svg>
+                      </Box>
+                    </Box>
+                  </Box>
+                ))
               }
             </Box>
           </Box>
