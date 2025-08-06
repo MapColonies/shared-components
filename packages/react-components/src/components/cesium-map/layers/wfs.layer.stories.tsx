@@ -144,8 +144,6 @@ MapWithWFSLayer.storyName = 'WFS Vector layer';
 
 // #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
 export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
-  const show = useRef(false);
-
   function MyWFSLayer() {
     const [show, setShow] = useState(false);
     return (
@@ -158,14 +156,15 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
           value={`SHOW WFS LAYER (${show})`}
           style={{ zIndex: '2', position: 'absolute' }}
         ></input>
-        {show && (
+        {
+          show &&
           <CesiumWFSLayer
             key={metaBuildings.id}
             options={optionsBuildings}
             meta={metaBuildings}
             // visualizationHandler={handleVisualizationBuildings}
           />
-        )}
+        }
       </>
     );
   }
@@ -174,7 +173,7 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
     <div style={mapDivStyle}>
       <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
         <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
-        <MyWFSLayer></MyWFSLayer>
+        <MyWFSLayer />
       </CesiumMap>
     </div>
   );
