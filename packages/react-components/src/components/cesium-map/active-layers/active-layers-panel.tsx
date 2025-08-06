@@ -1,11 +1,15 @@
-import { get } from 'lodash';
+import _, { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
-import { Tooltip, Typography } from '@map-colonies/react-core';
+import { Typography } from '@map-colonies/react-core';
 import { Box } from '../../box';
+import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { ICesiumImageryLayer } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
 import './active-layers-panel.css';
+
+const IMAGERY = 'Imagery';
+const DATA = 'Data';
 
 interface ISection {
   id: string;
@@ -18,8 +22,7 @@ interface IActiveLayersPanelProps {
 
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [active, setActive] = useState<ICesiumImageryLayer[]>([]);
-  const [sections, setSections] = useState<ISection[]>([]);
+  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, content: [] }, { id: DATA, content: [] } ]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const getLabel = (key: string) => {
@@ -30,46 +33,31 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     const updateSections = () => {
       const newSections = [
         {
-          id: 'Image',
+          id: IMAGERY,
           content: mapViewer.layersManager?.layerList.map((layer) => layer.meta?.id as string) || [],
         },
         {
-          id: 'Data',
+          id: DATA,
           content: mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta?.productName as string) || [],
         },
       ];
       setSections(newSections);
       setCollapsedSections(newSections.reduce((acc, section) => ({ ...acc, [section.id]: true }), {}));
     };
-
     updateSections();
   }, []);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
 
-    const handleLayerUpdated = (layers: ICesiumImageryLayer[], layerId?: string): void => {
-      layers.forEach((layer: ICesiumImageryLayer): void => {
-        if (layerId !== undefined && layerId !== layer.meta?.id) {
-          return;
-        }
-        setActive((prevActive) => {
-          const existingIndex = prevActive.findIndex((item) => item.meta?.id === layer.meta?.id);
-          if (existingIndex >= 0) {
-            if (JSON.stringify(prevActive[existingIndex]) !== JSON.stringify(layer)) {
-              const updatedActive = [...prevActive];
-              updatedActive[existingIndex] = layer;
-              return updatedActive;
-            }
-          } else {
-            return [...prevActive, layer];
-          }
-          return prevActive;
-        });
-      });
-
-      const activeLayersIds = new Set(mapViewer.layersManager?.layerList.map((layer) => layer.meta?.id));
-      setActive((prevActive) => prevActive.filter((item) => activeLayersIds.has(item.meta?.id)));
+    const handleLayerUpdated = (layers: ICesiumImageryLayer[]): void => {
+      setSections((prev) =>
+        prev.map((item) =>
+          item.id === IMAGERY
+            ? { ...item, content: (layers.map((layer) => layer.meta?.id) || []).map(String) }
+            : item
+        )
+      );
     };
 
     mapViewer.layersManager.addLayerUpdatedListener(handleLayerUpdated);
@@ -79,6 +67,26 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     };
   }, [mapViewer.layersManager?.layerList]);
 
+  useEffect(() => {
+    if (!mapViewer.layersManager) return;
+
+    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[]): void => {
+      setSections((prev) =>
+        prev.map((item) =>
+          item.id === DATA
+            ? { ...item, content: (dataLayers.map((layer) => layer.meta?.id) || []).map(String) }
+            : item
+        )
+      );
+    };
+
+    mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
+
+    return () => {
+      mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
+    };
+  }, [mapViewer.layersManager?.dataLayerList]);
+
   const toggleSection = (id: string) => {
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -86,7 +94,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   return (
     <Box className="activeLayersContainer">
       {
-        sections.map((section) => (
+        sections.filter(item => item.content.length > 0).map((section) => (
           <Box
             key={section.id}
             className={`cesium-cesiumInspector-section ${collapsedSections[section.id] ? 'cesium-cesiumInspector-section-collapsed' : ''}`}
@@ -97,20 +105,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             </Typography>
             <Box className="cesium-cesiumInspector-sectionContent">
               {
-                section.content.map((item: string) => <Box key={item}>{item}</Box>)
+                section.content.map((active: string) => <Box key={active}>{active}</Box>)
               }
             </Box>
-          </Box>
-        ))
-      }
-      {
-        active.filter((layer) => layer.meta?.type === 'raster').map((layer, index) => (
-          <Box key={index} className="layer">
-            <Tooltip content={layer.meta?.id as string}>
-              <Box className="name">
-                {layer.meta?.id as string}
-              </Box>
-            </Tooltip>
           </Box>
         ))
       }
