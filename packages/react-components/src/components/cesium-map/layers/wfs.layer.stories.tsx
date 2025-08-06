@@ -480,7 +480,7 @@ const metaPolygonParts = {
   srsId: '4326',
   srsName: '4326',
   producerName: 'IDFMU',
-  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
   productType: 'VECTOR_BEST',
   featureStructure: {
     layerName: 'polygonParts:layer',
@@ -862,7 +862,7 @@ const metaBuildings = {
   srsId: '4326',
   srsName: '4326',
   producerName: 'Moria',
-  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
   productType: 'VECTOR_BEST',
   featureStructure: {
     layerName: 'buildings',
