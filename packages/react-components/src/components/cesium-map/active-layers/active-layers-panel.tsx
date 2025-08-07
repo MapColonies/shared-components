@@ -96,7 +96,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     return () => {
-      if (mapViewer.imageryLayers) {
+      if (get(mapViewer, '_cesiumWidget') !== undefined) {
         mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
         mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
       }
