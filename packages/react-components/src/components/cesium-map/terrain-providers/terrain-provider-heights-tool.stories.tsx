@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import React, { useState } from 'react';
 import {
   ArcGISTiledElevationTerrainProvider,
   EllipsoidTerrainProvider,
@@ -7,9 +5,11 @@ import {
   // Resource,
   TerrainProvider,
 } from 'cesium';
+import React, { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { getValue } from '../../utils/config';
+import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
-import { LayerType } from '../layers-manager';
 import { CesiumMap, CesiumViewer, useCesiumMap } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
 import { InspectorTool } from '../tools/inspector.tool';
@@ -27,31 +27,6 @@ const mapDivStyle = {
   height: '90%',
   width: '100%',
   position: 'absolute' as const,
-};
-
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
 };
 
 const EllipsoidProvider = new EllipsoidTerrainProvider({});
@@ -147,7 +122,7 @@ export const QuantizedMeshHeightsTool: Story = () => {
         sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
         baseMaps={BASE_MAPS}
       >
-        <Cesium3DTileset url="https://3d.ofek-air.com/3d/Jeru_Old_City_Cesium/ACT/Jeru_Old_City_Cesium_ACT.json" isZoomTo={true} />
+        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} isZoomTo={true} />
         <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
         <TerrainianHeightTool />
         <InspectorTool />

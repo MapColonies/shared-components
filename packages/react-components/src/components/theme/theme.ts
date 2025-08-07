@@ -33,7 +33,23 @@ const mapMcToMuiTheme = (mcTheme: { [key: string]: string }, prefersDarkMode = f
   });
 };
 
-export { useMediaQuery, useMappedMuiTheme, mapMcToMuiTheme };
+const useMappedCesiumTheme = (theme: { [key: string]: string }): any => {
+  return React.useMemo(() => {
+    return {
+      ...theme,
+      'cesium-background-color': 'rgba(38, 38, 38, 0.75)',
+      'cesium-color': '#EDFFFF',
+      'cesium-service-error': theme['--mdc-theme-error'] ?? '#EC3713',
+      'cesium-checkbox-color': '#1A73E8',
+      'cesium-checkbox-width': '12px',
+      'cesium-checkbox-height': '12px',
+      'cesium-container-border-radius': '4px',
+      'cesium-font-size': '10pt',
+    };
+  }, [theme]);
+};
+
+export { useMediaQuery, useMappedMuiTheme, mapMcToMuiTheme, useMappedCesiumTheme };
 /* primary: '#24aee9',
 secondary: '#e539ff',
 error: '#b00020',

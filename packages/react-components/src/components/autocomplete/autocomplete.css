@@ -8,7 +8,7 @@
   list-style: none;
   padding: 1px;
   position: absolute;
-  z-index: 20000;
+  z-index: 200;
   margin-block-start: unset;
   margin-block-end: unset;
 }

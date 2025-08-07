@@ -4,9 +4,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
 
-import './zoom_level-tracker.tool.css';
+import './zoom-level-tracker.tool.css';
 
 type ValueBy = 'CALCULATION' | 'RENDERED_TILES';
+
 export interface RZoomLevelTrackerToolProps {
   locale?: { [key: string]: string };
   valueBy?: ValueBy;
@@ -126,13 +127,10 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
     }
   }, [mapViewer]);
 
-  const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(
-    () => ({
-      CALCULATION: calculateZoomLevel,
-      RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles,
-    }),
-    [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]
-  );
+  const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(() => ({
+    CALCULATION: calculateZoomLevel,
+    RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles
+  }), [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]);
 
   const zoomExtractionMethod = extractZoomMethods[valueBy];
 

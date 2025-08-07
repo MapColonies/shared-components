@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-
 import { UrlTemplateImageryProvider } from 'cesium';
 import { CustomUrlTemplateImageryProvider } from '../helpers/customImageryProviders';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
@@ -17,7 +16,9 @@ export const CesiumXYZLayer: React.FC<RCesiumXYZLayerProps> = (props) => {
   const { viewState } = useCesiumMapViewstate();
 
   const providerInstance = useMemo(() => {
-    return viewState.shouldOptimizedTileRequests ? new CustomUrlTemplateImageryProvider(options, mapViewer) : new UrlTemplateImageryProvider(options);
+    return viewState.shouldOptimizedTileRequests
+      ? new CustomUrlTemplateImageryProvider(options, mapViewer)
+      : new UrlTemplateImageryProvider(options);
   }, [viewState.shouldOptimizedTileRequests]);
 
   return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;

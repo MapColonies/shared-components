@@ -1,11 +1,9 @@
-.trackerPosition {
+.cesium-viewer .coordinatesTracker {
   background-color: var(--mdc-theme-surface);
-  z-index: 2000;
-  padding: 2px 2px;
+  padding-top: 7px;
   border-radius: 2px;
   font-size: 12px;
-  height: 24px;
   text-align: center;
-  line-height: 20px;
   white-space: nowrap;
+  min-width: 200px;
 }

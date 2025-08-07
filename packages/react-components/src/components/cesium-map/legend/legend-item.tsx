@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 
-import './MapLegend.css';
+import './legend.css';
 
 export interface IMapLegend {
   layer?: string;
@@ -10,13 +10,14 @@ export interface IMapLegend {
   legendImg?: string;
   legend?: Record<string, unknown>[];
 }
-interface MapLegendProps {
+
+interface LegendItemProps {
   legend: IMapLegend;
   docText?: string;
   imgText?: string;
 }
 
-export const MapLegend: React.FC<MapLegendProps> = ({ legend: { legendImg, legendDoc, layer }, docText, imgText }) => {
+export const LegendItem: React.FC<LegendItemProps> = ({ legend: { legendImg, legendDoc, layer }, docText, imgText }) => {
   const handleLegendImgOpen = useCallback(() => {
     // Open image in a new tab.
     window.open(legendImg, '_blank');

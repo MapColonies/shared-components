@@ -1,0 +1,35 @@
+.cesium-viewer .activeLayersPanel .layer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+}
+
+.cesium-viewer .activeLayersPanel .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cesium-viewer .activeLayersPanel .name.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cesium-viewer .activeLayersPanel .icons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.cesium-viewer .activeLayersPanel .icon {
+  width: 17px;
+  height: 17px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.cesium-viewer .activeLayersPanel .icon.disabled {
+  opacity: 0;
+  pointer-events: none;
+}

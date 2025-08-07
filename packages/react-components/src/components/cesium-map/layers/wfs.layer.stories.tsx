@@ -1,8 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0';
-import { CesiumMap, CesiumViewer } from '../map';
-import { LayerType } from '../layers-manager';
-import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
-import { Cesium3DTileset } from './3d.tileset';
+import { useRef, useState } from 'react';
 import { BBox } from 'geojson';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
@@ -10,6 +6,10 @@ import centroid from '@turf/centroid';
 import { Feature, Polygon, Properties } from '@turf/helpers';
 import * as turf from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
+import { Story, Meta } from '@storybook/react/types-6-0';
+import { getValue } from '../../utils/config';
+import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL } from '../helpers/constants';
+import { CesiumMap, CesiumViewer } from '../map';
 import {
   CesiumMath,
   CesiumSceneMode,
@@ -30,9 +30,10 @@ import {
   CesiumScene,
   CesiumSceneTransforms,
   CesiumEllipsoid,
+  CesiumCesiumTerrainProvider,
 } from '../proxied.types';
-import { getValue } from '../../utils/config';
-import { useRef, useState } from 'react';
+import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
+import { Cesium3DTileset } from './3d.tileset';
 
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
@@ -48,39 +49,12 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
-};
-
-const DEBUG_PANEL = {
-  wfs: {},
-};
+const DEBUG_PANEL = true;
 
 const POINT_STROKE = '#FFFF00';
 const BRIGHT_GREEN = '#01FF1F';
 const LIGHT_BLUE = '#24AEE9';
-const BRIGHT_PURPLE = '#b734eb';
+const BRIGHT_PURPLE = '#B734EB';
 
 // #region STORY PP component
 export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
@@ -111,8 +85,11 @@ MapWithPPWFSLayer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
+  },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
   },
 };
 
@@ -154,8 +131,11 @@ MapWithWFSLayer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
+  },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
   },
 };
 
@@ -164,8 +144,6 @@ MapWithWFSLayer.storyName = 'WFS Vector layer';
 
 // #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
 export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
-  const show = useRef(false);
-
   function MyWFSLayer() {
     const [show, setShow] = useState(false);
     return (
@@ -178,14 +156,15 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
           value={`SHOW WFS LAYER (${show})`}
           style={{ zIndex: '2', position: 'absolute' }}
         ></input>
-        {show && (
+        {
+          show &&
           <CesiumWFSLayer
             key={metaBuildings.id}
             options={optionsBuildings}
             meta={metaBuildings}
             // visualizationHandler={handleVisualizationBuildings}
           />
-        )}
+        }
       </>
     );
   }
@@ -194,7 +173,7 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
     <div style={mapDivStyle}>
       <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
         <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
-        <MyWFSLayer></MyWFSLayer>
+        <MyWFSLayer />
       </CesiumMap>
     </div>
   );
@@ -212,8 +191,11 @@ MapWithWFSLayerAPPScenario.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
+  },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
   },
 };
 
@@ -244,8 +226,11 @@ MapWithWFSLayerWithVisualizer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
+  },
+  terrainProvider: {
+    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
   },
 };
 
@@ -494,7 +479,7 @@ const metaPolygonParts = {
   srsId: '4326',
   srsName: '4326',
   producerName: 'IDFMU',
-  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
   productType: 'VECTOR_BEST',
   featureStructure: {
     layerName: 'polygonParts:layer',
@@ -607,10 +592,10 @@ const handleVisualizationPolygonParts = (
       // Polygon
       const polygonData = entity.polygon.hierarchy?.getValue(CesiumJulianDate.now()) as CesiumPolygonHierarchy;
       const positions = polygonData.positions.map((position) => {
-        const worlPosCartographic = CesiumCartographic.fromCartesian(position);
+        const worldPosCartographic = CesiumCartographic.fromCartesian(position);
         const correctedCarto = new CesiumCartographic(
-          CesiumMath.toDegrees(worlPosCartographic.longitude),
-          CesiumMath.toDegrees(worlPosCartographic.latitude),
+          CesiumMath.toDegrees(worldPosCartographic.longitude),
+          CesiumMath.toDegrees(worldPosCartographic.latitude),
           is2D ? 500 : undefined //mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(position))
         );
         return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
@@ -700,12 +685,12 @@ const handleVisualizationPolygonParts = (
     {
       minRes: 0.00000536441802978516, // 17
       maxRes: 0.0000107288360595703, // 16
-      color: '#fbff01', // BRIGHT_YELLOW
+      color: '#FBFF01', // BRIGHT_YELLOW
     },
     {
       minRes: 0.0000214576721191406, // 15
       maxRes: 0.703125, // 0
-      color: '#ff3401', // BRIGHT_RED
+      color: '#FF3401', // BRIGHT_RED
     },
   ];
 
@@ -773,10 +758,10 @@ const handleVisualizationPolygonParts = (
     }
     if (entity.billboard) {
       const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-      const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+      const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
       const correctedCarto = new CesiumCartographic(
-        worlPosCartographic.longitude,
-        worlPosCartographic.latitude,
+        worldPosCartographic.longitude,
+        worldPosCartographic.latitude,
         is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
       );
 
@@ -826,10 +811,10 @@ const handleVisualizationPolygonParts = (
       .then((dataSource) => {
         dataSource?.entities.values.forEach((entity: CesiumCesiumEntity) => {
           const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-          const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+          const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
           const correctedCarto = new CesiumCartographic(
-            worlPosCartographic.longitude,
-            worlPosCartographic.latitude,
+            worldPosCartographic.longitude,
+            worldPosCartographic.latitude,
             is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
           );
 
@@ -876,7 +861,7 @@ const metaBuildings = {
   srsId: '4326',
   srsName: '4326',
   producerName: 'Moria',
-  footprint: '{"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]}',
+  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
   productType: 'VECTOR_BEST',
   featureStructure: {
     layerName: 'buildings',
@@ -949,10 +934,10 @@ const handleVisualizationBuildings = (mapViewer: CesiumViewer, dataSource: Cesiu
     }
     if (entity.billboard) {
       const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-      const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
+      const worldPosCartographic = CesiumCartographic.fromCartesian(worldPos);
       const correctedCarto = new CesiumCartographic(
-        worlPosCartographic.longitude,
-        worlPosCartographic.latitude,
+        worldPosCartographic.longitude,
+        worldPosCartographic.latitude,
         is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
       );
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@map-colonies/react-core';
 import { useCesiumMap } from '../map';
 
-import './zoomButtons.css';
+import './zoom-buttons.css';
 
 export const ZoomButtons: React.FC = () => {
   const viewer = useCesiumMap();
@@ -13,17 +13,17 @@ export const ZoomButtons: React.FC = () => {
   ];
 
   return (
-    <div className={`zoom-buttons-container`}>
+    <div className="zoomButtons">
       {
         buttons.map((button: { onClick: () => void; iconPath: string }, index) => (
         <Icon
           key={index}
           icon={
-            <div className="zoom-button">
+            <div className="zoomButton">
               <svg
-                fill="#fff"
-                width="10px"
-                height="10px"
+                fill="var(--mdc-theme-cesium-color)"
+                width="12px"
+                height="12px"
                 viewBox="0 -20 50 50"
                 version="1.2"
                 baseProfile="tiny"

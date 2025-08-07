@@ -1,6 +1,8 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { Proj } from '../utils/projections';
+import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
-import { CesiumSceneMode, Proj } from '.';
+import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
 
 export default {
   title: 'Cesium Map',
@@ -22,6 +24,36 @@ export const BaseMap: Story = (args: CesiumMapProps) => (
   </div>
 );
 
+BaseMap.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
+  terrains: {
+    defaultValue: [{
+      id: '1',
+      url: DEFAULT_TERRAIN_PROVIDER_URL,
+      title: 'Default Terrain',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: true,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL })
+    },{
+      id: '2',
+      url: TERRAIN_SRTM100,
+      title: 'srtm100',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: false,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_SRTM100 })
+    },{
+      id: '3',
+      url: TERRAIN_COMBINED,
+      title: 'combined_srtm_30_100_il_ever',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: false,
+      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_COMBINED })
+    }],
+  },
+};
+
 export const ZoomedMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}></CesiumMap>
@@ -29,6 +61,9 @@ export const ZoomedMap: Story = (args: CesiumMapProps) => (
 );
 
 ZoomedMap.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
   center: {
     defaultValue: [34.9578094, 32.8178637],
   },
@@ -49,6 +84,9 @@ export const MapWithProjection: Story = (args: CesiumMapProps) => (
 );
 
 MapWithProjection.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
   center: {
     defaultValue: [34.9578094, 32.8178637],
   },
@@ -76,6 +114,9 @@ export const Map2DWithProjection: Story = (args: CesiumMapProps) => (
 );
 
 Map2DWithProjection.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
   center: {
     defaultValue: [34.9578094, 32.8178637],
   },
@@ -107,6 +148,9 @@ export const LocalizedMap: Story = (args: CesiumMapProps) => (
 );
 
 LocalizedMap.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
   center: {
     defaultValue: [34.9578094, 32.8178637],
   },
@@ -115,16 +159,19 @@ LocalizedMap.argTypes = {
     defaultValue: {
       METERS_UNIT: "מ'",
       KILOMETERS_UNIT: "קמ'",
-      MAP_SETTINGS_DIALOG_TITLE: 'הגדרות מפה',
-      MAP_SETTINGS_SCENE_MODE_TITLE: 'תצורה',
-      MAP_SETTINGS_BASE_MAP_TITLE: 'מפות בסיס',
-      MAP_SETTINGS_OK_BUTTON_TEXT: 'אישור',
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
       NO_DATA_LAYERS: 'לא נמצאו שכבות',
+      ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
+      IMAGERY: 'ראסטר',
+      DATA: 'מידע',
+      FLY_TO: 'הצג מיקום',
+      REMOVE: 'הסר',
+      BASE_MAP_TITLE: 'מפות בסיס',
+      TERRAIN_TITLE: 'פני השטח',
     },
     /* eslint-enable @typescript-eslint/naming-convention */
   },
@@ -141,11 +188,6 @@ LocalizedMap.argTypes = {
       type: 'range',
       min: 0,
       max: 20,
-    },
-  },
-  debugPanel: {
-    defaultValue: {
-      wfs: {},
     },
   },
 };

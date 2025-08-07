@@ -1,11 +1,11 @@
 import React from 'react';
 import { Icon, Drawer, DrawerHeader, DrawerTitle, DrawerContent } from '@map-colonies/react-core';
-import { IMapLegend } from './MapLegend';
-import { MapLegendList } from './MapLegendList';
+import { IMapLegend } from './legend-item';
+import { LegendList } from './legend-list';
 
-import './MapLegend.css';
+import './legend.css';
 
-interface MapLegendSidebarProps {
+interface LegendSidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
   title?: string;
@@ -14,7 +14,7 @@ interface MapLegendSidebarProps {
   legends?: IMapLegend[];
 }
 
-export const MapLegendSidebar: React.FC<MapLegendSidebarProps> = ({
+export const LegendSidebar: React.FC<LegendSidebarProps> = ({
   isOpen,
   toggleSidebar,
   title = 'Map Legends',
@@ -29,7 +29,7 @@ export const MapLegendSidebar: React.FC<MapLegendSidebarProps> = ({
       </DrawerHeader>
       <DrawerContent className="sidebarContent">
         <Icon onClick={toggleSidebar} className="mapLegendCloseBtn" icon={{ icon: 'close', size: 'small' }} />
-        <MapLegendList noLegendsText={noLegendsText} legends={legends} actionsTexts={actionsTexts} />
+        <LegendList noLegendsText={noLegendsText} legends={legends} actionsTexts={actionsTexts} />
       </DrawerContent>
     </Drawer>
   ) : null;

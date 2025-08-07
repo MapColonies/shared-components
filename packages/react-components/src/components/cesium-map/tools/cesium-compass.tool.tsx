@@ -1,12 +1,11 @@
+import { useEffect } from 'react';
+import { get } from 'lodash';
 // @ts-ignore - viewerCesiumNavigationMixin has no typings.
 import viewerCesiumNavigationMixin from '@cmcleese/cesium-navigation';
 import { useCesiumMap } from '../map';
 
 import '@cmcleese/cesium-navigation/dist/index.css';
 import './cesium-compass.tool.css';
-
-import { useEffect } from 'react';
-import { get } from 'lodash';
 
 interface CesiumCompassToolProps {
   enableCompass?: boolean;
@@ -15,7 +14,7 @@ interface CesiumCompassToolProps {
   locale?: { [key: string]: string };
 }
 
-const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
+export const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
   const mapViewer = useCesiumMap();
 
   const { enableCompass = true, enableZoomControls = false, lockCompassNavigation = false, locale = { DIRECTION: 'ltr' } } = props;
@@ -40,5 +39,3 @@ const CesiumCompassTool: React.FC<CesiumCompassToolProps> = (props) => {
 
   return null;
 };
-
-export default CesiumCompassTool;

@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { Box } from '../../box';
-import { IMapLegend, MapLegend } from './MapLegend';
+import { IMapLegend, LegendItem } from './legend-item';
 
-import './MapLegend.css';
+import './legend.css';
 
-interface MapLegendListProps {
+interface LegendListProps {
   legends: IMapLegend[];
   actionsTexts: {
     docText: string;
@@ -13,7 +13,7 @@ interface MapLegendListProps {
   noLegendsText: string;
 }
 
-export const MapLegendList: React.FC<MapLegendListProps> = ({ legends, actionsTexts: { docText, imgText }, noLegendsText }) => {
+export const LegendList: React.FC<LegendListProps> = ({ legends, actionsTexts: { docText, imgText }, noLegendsText }) => {
   const handleNoLegends = useCallback(() => {
     return (
       <Box className="noLegendsContainer">
@@ -28,7 +28,7 @@ export const MapLegendList: React.FC<MapLegendListProps> = ({ legends, actionsTe
     }
 
     return legends.map((legend, i) => {
-      return <MapLegend key={`${legend.layer as string}_${i}`} legend={legend} docText={docText} imgText={imgText} />;
+      return <LegendItem key={`${legend.layer as string}_${i}`} legend={legend} docText={docText} imgText={imgText} />;
     });
   }, [legends]);
 

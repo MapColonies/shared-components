@@ -478,7 +478,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       } else {
         page.current = 0;
 
-        applyVisulization(
+        applyVisualization(
           mapViewer,
           wfsDataSource,
           wfsDataSource.entities.values.map((entities) => entities.id as string),
@@ -497,7 +497,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     await wfsDataSource.process(newGeoJson, { describe });
     mapViewer.scene.requestRender();
 
-    applyVisulization(
+    applyVisualization(
       mapViewer,
       wfsDataSource,
       newFeatures.map((feature) => feature.id as string),
@@ -565,10 +565,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         // Polygon
         const polygonData = entity.polygon.hierarchy?.getValue(JulianDate.now()) as PolygonHierarchy;
         const positions = polygonData.positions.map((position) => {
-          const worlPosCartographic = Cartographic.fromCartesian(position);
+          const worldPosCartographic = Cartographic.fromCartesian(position);
           const correctedCarto = new Cartographic(
-            CesiumMath.toDegrees(worlPosCartographic.longitude),
-            CesiumMath.toDegrees(worlPosCartographic.latitude),
+            CesiumMath.toDegrees(worldPosCartographic.longitude),
+            CesiumMath.toDegrees(worldPosCartographic.latitude),
             is2D ? 500 : undefined //viewer.scene.sampleHeight(Cartographic.fromCartesian(position))
           );
           return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
@@ -713,10 +713,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       }
       if (entity.billboard) {
         const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
-        const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+        const worldPosCartographic = Cartographic.fromCartesian(worldPos);
         const correctedCarto = new Cartographic(
-          worlPosCartographic.longitude,
-          worlPosCartographic.latitude,
+          worldPosCartographic.longitude,
+          worldPosCartographic.latitude,
           is2D ? 500 : viewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
         );
 
@@ -761,7 +761,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     }
   };
 
-  const applyVisulization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
+  const applyVisualization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
     visualizationHandler
       ? visualizationHandler(viewer, dataSource, processEntityIds, extent)
       : defaultVisualizationHandler(viewer, dataSource, processEntityIds, extent);
@@ -770,7 +770,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   useEffect((): void => {
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      applyVisulization(mapViewer, dataSource, [], undefined);
+      applyVisualization(mapViewer, dataSource, [], undefined);
     }
   }, [mapViewer.scene.mode]);
 
