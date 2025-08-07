@@ -67,7 +67,7 @@ export interface ICesiumWFSLayerOptions {
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
-  keyField?: string; // if PK is not defined, or is different from 'id', or sortBy should be used
+  keyField?: string; // if PK is not defined, or is different from 'id'
   labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
@@ -375,7 +375,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
 
-              // IMPORTANT FOR DESCRIBE WINDOW,  DESCRIPTION field MUST BE UNDEFIEND
+              // IMPORTANT FOR DESCRIBE WINDOW, DESCRIPTION field MUST BE UNDEFINED
               const descriptionValue = (f.properties as any).description;
               (f.properties as any).description = undefined;
               (f.properties as any)._description = descriptionValue;
@@ -537,9 +537,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
           ','
         )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-        if (keyField) {
-          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
-        }
         const wfsResponse = await fetchWfsData(wfsDataUrl);
         await handleWfsResponse(wfsResponse, extent, offset, position);
       } catch (error) {

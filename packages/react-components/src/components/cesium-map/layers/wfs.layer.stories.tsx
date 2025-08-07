@@ -264,7 +264,6 @@ const optionsPolygonParts = {
   pageSize: 300,
   zoomLevel: 7,
   maxCacheSize: 6000,
-  keyField: 'id',
   labeling: {
     dataSourcePrefix: 'labels_',
     text: {
@@ -863,7 +862,7 @@ const optionsBuildings = {
   pageSize: 300,
   zoomLevel: 14,
   maxCacheSize: 6000,
-  keyField: 'id',
+  keyField: 'osm_id',
 };
 
 const metaBuildings = {
