@@ -1,4 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  ComponentProps,
+  MouseEvent,
+  useMemo
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -14,29 +24,29 @@ import {
   Ray,
 } from 'cesium';
 import { isNumber, isArray } from 'lodash';
-import { LinearProgress, useTheme } from '@map-colonies/react-core';
+import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
+import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
-import { DebugPanel } from './debug/debug-panel';
-import { WFS } from './debug/wfs';
-import LayerManager, { LegendExtractor } from './layers-manager';
-import { IMapLegend, MapLegendSidebar, MapLegendToggle } from './map-legend';
+import { ActiveLayersWidget } from './active-layers/active-layers-widget';
+import { BaseMapWidget } from './base-map/base-map-widget';
+import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
+import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
+import { pointToLonLat } from './helpers/geojson/point.geojson';
+import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
+import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
-import { CesiumSettings, IBaseMap, IBaseMaps } from './settings/settings';
-import CesiumCompassTool from './tools/cesium-compass.tool';
+import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
-import { pointToLonLat } from './tools/geojson/point.geojson';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
-import { ZoomLevelTrackerTool } from './tools/zoom_level-tracker.tool';
-import { ZoomButtons } from './zoom/zoomButtons';
+import { ZoomButtons } from './tools/zoom-buttons';
+import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
 import '@map-colonies/react-core/dist/checkbox/styles';
-import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
-import { ThemeProvider } from '@map-colonies/react-core';
-import { useMappedCesiumTheme } from '../theme';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -100,16 +110,35 @@ export interface IContextMenuData {
   contextEvt: MouseEvent | TouchEvent | KeyboardEvent | React.MouseEvent | React.TouchEvent | React.KeyboardEvent;
 }
 
+export interface IBaseMap {
+  id: string;
+  title?: string;
+  thumbnail?: string;
+  isCurrent?: boolean;
+  isForPreview?: boolean;
+  baseRasterLayers: IRasterLayer[];
+  baseVectorLayers: IVectorLayer[];
+}
+
+export interface IBaseMaps {
+  maps: IBaseMap[];
+}
+
+export interface ITerrain {
+  id: string;
+  url: string;
+  title?: string;
+  thumbnail?: string;
+  isCurrent?: boolean;
+  terrainProvider?: TerrainProvider;
+}
+
 interface ILegends {
   legendsList?: IMapLegend[];
   emptyText?: string;
   title?: string;
   actionsTexts?: { docText: string; imgText: string };
   mapLegendsExtractor?: LegendExtractor;
-}
-
-export interface IDebugPanel {
-  wfs?: Record<string, unknown>;
 }
 
 export interface IGeocoderPanel {
@@ -122,12 +151,16 @@ export interface CesiumMapProps extends ViewerProps {
   showScale?: boolean;
   showLoadingProgress?: boolean;
   showCompass?: boolean;
+  showZoomButtons?: boolean;
+  showDebuggerTool?: boolean;
+  showActiveLayersTool?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
   sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
+  terrains?: ITerrain[];
   useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
   imageryContextMenu?: React.ReactElement<IContextMenuData>;
@@ -138,8 +171,6 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
-  displayZoomButtons?: boolean;
-  debugPanel?: IDebugPanel;
   geocoderPanel?: GeocoderPanelProps['options'];
 }
 
@@ -167,36 +198,34 @@ export const useCesiumMapViewstate = (): IMapViewState => {
 export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
   const [mapViewRef, setMapViewRef] = useState<CesiumViewer>();
+  const [locale, setLocale] = useState<{ [key: string]: string }>();
   const [projection, setProjection] = useState<Proj>();
   const [showMousePosition, setShowMousePosition] = useState<boolean>();
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
+  const [showZoomButtons, setShowZoomButtons] = useState<boolean>();
+  const [showActiveLayersTool, setShowActiveLayersTool] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
-  const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
+  const [terrains, setTerrains] = useState<ITerrain[] | undefined>();
   const [showImageryMenu, setShowImageryMenu] = useState<boolean>(false);
   const imageryMenuEvent = useRef<MouseEvent>();
   const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
   const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(false);
-  const [rightClickCoordinates, setRightClickCoordinates] = useState<{
-    longitude: number;
-    latitude: number;
-  }>();
-  const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
+  const [rightClickCoordinates, setRightClickCoordinates] = useState<{ longitude: number; latitude: number; }>();
+  const [viewState, setViewState] = useState<MapViewState>();
   const theme = useTheme();
   const themeCesium = useMappedCesiumTheme(theme);
 
   const isLoadingProgress = useMemo(() => {
     return isLoadingTiles || isLoadingDataLayer;
   }, [isLoadingTiles, isLoadingDataLayer]);
-
-  const [viewState, setViewState] = useState<MapViewState>();
 
   useEffect(() => {
     setViewState({
@@ -210,10 +239,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     timeline: false,
     animation: false,
     baseLayerPicker: false,
-    geocoder: false,
+    geocoder: true,
     navigationHelpButton: false,
-    homeButton: false,
-    sceneModePicker: false,
+    homeButton: true,
+    sceneModePicker: true,
     imageryProvider: false,
     ...(props as ViewerProps),
   };
@@ -299,12 +328,23 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
-
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
   }, [props.baseMaps, mapViewRef]);
+
+  useEffect(() => {
+    const newTerrains = props.terrains || ((mapViewRef && mapViewRef.terrainProvider) ? [{
+      id: '1',
+      url: DEFAULT_TERRAIN_PROVIDER_URL,
+      title: 'Default Terrain',
+      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+      isCurrent: true,
+      terrainProvider: mapViewRef.terrainProvider
+    }] : undefined);
+    setTerrains(newTerrains);
+  }, [props.terrains, mapViewRef]);
 
   useEffect(() => {
     setProjection(props.projection ?? Proj.WGS84);
@@ -333,6 +373,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setShowLoadingProgress(props.showLoadingProgress ?? true);
   }, [props.showLoadingProgress]);
+
+  useEffect(() => {
+    setShowActiveLayersTool(props.showActiveLayersTool ?? true);
+  }, [props.showActiveLayersTool]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -467,8 +511,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.zoom, props.center, mapViewRef]);
 
   useEffect(() => {
-    setDisplayZoomButtons(props.displayZoomButtons ?? true);
-  }, [props.displayZoomButtons]);
+    setShowZoomButtons(props.showZoomButtons ?? true);
+  }, [props.showZoomButtons]);
+
+  const updateLegendToggle = () => {
+    setIsLegendsSidebarOpen(prev => !prev);
+  };
 
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
     return (
@@ -476,40 +524,64 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           {showLoadingProgress && isLoadingProgress && <LinearProgress style={{ position: 'absolute', top: 0, height: '10px', zIndex: 4 }} />}
-          <Box className="sideToolsContainer">
-            {props.geocoderPanel && <GeocoderPanel locale={locale} options={[...props.geocoderPanel]} />}
-            {props.debugPanel && <DebugPanel locale={locale}>{props.debugPanel.wfs && <WFS locale={locale} featureTypes={[]} />}</DebugPanel>}
-            <CesiumSettings sceneModes={sceneModes as (typeof CesiumSceneMode)[]} baseMaps={baseMaps} locale={locale} />
-            <MapLegendToggle onClick={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)} />
-          </Box>
-          <Box className="toolsContainer">
+          {showCompass && <CesiumCompassTool locale={locale} />}
+          <Box className="bottomToolsContainer">
             {showMousePosition && <CoordinatesTrackerTool projection={projection} />}
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
             {showScale && <ScaleTrackerTool locale={locale} />}
-            {showCompass && <CesiumCompassTool locale={locale} />}
           </Box>
-          {displayZoomButtons && <ZoomButtons />}
+          {showZoomButtons && <ZoomButtons />}
         </>,
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [baseMaps, locale, mapViewRef, projection, sceneModes, showMousePosition, showScale, isLegendsSidebarOpen, isLoadingProgress]);
+  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress]);
+
+  const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
+    return (
+      mapViewRef &&
+      createPortal(
+        <>
+          {props.geocoderPanel && <GeocoderPanel locale={locale} options={[...props.geocoderPanel]} />}
+          <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
+          {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
+          <LegendWidget legendToggle={updateLegendToggle} />
+        </>,
+        document.querySelector('.cesium-viewer-toolbar') as Element
+      )
+    );
+  }, [mapViewRef, locale, baseMaps, terrains]);
+
+  const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
+    return (
+      mapViewRef &&
+      createPortal(
+        <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
+          {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
+        </Box>,
+        document.querySelector('.cesium-widget') as Element
+      )
+    );
+  }, [mapViewRef, locale]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
         <MapViewProvider value={contextValue as IMapContext}>
-          <MapLegendSidebar
+          <LegendSidebar
             title={props.legends?.title}
             isOpen={isLegendsSidebarOpen}
-            toggleSidebar={(): void => setIsLegendsSidebarOpen(!isLegendsSidebarOpen)}
+            toggleSidebar={updateLegendToggle}
             noLegendsText={props.legends?.emptyText}
             legends={props.legends?.legendsList ?? legendsList}
             actionsTexts={props.legends?.actionsTexts}
           />
           {props.children}
           {bindCustomToolsToViewer()}
-          {props.imageryContextMenu &&
+          {bindToolsToToolbar()}
+          {bindInspectorsToWidgets()}
+          {
+            props.imageryContextMenu &&
             showImageryMenu &&
             imageryMenuPosition &&
             rightClickCoordinates &&
@@ -539,7 +611,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
                 setShowImageryMenu(!showImageryMenu);
               },
               contextEvt: imageryMenuEvent.current,
-            })}
+            })
+          }
         </MapViewProvider>
       </Viewer>
     </ThemeProvider>

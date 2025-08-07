@@ -1,9 +1,9 @@
-.compass.rtl {
-  right: unset;
-  left: 24px;
+.cesium-viewer .compass {
+  top: 20px;
+  right: 0px;
 }
 
-.compass.ltr {
-  left: unset;
-  right: 24px;
+body[dir='rtl'] .cesium-viewer .compass {
+  right: unset;
+  left: 0px;
 }

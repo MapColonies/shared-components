@@ -1,9 +1,9 @@
-import React from 'react';
 import { ArcGISTiledElevationTerrainProvider } from 'cesium';
 import { Story, Meta } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
+import { getValue } from '../../utils/config';
+import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
-import { LayerType } from '../layers-manager';
 import { Cesium3DTileset } from './3d.tileset';
 
 export default {
@@ -20,31 +20,6 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-const BASE_MAPS = {
-  maps: [
-    {
-      id: '1st',
-      title: '1st Map Title',
-      isCurrent: true,
-      thumbnail: 'https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png',
-      baseRasteLayers: [
-        {
-          id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER' as LayerType,
-          opacity: 1,
-          zIndex: 0,
-          options: {
-            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-            layers: '',
-            credit: 'GOOGLE',
-          },
-        },
-      ],
-      baseVectorLayers: [],
-    },
-  ],
-};
-
 const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
   url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
 });
@@ -54,7 +29,7 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
     <CesiumMap {...args}>
       <Cesium3DTileset
         isZoomTo={true}
-        url="/mock/tileset_1/tileset.json"
+        url={getValue('GLOBAL', '3D_MODEL')}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -91,7 +66,7 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
       <Cesium3DTileset
         isZoomTo={false}
         heightFromGround={-10}
-        url="/mock/tileset_1/tileset.json"
+        url={getValue('GLOBAL', '3D_MODEL')}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -128,7 +103,7 @@ Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction 
 export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <Cesium3DTileset isZoomTo={true} url="/mock/tileset_2/L16_31023/L16_31023.json" />
+      <Cesium3DTileset isZoomTo={true} url={getValue('GLOBAL', '3D_MODEL')} />
     </CesiumMap>
   </div>
 );

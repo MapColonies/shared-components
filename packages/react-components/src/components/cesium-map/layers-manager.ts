@@ -12,10 +12,9 @@ import { get, isEmpty } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
-import { CesiumViewer } from './map';
-import { IBaseMap } from './settings/settings';
-import { pointToGeoJSON } from './tools/geojson/point.geojson';
-import { IMapLegend } from './map-legend';
+import { CesiumViewer, IBaseMap } from './map';
+import { pointToGeoJSON } from './helpers/geojson/point.geojson';
+import { IMapLegend } from './legend';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
@@ -132,6 +131,10 @@ class LayerManager {
     return this.dataLayers;
   }
 
+  public isBaseMapLayer(meta: any): boolean {
+    return !!get(meta, 'parentBasetMapId');
+  }
+
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
     this.dataLayers.push({ ...dataLayer });
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
@@ -160,7 +163,7 @@ class LayerManager {
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
-    const sortedBaseMapLayers = baseMap.baseRasteLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
+    const sortedBaseMapLayers = baseMap.baseRasterLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });
@@ -236,7 +239,6 @@ class LayerManager {
 
   public removeLayer(layerId: string): void {
     const layer = this.findLayerById(layerId);
-
     if (layer) {
       this.mapViewer.imageryLayers.remove(layer, true);
     }
@@ -255,8 +257,7 @@ class LayerManager {
 
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? true : false;
+      return this.isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -429,6 +430,14 @@ class LayerManager {
       skipRelevancyCheck: true,
       parentBasetMapId: 'TRANSPARENT_LAYER',
     };
+  }
+
+  public addLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.layerUpdated.addEventListener(callback, this);
+  }
+
+  public removeLayerUpdatedListener(callback: (meta: any) => void): void {
+    this.layerUpdated.removeEventListener(callback, this);
   }
 
   public addDataLayerUpdatedListener(callback: (meta: any) => void): void {

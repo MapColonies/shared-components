@@ -1,10 +1,10 @@
-import React, { useMemo, useState, ReactNode, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
-import { Dialog, DialogTitle, DialogContent, Icon } from '@map-colonies/react-core';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
-
-import './debug-panel.css';
+import { CesiumIcon } from '../widget/cesium-icon';
+import { CesiumTool } from '../widget/cesium-tool';
+import { WFS } from './wfs';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -19,12 +19,11 @@ export type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface IDebugPanelProps {
-  children: ReactNode;
+export interface IWFSDebugWidgetProps {
   locale?: { [key: string]: string };
 }
 
-export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => {
+export const WFSDebugWidget: React.FC<IWFSDebugWidgetProps> = ({ locale }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
@@ -76,35 +75,14 @@ export const DebugPanel: React.FC<IDebugPanelProps> = ({ children, locale }) => 
 
   return (
     <>
-      <Icon
-        icon={
-          <div className="debugPanelIconContainer">
-            <svg width="100%" height="100%" viewBox="0 0 24 24">
-              <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" />
-            </svg>
-          </div>
-        }
-        onClick={(): void => {
-          setIsOpen(!isOpen);
-        }}
-      />
-      {isOpen && (
-        <div className="debugPanel">
-          <Dialog
-            open={isOpen}
-            onClosed={(): void => {
-              setIsOpen(false);
-            }}
-          >
-            <DialogTitle className="title">{title}</DialogTitle>
-            <DialogContent>
-              {React.Children.map(children, (child) => {
-                return React.isValidElement<{ featureTypes?: IActiveFeatureTypes[] }>(child) ? React.cloneElement(child, { featureTypes }) : child;
-              })}
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
+      <CesiumIcon onClick={() => setIsOpen(!isOpen)}>
+        <svg width="100%" height="100%" viewBox="0 0 24 24">
+          <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z" fill="orange" />
+        </svg>
+      </CesiumIcon>
+      <CesiumTool isVisible={isOpen} title={title}>
+        <WFS featureTypes={featureTypes} locale={locale} />
+      </CesiumTool>
     </>
   );
 };

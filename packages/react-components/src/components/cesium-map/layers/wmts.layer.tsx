@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-
 import { WebMapTileServiceImageryProvider } from 'cesium';
 import { CustomWebMapTileServiceImageryProvider } from '../helpers/customImageryProviders';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';

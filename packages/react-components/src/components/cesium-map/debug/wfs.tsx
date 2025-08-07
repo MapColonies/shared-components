@@ -2,7 +2,7 @@ import { get } from 'lodash';
 import React, { useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { IActiveFeatureTypes } from './debug-panel';
+import { IActiveFeatureTypes } from './wfs-debug-widget';
 
 import './wfs.css';
 

@@ -1,5 +1,9 @@
 import { getValue } from '../../utils/config';
-import { IBaseMaps } from '../settings/settings';
+import { IBaseMaps } from '../map';
+
+export const DEFAULT_TERRAIN_PROVIDER_URL = getValue('GLOBAL', 'DEFAULT_TERRAIN_PROVIDER_URL');
+export const TERRAIN_SRTM100 = getValue('GLOBAL', 'TERRAIN_SRTM100');
+export const TERRAIN_COMBINED = getValue('GLOBAL', 'TERRAIN_COMBINED');
 
 export const BASE_MAPS: IBaseMaps = {
   maps: [
@@ -7,19 +11,19 @@ export const BASE_MAPS: IBaseMaps = {
       id: '1st',
       title: '1st Map',
       isCurrent: true,
-      thumbnail: 'assets/img/1st.png',
-      baseRasteLayers: [
-        // {
-        //   id: 'GOOGLE_TERRAIN',
-        //   type: 'XYZ_LAYER',
-        //   opacity: 1,
-        //   zIndex: 0,
-        //   options: {
-        //     url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
-        //     layers: '',
-        //     credit: 'GOOGLE',
-        //   },
-        // },
+      thumbnail: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      baseRasterLayers: [
+        {
+          id: 'GOOGLE_TERRAIN',
+          type: 'XYZ_LAYER',
+          opacity: 1,
+          zIndex: 0,
+          options: {
+            url: getValue('GLOBAL', 'BM-GOOGLE_TERRAIN-XYZ_LAYER'),
+            layers: '',
+            credit: 'GOOGLE',
+          },
+        },
         {
           id: 'INFRARED_RASTER',
           type: 'WMS_LAYER',
@@ -41,8 +45,8 @@ export const BASE_MAPS: IBaseMaps = {
     {
       id: '2nd',
       title: '2nd Map',
-      thumbnail: 'assets/img/2nd.png',
-      baseRasteLayers: [
+      thumbnail: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      baseRasterLayers: [
         {
           id: 'RADAR_RASTER',
           type: 'WMS_LAYER',
@@ -86,8 +90,8 @@ export const BASE_MAPS: IBaseMaps = {
     {
       id: '3rd',
       title: '3rd Map',
-      thumbnail: 'assets/img/3rd.png',
-      baseRasteLayers: [
+      thumbnail: 'https://a.tile.thunderforest.com/cycle/17/78208/53265.png',
+      baseRasterLayers: [
         {
           id: 'VECTOR_TILES',
           type: 'XYZ_LAYER',

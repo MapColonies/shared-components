@@ -50,7 +50,7 @@ export interface ICesiumWFSLayerOptions {
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
-  keyField?: string; // if PK is not defined, or is different from 'id', or sortBy should be used
+  keyField?: string; // if PK is not defined, or is different from 'id'
   labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
@@ -358,7 +358,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
 
-              // IMPORTANT FOR DESCRIBE WINDOW,  DESCRIPTION field MUST BE UNDEFIEND
+              // IMPORTANT FOR DESCRIBE WINDOW, DESCRIPTION field MUST BE UNDEFINED
               const descriptionValue = (f.properties as any).description;
               (f.properties as any).description = undefined;
               (f.properties as any)._description = descriptionValue;
@@ -461,7 +461,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       } else {
         page.current = 0;
 
-        applyVisulization(
+        applyVisualization(
           mapViewer,
           wfsDataSource,
           wfsDataSource.entities.values.map((entities) => entities.id as string),
@@ -480,7 +480,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     await wfsDataSource.process(newGeoJson, { describe });
     mapViewer.scene.requestRender();
 
-    applyVisulization(
+    applyVisualization(
       mapViewer,
       wfsDataSource,
       newFeatures.map((feature) => feature.id as string),
@@ -520,9 +520,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
           ','
         )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-        if (keyField) {
-          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
-        }
         const wfsResponse = await fetchWfsData(wfsDataUrl);
         await handleWfsResponse(wfsResponse, extent, offset, position);
       } catch (error) {
@@ -543,7 +540,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     });
   };
 
-  const applyVisulization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
+  const applyVisualization = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
     visualizationHandler
       ? visualizationHandler(viewer, dataSource, processEntityIds, extent)
       : defaultVisualizationHandler(viewer, dataSource, processEntityIds, color, extent, labeling);
@@ -552,7 +549,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   useEffect((): void => {
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
-      applyVisulization(mapViewer, dataSource, [], undefined);
+      applyVisualization(mapViewer, dataSource, [], undefined);
     }
   }, [mapViewer.scene.mode]);
 

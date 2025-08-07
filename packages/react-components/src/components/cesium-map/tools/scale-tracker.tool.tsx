@@ -28,7 +28,7 @@ const updateDistanceLegendCesium = (
   locale?: { [key: string]: string }
 ): void => {
   const metersUnit = get(locale, 'METERS_UNIT') ?? 'm';
-  const kiloMetersUnit = get(locale, 'KILOMETERS_UNIT') ?? 'km';
+  const kilometersUnit = get(locale, 'KILOMETERS_UNIT') ?? 'km';
   const scale: IScaleData = {
     barWidth: undefined,
     distanceLabel: undefined,
@@ -76,7 +76,7 @@ const updateDistanceLegendCesium = (
   if (isNumber(distance)) {
     let label = '';
     if (distance >= 1000) {
-      label = `${(distance / 1000).toString()} ${kiloMetersUnit}`;
+      label = `${(distance / 1000).toString()} ${kilometersUnit}`;
     } else {
       label = `${distance.toString()} ${metersUnit}`;
     }
@@ -133,14 +133,15 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
   };
 
   return (
-    <div className="scalePosition">
-      {isNumber(scaleData.barWidth) && (
+    <div className="scaleTracker">
+      {
+        isNumber(scaleData.barWidth) &&
         <>
-          <div className="scale-tracker-label">
+          <div className="scaleTrackerLabel">
             <bdi>{scaleData.distanceLabel}</bdi>
           </div>
           <div
-            className="scale-tracker-bar"
+            className="scaleTrackerBar"
             style={{
               height: '2px',
               width: `${scaleData.barWidth.toString()}px`,
@@ -148,7 +149,7 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
             }}
           />
         </>
-      )}
+      }
     </div>
   );
 };

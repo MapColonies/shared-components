@@ -3,7 +3,7 @@ import { WebMercatorProjection, ScreenSpaceEventType } from 'cesium';
 import { Proj, COORDINATES_WGS_FRACTION_DIGITS, COORDINATES_MERCATOR_FRACTION_DIGITS } from '../../utils/projections';
 import { CesiumViewer, useCesiumMap } from '../map';
 import { CesiumCartographic } from '../proxied.types';
-import { pointToLonLat } from './geojson/point.geojson';
+import { pointToLonLat } from '../helpers/geojson/point.geojson';
 
 import './coordinates-tracker.tool.css';
 
@@ -39,7 +39,7 @@ export const CoordinatesTrackerTool: React.FC<RCoordinatesTrackerToolProps> = (p
 
     if (position) {
       const screenPositionDegrees = pointToLonLat(mapViewer, position.x, position.y);
-      if(screenPositionDegrees) {
+      if (screenPositionDegrees) {
       const cartographic = new CesiumCartographic(screenPositionDegrees.longitude, screenPositionDegrees.latitude);
         if (ref.current) {
           let coordinatesText = '';
@@ -55,9 +55,7 @@ export const CoordinatesTrackerTool: React.FC<RCoordinatesTrackerToolProps> = (p
             }
             case Proj.WGS84: {
               const longitudeString = cartographic.longitude.toFixed(COORDINATES_WGS_FRACTION_DIGITS);
-              
               const latitudeString = cartographic.latitude.toFixed(COORDINATES_WGS_FRACTION_DIGITS);
-  
               coordinatesText = `WGS84: ${latitudeString}°N ${longitudeString}°E`;
               ref.current.style.width = '200px';
               break;
@@ -71,5 +69,5 @@ export const CoordinatesTrackerTool: React.FC<RCoordinatesTrackerToolProps> = (p
     }
   }, [position, ref, mapViewer, props.projection]);
 
-  return <div className="trackerPosition" ref={ref}></div>;
+  return <div className="coordinatesTracker" ref={ref}></div>;
 };

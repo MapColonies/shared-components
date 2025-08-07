@@ -1,21 +1,21 @@
-.wfsContainer .title {
+.cesium-viewer .wfsContainer .title {
   text-align: center;
   font-weight: bold;
   margin-bottom: 12px;
   width: 260px;
 }
 
-.wfsContainer .featureType {
+.cesium-viewer .wfsContainer .featureType {
   font-size: 12px;
   margin-bottom: 12px;
   direction: ltr;
 }
 
-body[dir='rtl'] .wfsContainer .featureType {
+body[dir='rtl'] .cesium-viewer .wfsContainer .featureType {
   direction: rtl;
 }
 
-.wfsContainer .name {
+.cesium-viewer .wfsContainer .name {
   color: #AEF;
   font-weight: bold;
   white-space: nowrap;
@@ -24,15 +24,15 @@ body[dir='rtl'] .wfsContainer .featureType {
   width: 260px;
 }
 
-.wfsContainer .info {
+.cesium-viewer .wfsContainer .info {
   display: flex;
 }
 
-.wfsContainer .spacer {
+.cesium-viewer .wfsContainer .spacer {
   margin: 0 20px;
 }
 
-.wfsContainer .blinking {
+.cesium-viewer .wfsContainer .blinking {
   animation: blink 1s infinite;
 }
 
