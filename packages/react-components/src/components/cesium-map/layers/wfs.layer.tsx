@@ -67,7 +67,7 @@ export interface ICesiumWFSLayerOptions {
   pageSize: number;
   zoomLevel: number;
   maxCacheSize: number;
-  keyField?: string; // if PK is not defined, or is different from 'id', or sortBy should be used
+  keyField?: string; // if PK is not defined, or is different from 'id'
   labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
@@ -537,9 +537,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
           ','
         )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-        if (keyField) {
-          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
-        }
         const wfsResponse = await fetchWfsData(wfsDataUrl);
         await handleWfsResponse(wfsResponse, extent, offset, position);
       } catch (error) {
@@ -650,7 +647,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       return area(polygon1) / area(polygon2);
     };
 
+    if (!viewer.dataSources.getByName(dataSource.name)[0]) {
+      return;
+    }
+
     const labelPos = [] as turf.Feature<turf.Point>[];
+
     dataSource?.entities.values.forEach((entity: Entity) => {
       if (extent && labeling && is2D) {
         try {
