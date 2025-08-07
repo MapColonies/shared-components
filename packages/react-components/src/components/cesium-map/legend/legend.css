@@ -1,4 +1,4 @@
-.mapLegendSidebarContainer {
+.viewer .mapLegendSidebarContainer {
   width: 340px;
   height: 100%;
   position: relative;
@@ -9,20 +9,20 @@
 
 /* Disable drawer animation */
 
-.mapLegendSidebarContainer.mdc-drawer--animate {
+.viewer .mapLegendSidebarContainer.mdc-drawer--animate {
   transform: translateX(0) !important;
   transition: none !important;
 }
 
-.mapLegendSidebarContainer.mdc-drawer--dismissible {
+.viewer .mapLegendSidebarContainer.mdc-drawer--dismissible {
   position: relative;
 }
 
-div.MuiPaper-root {
+.viewer div.MuiPaper-root {
   transition: none !important;
 }
 
-.mapLegendCloseBtn {
+.viewer .mapLegendCloseBtn {
   position: absolute;
   top: 0;
   right: 0;
@@ -33,28 +33,28 @@ div.MuiPaper-root {
   font-size: 24px;
 }
 
-body[dir='rtl'] .mapLegendCloseBtn {
+body[dir='rtl'] .viewer .mapLegendCloseBtn {
   right: unset;
   left: 0;
 }
 
-.mapLegendIcon {
+.viewer .mapLegendIcon {
   width: 2rem;
   height: 2rem;
   transform: translate(8%, 8%);
 }
 
-.sidebarHeaderContainer {
+.viewer .sidebarHeaderContainer {
   text-align: center;
   margin-top: 40px;
 }
 
-.sidebarTitle {
+.viewer .sidebarTitle {
   font-size: 1.5rem;
   font-weight: bold;
 }
 
-.mapLegend {
+.viewer .mapLegend {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,20 +63,20 @@ body[dir='rtl'] .mapLegendCloseBtn {
   padding: 10px 14px;
 }
 
-.layerNameContainer {
+.viewer .layerNameContainer {
   width: 90%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.layerName {
+.viewer .layerName {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.legendImg {
+.viewer .legendImg {
   width: 90%;
   height: 150px;
   border: 1px solid black;
@@ -85,18 +85,18 @@ body[dir='rtl'] .mapLegendCloseBtn {
   cursor: pointer;
 }
 
-.legendActionsContainer {
+.viewer .legendActionsContainer {
   display: flex;
   flex-direction: row;
   align-self: center;
 }
 
-.legendAction:not(:last-child)::after {
+.viewer .legendAction:not(:last-child)::after {
   content: '|';
   margin: 0px 4px;
 }
 
-.mapLegendsList {
+.viewer .mapLegendsList {
   display: flex;
   flex-direction: column;
   padding: 20px 0px;
@@ -104,7 +104,7 @@ body[dir='rtl'] .mapLegendCloseBtn {
   height: 90%;
 }
 
-.legendAction {
+.viewer .legendAction {
   text-decoration: underline;
   cursor: pointer;
   font-size: 1.1rem;
@@ -112,11 +112,11 @@ body[dir='rtl'] .mapLegendCloseBtn {
   width: max-content;
 }
 
-.legendAction:hover {
+.viewer .legendAction:hover {
   filter: brightness(1.2);
 }
 
-.noLegendsContainer {
+.viewer .noLegendsContainer {
   width: 100%;
   height: 100%;
   display: flex;
@@ -125,6 +125,6 @@ body[dir='rtl'] .mapLegendCloseBtn {
   align-items: center;
 }
 
-.noLegendsMsg {
+.viewer .noLegendsMsg {
   text-align: center;
 }
