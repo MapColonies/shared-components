@@ -146,6 +146,133 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
   right: unset;
 }
 
+/* #region for NATIVE CONTROLS */
+.cesium-viewer input[type='checkbox'] {
+  accent-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+.cesium-viewer input::placeholder {
+  color: unset;
+  opacity: 0.8;
+}
+
+.cesium-viewer input {
+  font-size: var(--mdc-theme-cesium-font-size);
+  color: unset;
+  font-weight: bold;
+  caret-color: unset;
+}
+
+.cesium-viewer ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.cesium-viewer ::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+  border-radius: 6px;
+}
+
+.cesium-viewer ::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 6px;
+}
+
+/* #endregion for NATIVE CONTROLS */
+
+/* #region for mdc-checkbox */
+.cesium-viewer .mdc-checkbox .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background,
+.mdc-checkbox .mdc-checkbox__native-control[data-indeterminate='true']:enabled ~ .mdc-checkbox__background {
+  border-color: var(--mdc-theme-cesium-checkbox-color);
+  background-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+.cesium-viewer .mdc-checkbox--upgraded {
+  --mdc-checkbox-checked-color: var(--mdc-theme-cesium-checkbox-color);
+}
+
+.cesium-viewer .mdc-checkbox {
+  width: var(--mdc-theme-cesium-checkbox-width);
+  height: var(--mdc-theme-cesium-checkbox-width);
+}
+
+.cesium-viewer .mdc-checkbox__background {
+  width: 12px;
+  height: 12px;
+}
+
+.cesium-viewer .mdc-form-field {
+  color: unset;
+  margin: -2%;
+  margin-bottom: -4%;
+}
+
+.cesium-viewer .mdc-form-field > label {
+  color: unset;
+}
+
+.cesium-viewer .mdc-ripple-upgraded--unbounded {
+  --mdc-ripple-fg-size: 0px !important;
+}
+
+/* #endregion mdc-checkbox */
+
+/* #region mdc-list */
+.cesium-viewer .mdc-list {
+  font-size: var(--mdc-theme-cesium-font-size);
+  font-family: sans-serif;
+  padding: 1px;
+  color: unset;
+}
+
+.cesium-viewer .mdc-list-item {
+  padding: unset;
+  padding-right: 4px;
+  padding-left: 4px;
+  height: 24px;
+  font-weight: bold;
+}
+
+.cesium-viewer .mdc-text-field--filled {
+  height: 32px;
+}
+
+/* #endregion mdc-list */
+
+/* #region mdc-TextField */
+.cesium-viewer .mdc-text-field__input {
+  box-sizing: border-box;
+  border: unset;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: transparent !important;
+}
+
+.cesium-viewer .mdc-text-field {
+  padding: unset;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+/* Removing the purple underline in RMWC */
+.cesium-viewer .mdc-line-ripple::before,
+.cesium-viewer .mdc-line-ripple::after {
+  border-bottom: none !important;
+}
+
+/* #endregion mdc-TextField */
+
+.cesium-viewer .disabled {
+  opacity: 0.6;
+  cursor: initial;
+}
+
+.cesium-viewer .search-results {
+  padding: 4px;
+}
+
 .viewer {
   display: flex;
   flex-direction: row;

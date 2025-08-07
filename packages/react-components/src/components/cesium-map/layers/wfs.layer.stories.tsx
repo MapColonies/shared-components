@@ -49,7 +49,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-const DEBUG_PANEL = true;
+const SHOW_DEBUGGER_TOOL = true;
 
 const POINT_STROKE = '#FFFF00';
 const BRIGHT_GREEN = '#01FF1F';
@@ -86,7 +86,7 @@ MapWithPPWFSLayer.argTypes = {
     },
   },
   showDebuggerTool: {
-    defaultValue: DEBUG_PANEL,
+    defaultValue: SHOW_DEBUGGER_TOOL,
   },
   terrainProvider: {
     defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
@@ -132,7 +132,7 @@ MapWithWFSLayer.argTypes = {
     },
   },
   showDebuggerTool: {
-    defaultValue: DEBUG_PANEL,
+    defaultValue: SHOW_DEBUGGER_TOOL,
   },
   terrainProvider: {
     defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
@@ -192,7 +192,7 @@ MapWithWFSLayerAPPScenario.argTypes = {
     },
   },
   showDebuggerTool: {
-    defaultValue: DEBUG_PANEL,
+    defaultValue: SHOW_DEBUGGER_TOOL,
   },
   terrainProvider: {
     defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
@@ -227,7 +227,7 @@ MapWithWFSLayerWithVisualizer.argTypes = {
     },
   },
   showDebuggerTool: {
-    defaultValue: DEBUG_PANEL,
+    defaultValue: SHOW_DEBUGGER_TOOL,
   },
   terrainProvider: {
     defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),

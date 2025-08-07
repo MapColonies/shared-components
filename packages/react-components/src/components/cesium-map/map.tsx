@@ -32,6 +32,7 @@ import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
@@ -45,6 +46,7 @@ import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import '@map-colonies/react-core/dist/checkbox/styles';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -139,6 +141,10 @@ interface ILegends {
   mapLegendsExtractor?: LegendExtractor;
 }
 
+export interface IGeocoderPanel {
+  options?: Record<string, unknown>;
+}
+
 export interface CesiumMapProps extends ViewerProps {
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
@@ -165,6 +171,7 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
+  geocoderPanel?: GeocoderPanelProps['options'];
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -535,6 +542,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
+          {props.geocoderPanel && <GeocoderPanel locale={locale} options={[...props.geocoderPanel]} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
           {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
