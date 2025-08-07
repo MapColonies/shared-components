@@ -6,8 +6,6 @@ import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
 import { WFS } from './wfs';
 
-import './wfs-debug-widget.css';
-
 interface IFeatureTypeMetadata {
   id: string;
   items: number;

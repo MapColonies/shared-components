@@ -145,6 +145,9 @@ export interface CesiumMapProps extends ViewerProps {
   showScale?: boolean;
   showLoadingProgress?: boolean;
   showCompass?: boolean;
+  showZoomButtons?: boolean;
+  showDebuggerTool?: boolean;
+  showActiveLayersTool?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
@@ -162,8 +165,6 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
-  displayZoomButtons?: boolean;
-  debugPanel?: boolean;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -190,15 +191,17 @@ export const useCesiumMapViewstate = (): IMapViewState => {
 export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
   const [mapViewRef, setMapViewRef] = useState<CesiumViewer>();
+  const [locale, setLocale] = useState<{ [key: string]: string }>();
   const [projection, setProjection] = useState<Proj>();
   const [showMousePosition, setShowMousePosition] = useState<boolean>();
   const [showZoomLevel, setShowZoomLevel] = useState<boolean>();
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
+  const [showZoomButtons, setShowZoomButtons] = useState<boolean>();
+  const [showActiveLayersTool, setShowActiveLayersTool] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
-  const [locale, setLocale] = useState<{ [key: string]: string }>();
   const cameraStateRef = useRef<ICameraState | undefined>();
   const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
@@ -208,11 +211,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const imageryMenuEvent = useRef<MouseEvent>();
   const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
   const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(false);
-  const [rightClickCoordinates, setRightClickCoordinates] = useState<{
-    longitude: number;
-    latitude: number;
-  }>();
-  const [displayZoomButtons, setDisplayZoomButtons] = useState<boolean>();
+  const [rightClickCoordinates, setRightClickCoordinates] = useState<{ longitude: number; latitude: number; }>();
   const [viewState, setViewState] = useState<MapViewState>();
   const theme = useTheme();
   const themeCesium = useMappedCesiumTheme(theme);
@@ -369,6 +368,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showLoadingProgress]);
 
   useEffect(() => {
+    setShowActiveLayersTool(props.showActiveLayersTool ?? true);
+  }, [props.showActiveLayersTool]);
+
+  useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
       if (mapViewRef === undefined) {
         return {
@@ -501,8 +504,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.zoom, props.center, mapViewRef]);
 
   useEffect(() => {
-    setDisplayZoomButtons(props.displayZoomButtons ?? true);
-  }, [props.displayZoomButtons]);
+    setShowZoomButtons(props.showZoomButtons ?? true);
+  }, [props.showZoomButtons]);
 
   const updateLegendToggle = () => {
     setIsLegendsSidebarOpen(prev => !prev);
@@ -520,7 +523,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
             {showScale && <ScaleTrackerTool locale={locale} />}
           </Box>
-          {displayZoomButtons && <ZoomButtons />}
+          {showZoomButtons && <ZoomButtons />}
         </>,
         document.querySelector('.cesium-viewer') as Element
       )
@@ -533,7 +536,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <>
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.debugPanel && <WFSDebugWidget locale={locale} />}
+          {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element
@@ -546,7 +549,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
-          <ActiveLayersWidget locale={locale} />
+          {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
         </Box>,
         document.querySelector('.cesium-widget') as Element
       )

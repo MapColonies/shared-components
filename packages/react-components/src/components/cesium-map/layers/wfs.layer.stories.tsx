@@ -85,7 +85,7 @@ MapWithPPWFSLayer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
   },
   terrainProvider: {
@@ -131,7 +131,7 @@ MapWithWFSLayer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
   },
   terrainProvider: {
@@ -191,7 +191,7 @@ MapWithWFSLayerAPPScenario.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
   },
   terrainProvider: {
@@ -226,7 +226,7 @@ MapWithWFSLayerWithVisualizer.argTypes = {
       max: 20,
     },
   },
-  debugPanel: {
+  showDebuggerTool: {
     defaultValue: DEBUG_PANEL,
   },
   terrainProvider: {
