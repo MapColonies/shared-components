@@ -11,7 +11,7 @@ export const BASE_MAPS: IBaseMaps = {
       id: '1st',
       title: '1st Map',
       isCurrent: true,
-      thumbnail: 'assets/img/1st.png',
+      thumbnail: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
       baseRasterLayers: [
         {
           id: 'GOOGLE_TERRAIN',
@@ -45,7 +45,7 @@ export const BASE_MAPS: IBaseMaps = {
     {
       id: '2nd',
       title: '2nd Map',
-      thumbnail: 'assets/img/2nd.png',
+      thumbnail: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
       baseRasterLayers: [
         {
           id: 'RADAR_RASTER',
@@ -90,7 +90,7 @@ export const BASE_MAPS: IBaseMaps = {
     {
       id: '3rd',
       title: '3rd Map',
-      thumbnail: 'assets/img/3rd.png',
+      thumbnail: 'https://a.tile.thunderforest.com/cycle/17/78208/53265.png',
       baseRasterLayers: [
         {
           id: 'VECTOR_TILES',
