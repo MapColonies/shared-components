@@ -2,16 +2,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 90%;
 }
 
 .activeLayersPanel .name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 80px;
+  width: 104px;
 }
 
-.activeLayersPanel .name .disabled {
+.activeLayersPanel .name.disabled {
   opacity: 0.5;
   pointer-events: none;
 }
@@ -29,7 +30,7 @@
   cursor: pointer;
 }
 
-.activeLayersPanel .icon .disabled {
+.activeLayersPanel .icon.disabled {
   opacity: 0;
   pointer-events: none;
 }
