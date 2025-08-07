@@ -1,4 +1,4 @@
-.coordinatesTracker {
+.cesium-viewer .coordinatesTracker {
   background-color: var(--mdc-theme-surface);
   padding-top: 7px;
   border-radius: 2px;

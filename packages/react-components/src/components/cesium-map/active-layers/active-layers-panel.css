@@ -1,35 +1,35 @@
-.activeLayersPanel .layer {
+.cesium-viewer .activeLayersPanel .layer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 90%;
 }
 
-.activeLayersPanel .name {
+.cesium-viewer .activeLayersPanel .name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.activeLayersPanel .name.disabled {
+.cesium-viewer .activeLayersPanel .name.disabled {
   opacity: 0.5;
   pointer-events: none;
 }
 
-.activeLayersPanel .icons {
+.cesium-viewer .activeLayersPanel .icons {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
-.activeLayersPanel .icon {
+.cesium-viewer .activeLayersPanel .icon {
   width: 17px;
   height: 17px;
   margin-left: 8px;
   cursor: pointer;
 }
 
-.activeLayersPanel .icon.disabled {
+.cesium-viewer .activeLayersPanel .icon.disabled {
   opacity: 0;
   pointer-events: none;
 }

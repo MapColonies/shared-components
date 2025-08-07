@@ -1,18 +1,18 @@
-.zoomLevel {
+.cesium-viewer .zoomLevel {
   background-color: var(--mdc-theme-surface);
   border-radius: 2px;
   padding: 2px;
   height: 24px;
 }
 
-.zoomLevelValue {
+.cesium-viewer .zoomLevelValue {
   margin: 2px;
   font-size: 14px;
   line-height: 12px;
   text-align: center;
 }
 
-.zoomLevelLabel {
+.cesium-viewer .zoomLevelLabel {
   font-size: 8px;
   line-height: 8px;
   display: table;

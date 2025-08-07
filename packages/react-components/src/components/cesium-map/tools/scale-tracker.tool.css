@@ -1,4 +1,4 @@
-.scaleTracker {
+.cesium-viewer .scaleTracker {
   background-color: var(--mdc-theme-surface);
   padding-top: 4px;
   border-radius: 2px;
@@ -6,11 +6,11 @@
   width: 110px;
 }
 
-.scaleTrackerLabel {
+.cesium-viewer .scaleTrackerLabel {
   text-align: center;
 }
 
-.scaleTrackerBar {
+.cesium-viewer .scaleTrackerBar {
   background: var(--mdc-theme-on-surface);
   margin: 0 auto;
   display: block;

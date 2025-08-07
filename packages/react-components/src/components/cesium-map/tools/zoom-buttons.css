@@ -1,4 +1,4 @@
-.zoomButtons {
+.cesium-viewer .zoomButtons {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -7,12 +7,12 @@
   right: 30px;
 }
 
-body[dir='rtl'] .zoomButtons {
+body[dir='rtl'] .cesium-viewer .zoomButtons {
   right: unset;
   left: 30px;
 }
 
-.zoomButton {
+.cesium-viewer .zoomButton {
   width: 32px;
   height: 32px;
   background: #303336;
@@ -25,7 +25,7 @@ body[dir='rtl'] .zoomButtons {
   cursor: pointer;
 }
 
-.zoomButton:hover {
+.cesium-viewer .zoomButton:hover {
   background: #48b;
   border-color: #aef;
 }
