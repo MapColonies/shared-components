@@ -556,6 +556,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       }, 100);
     });
   };
+
   const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox): void => {
     const is2D = viewer.scene.mode === SceneMode.SCENE2D;
 
@@ -646,7 +647,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       return area(polygon1) / area(polygon2);
     };
 
+    if (!viewer.dataSources.getByName(dataSource.name)[0]) {
+      return;
+    }
+
     const labelPos = [] as turf.Feature<turf.Point>[];
+
     dataSource?.entities.values.forEach((entity: Entity) => {
       if (extent && labeling && is2D) {
         try {
