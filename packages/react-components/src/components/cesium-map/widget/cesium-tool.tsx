@@ -12,7 +12,7 @@ export const CesiumTool: React.FC<ICesiumToolProps> = ({ isVisible, children, ti
   return (
     <Box className={`cesium-mc-tool ${isVisible ? 'cesium-mc-tool-visible' : ''}`}>
       {title && <CesiumTitle title={title} />}
-      <Box>{children}</Box>
+      {children}
     </Box>
   );
 };

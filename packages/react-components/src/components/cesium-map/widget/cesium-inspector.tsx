@@ -16,7 +16,7 @@ export const CesiumInspector: React.FC<ICesiumInspectorProps> = ({ title, isVisi
       {
         isVisible &&
         <Box className={`cesium-cesiumInspector-dropDown`}>
-          <Box>{children}</Box>
+          {children}
         </Box>
       }
     </Box>
