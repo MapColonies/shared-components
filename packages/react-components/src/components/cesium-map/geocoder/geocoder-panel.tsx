@@ -1,9 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { debounce, get } from 'lodash';
-import { Cartesian2, Cartesian3, Cartographic, defined, GeoJsonDataSource, Ray, Rectangle, SceneMode, Viewer } from 'cesium';
+import {
+  // Cartesian2,
+  // Cartesian3,
+  // Cartographic,
+  // defined,
+  GeoJsonDataSource,
+  // Ray,
+  // Rectangle,
+  SceneMode,
+  // Viewer
+} from 'cesium';
 import bbox from '@turf/bbox';
 import { getType } from '@turf/invariant';
-import { IconButton, TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
+import { TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { useCesiumMap } from '../map';
 import { applyFactor, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
@@ -13,7 +23,7 @@ import './geocoder-panel.css';
 import '@map-colonies/react-core/dist/list/styles';
 import '@map-colonies/react-core/dist/textfield/styles';
 
-export type Method = 'GET' | 'POST';
+type Method = 'GET' | 'POST';
 
 type UrlGroup = { baseUrl: string; endPoint: string; url?: string } | { baseUrl?: string; endPoint?: string; url: string };
 
@@ -23,7 +33,7 @@ type relatedParamsType = {
   titles?: Array<string | undefined>;
 };
 
-export type CesiumGeocodingProps = UrlGroup & {
+export type GeocoderOptions = UrlGroup & {
   title?: string;
   geometryIconClassName?: string;
   method: Method;
@@ -37,8 +47,8 @@ export type CesiumGeocodingProps = UrlGroup & {
   };
 };
 
-export type GeocoderPanelProps = {
-  options: CesiumGeocodingProps[];
+type GeocoderPanelProps = {
+  options: GeocoderOptions[];
   locale?: { [key: string]: string };
 };
 
@@ -81,12 +91,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
     </svg>
   );
 
-  const SearchIcon = (
-    <svg className="cesium-svgPath-svg" width="32" height="32" fill="white" viewBox="0 0 32 32">
-      <path d="M29.772,26.433l-7.126-7.126c0.96-1.583,1.523-3.435,1.524-5.421C24.169,8.093,19.478,3.401,13.688,3.399C7.897,3.401,3.204,8.093,3.204,13.885c0,5.789,4.693,10.481,10.484,10.481c1.987,0,3.839-0.563,5.422-1.523l7.128,7.127L29.772,26.433zM7.203,13.885c0.006-3.582,2.903-6.478,6.484-6.486c3.579,0.008,6.478,2.904,6.484,6.486c-0.007,3.58-2.905,6.476-6.484,6.484C10.106,20.361,7.209,17.465,7.203,13.885z"></path>
-    </svg>
-  );
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       const target = event.target;
@@ -105,7 +109,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
   });
 
   useEffect(() => {
-    options.forEach((option: CesiumGeocodingProps) => {
+    options.forEach((option: GeocoderOptions) => {
       if (option.baseUrl && option.endPoint && !option.url) {
         option.url = option.baseUrl + option.endPoint;
       }
@@ -174,7 +178,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const getAccurateViewRectangle = (viewer: Viewer) => {
+  /*const getAccurateViewRectangle = (viewer: Viewer) => {
     const scene = viewer.scene;
     const canvas = scene.canvas;
 
@@ -208,10 +212,10 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
     });
 
     return new Rectangle(west, south, east, north);
-  };
+  };*/
 
   const buildUrlParams = useCallback(
-    (url: string, params: CesiumGeocodingProps['params'], text: string, isInMapExtent: boolean) => {
+    (url: string, params: GeocoderOptions['params'], text: string, isInMapExtent: boolean) => {
       const dynamicParams = () => {
         const queryText = params.dynamic.queryText;
         const queryTextName = typeof queryText === 'string' ? queryText : queryText.name;
@@ -229,7 +233,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
           // const rectangle = getAccurateViewRectangle(mapViewer);
 
           // const rectangle = computeLimitedViewRectangle(mapViewer);
-          
+
           const rectangle = customComputeViewRectangle(mapViewer);
 
           const geoContext = params.dynamic.geoContext;
@@ -366,99 +370,94 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
 
   return (
     <div ref={geocoderPanelRef} className="geocoderContainer">
-      <IconButton className="cesium-geocoder-searchButton" icon={SearchIcon} onClick={() => setIsOpen((prev) => !prev)} />
+      <Box className="geocoderForm">
+        <TextField
+          id="geocoderTextField"
+          className="cesium-geocoder-input geocoderInput"
+          ref={inputRef}
+          onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
+          placeholder={searchPlaceholder}
+          value={searchValue}
+        />
+        <Box className="search-results">
+          <Box className="checkboxesContainer">
+            <Checkbox
+              className="checkboxElement"
+              label={showFeatureOnMapLabel}
+              icon={UncheckedIcon}
+              checkedIcon={CheckedIcon}
+              checked={showFeatureOnMap}
+              onClick={() => {
+                setShowFeatureOnMap(!showFeatureOnMap);
+              }}
+            />
 
-      {
-        isOpen &&
-        <Box className="geocoderForm">
-          <TextField
-            id="geocoderTextField"
-            className="cesium-geocoder-input geocoderInput"
-            ref={inputRef}
-            onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
-            placeholder={searchPlaceholder}
-            value={searchValue}
-          />
-          <Box className="search-results">
-            <Box className="checkboxesContainer">
-              <Checkbox
-                className="checkboxElement"
-                label={showFeatureOnMapLabel}
-                icon={UncheckedIcon}
-                checkedIcon={CheckedIcon}
-                checked={showFeatureOnMap}
-                onClick={() => {
-                  setShowFeatureOnMap(!showFeatureOnMap);
-                }}
-              />
+            <Checkbox
+              className="checkboxElement"
+              label={
+                <Typography tag="span" className={isNotIn2DMode ? 'disabled' : ''}>
+                  {inMapExtentLabel}
+                </Typography>
+              }
+              checked={isInMapExtent}
+              icon={UncheckedIcon}
+              checkedIcon={CheckedIcon}
+              disabled={isNotIn2DMode}
+              onClick={() => {
+                setIsInMapExtent(!isInMapExtent);
+              }}
+            />
+          </Box>
 
-              <Checkbox
-                className="checkboxElement"
-                label={
-                  <Typography tag="span" className={isNotIn2DMode ? 'disabled' : ''}>
-                    {inMapExtentLabel}
-                  </Typography>
-                }
-                checked={isInMapExtent}
-                icon={UncheckedIcon}
-                checkedIcon={CheckedIcon}
-                disabled={isNotIn2DMode}
-                onClick={() => {
-                  setIsInMapExtent(!isInMapExtent);
-                }}
-              />
-            </Box>
+          <Box className="listsContainer">
+            {options.map((option, index) => (
+              <List>
+                <Typography className="bold" tag="span">
+                  {option.title ?? option.endPoint}
+                </Typography>
+                <Box className="listContainer">
+                  {(() => {
+                    const features = responses?.[index]?.resultObj?.features;
+                    const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
+                    const message: string = responses?.[index]?.resultObj?.message;
 
-            <Box className="listsContainer">
-              {options.map((option, index) => (
-                <List>
-                  <Typography className="bold" tag="span">
-                    {option.title ?? option.endPoint}
-                  </Typography>
-                  <Box className="listContainer">
-                    {(() => {
-                      const features = responses?.[index]?.resultObj?.features;
-                      const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
-                      const message: string = responses?.[index]?.resultObj?.message;
+                    const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
 
-                      const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
+                    if (featuresLength) {
+                      return features.map((feature: any, i: number) => (
+                        <ListItem
+                          key={`feature-${i}`}
+                          className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''}
+                          onClick={() => {
+                            mapViewer.camera.flyTo({
+                              destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
+                            });
 
-                      if (featuresLength) {
-                        return features.map((feature: any, i: number) => (
-                          <ListItem
-                            key={`feature-${i}`}
-                            className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''}
-                            onClick={() => {
-                              mapViewer.camera.flyTo({
-                                destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
-                              });
-
-                              setFeatureToShow(feature);
-                            }}
-                          >
-                            <Box className="queryItemResult">
-                              <Tooltip content={feature?.properties?.names?.display}>
-                                <Box>{feature?.properties?.names?.default?.[0]}</Box>
-                              </Tooltip>
-                              {getIconByFeatureType(feature, option.geometryIconClassName)}
-                            </Box>
-                          </ListItem>
-                        ));
-                      } else if (featuresLength === 0) {
-                        return noResultsJSX;
-                      } else if (message) {
-                        return <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
-                      } else {
-                        return noResultsJSX;
-                      }
-                    })()}
-                  </Box>
-                </List>
-              ))}
-            </Box>
+                            setFeatureToShow(feature);
+                          }}
+                        >
+                          <Box className="queryItemResult">
+                            <Tooltip content={feature?.properties?.names?.display}>
+                              <Box>{feature?.properties?.names?.default?.[0]}</Box>
+                            </Tooltip>
+                            {getIconByFeatureType(feature, option.geometryIconClassName)}
+                          </Box>
+                        </ListItem>
+                      ));
+                    } else if (featuresLength === 0) {
+                      return noResultsJSX;
+                    } else if (message) {
+                      return <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
+                    } else {
+                      return noResultsJSX;
+                    }
+                  })()}
+                </Box>
+              </List>
+            ))}
           </Box>
         </Box>
-      }
+      </Box>
     </div>
   );
 };

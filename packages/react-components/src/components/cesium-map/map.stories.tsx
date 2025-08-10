@@ -39,7 +39,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'location',
+    title: 'Location',
     geometryIconClassName: 'customIcon',
   },
   {
@@ -59,7 +59,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'tiles',
+    title: 'Tiles',
     geometryIconClassName: 'customIcon',
   },
   {
@@ -79,7 +79,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'control',
+    title: 'Control',
     geometryIconClassName: 'customIcon',
   },
   {
@@ -96,7 +96,7 @@ const GEOCODER_OPTIONS = [
       },
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
-    title: 'routes',
+    title: 'Routes',
     geometryIconClassName: 'customIcon',
   },
 ] satisfies GeocoderPanelProps['options'];
@@ -139,7 +139,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'טיילים',
+    title: 'אריחים',
     geometryIconClassName: 'customIcon',
   },
   {
