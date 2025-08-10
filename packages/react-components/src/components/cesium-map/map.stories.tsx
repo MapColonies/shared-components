@@ -366,7 +366,7 @@ LocalizedMap.argTypes = {
       KILOMETERS_UNIT: "קמ'",
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
-      SHOW_FEATURE_ON_MAP: "הראה פיצ'ר",
+      SHOW_FEATURE_ON_MAP: "הראה על המפה",
       IN_MAP_EXTENT: 'חיפוש בתצוגה',
       SEARCH_PLACEHOLDER: 'חיפוש...',
       NO_RESULTS: 'אין תוצאות',
