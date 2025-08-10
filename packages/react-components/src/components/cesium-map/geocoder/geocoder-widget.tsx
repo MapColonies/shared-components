@@ -19,7 +19,7 @@ export const GeocoderWidget: React.FC<IGeocoderWidgetProps> = ({ options, locale
         </svg>
       </CesiumIcon>
       <CesiumTool isVisible={isOpen}>
-        <GeocoderPanel options={options} locale={locale} />
+        <GeocoderPanel options={options} isOpen={isOpen} locale={locale} />
       </CesiumTool>
     </>
   );
