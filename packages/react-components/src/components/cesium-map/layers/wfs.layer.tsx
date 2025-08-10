@@ -68,8 +68,6 @@ interface IFetchMetadata {
   items?: number;
 }
 
-const POINT_STROKE = '#FFFF00';
-
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;

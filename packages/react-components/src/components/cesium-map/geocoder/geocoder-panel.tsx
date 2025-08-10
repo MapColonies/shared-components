@@ -368,7 +368,8 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
     <div ref={geocoderPanelRef} className="geocoderContainer">
       <IconButton className="cesium-geocoder-searchButton" icon={SearchIcon} onClick={() => setIsOpen((prev) => !prev)} />
 
-      {isOpen && (
+      {
+        isOpen &&
         <Box className="geocoderForm">
           <TextField
             id="geocoderTextField"
@@ -457,7 +458,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options: options, 
             </Box>
           </Box>
         </Box>
-      )}
+      }
     </div>
   );
 };

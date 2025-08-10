@@ -239,7 +239,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     timeline: false,
     animation: false,
     baseLayerPicker: false,
-    geocoder: true,
+    geocoder: false,
     navigationHelpButton: false,
     homeButton: true,
     sceneModePicker: true,

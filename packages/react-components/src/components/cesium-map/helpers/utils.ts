@@ -370,10 +370,10 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
       // Polygon
       const polygonData = entity.polygon.hierarchy?.getValue(JulianDate.now()) as PolygonHierarchy;
       const positions = polygonData.positions.map((position) => {
-        const worlPosCartographic = Cartographic.fromCartesian(position);
+        const worldPosCartographic = Cartographic.fromCartesian(position);
         const correctedCarto = new Cartographic(
-          CesiumMath.toDegrees(worlPosCartographic.longitude),
-          CesiumMath.toDegrees(worlPosCartographic.latitude),
+          CesiumMath.toDegrees(worldPosCartographic.longitude),
+          CesiumMath.toDegrees(worldPosCartographic.latitude),
           is2D ? 500 : undefined //viewer.scene.sampleHeight(Cartographic.fromCartesian(position))
         );
         return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
@@ -452,7 +452,12 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
     return area(polygon1) / area(polygon2);
   };
 
+  if (!viewer.dataSources.getByName(dataSource.name)[0]) {
+    return;
+  }
+
   const labelPos = [] as turf.Feature<turf.Point>[];
+
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (extent && labeling && is2D) {
       try {
@@ -513,10 +518,10 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
     }
     if (entity.billboard) {
       const worldPos = entity.position?.getValue(JulianDate.now()) as Cartesian3;
-      const worlPosCartographic = Cartographic.fromCartesian(worldPos);
+      const worldPosCartographic = Cartographic.fromCartesian(worldPos);
       const correctedCarto = new Cartographic(
-        worlPosCartographic.longitude,
-        worlPosCartographic.latitude,
+        worldPosCartographic.longitude,
+        worldPosCartographic.latitude,
         is2D ? 500 : viewer.scene.sampleHeight(Cartographic.fromCartesian(worldPos))
       );
 
@@ -529,10 +534,10 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
         image:
           'data:image/svg+xml;base64,' +
           btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-              <circle cx="8" cy="8" r="6" fill="${color}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
-            </svg>
-          `), //${color}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <circle cx="8" cy="8" r="6" fill="${color}33" stroke="${POINT_STROKE}80" stroke-width="2"/>
+          </svg>
+        `), //${color}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
         verticalOrigin: VerticalOrigin.BOTTOM,
         heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
         scale: 1.0,
@@ -553,13 +558,13 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
       .then((dataSource) => {
         dataSource?.entities.values.forEach((entity: Entity) => {
           entity.billboard = new BillboardGraphics({
-            image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
-            heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
-            scale: 1.0,
-            disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          });
+          image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
+          heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+          scale: 1.0,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
         });
       });
+    });
   }
 };
 

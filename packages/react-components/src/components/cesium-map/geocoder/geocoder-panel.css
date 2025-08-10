@@ -102,5 +102,4 @@ body[dir='rtl'] .geocoderContainer .geocoderForm {
   background: transparent;
   border-color: var(--mdc-theme-cesium-color);
 }
-
 /* #endregion cesium classes */
