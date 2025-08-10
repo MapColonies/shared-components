@@ -35,7 +35,7 @@ import { WFSDebugWidget } from './debug/wfs-debug-widget';
 import { GeocoderPanel, GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
-import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
+import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
