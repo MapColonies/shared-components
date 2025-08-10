@@ -117,7 +117,6 @@ export interface IBaseMap {
   isCurrent?: boolean;
   isForPreview?: boolean;
   baseRasterLayers: IRasterLayer[];
-  baseVectorLayers: IVectorLayer[];
 }
 
 export interface IBaseMaps {

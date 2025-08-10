@@ -2,6 +2,7 @@ import { Story, Meta } from '@storybook/react/types-6-0';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
+import { GeocoderPanelProps } from './geocoder/geocoder-panel';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
 import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
