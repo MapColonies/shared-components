@@ -1,5 +1,8 @@
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { ThemeProvider } from '@map-colonies/react-core';
+import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
+import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
 import { CesiumMap, CesiumMapProps } from './map';
 import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
@@ -17,6 +20,166 @@ const mapDivStyle = {
   width: '100%',
   position: 'absolute' as const,
 };
+
+const GEOCODER_OPTIONS = [
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/location/query',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'query',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'Location',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/tiles',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'tile',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'Tiles',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/items',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'Control',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/routes',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      // "geo_context": { "bbox": [-180, -90, 180, 90] },
+    },
+    title: 'Routes',
+    geometryIconClassName: 'customIcon',
+  },
+] satisfies GeocoderOptions[];
+
+const LOCALIZED_GEOCODER_OPTIONS = [
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/location/query',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'query',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'מיקום',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/tiles',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'tile',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'אריחים',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/items',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      static: [
+        ['limit', 6],
+        ['disable_fuzziness', false],
+      ],
+    },
+    title: 'שליטה',
+    geometryIconClassName: 'customIcon',
+  },
+  {
+    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    endPoint: '/search/control/routes',
+    method: 'GET',
+    params: {
+      dynamic: {
+        queryText: 'command_name',
+        geoContext: {
+          name: 'geo_context',
+          relatedParams: [['geo_context_mode', 'filter']],
+        },
+      },
+      // "geo_context": { "bbox": [-180, -90, 180, 90] },
+    },
+    title: 'דרכים',
+    geometryIconClassName: 'customIcon',
+  },
+] satisfies GeocoderOptions[];
 
 export const BaseMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -76,6 +239,48 @@ ZoomedMap.argTypes = {
     },
   },
 };
+
+const cesiumTheme = {
+  // '--mdc-theme-primary': '#24aee9',
+  '--mdc-theme-on-surface': 'white',
+  '--mdc-theme-error': '#FF3636',
+};
+
+export const GeocoderPanel: Story = (args: CesiumMapProps) => (
+  <ThemeProvider options={cesiumTheme}>
+    <div style={mapDivStyle}>
+      <CesiumMap {...args}></CesiumMap>
+    </div>
+  </ThemeProvider>
+);
+
+GeocoderPanel.argTypes = {
+  baseMaps: {
+    defaultValue: BASE_MAPS,
+  },
+  sceneMode: {
+    defaultValue: CesiumSceneMode.SCENE2D,
+  },
+  projection: {
+    defaultValue: Proj.WGS84,
+    control: {
+      type: 'radio',
+      options: [Proj.WEB_MERCATOR, Proj.WGS84],
+    },
+  },
+  zoom: {
+    defaultValue: 3,
+    control: {
+      type: 'range',
+      min: 0,
+      max: 20,
+    },
+  },
+  geocoderPanel: {
+    defaultValue: GEOCODER_OPTIONS,
+  },
+};
+GeocoderPanel.storyName = 'Geocoder';
 
 export const MapWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -161,6 +366,10 @@ LocalizedMap.argTypes = {
       KILOMETERS_UNIT: "קמ'",
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
+      SHOW_FEATURE_ON_MAP: "הראה על המפה",
+      IN_MAP_EXTENT: 'חיפוש בתצוגה',
+      SEARCH_PLACEHOLDER: 'חיפוש...',
+      NO_RESULTS: 'אין תוצאות',
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
@@ -189,6 +398,12 @@ LocalizedMap.argTypes = {
       min: 0,
       max: 20,
     },
+  },
+  geocoderPanel: {
+    defaultValue: LOCALIZED_GEOCODER_OPTIONS,
+  },
+  showDebuggerTool: {
+    defaultValue: true,
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';

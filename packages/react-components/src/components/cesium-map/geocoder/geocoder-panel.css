@@ -1,0 +1,105 @@
+.cesium-viewer .geocoderContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  color: var(--mdc-theme-cesium-color);
+}
+
+.cesium-viewer .geocoderContainer .geocoderForm {
+  background-color: var(--mdc-theme-cesium-background-color);
+  border-radius: var(--mdc-theme-cesium-container-border-radius);
+}
+
+.cesium-viewer .geocoderContainer .mdc-text-field__input {
+  width: 100%;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.cesium-viewer .geocoderContainer .listsContainer {
+  max-height: 348px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.cesium-viewer .geocoderContainer .listContainer {
+  border: 1px solid var(--mdc-theme-cesium-color);
+  min-height: 56px;
+  width: 308px;
+  max-height: 56px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 2px;
+}
+
+.cesium-viewer .geocoderContainer .listContainer .queryItemResult {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cesium-viewer .geocoderContainer .geometrysSvgIcons {
+  stroke: black;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: var(--mdc-theme-cesium-color);
+  fill: transparent;
+}
+
+.cesium-viewer .geocoderContainer .listContainer .queryNoResults {
+  justify-content: normal;
+  color: unset;
+}
+
+.cesium-viewer .geocoderContainer .listContainer .queryServiceError {
+  color: var(--mdc-theme-cesium-service-error);
+  text-wrap: unset;
+  width: unset;
+}
+
+.cesium-viewer .geocoderContainer .listContainer .generalListItem {
+  font-size: var(--mdc-theme-cesium-font-size);
+  text-wrap: wrap !important;
+  padding: unset;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+body[dir='ltr'] .cesium-viewer .geocoderContainer .geocoderForm {
+  position: relative;
+  right: 8%;
+}
+
+body[dir='rtl'] .cesium-viewer .geocoderContainer .geocoderForm {
+  position: relative;
+  right: 0%;
+}
+
+.cesium-viewer .geocoderContainer .checkboxesContainer {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.cesium-viewer .geocoderContainer .checkboxElement {
+  font-size: var(--mdc-theme-cesium-font-size);
+  font-weight: bold;
+  flex: 1;
+}
+
+.cesium-viewer .geocoderContainer .bold {
+  font-weight: bold;
+}
+
+/* #region cesium classes */
+.cesium-viewer .geocoderContainer .cesium-geocoder-searchButton {
+  position: relative !important;
+}
+
+.cesium-viewer .geocoderContainer .cesium-geocoder-input {
+  width: 100%;
+  background: transparent;
+  border-color: var(--mdc-theme-cesium-color);
+}
+/* #endregion cesium classes */

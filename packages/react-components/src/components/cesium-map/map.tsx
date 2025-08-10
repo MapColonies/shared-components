@@ -32,9 +32,11 @@ import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
 import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { GeocoderOptions } from './geocoder/geocoder-panel';
+import { GeocoderWidget } from './geocoder/geocoder-widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
-import LayerManager, { IRasterLayer, IVectorLayer, LegendExtractor } from './layers-manager';
+import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumSceneMode } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
@@ -45,6 +47,7 @@ import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 
 import './map.css';
 import '@map-colonies/react-core/dist/linear-progress/styles';
+import '@map-colonies/react-core/dist/checkbox/styles';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
@@ -115,7 +118,6 @@ export interface IBaseMap {
   isCurrent?: boolean;
   isForPreview?: boolean;
   baseRasterLayers: IRasterLayer[];
-  baseVectorLayers: IVectorLayer[];
 }
 
 export interface IBaseMaps {
@@ -165,6 +167,7 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   layerManagerFootprintMetaFieldPath?: string;
+  geocoderPanel?: GeocoderOptions[];
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -232,7 +235,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     timeline: false,
     animation: false,
     baseLayerPicker: false,
-    geocoder: true,
+    geocoder: false,
     navigationHelpButton: false,
     homeButton: true,
     sceneModePicker: true,
@@ -535,6 +538,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <>
+          {props.geocoderPanel && <GeocoderWidget options={[...props.geocoderPanel]} locale={locale} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
           {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />

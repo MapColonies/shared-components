@@ -10,7 +10,7 @@ export const BASE_MAPS: IBaseMaps = {
     {
       id: '1st',
       title: '1st Map',
-      isCurrent: true,
+      isForPreview: true,
       thumbnail: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
       baseRasterLayers: [
         {
@@ -40,7 +40,6 @@ export const BASE_MAPS: IBaseMaps = {
           },
         },
       ],
-      baseVectorLayers: [],
     },
     {
       id: '2nd',
@@ -85,11 +84,11 @@ export const BASE_MAPS: IBaseMaps = {
           },
         },
       ],
-      baseVectorLayers: [],
     },
     {
       id: '3rd',
       title: '3rd Map',
+      isCurrent: true,
       thumbnail: 'https://a.tile.thunderforest.com/cycle/17/78208/53265.png',
       baseRasterLayers: [
         {
@@ -130,7 +129,6 @@ export const BASE_MAPS: IBaseMaps = {
           },
         },
       ],
-      baseVectorLayers: [],
     },
   ],
 };
