@@ -280,7 +280,7 @@ GeocoderPanel.argTypes = {
     defaultValue: GEOCODER_OPTIONS,
   },
 };
-GeocoderPanel.storyName = 'Geocoder Panel';
+GeocoderPanel.storyName = 'Geocoder';
 
 export const MapWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
