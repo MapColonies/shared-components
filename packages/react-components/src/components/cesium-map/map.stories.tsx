@@ -40,7 +40,6 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Location',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -60,7 +59,6 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Tiles',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -80,7 +78,6 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Control',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -97,7 +94,6 @@ const GEOCODER_OPTIONS = [
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'Routes',
-    geometryIconClassName: 'customIcon',
   },
 ] satisfies GeocoderOptions[];
 
@@ -120,7 +116,6 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'מיקום',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -140,7 +135,6 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'אריחים',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -160,7 +154,6 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'שליטה',
-    geometryIconClassName: 'customIcon',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -177,7 +170,6 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'דרכים',
-    geometryIconClassName: 'customIcon',
   },
 ] satisfies GeocoderOptions[];
 

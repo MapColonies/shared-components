@@ -25,7 +25,6 @@ type relatedParamsType = {
 
 export type GeocoderOptions = UrlGroup & {
   title?: string;
-  geometryIconClassName?: string;
   method: Method;
   headers?: Record<string, string>;
   params: {
@@ -259,27 +258,27 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     fetchData(searchValue, isInMapExtent);
   }, [isInMapExtent]);
 
-  const getIconByFeatureType = (geometry: any, className?: string) => {
+  const getIconByFeatureType = (geometry: any) => {
     const geometryType = getType(geometry);
     let typedIcon;
     switch (geometryType) {
       case 'Point':
         typedIcon = (
-          <svg className={`geometrysSvgIcons ${className}`} width="30px" height="18px" viewBox="0 0 24 24">
+          <svg className={`geometrysSvgIcons`} width="30px" height="18px" viewBox="0 0 24 24">
             <path d="M5 14.2864C3.14864 15.1031 2 16.2412 2 17.5C2 19.9853 6.47715 22 12 22C17.5228 22 22 19.9853 22 17.5C22 16.2412 20.8514 15.1031 19 14.2864M18 8C18 12.0637 13.5 14 12 17C10.5 14 6 12.0637 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8ZM13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8Z" />
           </svg>
         );
         break;
       case 'LineString':
         typedIcon = (
-          <svg className={`geometrysSvgIcons ${className}`} width="30px" height="25px" viewBox="0 0 24 24">
+          <svg className={`geometrysSvgIcons`} width="30px" height="25px" viewBox="0 0 24 24">
             <path d="M3 16.5L9 10L13 16L21 6.5" />
           </svg>
         );
         break;
       default:
         typedIcon = (
-          <svg className={`geometrysSvgIcons ${className}`} width="30px" height="20px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className={`geometrysSvgIcons`} width="30px" height="20px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2 L26 12 L24 20 L6 20 L4 8 Z" />
           </svg>
         );
@@ -359,7 +358,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                             <Tooltip content={feature?.properties?.names?.display}>
                               <Box>{feature?.properties?.names?.default?.[0]}</Box>
                             </Tooltip>
-                            {getIconByFeatureType(feature, option.geometryIconClassName)}
+                            {getIconByFeatureType(feature)}
                           </Box>
                         </ListItem>
                       ));
