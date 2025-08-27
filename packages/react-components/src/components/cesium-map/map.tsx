@@ -38,7 +38,7 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
-import { CesiumSceneMode } from './proxied.types';
+import { CesiumMath, CesiumSceneMode } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
@@ -51,6 +51,7 @@ import '@map-colonies/react-core/dist/checkbox/styles';
 
 interface ViewerProps extends ComponentProps<typeof Viewer> {}
 
+const TWO = 2;
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
 const DEFAULT_DYNAMIC_HEIGHT_INCREMENT = 0;
@@ -293,6 +294,27 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setMapViewRef(ref.current?.cesiumElement);
   }, [ref, props.imageryContextMenu]);
 
+  useEffect(() => {
+    if (mapViewRef) {
+      const homeButtonCommand = mapViewRef.homeButton.viewModel.command;
+      const customHomeButtonHandler = function (event: any) {
+        event.cancel = true;
+        mapViewRef.camera.setView({
+          destination: Cartesian3.fromDegrees(45.0, 30.0, 5000000),
+          orientation: {
+            heading: CesiumMath.toRadians(0.0),
+            pitch: CesiumMath.toRadians(-30.0),
+            roll: CesiumMath.toRadians(0.0)
+          }
+        });
+      };
+      homeButtonCommand.beforeExecute.addEventListener(customHomeButtonHandler);
+      return () => {
+        homeButtonCommand.beforeExecute.removeEventListener(customHomeButtonHandler);
+      };
+    }
+  }, [mapViewRef]);
+
   const contextValue = useMemo(() => {
     if (mapViewRef) {
       const mv = mapViewRef.layersManager
@@ -396,10 +418,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       // https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
       if (mapViewRef.scene.mode === SceneMode.SCENE3D) {
         const windowPosition = new Cartesian2(
-          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-          mapViewRef.container.clientWidth / 2,
-          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-          mapViewRef.container.clientHeight / 2
+          mapViewRef.container.clientWidth / TWO,
+          mapViewRef.container.clientHeight / TWO
         );
         const pickRay = mapViewRef.scene.camera.getPickRay(windowPosition);
         const pickPosition = mapViewRef.scene.globe.pick(pickRay as Ray, mapViewRef.scene);
