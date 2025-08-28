@@ -21,19 +21,18 @@ import {
   Rectangle,
   PerspectiveFrustum,
 } from 'cesium';
-import { Properties } from '@turf/helpers';
 import { BBox, Feature, Point, Polygon } from 'geojson';
-import bboxPolygon from '@turf/bbox-polygon';
-import { point } from '@turf/helpers';
-import pointToPolygonDistance from '@turf/point-to-polygon-distance';
-import { CesiumViewer } from '../map';
-import { CustomImageryProvider } from './customImageryProviders';
 import area from '@turf/area';
+import bboxPolygon from '@turf/bbox-polygon';
+import centroid from '@turf/centroid';
+import { point, Properties } from '@turf/helpers';
 import * as turf from '@turf/helpers';
 import intersect from '@turf/intersect';
-import centroid from '@turf/centroid';
+import pointToPolygonDistance from '@turf/point-to-polygon-distance';
 import { ICesiumWFSLayerLabelingOptions } from '../layers';
+import { CesiumViewer } from '../map';
 import { CesiumMath, CesiumRectangle } from '../proxied.types';
+import { CustomImageryProvider } from './customImageryProviders';
 
 const canvasElem = document.createElement('canvas');
 const canvasCtx = canvasElem.getContext('2d');
