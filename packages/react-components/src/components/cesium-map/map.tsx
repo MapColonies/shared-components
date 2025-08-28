@@ -238,7 +238,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     baseLayerPicker: false,
     geocoder: false,
     navigationHelpButton: false,
-    homeButton: true,
+    homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     imageryProvider: false,
     ...(props as ViewerProps),
@@ -293,27 +293,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     }
     setMapViewRef(ref.current?.cesiumElement);
   }, [ref, props.imageryContextMenu]);
-
-  useEffect(() => {
-    if (mapViewRef) {
-      const homeButtonCommand = mapViewRef.homeButton.viewModel.command;
-      const customHomeButtonHandler = function (event: any) {
-        event.cancel = true;
-        mapViewRef.camera.setView({
-          destination: Cartesian3.fromDegrees(45.0, 30.0, 5000000),
-          orientation: {
-            heading: CesiumMath.toRadians(0.0),
-            pitch: CesiumMath.toRadians(-30.0),
-            roll: CesiumMath.toRadians(0.0)
-          }
-        });
-      };
-      homeButtonCommand.beforeExecute.addEventListener(customHomeButtonHandler);
-      return () => {
-        homeButtonCommand.beforeExecute.removeEventListener(customHomeButtonHandler);
-      };
-    }
-  }, [mapViewRef]);
 
   const contextValue = useMemo(() => {
     if (mapViewRef) {
@@ -519,10 +498,25 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     const zoom = props.zoom;
     const center = props.center;
     if (mapViewRef && isNumber(zoom) && isArray(center)) {
+      const longitude = center[0];
+      const latitude = center[1];
+      const height = getAltitude(zoom);
       void mapViewRef.camera.flyTo({
-        destination: Cartesian3.fromDegrees(center[0], center[1], getAltitude(zoom)),
+        destination: Cartesian3.fromDegrees(longitude, latitude, height),
         duration: 0,
       });
+      const homeButtonCommand = mapViewRef.homeButton.viewModel.command;
+      const customHomeButtonHandler = function (event: any) {
+        void mapViewRef.camera.flyTo({
+          destination: Cartesian3.fromDegrees(longitude, latitude, height),
+          duration: 0,
+        });
+        event.cancel = true;
+      };
+      homeButtonCommand.beforeExecute.addEventListener(customHomeButtonHandler);
+      return () => {
+        homeButtonCommand.beforeExecute.removeEventListener(customHomeButtonHandler);
+      };
     }
   }, [props.zoom, props.center, mapViewRef]);
 
