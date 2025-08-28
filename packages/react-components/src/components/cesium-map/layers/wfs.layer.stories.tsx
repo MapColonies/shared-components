@@ -107,12 +107,14 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
           options={optionsBuildings}
           meta={metaBuildings}
           // visualizationHandler={handleVisualizationBuildings}
+          withGeometryValidation={true}
         />
         {/* <CesiumWFSLayer
           key={metaBuildings.id + '_2'}
           options={optionsBuildings}
           meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
           visualizationHandler={handleVisualizationBuildings}
+          withGeometryValidation={true}
         /> */}
       </CesiumMap>
     </div>
@@ -163,6 +165,7 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
             options={optionsBuildings}
             meta={metaBuildings}
             // visualizationHandler={handleVisualizationBuildings}
+            withGeometryValidation={true}
           />
         }
       </>
@@ -208,7 +211,13 @@ export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknow
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
         <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')} />
-        <CesiumWFSLayer key={metaBuildings.id} options={optionsBuildings} meta={metaBuildings} visualizationHandler={handleVisualizationBuildings} />
+        <CesiumWFSLayer
+          key={metaBuildings.id}
+          options={optionsBuildings}
+          meta={metaBuildings}
+          visualizationHandler={handleVisualizationBuildings}
+          withGeometryValidation={true}
+        />
       </CesiumMap>
     </div>
   );

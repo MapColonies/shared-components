@@ -17,6 +17,7 @@ import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import pMap from 'p-map';
 import { format as formatDateFns } from 'date-fns';
+import booleanValid from '@turf/boolean-valid';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
@@ -58,6 +59,7 @@ export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
   meta: Record<string, unknown>;
   visualizationHandler?: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox) => void;
+  withGeometryValidation?: boolean;
 }
 
 interface IFetchMetadata {
@@ -69,7 +71,7 @@ interface IFetchMetadata {
 }
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
-  const { options, meta, visualizationHandler } = props;
+  const { options, meta, visualizationHandler, withGeometryValidation = false } = props;
   const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
@@ -352,7 +354,19 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         (f: Feature): void => {
           if (f.properties) {
             const keyFieldValue = f.properties[keyField ?? 'id'];
-            if (!wfsCache.current.has(keyFieldValue)) {
+            let isValidGeometry = true;
+            if (withGeometryValidation) {
+              try {
+                isValidGeometry = booleanValid(f.geometry);
+                if (!isValidGeometry) {
+                  console.error('Skipped invalid WFS feature with', keyField ?? 'id', '->', keyFieldValue);
+                }
+              } catch (error) {
+                isValidGeometry = false;
+                console.error('Skipped invalid WFS feature with', keyField ?? 'id', '->', keyFieldValue);
+              }
+            }
+            if (!wfsCache.current.has(keyFieldValue) && isValidGeometry) {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
 
