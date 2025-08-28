@@ -48,7 +48,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const geocoderInputRef = useRef<HTMLInputElement | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
-  const [showFeatureOnMap, setShowFeatureOnMap] = useState(false);
+  const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
   const [responses, setSearchResults] = useState<{ resultObj: any; url: string }[]>();
   const [featureToShow, setFeatureToShow] = useState();
   const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show on map', [locale]);

@@ -58,7 +58,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'Tiles',
+    title: 'Control Tiles',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -77,7 +77,7 @@ const GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'Control',
+    title: 'Control Data',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -93,7 +93,7 @@ const GEOCODER_OPTIONS = [
       },
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
-    title: 'Routes',
+    title: 'Control Routes',
   },
 ] satisfies GeocoderOptions[];
 
@@ -134,7 +134,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'אריחים',
+    title: 'אריחי שליטה (נצ"א)',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -153,7 +153,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
         ['disable_fuzziness', false],
       ],
     },
-    title: 'שליטה',
+    title: 'נתוני שליטה',
   },
   {
     baseUrl: getValue('GLOBAL', 'GEOCODING'),
@@ -169,7 +169,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       },
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
-    title: 'דרכים',
+    title: 'צירי שליטה',
   },
 ] satisfies GeocoderOptions[];
 
@@ -359,7 +359,7 @@ LocalizedMap.argTypes = {
       ZOOM_LABEL: 'זום',
       DEBUG_PANEL_TITLE: 'דיבאגר',
       SHOW_FEATURE_ON_MAP: "הראה על המפה",
-      IN_MAP_EXTENT: 'חיפוש בתצוגה',
+      IN_MAP_EXTENT: 'חיפוש בתיחום נוכחי',
       SEARCH_PLACEHOLDER: 'חיפוש...',
       NO_RESULTS: 'אין תוצאות',
       WFS_TITLE: 'שכבות מידע',
