@@ -353,19 +353,19 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         features,
         (f: Feature): void => {
           if (f.properties) {
+            const keyFieldValue = f.properties[keyField ?? 'id'];
             let isValidGeometry = true;
             if (withGeometryValidation) {
               try {
                 isValidGeometry = booleanValid(f.geometry);
                 if (!isValidGeometry) {
-                  console.error('Invalid feature skipped:', f);
+                  console.error('Skipped invalid WFS feature with', keyField ?? 'id', '->', keyFieldValue);
                 }
               } catch (error) {
                 isValidGeometry = false;
-                console.error('Invalid feature skipped:', f);
+                console.error('Skipped invalid WFS feature with', keyField ?? 'id', '->', keyFieldValue);
               }
             }
-            const keyFieldValue = f.properties[keyField ?? 'id'];
             if (!wfsCache.current.has(keyFieldValue) && isValidGeometry) {
               wfsCache.current.add(keyFieldValue);
               (f.properties as any).fetch_id = fetchId;
