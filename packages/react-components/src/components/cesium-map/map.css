@@ -194,7 +194,7 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
 
 .cesium-viewer .mdc-checkbox {
   width: var(--mdc-theme-cesium-checkbox-width);
-  height: var(--mdc-theme-cesium-checkbox-width);
+  height: var(--mdc-theme-cesium-checkbox-height);
 }
 
 .cesium-viewer .mdc-checkbox__background {
