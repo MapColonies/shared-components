@@ -49,7 +49,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const [searchValue, setSearchValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
-  const [responses, setSearchResults] = useState<{ resultObj: any; url: string }[]>();
+  const [searchResults, setSearchResults] = useState<{ body: any; status: number; url: string }[]>();
   const [featureToShow, setFeatureToShow] = useState();
   const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show on map', [locale]);
   const inMapExtentLabel = useMemo(() => get(locale, 'IN_MAP_EXTENT') ?? 'Search in extent', [locale]);
@@ -227,15 +227,16 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     const jsonResponses = await Promise.all(
       responses.map(async (res) => {
         if (res === undefined) return;
-        const resultObj = await res.json();
+        const body = await res.json();
         return {
-          resultObj,
+          body,
+          status: res.status,
           url: res.url,
         };
       })
     );
     if (jsonResponses) {
-      const cleaned = jsonResponses.filter((item): item is { resultObj: any; url: string } => item !== undefined);
+      const cleaned = jsonResponses.filter((item): item is { body: any; status: number; url: string } => item !== undefined);
       setSearchResults(cleaned);
     }
   }, [buildUrlParams, options]);
@@ -335,9 +336,10 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                 </Typography>
                 <Box className="listContainer">
                   {(() => {
-                    const features = responses?.[index]?.resultObj?.features;
-                    const featuresLength: number | undefined = responses?.[index]?.resultObj?.features?.length;
-                    const message: string = responses?.[index]?.resultObj?.message;
+                    const features = searchResults?.[index]?.body?.features;
+                    const featuresLength: number | undefined = searchResults?.[index]?.body?.features?.length;
+                    const message: string = searchResults?.[index]?.body?.message;
+                    const status: number = searchResults?.[index]?.status as number;
 
                     const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
 
@@ -350,7 +352,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                             mapViewer.camera.flyTo({
                               destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
                             });
-
                             setFeatureToShow(feature);
                           }}
                         >
@@ -365,7 +366,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                     } else if (featuresLength === 0) {
                       return noResultsJSX;
                     } else if (message) {
-                      return <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
+                      return status !== 400 && <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
                     } else {
                       return noResultsJSX;
                     }
