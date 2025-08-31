@@ -4,11 +4,6 @@
   color: var(--mdc-theme-cesium-color);
 }
 
-.cesium-viewer .geocoderContainer .geocoderForm {
-  background-color: var(--mdc-theme-cesium-background-color);
-  border-radius: var(--mdc-theme-cesium-container-border-radius);
-}
-
 .cesium-viewer .geocoderContainer .mdc-text-field__input {
   width: 100%;
   border-radius: 4px;
