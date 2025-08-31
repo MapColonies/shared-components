@@ -509,13 +509,18 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       const customHomeButtonHandler = function (event: any) {
         void mapViewRef.camera.flyTo({
           destination: Cartesian3.fromDegrees(longitude, latitude, height),
-          duration: 0,
+          duration: 1,
         });
         event.cancel = true;
       };
       homeButtonCommand.beforeExecute.addEventListener(customHomeButtonHandler);
-      return () => {
+      return (): void => {
         homeButtonCommand.beforeExecute.removeEventListener(customHomeButtonHandler);
+        try {
+          homeButtonCommand.beforeExecute.removeEventListener(customHomeButtonHandler);
+        } catch (e) {
+          console.error('customHomeButtonHandler event not cleaned');
+        }
       };
     }
   }, [props.zoom, props.center, mapViewRef]);
