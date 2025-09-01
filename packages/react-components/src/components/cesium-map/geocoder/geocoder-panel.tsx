@@ -366,7 +366,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                     } else if (featuresLength === 0) {
                       return noResultsJSX;
                     } else if (message) {
-                      return status !== 400 && <ListItemSecondaryText className="generalListItem queryServiceError">{message}</ListItemSecondaryText>;
+                      return <ListItemSecondaryText className={`generalListItem ${status === 400 ? 'queryWarning' : 'queryError'}`}>{message}</ListItemSecondaryText>;
                     } else {
                       return noResultsJSX;
                     }

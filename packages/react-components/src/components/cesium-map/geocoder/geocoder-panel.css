@@ -47,10 +47,12 @@
   color: unset;
 }
 
-.cesium-viewer .geocoderContainer .listContainer .queryServiceError {
-  color: var(--mdc-theme-cesium-service-error);
-  text-wrap: unset;
-  width: unset;
+.cesium-viewer .geocoderContainer .listContainer .queryError {
+  color: var(--mdc-theme-cesium-error);
+}
+
+.cesium-viewer .geocoderContainer .listContainer .queryWarning {
+  color: var(--mdc-theme-cesium-warning);
 }
 
 .cesium-viewer .geocoderContainer .listContainer .generalListItem {

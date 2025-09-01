@@ -38,7 +38,8 @@ const useMappedCesiumTheme = (theme: { [key: string]: string }): any => {
     return {
       ...theme,
       'cesium-color': '#EDFFFF',
-      'cesium-service-error': theme['--mdc-theme-error'] ?? '#EC3713',
+      'cesium-error': theme['--mdc-theme-gc-error-medium'] ?? '#FF3636',
+      'cesium-warning': theme['--mdc-theme-gc-warning-high'] ?? '#FFA032',
       'cesium-checkbox-color': '#1A73E8',
       'cesium-checkbox-width': '12px',
       'cesium-checkbox-height': '12px',
