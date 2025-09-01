@@ -341,8 +341,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                     const message: string = searchResults?.[index]?.body?.message;
                     const status: number = searchResults?.[index]?.status as number;
 
-                    const noResultsJSX = <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
-
                     if (featuresLength) {
                       return features.map((feature: any, i: number) => (
                         <ListItem
@@ -364,11 +362,11 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                         </ListItem>
                       ));
                     } else if (featuresLength === 0) {
-                      return noResultsJSX;
+                      return <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
                     } else if (message) {
                       return <ListItemSecondaryText className={`generalListItem ${status === 400 ? 'queryWarning' : 'queryError'}`}>{message}</ListItemSecondaryText>;
                     } else {
-                      return noResultsJSX;
+                      return <ListItemSecondaryText className="generalListItem"></ListItemSecondaryText>;
                     }
                   })()}
                 </Box>
