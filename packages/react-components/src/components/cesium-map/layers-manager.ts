@@ -60,6 +60,7 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
+  public layerMetaAdded: Event;
   public dataLayerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
@@ -81,6 +82,7 @@ class LayerManager {
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
+    this.layerMetaAdded = new Event();
     this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
@@ -150,6 +152,7 @@ class LayerManager {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
         this.setLegends();
         this.layerUpdated.raiseEvent(meta);
+        this.layerMetaAdded.raiseEvent();
       }
     });
   }
@@ -438,6 +441,14 @@ class LayerManager {
 
   public removeLayerUpdatedListener(callback: (meta: any) => void): void {
     this.layerUpdated.removeEventListener(callback, this);
+  }
+
+  public addLayerMetaAddedListener(callback: () => void): void {
+    this.layerMetaAdded.addEventListener(callback, this);
+  }
+
+  public removeLayerMetaAddedListener(callback: () => void): void {
+    this.layerMetaAdded.removeEventListener(callback, this);
   }
 
   public addDataLayerUpdatedListener(callback: (meta: any) => void): void {
