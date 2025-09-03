@@ -298,6 +298,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
           placeholder={searchPlaceholder}
           value={searchValue}
+          autoComplete="off"
         />
         <Box className="search-results">
           <Box className="checkboxesContainer">
