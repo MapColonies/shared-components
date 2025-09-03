@@ -93,11 +93,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         )
       );
     };
-    mapViewer.layersManager.addLayerMetaAddedListener(handleLayerEvent);
+    mapViewer.layersManager.addLayerUpdatedListener(handleLayerEvent);
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        mapViewer.layersManager?.removeLayerMetaAddedListener(handleLayerEvent);
+        mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerEvent);
         mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
       }
     };

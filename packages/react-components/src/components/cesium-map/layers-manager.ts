@@ -60,7 +60,6 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
-  public layerMetaAdded: Event;
   public dataLayerUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
@@ -82,18 +81,17 @@ class LayerManager {
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
-    this.layerMetaAdded = new Event();
     this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
 
     if (onLayersUpdate) {
-      this.layerUpdated.addEventListener(onLayersUpdate, this);
+      this.addLayerUpdatedListener(onLayersUpdate);
     }
 
     // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
     if (this.shouldOptimizedTileRequests) {
-      this.layerUpdated.addEventListener((meta: Record<string, unknown>) => {
+      this.addLayerUpdatedListener((meta: Record<string, unknown>) => {
         const newMetaKeys = Object.keys(meta);
         const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
         if (shouldTriggerRelevancyCheck) {
@@ -152,7 +150,6 @@ class LayerManager {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
         this.setLegends();
         this.layerUpdated.raiseEvent(meta);
-        this.layerMetaAdded.raiseEvent();
       }
     });
   }
@@ -441,14 +438,6 @@ class LayerManager {
 
   public removeLayerUpdatedListener(callback: (meta: any) => void): void {
     this.layerUpdated.removeEventListener(callback, this);
-  }
-
-  public addLayerMetaAddedListener(callback: () => void): void {
-    this.layerMetaAdded.addEventListener(callback, this);
-  }
-
-  public removeLayerMetaAddedListener(callback: () => void): void {
-    this.layerMetaAdded.removeEventListener(callback, this);
   }
 
   public addDataLayerUpdatedListener(callback: (meta: any) => void): void {
