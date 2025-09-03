@@ -293,7 +293,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
       <Box className="geocoderForm">
         <TextField
           id="geocoderTextField"
-          className="cesium-geocoder-input geocoderInput"
+          className="cesium-geocoder-input"
           ref={geocoderInputRef}
           onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
           placeholder={searchPlaceholder}
