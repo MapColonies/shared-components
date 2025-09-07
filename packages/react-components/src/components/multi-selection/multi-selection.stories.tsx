@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MultiSelection } from './multiSelection';
+import { MultiSelection } from './multi-selection';
 import { CSFStory } from '../utils/story';
 
 const colourOptions = [

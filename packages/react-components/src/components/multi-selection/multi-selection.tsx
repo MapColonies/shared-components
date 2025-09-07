@@ -4,16 +4,16 @@ import { Input, ThemeProvider } from '@material-ui/core';
 import { Checkbox, useTheme } from '@map-colonies/react-core';
 import { useMappedMuiTheme } from '../theme';
 
-export type MultiSelectOption = {
+export type MultiSelectionOption = {
   value: string;
   label: string;
   color?: string;
   disabled?: boolean;
 };
 
-interface IPropsMultiSelection {
-  options: MultiSelectOption[];
-  values?: MultiSelectOption[];
+interface MultiSelectionProps {
+  options: MultiSelectionOption[];
+  values?: MultiSelectionOption[];
   onChange?: (data: any) => void;
   placeholder?: string;
   styles?: StylesConfig;
@@ -29,11 +29,10 @@ const Option: React.FC<OptionProps> = (props) => {
 
 const SelectWrapped = (props: any) => {
   const { styles } = props;
-
   return <Select isMulti components={{ Option }} styles={styles} isClearable hideSelectedOptions={false} closeMenuOnSelect={false} {...props} />;
 };
 
-export const MultiSelection = (props: IPropsMultiSelection) => {
+export const MultiSelection = (props: MultiSelectionProps) => {
   const { values, options, onChange, placeholder, styles } = props;
   const theme: { [key: string]: string } = useTheme();
   const themeMui = useMappedMuiTheme(theme);
