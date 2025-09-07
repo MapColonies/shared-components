@@ -53,6 +53,7 @@
     "ol": "^6.4.3",
     "ol-ext": "^4.0.18",
     "p-map": "6.0.0",
+    "react-circular-progressbar": "^2.2.0",
     "react-datepicker": "^4.16.0",
     "react-rxjs": "^2.0.8",
     "react-select": "5.7.3",

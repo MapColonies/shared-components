@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useMemo, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import datePickerHebrewLocale from 'date-fns/locale/he';
 import moment from 'moment';
-import { endOfDay, isEqual, isSameDay } from 'date-fns';
+import { endOfDay, isSameDay } from 'date-fns';
 import { ExtractProps } from '../typeHelpers';
 
 export interface TimeRangeInputProps {
@@ -49,17 +49,16 @@ type DateRangePickerPropsToExclude =
   | 'showMonthDropdown'
   | 'scrollableMonthYearDropdown'
 
-  export interface ExtraDateRangePickerProps {
-    locale?: 'he' | 'en';
-    onChange?: (date: DateRange | Date | null, event?: React.SyntheticEvent<any>) => void;
-    // withTimeRange?: boolean;
-    withShortcuts?: (Shortcut | (() => Shortcut))[];
-    selectsRange?: boolean;
-    inputName?: string;
+export interface ExtraDateRangePickerProps {
+  locale?: 'he' | 'en';
+  onChange?: (date: DateRange | Date | null, event?: React.SyntheticEvent<any>) => void;
+  // withTimeRange?: boolean;
+  withShortcuts?: (Shortcut | (() => Shortcut))[];
+  selectsRange?: boolean;
+  inputName?: string;
+}
 
-  }
-
-  export type DateRangeFullProps = Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps;
+export type DateRangeFullProps = Omit<ExtractProps<typeof DatePicker>, DateRangePickerPropsToExclude> & ExtraDateRangePickerProps;
   
 interface ShortcutsProps {
   setStartDate?: (startDate: Date | null) => void;
@@ -246,7 +245,7 @@ export const DateRangePicker = React.forwardRef<DatePicker, DateRangeFullProps>(
       setEndDate(props.endDate as Date);
     }
     
-  }, [props.startDate, props.endDate, startDate, endDate])
+  }, [props.startDate, props.endDate, startDate, endDate]);
 
 
   const containerClassName = useMemo(() => {
@@ -263,7 +262,7 @@ export const DateRangePicker = React.forwardRef<DatePicker, DateRangeFullProps>(
     showMonthDropdown: true,
     showYearDropdown: true,
     dropdownMode: "select" as any
-  } : {}
+  } : {};
   
   return (
       <div className={containerClassName} style={{ direction: locale === 'he' ? 'rtl' : 'ltr' }}>
