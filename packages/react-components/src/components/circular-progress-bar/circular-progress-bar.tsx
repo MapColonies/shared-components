@@ -1,13 +1,30 @@
 import React from 'react';
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
+import {
+  buildStyles,
+  CircularProgressbar,
+  CircularProgressbarWithChildren
+} from 'react-circular-progressbar';
 
 import 'react-circular-progressbar/dist/styles.css';
+
+interface CircularProgressBarStylesProps {
+  rotation?: number;
+  strokeLinecap?: any;
+  textColor?: string;
+  textSize?: string | number;
+  pathColor?: string;
+  pathTransition?: string;
+  pathTransitionDuration?: number;
+  trailColor?: string;
+  backgroundColor?: string;
+}
 
 interface CircularProgressBarProps {
   value: number;
   text?: string;
+  children?: React.ReactNode;
   strokeWidth?: number;
-  styles?: any;
+  styles?: CircularProgressBarStylesProps;
   background?: boolean;
   backgroundPadding?: number;
   counterClockwise?: boolean;
@@ -17,6 +34,7 @@ interface CircularProgressBarProps {
 export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
   value,
   text,
+  children,
   strokeWidth = 8,
   styles,
   background = false,
@@ -24,21 +42,33 @@ export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
   counterClockwise = false,
   circleRatio = 1,
 }) => {
+  const progressBarProps = {
+    value,
+    strokeWidth,
+    background,
+    backgroundPadding,
+    counterClockwise,
+    circleRatio,
+    styles: buildStyles({
+      pathColor: `rgba(62, 152, 199, ${value / 100})`,
+      textColor: '#F88',
+      trailColor: '#D6D6D6',
+      ...styles,
+    }),
+  };
+
+  if (children) {
+    return (
+      <CircularProgressbarWithChildren {...progressBarProps}>
+        {children}
+      </CircularProgressbarWithChildren>
+    );
+  }
+
   return (
     <CircularProgressbar
-      value={value}
+      {...progressBarProps}
       text={text}
-      strokeWidth={strokeWidth}
-      background={background}
-      backgroundPadding={backgroundPadding}
-      counterClockwise={counterClockwise}
-      circleRatio={circleRatio}
-      styles={buildStyles({
-        pathColor: `rgba(62, 152, 199, ${value / 100})`,
-        textColor: '#F88',
-        trailColor: '#D6D6D6',
-        ...styles,
-      })}
     />
   );
 };
