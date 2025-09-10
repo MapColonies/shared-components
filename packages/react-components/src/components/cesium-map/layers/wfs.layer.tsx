@@ -12,11 +12,11 @@ import {
   BoundingSphere,
   SceneTransforms,
 } from 'cesium';
+import { format as formatDateFns } from 'date-fns';
 import { BBox, Feature, Point } from 'geojson';
 import { get } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import pMap from 'p-map';
-import { format as formatDateFns } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 import booleanValid from '@turf/boolean-valid';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
