@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import React from 'react';
-import { easeQuadInOut } from 'd3-ease';
 import { Story } from '@storybook/react/types-6-0';
 import { AnimatedValuesProvider } from '../animated';
 import { Box } from '../box';
@@ -125,7 +124,7 @@ export const TextAnimation: Story = () => (
       valueStart={0}
       valueEnd={66}
       duration={1.4}
-      easingFunction={easeQuadInOut}
+      easingFunction={(t: number) => t * t * t}
       repeat
     >
       {
