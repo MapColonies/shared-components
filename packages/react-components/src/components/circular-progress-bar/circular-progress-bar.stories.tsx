@@ -2,8 +2,8 @@ import _ from 'lodash';
 import React from 'react';
 import { easeQuadInOut } from 'd3-ease';
 import { Story } from '@storybook/react/types-6-0';
-import { Box } from '../box';
 import { AnimatedValuesProvider } from '../animated';
+import { Box } from '../box';
 import { CircularProgressBar } from './circular-progress-bar';
 
 const story = {
