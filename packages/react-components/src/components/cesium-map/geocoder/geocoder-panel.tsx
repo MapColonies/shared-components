@@ -273,7 +273,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
       case 'LineString':
         typedIcon = (
           <svg className={`geometrysSvgIcons`} width="30px" height="25px" viewBox="0 0 24 24">
-            <path d="M3 16.5L9 10L13 16L21 6.5" />
+            <path d="M3 16L9 10L13 13L19 7" />
           </svg>
         );
         break;
