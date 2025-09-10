@@ -50,9 +50,6 @@ export const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
     counterClockwise,
     circleRatio,
     styles: buildStyles({
-      pathColor: `rgba(62, 152, 199, ${value / 100})`,
-      textColor: '#F88',
-      trailColor: '#D6D6D6',
       ...styles,
     }),
   };
