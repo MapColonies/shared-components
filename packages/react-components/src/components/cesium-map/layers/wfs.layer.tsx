@@ -113,7 +113,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
             <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
               <strong>${key}:</strong>
             </td>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;">
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
               ${value}
             </td>
           </tr>
