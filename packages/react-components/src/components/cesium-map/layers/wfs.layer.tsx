@@ -106,10 +106,16 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         const { fieldName, aliasFieldName } = field;
         const key = aliasFieldName;
         const value = properties[fieldName] ?? 'N/A';
+        const keyMaxWidth = Math.max(100, Math.min(180, key.length * 10));
+        const valueMaxWidth = '260px';
         rows.push(`
           <tr>
-            <td><strong>${key}:</strong></td>
-            <td>${value}</td>
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
+              <strong>${key}:</strong>
+            </td>
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
+              ${value}
+            </td>
           </tr>
         `);
       }
