@@ -34,7 +34,6 @@
 }
 
 .cesium-viewer .geocoderContainer .geometrysSvgIcons {
-  stroke: black;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
