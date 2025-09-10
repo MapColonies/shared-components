@@ -3,8 +3,7 @@ import React from 'react';
 import { easeQuadInOut } from 'd3-ease';
 import { Story } from '@storybook/react/types-6-0';
 import { Box } from '../box';
-import { AnimatedProgressProvider } from './animated-progress-provider';
-import { ChangingProgressProvider } from './changing-progress-provider';
+import { AnimatedValuesProvider } from '../animated';
 import { CircularProgressBar } from './circular-progress-bar';
 
 const story = {
@@ -75,19 +74,19 @@ export const Rotation: Story = () => (
 // Animation stories
 export const DefaultAnimationSpeed: Story = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <ChangingProgressProvider values={[0, 20, 40, 60, 80, 100]}>
+    <AnimatedValuesProvider values={[0, 20, 40, 60, 80, 100]}>
       {
         (percentage) => (
           <CircularProgressBar value={percentage} text={`${percentage}%`} />
         )
       }
-    </ChangingProgressProvider>
+    </AnimatedValuesProvider>
   </Box>
 );
 
 export const CustomAnimationSpeed: Story = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <ChangingProgressProvider values={[0, 20, 40, 60, 80, 100]}>
+    <AnimatedValuesProvider values={[0, 20, 40, 60, 80, 100]}>
       {
         (percentage) => (
           <CircularProgressBar
@@ -97,13 +96,13 @@ export const CustomAnimationSpeed: Story = () => (
           />
         )
       }
-    </ChangingProgressProvider>
+    </AnimatedValuesProvider>
   </Box>
 );
 
 export const NoAnimationWhenReturningToZero: Story = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <ChangingProgressProvider values={[0, 100]}>
+    <AnimatedValuesProvider values={[0, 100]}>
       {
         (percentage) => (
           <CircularProgressBar
@@ -115,14 +114,14 @@ export const NoAnimationWhenReturningToZero: Story = () => (
           />
         )
       }
-    </ChangingProgressProvider>
+    </AnimatedValuesProvider>
   </Box>
 );
 
 // Additional Stories
-export const ControlledTextAnimation: Story = () => (
+export const TextAnimation: Story = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <AnimatedProgressProvider
+    <AnimatedValuesProvider 
       valueStart={0}
       valueEnd={66}
       duration={1.4}
@@ -141,7 +140,7 @@ export const ControlledTextAnimation: Story = () => (
           );
         }
       }
-    </AnimatedProgressProvider>
+    </AnimatedValuesProvider>
   </Box>
 );
 
@@ -295,7 +294,7 @@ export const ProgressBarWithSeparators: Story = () => (
 
 export const DashboardSpeedometer: Story = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <ChangingProgressProvider values={[0, 20, 80]}>
+    <AnimatedValuesProvider values={[0, 20, 80]}>
       {
         (value) => (
           <CircularProgressBar
@@ -310,6 +309,6 @@ export const DashboardSpeedometer: Story = () => (
           />
         )
       }
-    </ChangingProgressProvider>
+    </AnimatedValuesProvider>
   </Box>
 );
