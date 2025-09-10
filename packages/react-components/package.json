@@ -72,6 +72,7 @@
     "@storybook/builder-vite": "0.4.2",
     "@storybook/react": "6.5.16",
     "@storybook/theming": "6.5.16",
+    "@types/d3-ease": "^3.0.2",
     "@types/enzyme": "^3.10.5",
     "@types/geojson": "^7946.0.10",
     "@types/lodash": "^4.14.165",
