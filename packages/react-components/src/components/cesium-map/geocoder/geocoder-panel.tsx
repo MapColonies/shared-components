@@ -273,14 +273,14 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
       case 'LineString':
         typedIcon = (
           <svg width="18px" height="18px" viewBox="0 0 24 24">
-            <path fill="var(--mdc-theme-cesium-color)" d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z" />
+            <path fill="var(--mdc-theme-cesium-color)" stroke="var(--mdc-theme-cesium-color)" stroke-width="0.5" d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z" />
             <path fill="none" d="M0 0h24v24H0z" />
           </svg>
         );
         break;
       default:
         typedIcon = (
-          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" stroke-width="2">
+          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" stroke-width="2" stroke-linecap="round" rounded-linejoin="round">
             <path d="M11 4 L20 14 L20 20 L4 20 L4 10 Z" />
           </svg>
         );
