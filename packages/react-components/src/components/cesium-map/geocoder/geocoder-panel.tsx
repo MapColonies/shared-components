@@ -307,7 +307,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
               className="checkboxElement"
               label={showFeatureOnMapLabel}
               icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
+              checkedicon={CheckedIcon}
               checked={showFeatureOnMap}
               onClick={() => {
                 setShowFeatureOnMap(!showFeatureOnMap);
@@ -322,7 +322,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
               }
               checked={isInMapExtent}
               icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
+              checkedicon={CheckedIcon}
               disabled={isNotIn2DMode}
               onClick={() => {
                 setIsInMapExtent(!isInMapExtent);
