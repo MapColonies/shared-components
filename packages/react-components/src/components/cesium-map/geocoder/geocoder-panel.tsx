@@ -265,21 +265,22 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     switch (geometryType) {
       case 'Point':
         typedIcon = (
-          <svg fill="var(--mdc-theme-cesium-color)" width="18px" height="18px" viewBox="0 0 24 24">
+          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="var(--mdc-theme-cesium-color)">
             <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
           </svg>
         );
         break;
       case 'LineString':
         typedIcon = (
-          <svg className={`geometrysSvgIcons`} width="30px" height="25px" viewBox="0 0 24 24">
-            <path d="M3 16L9 10L13 13L19 7" />
+          <svg width="18px" height="18px" viewBox="0 0 24 24">
+            <path fill="var(--mdc-theme-cesium-color)" d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z" />
+            <path fill="none" d="M0 0h24v24H0z" />
           </svg>
         );
         break;
       default:
         typedIcon = (
-          <svg className={`geometrysSvgIcons`} width="20px" height="20px" viewBox="0 0 24 24">
+          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" stroke-width="2">
             <path d="M11 4 L20 14 L20 20 L4 20 L4 10 Z" />
           </svg>
         );

@@ -33,14 +33,6 @@
   width: 100%;
 }
 
-.cesium-viewer .geocoderContainer .geometrysSvgIcons {
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke: var(--mdc-theme-cesium-color);
-  fill: transparent;
-}
-
 .cesium-viewer .geocoderContainer .listContainer .queryNoResults {
   justify-content: normal;
   color: unset;
