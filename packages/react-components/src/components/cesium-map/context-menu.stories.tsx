@@ -304,7 +304,6 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         center={center}
         zoom={14}
         imageryProvider={false}
-        sceneModes={[CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
         sceneMode={CesiumSceneMode.SCENE2D}
         baseMaps={BASE_MAPS as IBaseMaps}
         // @ts-ignore

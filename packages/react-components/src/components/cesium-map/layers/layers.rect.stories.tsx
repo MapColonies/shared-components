@@ -5,7 +5,6 @@ import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { IRasterLayer, LayerType } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../proxied.types';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -26,7 +25,6 @@ const mapViewProps: CesiumMapProps = {
   center: [34.811, 31.908],
   zoom: 14,
   imageryProvider: false,
-  sceneModes: [CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW],
   baseMaps: BASE_MAPS,
 };
 

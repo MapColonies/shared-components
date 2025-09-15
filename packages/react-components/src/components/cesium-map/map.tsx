@@ -38,7 +38,6 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
-import { CesiumSceneMode } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
@@ -155,7 +154,6 @@ export interface CesiumMapProps extends ViewerProps {
   center?: [number, number];
   zoom?: number;
   locale?: { [key: string]: string };
-  sceneModes?: (typeof CesiumSceneMode)[];
   baseMaps?: IBaseMaps;
   terrains?: ITerrain[];
   useOptimizedTileRequests?: boolean;
@@ -207,7 +205,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
   const cameraStateRef = useRef<ICameraState | undefined>();
-  const [sceneModes, setSceneModes] = useState<(typeof CesiumSceneMode)[] | undefined>();
   const [legendsList, setLegendsList] = useState<IMapLegend[]>([]);
   const [baseMaps, setBaseMaps] = useState<IBaseMaps | undefined>();
   const [terrains, setTerrains] = useState<ITerrain[] | undefined>();
@@ -316,12 +313,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       };
     }
   }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
-
-  useEffect(() => {
-    setSceneModes(
-      props.sceneModes ?? ([CesiumSceneMode.SCENE2D, CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW] as unknown as (typeof CesiumSceneMode)[])
-    );
-  }, [props.sceneModes]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
