@@ -38,7 +38,7 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
-import { CesiumMath, CesiumSceneMode } from './proxied.types';
+import { CesiumSceneMode } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
