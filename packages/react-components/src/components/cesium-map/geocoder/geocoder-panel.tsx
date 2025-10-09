@@ -33,7 +33,9 @@ export type GeocoderOptions = UrlGroup & {
       geoContext?: string | relatedParamsType;
     };
     static?: [string, any][];
+    callback?: [string, any][]
   };
+  callbackBaseUrl?: string;
 };
 
 type GeocoderPanelProps = {
@@ -42,14 +44,23 @@ type GeocoderPanelProps = {
   locale?: { [key: string]: string };
 };
 
+type RequestResult = {
+  body: any;
+  status: number;
+  url: string;
+  headers: Headers;
+}
+
+type FeatWithHeaders = { headers: Headers, [key: string]: unknown };
+
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, locale }) => {
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const geocoderInputRef = useRef<HTMLInputElement | null>(null);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchTextValue, setSearchTextValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
-  const [searchResults, setSearchResults] = useState<{ body: any; status: number; url: string }[]>();
+  const [searchResults, setSearchResults] = useState<RequestResult[]>();
   const [featureToShow, setFeatureToShow] = useState();
   const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show on map', [locale]);
   const inMapExtentLabel = useMemo(() => get(locale, 'IN_MAP_EXTENT') ?? 'Search in extent', [locale]);
@@ -138,32 +149,40 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     }
   };
 
-  const addParamToUrl = (url: string, key: string, value: unknown): string => {
+  const appendUrlParam = (url: string, key: string, value: any) => {
     const stringValue = valueToString(value);
     if (stringValue) {
-      url += `&${key}=${encodeURIComponent(stringValue)}`;
+      const separator = url.includes('?') ? (url.endsWith('?') || url.endsWith('&') ? '' : '&') : '?';
+      return `${url}${separator}${encodeURIComponent(key)}=${encodeURIComponent(stringValue)}`;
     }
-
     return url;
   };
 
-  const buildUrlParams = useCallback(
+  const appendUrlParams = (params: [string, any][] | undefined, url: string) => {
+    if (params) {
+      params.forEach((tuple) => {
+        url = appendUrlParam(url, tuple[0], tuple[1]);
+      });
+    }
+    return url;
+  };
+
+  const buildQueryParams = useCallback(
     (url: string, params: GeocoderOptions['params'], text: string, isInMapExtent: boolean) => {
       const dynamicParams = () => {
         const queryText = params.dynamic.queryText;
         const queryTextName = typeof queryText === 'string' ? queryText : queryText.name;
         const queryTextAdditionalParams = typeof queryText === 'string' ? undefined : queryText.relatedParams;
 
-        url = addParamToUrl(url, queryTextName, text);
+        url = appendUrlParam(url, queryTextName, text);
 
         if (queryTextAdditionalParams) {
           queryTextAdditionalParams.forEach((tuple) => {
-            url = addParamToUrl(url, tuple[0], tuple[1]);
+            url = appendUrlParam(url, tuple[0], tuple[1]);
           });
         }
 
         if (isInMapExtent) {
-
           const rectangle = customComputeViewRectangle(mapViewer);
 
           const geoContext = params.dynamic.geoContext;
@@ -175,31 +194,21 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
               bbox: [rectangle2bboxVal[0], rectangle2bboxVal[1], rectangle2bboxVal[2], rectangle2bboxVal[3]],
             };
 
-            url = addParamToUrl(url, geoContextName, bbox);
+            url = appendUrlParam(url, geoContextName, bbox);
 
             const geoContextAdditionalParams = typeof geoContext === 'string' ? undefined : geoContext?.relatedParams;
 
             if (geoContextAdditionalParams) {
               geoContextAdditionalParams.forEach((tuple) => {
-                url = addParamToUrl(url, tuple[0], tuple[1]);
+                url = appendUrlParam(url, tuple[0], tuple[1]);
               });
             }
           }
         }
       };
 
-      const staticParams = () => {
-        params.static?.forEach((tuple) => {
-          url = addParamToUrl(url, tuple[0], tuple[1]);
-        });
-      };
-
-      url += '?';
       dynamicParams();
-      staticParams();
-
-      const questionMarkPosition = url.indexOf('?');
-      url = url.slice(0, questionMarkPosition) + '?' + url.slice(questionMarkPosition + 2);
+      url = appendUrlParams(params.static, url);
 
       return url;
     },
@@ -213,7 +222,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     }
     const queryPromises = options.map(async (option) => {
       if (option.url) {
-        const url = buildUrlParams(option.url, option.params, text, isInMapExtent);
+        const url = buildQueryParams(option.url, option.params, text, isInMapExtent);
         return fetch(url, {
           method: 'GET',
         });
@@ -232,14 +241,25 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           body,
           status: res.status,
           url: res.url,
+          headers: res.headers,
         };
       })
     );
     if (jsonResponses) {
-      const cleaned = jsonResponses.filter((item): item is { body: any; status: number; url: string } => item !== undefined);
+      const cleaned = jsonResponses.filter((item): item is RequestResult => item !== undefined);
+      cleaned.forEach((res) => {
+        if (res.body.features) {
+          res.body.features = res.body.features.map((feat: any) => {
+            return {
+              ...feat,
+              headers: res.headers
+            } as FeatWithHeaders
+          })
+        }
+      });
       setSearchResults(cleaned);
     }
-  }, [buildUrlParams, options]);
+  }, [buildQueryParams, options]);
 
   const debouncedSearch = useMemo(() =>
     debounce((value: string, isInMapExtent: boolean) => {
@@ -251,13 +271,33 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   }, [debouncedSearch]);
 
   const handleChange = (value: string, isInMapExtent: boolean) => {
-    setSearchValue(value);
+    setSearchTextValue(value);
     debouncedSearch(value, isInMapExtent);
   };
 
   useEffect(() => {
-    fetchData(searchValue, isInMapExtent);
+    fetchData(searchTextValue, isInMapExtent);
   }, [isInMapExtent]);
+
+  const triggerCallbackFunc = (data: FeatWithHeaders, options: GeocoderOptions, i: number) => {
+    const params: [string, any][] = [
+      ...options.params.callback || [],
+    ];
+
+    const body = {
+      request_id: data.headers.get('request_id'),
+      chosen_result_id: i
+    }
+
+    if (options.callbackBaseUrl) {
+      const url = appendUrlParams(params, options.callbackBaseUrl);
+
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+    }
+  };
 
   const getIconByFeatureType = (geometry: any) => {
     const geometryType = getType(geometry);
@@ -298,7 +338,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           ref={geocoderInputRef}
           onChange={(e) => handleChange((e.target as HTMLInputElement).value, isInMapExtent)}
           placeholder={searchPlaceholder}
-          value={searchValue}
+          value={searchTextValue}
           autoComplete="off"
         />
         <Box className="search-results">
@@ -353,6 +393,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                               destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
                             });
                             setFeatureToShow(feature);
+                            triggerCallbackFunc(feature, option, i);
                           }}
                         >
                           <Box className="queryItemResult">
