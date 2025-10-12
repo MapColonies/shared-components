@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { debounce, get } from 'lodash';
 import { GeoJsonDataSource, SceneMode } from 'cesium';
+import { Feature } from 'geojson';
 import bbox from '@turf/bbox';
 import { getType } from '@turf/invariant';
 import { TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
@@ -33,9 +34,8 @@ export type GeocoderOptions = UrlGroup & {
       geoContext?: string | relatedParamsType;
     };
     static?: [string, any][];
-    callback?: [string, any][]
   };
-  callbackBaseUrl?: string;
+  callbackFunc?: (data: Feature, options: GeocoderOptions, i: number) => void;
 };
 
 type GeocoderPanelProps = {
@@ -51,8 +51,6 @@ type RequestResult = {
   headers: Headers;
 }
 
-type FeatWithHeaders = { headers: Headers, [key: string]: unknown };
-
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, locale }) => {
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
@@ -61,7 +59,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
   const [searchResults, setSearchResults] = useState<RequestResult[]>();
-  const [featureToShow, setFeatureToShow] = useState();
+  const [featureToShow, setFeatureToShow] = useState<Feature>();
   const showFeatureOnMapLabel = useMemo(() => get(locale, 'SHOW_FEATURE_ON_MAP') ?? 'Show on map', [locale]);
   const inMapExtentLabel = useMemo(() => get(locale, 'IN_MAP_EXTENT') ?? 'Search in extent', [locale]);
   const searchPlaceholder = useMemo(() => get(locale, 'SEARCH_PLACEHOLDER') ?? 'Search...', [locale]);
@@ -252,8 +250,11 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           res.body.features = res.body.features.map((feat: any) => {
             return {
               ...feat,
-              headers: res.headers
-            } as FeatWithHeaders
+              properties: {
+                ...feat.properties,
+                headers: res.headers
+              }
+            } as Feature;
           })
         }
       });
@@ -278,26 +279,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   useEffect(() => {
     fetchData(searchTextValue, isInMapExtent);
   }, [isInMapExtent]);
-
-  const triggerCallbackFunc = (data: FeatWithHeaders, options: GeocoderOptions, i: number) => {
-    const params: [string, any][] = [
-      ...options.params.callback || [],
-    ];
-
-    const body = {
-      request_id: data.headers.get('request_id'),
-      chosen_result_id: i
-    }
-
-    if (options.callbackBaseUrl) {
-      const url = appendUrlParams(params, options.callbackBaseUrl);
-
-      fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(body)
-      });
-    }
-  };
 
   const getIconByFeatureType = (geometry: any) => {
     const geometryType = getType(geometry);
@@ -384,7 +365,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                     const status: number = searchResults?.[index]?.status as number;
 
                     if (featuresLength) {
-                      return features.map((feature: any, i: number) => (
+                      return features.map((feature: Feature, i: number) => (
                         <ListItem
                           key={`feature-${i}`}
                           className={featureToShow === feature ? 'mdc-ripple-upgraded--background-focused' : ''}
@@ -393,7 +374,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                               destination: applyFactor(CesiumRectangle.fromDegrees(...bbox(feature.geometry))),
                             });
                             setFeatureToShow(feature);
-                            triggerCallbackFunc(feature, option, i);
+                            option.callbackFunc?.(feature, option, i);
                           }}
                         >
                           <Box className="queryItemResult">
