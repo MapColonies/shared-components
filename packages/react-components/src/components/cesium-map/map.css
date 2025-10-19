@@ -112,6 +112,7 @@ body[dir='rtl'] .cesium-viewer .cesium-baseLayerPicker-sectionTitle {
   flex-direction: row-reverse;
   align-items: center;
   column-gap: 4px;
+  margin: 3px 3px 1px 3px;
 }
 
 .cesium-viewer .cesium-viewer-fullscreenContainer {
