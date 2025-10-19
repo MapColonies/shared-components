@@ -12,4 +12,6 @@ export * from './theme';
 export * from './cesium-map';
 export * from './autocomplete';
 export * from './file-picker';
-export * from './multiSelection';
+export * from './multi-selection';
+export * from './circular-progress-bar';
+export * from './animated';

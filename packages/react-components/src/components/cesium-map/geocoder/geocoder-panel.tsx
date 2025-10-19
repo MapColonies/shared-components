@@ -66,15 +66,15 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const DEFAULT_DEBOUNCE = 300;
 
   const UncheckedIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <rect x="0" y="0" width="16" height="16" rx="2" ry="2" fill="white" stroke="#ccc" strokeWidth="1" />
+    <svg width="16px" height="16px" viewBox="0 0 16 16">
+      <rect x="0" y="0" width={16} height={16} rx="2" ry="2" fill="white" stroke="#ccc" strokeWidth={1} />
     </svg>
   );
 
   const CheckedIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16">
-      <rect x="0" y="0" width="16" height="16" rx="2" ry="2" fill="#1976d2" stroke="#1976d2" strokeWidth="1" />
-      <path d="M4 8l2 2 6-6" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="16px" height="16px" viewBox="0 0 16 16">
+      <rect x="0" y="0" width={16} height={16} rx="2" ry="2" fill="#1976d2" stroke="#1976d2" strokeWidth={1} />
+      <path d="M4 8l2 2 6-6" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 
@@ -265,21 +265,22 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     switch (geometryType) {
       case 'Point':
         typedIcon = (
-          <svg className={`geometrysSvgIcons`} width="30px" height="18px" viewBox="0 0 24 24">
-            <path d="M5 14.2864C3.14864 15.1031 2 16.2412 2 17.5C2 19.9853 6.47715 22 12 22C17.5228 22 22 19.9853 22 17.5C22 16.2412 20.8514 15.1031 19 14.2864M18 8C18 12.0637 13.5 14 12 17C10.5 14 6 12.0637 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8ZM13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8Z" />
+          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="var(--mdc-theme-cesium-color)">
+            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
           </svg>
         );
         break;
       case 'LineString':
         typedIcon = (
-          <svg className={`geometrysSvgIcons`} width="30px" height="25px" viewBox="0 0 24 24">
-            <path d="M3 16.5L9 10L13 16L21 6.5" />
+          <svg width="18px" height="18px" viewBox="0 0 24 24">
+            <path fill="var(--mdc-theme-cesium-color)" stroke="var(--mdc-theme-cesium-color)" strokeWidth={0.5} d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z" />
+            <path fill="none" d="M0 0h24v24H0z" />
           </svg>
         );
         break;
       default:
         typedIcon = (
-          <svg className={`geometrysSvgIcons`} width="30px" height="20px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 4 L20 14 L20 20 L4 20 L4 10 Z" />
           </svg>
         );
@@ -306,7 +307,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
               className="checkboxElement"
               label={showFeatureOnMapLabel}
               icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
+              checkedicon={CheckedIcon}
               checked={showFeatureOnMap}
               onClick={() => {
                 setShowFeatureOnMap(!showFeatureOnMap);
@@ -321,7 +322,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
               }
               checked={isInMapExtent}
               icon={UncheckedIcon}
-              checkedIcon={CheckedIcon}
+              checkedicon={CheckedIcon}
               disabled={isNotIn2DMode}
               onClick={() => {
                 setIsInMapExtent(!isInMapExtent);

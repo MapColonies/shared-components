@@ -3,6 +3,101 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.12.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.4...@map-colonies/react-components@4.12.0) (2025-09-11)
+
+
+### Bug Fixes
+
+* active layers ([7abd739](https://github.com/MapColonies/shared-components/commit/7abd73917b55a0102bc7356db485bedcabbf52a4))
+* add custom scroll bar ([96e5b0c](https://github.com/MapColonies/shared-components/commit/96e5b0c3eb8567f83a5bd4d88dd6d6257fade8e5))
+* add geocoding story ([92a744c](https://github.com/MapColonies/shared-components/commit/92a744c8614d3b8530e6dd95caa1a023899dd3b5))
+* add theme to cesium components ([eed4bd3](https://github.com/MapColonies/shared-components/commit/eed4bd3b49565d17b7130ef88aa01503f407f7eb))
+* base maps ([bd149b2](https://github.com/MapColonies/shared-components/commit/bd149b2b1ab99932d8ce140b98c4375cfaa3b10f))
+* change font size, and remove underline in TextField ([dd967a3](https://github.com/MapColonies/shared-components/commit/dd967a335db8d06e2384c2b745cdd190d3110269))
+* change icon color to be the same as the text ([625fd34](https://github.com/MapColonies/shared-components/commit/625fd34eb780ed9a2255e3330c80f75206603847))
+* change import to lower case ([122753d](https://github.com/MapColonies/shared-components/commit/122753d6bdbe4b70a80139b373716485ca44e830))
+* circular progress bar ([66d376a](https://github.com/MapColonies/shared-components/commit/66d376acf41a7fe5c48a407f5a442279a3a2e13c))
+* cleanup labels ([c3a5c37](https://github.com/MapColonies/shared-components/commit/c3a5c378172723b7ddfb2f5d8d24f361e0fb34b5))
+* debug panel ([7c52f0e](https://github.com/MapColonies/shared-components/commit/7c52f0e29b28fff21d129555571ac4249d1221c9))
+* display nothing in case of a 400 error ([23abcb7](https://github.com/MapColonies/shared-components/commit/23abcb7eb907f98406bc0bdc4cd40fe9a76380e5))
+* home button should be configured to middle east instead of usa ([8ea34d0](https://github.com/MapColonies/shared-components/commit/8ea34d0fa7190cfe2a26ff8ee62d6b3a4ce6c593))
+* home should go to center if exists ([b412266](https://github.com/MapColonies/shared-components/commit/b4122668ef23dbf2e3df53b62147da0d9cde0c67))
+* infinite rerender components ([5f349ff](https://github.com/MapColonies/shared-components/commit/5f349fffaca34e385268e08a6589a8cb83b555b1))
+* legend toggle ([9c82fd6](https://github.com/MapColonies/shared-components/commit/9c82fd6ea117fb96b104f1ac80e394a2874c2a9a))
+* localized geocoder_options ([f514029](https://github.com/MapColonies/shared-components/commit/f514029cb565cd3f39cd6cba9ebfb71ac1cbc900))
+* long values in wfs features dialog ([d7cd4b8](https://github.com/MapColonies/shared-components/commit/d7cd4b8d87125014072be530a2064f1c0264e7a3))
+* merge ([aa2581f](https://github.com/MapColonies/shared-components/commit/aa2581fec7c978639f3db1e8f8bcabd5c1dfb940))
+* remove sortBy ([52d1a42](https://github.com/MapColonies/shared-components/commit/52d1a42f4c812a77f53dce1a18cf9f62c32d83cc))
+* rename config to option ([3eb0fca](https://github.com/MapColonies/shared-components/commit/3eb0fca0807b02995b3f61df985c43df03470e17))
+* request by geo_context in 2D mode only ([9c45dce](https://github.com/MapColonies/shared-components/commit/9c45dce93af2b26ddb03514550021c4a964f3b0f))
+* terrain picker ([2ba623a](https://github.com/MapColonies/shared-components/commit/2ba623a67c9082018ffe871d4a4a1a4c8c36272d))
+* theme and css organize ([7958489](https://github.com/MapColonies/shared-components/commit/79584890463cf7c30e37825adea63653157643c6))
+* update geocoder parameters structure ([1481cb4](https://github.com/MapColonies/shared-components/commit/1481cb44d8e29a8c112917df629eb4ef39e7894a))
+* updated style ([4aef349](https://github.com/MapColonies/shared-components/commit/4aef349cdfcc35d9bf4d067bceff5df6e83ae396))
+* wfs layer not to crash when invalid geometry ([6130d34](https://github.com/MapColonies/shared-components/commit/6130d346dccec608f934fc480dd546e6a72cc9ff))
+
+
+### Features
+
+* active layers ([b0b3cf0](https://github.com/MapColonies/shared-components/commit/b0b3cf0a830366ea5b8133087bf412ced97a24c0))
+* active layers ([52a5786](https://github.com/MapColonies/shared-components/commit/52a5786a01c1b6be5f22ab73817982f061363164))
+* add styles for geocoder panel ([ac4a1a5](https://github.com/MapColonies/shared-components/commit/ac4a1a5554aa8f1f60f77ada5e8f1fe3b3c24315))
+* circular progress bar ([a82bfc6](https://github.com/MapColonies/shared-components/commit/a82bfc60e4dde036101bd8c44fdab13b40d20100))
+* geocoder ([c2bc724](https://github.com/MapColonies/shared-components/commit/c2bc72461d66b8de7c482afb42c1c22536125b6f))
+* geocoder-panel ([579cebb](https://github.com/MapColonies/shared-components/commit/579cebb73605815c2166986e41f945512b9de95d))
+
+
+
+
+
+# [4.11.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.4...@map-colonies/react-components@4.11.0) (2025-09-11)
+
+
+### Bug Fixes
+
+* active layers ([7abd739](https://github.com/MapColonies/shared-components/commit/7abd73917b55a0102bc7356db485bedcabbf52a4))
+* add custom scroll bar ([96e5b0c](https://github.com/MapColonies/shared-components/commit/96e5b0c3eb8567f83a5bd4d88dd6d6257fade8e5))
+* add geocoding story ([92a744c](https://github.com/MapColonies/shared-components/commit/92a744c8614d3b8530e6dd95caa1a023899dd3b5))
+* add theme to cesium components ([eed4bd3](https://github.com/MapColonies/shared-components/commit/eed4bd3b49565d17b7130ef88aa01503f407f7eb))
+* base maps ([bd149b2](https://github.com/MapColonies/shared-components/commit/bd149b2b1ab99932d8ce140b98c4375cfaa3b10f))
+* change font size, and remove underline in TextField ([dd967a3](https://github.com/MapColonies/shared-components/commit/dd967a335db8d06e2384c2b745cdd190d3110269))
+* change icon color to be the same as the text ([625fd34](https://github.com/MapColonies/shared-components/commit/625fd34eb780ed9a2255e3330c80f75206603847))
+* change import to lower case ([122753d](https://github.com/MapColonies/shared-components/commit/122753d6bdbe4b70a80139b373716485ca44e830))
+* circular progress bar ([66d376a](https://github.com/MapColonies/shared-components/commit/66d376acf41a7fe5c48a407f5a442279a3a2e13c))
+* cleanup labels ([c3a5c37](https://github.com/MapColonies/shared-components/commit/c3a5c378172723b7ddfb2f5d8d24f361e0fb34b5))
+* debug panel ([7c52f0e](https://github.com/MapColonies/shared-components/commit/7c52f0e29b28fff21d129555571ac4249d1221c9))
+* display nothing in case of a 400 error ([23abcb7](https://github.com/MapColonies/shared-components/commit/23abcb7eb907f98406bc0bdc4cd40fe9a76380e5))
+* home button should be configured to middle east instead of usa ([8ea34d0](https://github.com/MapColonies/shared-components/commit/8ea34d0fa7190cfe2a26ff8ee62d6b3a4ce6c593))
+* home should go to center if exists ([b412266](https://github.com/MapColonies/shared-components/commit/b4122668ef23dbf2e3df53b62147da0d9cde0c67))
+* infinite rerender components ([5f349ff](https://github.com/MapColonies/shared-components/commit/5f349fffaca34e385268e08a6589a8cb83b555b1))
+* legend toggle ([9c82fd6](https://github.com/MapColonies/shared-components/commit/9c82fd6ea117fb96b104f1ac80e394a2874c2a9a))
+* localized geocoder_options ([f514029](https://github.com/MapColonies/shared-components/commit/f514029cb565cd3f39cd6cba9ebfb71ac1cbc900))
+* long values in wfs features dialog ([d7cd4b8](https://github.com/MapColonies/shared-components/commit/d7cd4b8d87125014072be530a2064f1c0264e7a3))
+* merge ([aa2581f](https://github.com/MapColonies/shared-components/commit/aa2581fec7c978639f3db1e8f8bcabd5c1dfb940))
+* remove sortBy ([52d1a42](https://github.com/MapColonies/shared-components/commit/52d1a42f4c812a77f53dce1a18cf9f62c32d83cc))
+* rename config to option ([3eb0fca](https://github.com/MapColonies/shared-components/commit/3eb0fca0807b02995b3f61df985c43df03470e17))
+* request by geo_context in 2D mode only ([9c45dce](https://github.com/MapColonies/shared-components/commit/9c45dce93af2b26ddb03514550021c4a964f3b0f))
+* terrain picker ([2ba623a](https://github.com/MapColonies/shared-components/commit/2ba623a67c9082018ffe871d4a4a1a4c8c36272d))
+* theme and css organize ([7958489](https://github.com/MapColonies/shared-components/commit/79584890463cf7c30e37825adea63653157643c6))
+* update geocoder parameters structure ([1481cb4](https://github.com/MapColonies/shared-components/commit/1481cb44d8e29a8c112917df629eb4ef39e7894a))
+* updated style ([4aef349](https://github.com/MapColonies/shared-components/commit/4aef349cdfcc35d9bf4d067bceff5df6e83ae396))
+* wfs layer not to crash when invalid geometry ([6130d34](https://github.com/MapColonies/shared-components/commit/6130d346dccec608f934fc480dd546e6a72cc9ff))
+
+
+### Features
+
+* active layers ([b0b3cf0](https://github.com/MapColonies/shared-components/commit/b0b3cf0a830366ea5b8133087bf412ced97a24c0))
+* active layers ([52a5786](https://github.com/MapColonies/shared-components/commit/52a5786a01c1b6be5f22ab73817982f061363164))
+* add styles for geocoder panel ([ac4a1a5](https://github.com/MapColonies/shared-components/commit/ac4a1a5554aa8f1f60f77ada5e8f1fe3b3c24315))
+* circular progress bar ([a82bfc6](https://github.com/MapColonies/shared-components/commit/a82bfc60e4dde036101bd8c44fdab13b40d20100))
+* geocoder ([c2bc724](https://github.com/MapColonies/shared-components/commit/c2bc72461d66b8de7c482afb42c1c22536125b6f))
+* geocoder-panel ([579cebb](https://github.com/MapColonies/shared-components/commit/579cebb73605815c2166986e41f945512b9de95d))
+
+
+
+
+
+
 ## [4.10.4](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.3...@map-colonies/react-components@4.10.4) (2025-06-26)
 
 

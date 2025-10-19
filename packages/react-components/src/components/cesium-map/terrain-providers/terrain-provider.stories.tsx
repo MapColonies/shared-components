@@ -14,7 +14,6 @@ import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../proxied.types';
 import { InspectorTool } from '../tools/inspector.tool';
 import QuantizedMeshTerrainProvider from './custom/quantized-mesh-terrain-provider';
 
@@ -134,7 +133,6 @@ export const QuantizedMeshProviders: Story = () => {
         center={center}
         zoom={5}
         imageryProvider={false}
-        sceneModes={[CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW]}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
       >

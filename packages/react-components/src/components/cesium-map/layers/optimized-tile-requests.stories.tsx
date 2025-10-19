@@ -4,7 +4,6 @@ import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap } from '../map';
-import { CesiumSceneMode } from '../proxied.types';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -38,7 +37,6 @@ const mapViewProps: CesiumMapProps = {
   center: [-117.30644008676421, 33.117098433617564],
   zoom: 14,
   imageryProvider: false,
-  sceneModes: [CesiumSceneMode.SCENE3D, CesiumSceneMode.COLUMBUS_VIEW],
   baseMaps: BASE_MAPS as IBaseMaps,
 };
 
