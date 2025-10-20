@@ -226,7 +226,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
         });
       } else {
         return Promise.reject({
-          message: "Url doesn't exist, please provide",
+          message: "No URL provided. Please provide one",
         });
       }
     });

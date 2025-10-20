@@ -29,7 +29,7 @@ const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number)
   const requestId = properties?.headers['request_id'];
 
   if(!requestId) {
-    console.warn('GEOCODING[FEEDBACK]: request_id header not propagated (pay attention on "Access-Control-Expose-Headers" response header of geocoding API\'s call)');
+    console.warn('GEOCODING[FEEDBACK]: Missing request_id in response. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
   }
 
   if (!baseUrl || !properties) return;
