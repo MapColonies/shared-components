@@ -230,35 +230,36 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
         });
       }
     });
-    const responses = await Promise.all(queryPromises);
-    const jsonResponses = await Promise.all(
-      responses.map(async (res) => {
-        if (res === undefined) return;
-        const body = await res.json();
-        return {
-          body,
-          status: res.status,
-          url: res.url,
-          headers: Object.fromEntries(res.headers.entries()),
-        };
-      })
+    const rawResponses = await Promise.all(queryPromises);
+    const parsedResponses = await Promise.all(
+      rawResponses
+        .filter((res): res is Response => res !== undefined)
+        .map(async (res) => {
+          const body = await res.json();
+          return {
+            body,
+            status: res.status,
+            url: res.url,
+            headers: Object.fromEntries(res.headers.entries()),
+          };
+        })
     );
-    if (jsonResponses) {
-      const cleaned = jsonResponses.filter((item): item is RequestResult => item !== undefined);
-      cleaned.forEach((res) => {
-        if (res.body.features) {
-          res.body.features = res.body.features.map((feat: any) => {
+
+    if (parsedResponses) {
+      parsedResponses.forEach((parsedResponse) => {
+        if (parsedResponse.body.features) {
+          parsedResponse.body.features = parsedResponse.body.features.map((feat: Feature) => {
             return {
               ...feat,
               properties: {
                 ...feat.properties,
-                headers: res.headers
+                headers: parsedResponse.headers
               }
             } as Feature;
           })
         }
       });
-      setSearchResults(cleaned);
+      setSearchResults(parsedResponses);
     }
   }, [buildQueryParams, options]);
 
