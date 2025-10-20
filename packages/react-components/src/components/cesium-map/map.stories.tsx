@@ -26,13 +26,18 @@ const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number)
   const baseUrl = getValue('GEOCODER', 'CALLBACK_URL');
 
   const properties = data.properties;
+  const requestId = properties?.headers['request_id'];
 
-  if (!baseUrl) return;
-  if (!properties) return;
+  if(!requestId) {
+    console.warn('GEOCODING[FEEDBACK]: request_id header not propagated (pay attention on "Access-Control-Expose-Headers" response header of geocoding API\'s call)');
+  }
+
+  if (!baseUrl || !properties) return;
 
   const body = {
-    request_id: properties.headers.get('request_id'),
-    chosen_result_id: i
+    request_id: requestId,
+    chosen_result_id: i,
+    user_id: 'catalog-app@mapcolonies.net'
   }
 
   const url = `${baseUrl}?token=${getValue('GLOBAL', 'TOKEN')}`;

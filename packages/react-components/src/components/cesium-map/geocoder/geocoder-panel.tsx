@@ -48,7 +48,7 @@ type RequestResult = {
   body: any;
   status: number;
   url: string;
-  headers: Headers;
+  headers: Record<string, string>;
 }
 
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, locale }) => {
@@ -239,7 +239,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           body,
           status: res.status,
           url: res.url,
-          headers: res.headers,
+          headers: Object.fromEntries(res.headers.entries()),
         };
       })
     );
