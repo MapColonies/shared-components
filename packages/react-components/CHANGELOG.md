@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.13.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.12.0...@map-colonies/react-components@4.13.0) (2025-10-21)
+
+
+### Bug Fixes
+
+* add request id in triggerCallbackFunc ([3359c5c](https://github.com/MapColonies/shared-components/commit/3359c5cf25f3448020b416f8b88097945236bf74))
+* messages ([74828c7](https://github.com/MapColonies/shared-components/commit/74828c79819785f4b194d87a69af0709bca90c96))
+* move callbackFunc outside ([046fb75](https://github.com/MapColonies/shared-components/commit/046fb7595ef4dcb19c07b33f053600f8fa39a9aa))
+* pr ([67c89c2](https://github.com/MapColonies/shared-components/commit/67c89c25fe88dbc2746d328908b78ce07c73d0f5))
+* pr ([52acb2b](https://github.com/MapColonies/shared-components/commit/52acb2b87695ba96e498689eb70556c100f9f57e))
+* space between widgets ([2604a38](https://github.com/MapColonies/shared-components/commit/2604a38c0a69f978c8ffbaed132fe8e07f31ec6d))
+* update warning message ([1587494](https://github.com/MapColonies/shared-components/commit/1587494d82cbaa8eb3c6bbfeddfd9a02dec7fc5d))
+
+
+### Features
+
+* add callback function ([f9674de](https://github.com/MapColonies/shared-components/commit/f9674dee1f912b3db71a6d136563f341893c5623))
+
+
+
+
+
 # [4.12.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.10.4...@map-colonies/react-components@4.12.0) (2025-09-11)
 
 
