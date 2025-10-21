@@ -236,6 +236,16 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
         .filter((res): res is Response => res !== undefined)
         .map(async (res) => {
           const body = await res.json();
+          body.features = body.features?.map((feat: Feature) => {
+            return {
+              ...feat,
+              properties: {
+                ...feat.properties,
+                headers: res.headers
+              }
+            } as Feature;
+          });
+
           return {
             body,
             status: res.status,
@@ -245,22 +255,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
         })
     );
 
-    if (parsedResponses) {
-      parsedResponses.forEach((parsedResponse) => {
-        if (parsedResponse.body.features) {
-          parsedResponse.body.features = parsedResponse.body.features.map((feat: Feature) => {
-            return {
-              ...feat,
-              properties: {
-                ...feat.properties,
-                headers: parsedResponse.headers
-              }
-            } as Feature;
-          })
-        }
-      });
-      setSearchResults(parsedResponses);
-    }
+    setSearchResults(parsedResponses);
   }, [buildQueryParams, options]);
 
   const debouncedSearch = useMemo(() =>
