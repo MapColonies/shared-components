@@ -1,3 +1,4 @@
+import { Feature } from 'geojson';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
@@ -21,9 +22,35 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
+  const baseUrl = getValue('GEOCODER', 'CALLBACK_URL');
+
+  const properties = data.properties;
+  const requestId = properties?.headers['request_id'];
+
+  if(!requestId) {
+    console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
+  }
+
+  if (!baseUrl || !properties) return;
+
+  const body = {
+    request_id: requestId,
+    chosen_result_id: i,
+    user_id: 'catalog-app@mapcolonies.net'
+  }
+
+  const url = `${baseUrl}?token=${getValue('GLOBAL', 'TOKEN')}`;
+
+  fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+};
+
 const GEOCODER_OPTIONS = [
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/location/query',
     method: 'GET',
     params: {
@@ -31,18 +58,20 @@ const GEOCODER_OPTIONS = [
         queryText: 'query',
         geoContext: {
           name: 'geo_context',
-          relatedParams: [['geo_context_mode', 'filter']],
+          relatedParams: [['geo_context_mode', 'filter']],  
         },
       },
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'Location',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/tiles',
     method: 'GET',
     params: {
@@ -56,12 +85,14 @@ const GEOCODER_OPTIONS = [
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'Control Tiles',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/items',
     method: 'GET',
     params: {
@@ -75,12 +106,14 @@ const GEOCODER_OPTIONS = [
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'Control Data',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/routes',
     method: 'GET',
     params: {
@@ -91,15 +124,19 @@ const GEOCODER_OPTIONS = [
           relatedParams: [['geo_context_mode', 'filter']],
         },
       },
+      static: [
+        ['token', getValue('GLOBAL', 'TOKEN')],
+      ]
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'Control Routes',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
 ] satisfies GeocoderOptions[];
 
 const LOCALIZED_GEOCODER_OPTIONS = [
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/location/query',
     method: 'GET',
     params: {
@@ -113,12 +150,14 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'מיקום',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/tiles',
     method: 'GET',
     params: {
@@ -132,12 +171,14 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'אריחי שליטה (נצ"א)',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/items',
     method: 'GET',
     params: {
@@ -151,12 +192,14 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       static: [
         ['limit', 6],
         ['disable_fuzziness', false],
+        ['token', getValue('GLOBAL', 'TOKEN')],
       ],
     },
     title: 'נתוני שליטה',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
   {
-    baseUrl: getValue('GLOBAL', 'GEOCODING'),
+    baseUrl: getValue('GEOCODER', 'URL'),
     endPoint: '/search/control/routes',
     method: 'GET',
     params: {
@@ -167,9 +210,13 @@ const LOCALIZED_GEOCODER_OPTIONS = [
           relatedParams: [['geo_context_mode', 'filter']],
         },
       },
+      static: [
+        ['token', getValue('GLOBAL', 'TOKEN')],
+      ]
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'צירי שליטה',
+    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
   },
 ] satisfies GeocoderOptions[];
 
