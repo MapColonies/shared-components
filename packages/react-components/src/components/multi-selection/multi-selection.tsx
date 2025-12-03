@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select, { components, GroupBase, OptionProps, StylesConfig as rcStylesConfig } from 'react-select';
 import { Input, ThemeProvider } from '@material-ui/core';
 import { Checkbox, useTheme } from '@map-colonies/react-core';
@@ -14,7 +14,7 @@ export type MultiSelectionOption = {
 interface MultiSelectionProps {
   options: MultiSelectionOption[];
   values?: MultiSelectionOption[];
-  onChange?: (data: any) => void;
+  onChange?: (data: MultiSelectionOption[]) => void;
   placeholder?: string;
   styles?: StylesConfig;
 }
@@ -38,6 +38,10 @@ export const MultiSelection = (props: MultiSelectionProps) => {
   const themeMui = useMappedMuiTheme(theme);
   const [value, setValue] = useState(values);
 
+   useEffect(() => {
+    setValue(values??[]);
+  }, [values]);
+  
   const handleChange = (data: any) => {
     setValue(data);
     onChange && onChange(data);
