@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.0...@map-colonies/react-components@4.13.1) (2025-12-03)
+
+
+### Bug Fixes
+
+* add useEffect to MultiSelection component ([187ace5](https://github.com/MapColonies/shared-components/commit/187ace5e82e593ce861603c34764ea914fcc36f5))
+
+
+
+
+
 # [4.13.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.12.0...@map-colonies/react-components@4.13.0) (2025-10-21)
 
 
