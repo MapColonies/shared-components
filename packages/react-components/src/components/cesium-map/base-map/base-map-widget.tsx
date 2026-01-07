@@ -1,27 +1,28 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { get } from 'lodash';
 import { IBaseMap, IBaseMaps, ITerrain } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
+import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { BaseMapsPanel } from './base-maps-panel';
 import { TerrainsPanel } from './terrains-panel';
 
-interface IBaseMapWidgetProps {
+interface IBaseMapWidgetProps extends IWidgetProps {
   baseMaps?: IBaseMaps;
   terrains?: ITerrain[];
   locale?: { [key: string]: string };
 }
 
-export const BaseMapWidget: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, locale }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const BaseMapComponent: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, locale, isOpen, setIsOpen }) => {
   const [selected, setSelected] = useState<IBaseMap>();
   const baseMapsTitle = useMemo(() => get(locale, 'BASE_MAP_TITLE') ?? 'Base Map', [locale]);
   const terrainsTitle = useMemo(() => get(locale, 'TERRAIN_TITLE') ?? 'Terrain', [locale]);
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <>
-      <CesiumIcon onClick={() => setIsOpen(prev => !prev)}>
-        <img 
+    <div className='disappear' ref={panelRef}>
+      <CesiumIcon onClick={() => setIsOpen(!isOpen)}>
+        <img
           className="cesium-baseLayerPicker-selected"
           src={selected?.thumbnail}
           title={selected?.title}
@@ -32,6 +33,8 @@ export const BaseMapWidget: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrain
         {baseMaps && <BaseMapsPanel title={baseMapsTitle} baseMaps={baseMaps} setCurrent={setSelected} />}
         {terrains && <TerrainsPanel title={terrainsTitle} terrains={terrains}></TerrainsPanel>}
       </CesiumTool>
-    </>
+    </div>
   );
 };
+
+export const BaseMapWidget = WidgetWrapper(BaseMapComponent);
