@@ -10,9 +10,9 @@ import { useCesiumMap } from '../map';
 import { applyFactor, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { CesiumRectangle } from '../proxied.types';
 
-import './geocoder-panel.css';
 import '@map-colonies/react-core/dist/list/styles';
 import '@map-colonies/react-core/dist/textfield/styles';
+import './geocoder-panel.css';
 
 type Method = 'GET' | 'POST';
 

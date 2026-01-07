@@ -4,6 +4,7 @@ import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
+import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { WFS } from './wfs';
 
 interface IFeatureTypeMetadata {
@@ -19,12 +20,11 @@ export type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface IWFSDebugWidgetProps {
+export interface IWFSDebugWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
-export const WFSDebugWidget: React.FC<IWFSDebugWidgetProps> = ({ locale }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const WFSDebugComponent: React.FC<IWFSDebugWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
 
@@ -86,3 +86,5 @@ export const WFSDebugWidget: React.FC<IWFSDebugWidgetProps> = ({ locale }) => {
     </>
   );
 };
+
+export const WFSDebugWidget = WidgetWrapper(WFSDebugComponent);
