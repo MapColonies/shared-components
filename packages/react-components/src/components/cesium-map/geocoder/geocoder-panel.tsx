@@ -10,9 +10,9 @@ import { useCesiumMap } from '../map';
 import { applyFactor, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { CesiumRectangle } from '../proxied.types';
 
-import './geocoder-panel.css';
 import '@map-colonies/react-core/dist/list/styles';
 import '@map-colonies/react-core/dist/textfield/styles';
+import './geocoder-panel.css';
 
 type Method = 'GET' | 'POST';
 
@@ -55,7 +55,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const geocoderInputRef = useRef<HTMLInputElement | null>(null);
-
   const [searchTextValue, setSearchTextValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
@@ -308,7 +307,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   };
 
   return (
-    <div className="geocoderContainer">
+    <Box className="geocoderContainer">
       <Box className="geocoderForm">
         <TextField
           id="geocoderTextField"
@@ -396,6 +395,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
           </Box>
         </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
