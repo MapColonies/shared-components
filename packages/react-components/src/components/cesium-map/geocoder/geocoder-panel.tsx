@@ -55,7 +55,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const geocoderInputRef = useRef<HTMLInputElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
 
   const [searchTextValue, setSearchTextValue] = useState('');
   const [isInMapExtent, setIsInMapExtent] = useState(false);
@@ -309,7 +308,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   };
 
   return (
-    <div className="geocoderContainer" ref={panelRef}>
+    <div className="geocoderContainer">
       <Box className="geocoderForm">
         <TextField
           id="geocoderTextField"

@@ -17,10 +17,9 @@ const BaseMapComponent: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, l
   const [selected, setSelected] = useState<IBaseMap>();
   const baseMapsTitle = useMemo(() => get(locale, 'BASE_MAP_TITLE') ?? 'Base Map', [locale]);
   const terrainsTitle = useMemo(() => get(locale, 'TERRAIN_TITLE') ?? 'Terrain', [locale]);
-  const panelRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <div className='disappear' ref={panelRef}>
+    <>
       <CesiumIcon onClick={() => setIsOpen(!isOpen)}>
         <img
           className="cesium-baseLayerPicker-selected"
@@ -33,7 +32,7 @@ const BaseMapComponent: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, l
         {baseMaps && <BaseMapsPanel title={baseMapsTitle} baseMaps={baseMaps} setCurrent={setSelected} />}
         {terrains && <TerrainsPanel title={terrainsTitle} terrains={terrains}></TerrainsPanel>}
       </CesiumTool>
-    </div>
+    </>
   );
 };
 

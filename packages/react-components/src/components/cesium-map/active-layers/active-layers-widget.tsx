@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { CesiumInspector } from '../widget/cesium-inspector';
-import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { ActiveLayersPanel } from './active-layers-panel';
 
-interface IDebugProps extends IWidgetProps {
+interface IDebugProps {
   locale?: { [key: string]: string };
 }
 
-const ActiveLayersComponent: React.FC<IDebugProps> = ({ locale, isOpen, setIsOpen }) => {
+export const ActiveLayersWidget: React.FC<IDebugProps> = ({ locale }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const title = useMemo(() => get(locale, 'ACTIVE_LAYERS_TITLE') ?? 'Active Layers', [locale]);
 
   return (
@@ -17,5 +17,3 @@ const ActiveLayersComponent: React.FC<IDebugProps> = ({ locale, isOpen, setIsOpe
     </CesiumInspector>
   );
 };
-
-export const ActiveLayersWidget = WidgetWrapper(ActiveLayersComponent);

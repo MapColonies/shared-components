@@ -24,10 +24,10 @@ export function WidgetWrapper<P extends IWidgetProps>(WrappedComponent: React.JS
         }
       };
 
-      document.addEventListener('pointerdown', handleClickOutside, true);
+      document.addEventListener('click', handleClickOutside, true);
 
       return () => {
-        document.removeEventListener('pointerdown', handleClickOutside, true);
+        document.removeEventListener('click', handleClickOutside, true);
       };
     }, [isOpen]);
 
