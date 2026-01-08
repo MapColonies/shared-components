@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { format as formatDateFns } from 'date-fns';
 import { Button, TextField } from '@map-colonies/react-core';
-
 import { SupportedLocales } from '../models/enums';
 import DEFAULTS from '../models/defaults';
 import { Popover } from '../popover';
 import { DateTimeRangePicker } from './date-range-picker';
+
 import './date-range-picker.form-control.css';
 
 interface DateRangePickerProps {

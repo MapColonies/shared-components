@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+
 import './widget-wrapper.css';
 
 export interface IWidgetProps {
@@ -14,18 +15,16 @@ export function WidgetWrapper<P extends IWidgetProps>(WrappedComponent: React.JS
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-      if (!isOpen) return;
-
+      if (!isOpen) {
+        return;
+      }
       const handleClickOutside = (event: MouseEvent) => {
         const target = event.target as Node;
-
         if (widgetRef.current && !widgetRef.current.contains(target)) {
           setIsOpen(false);
         }
       };
-
       document.addEventListener('click', handleClickOutside, true);
-
       return () => {
         document.removeEventListener('click', handleClickOutside, true);
       };
@@ -33,9 +32,9 @@ export function WidgetWrapper<P extends IWidgetProps>(WrappedComponent: React.JS
 
 
     return (
-      <div ref={widgetRef} className='disappear'>
+      <div ref={widgetRef} className="disappear">
         <WrappedComponent {...props as P} isOpen={isOpen} setIsOpen={setIsOpen} />
       </div>
-    )
+    );
   }
 }
