@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { isValid, isBefore } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
-import { MuiPickersUtilsProvider, KeyboardDateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardDateTimePicker } from '@material-ui/pickers';
 import { ThemeProvider } from '@material-ui/core';
-
-import { Button, useTheme } from '@map-colonies/react-core';
-import { ThemeProvider as RmwcThemeProvider } from '@map-colonies/react-core';
-import { SupportedLocales } from '../models/enums';
-import DEFAULTS from '../models/defaults';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { Button, ThemeProvider as RmwcThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
+import DEFAULTS from '../models/defaults';
+import { SupportedLocales } from '../models/enums';
 import { useMappedMuiTheme } from '../theme';
+
 import './date-range-picker.css';
 
 const CONTAINER_SPACING_FACTOR = 2;
@@ -32,7 +31,7 @@ const useStyle = makeStyles((theme: Theme) =>
   })
 );
 
-interface DateRangePickerProps {
+interface DateTimeRangePickerProps {
   onChange: (dateRange: { from?: Date; to?: Date }) => void;
   from?: Date;
   to?: Date;
@@ -42,6 +41,7 @@ interface DateRangePickerProps {
   disableFuture?: boolean;
   maxDate?: string | number | Date | null | undefined;
   minDate?: string | number | Date | null | undefined;
+  showTime?: boolean;
   local?: {
     setText?: string;
     startPlaceHolderText?: string;
@@ -50,7 +50,7 @@ interface DateRangePickerProps {
   };
 }
 
-export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
+export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = (props) => {
   const classes = useStyle();
   const theme: { [key: string]: string } = useTheme();
   const themeMui = useMappedMuiTheme(theme);
@@ -64,6 +64,7 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
   const endPlaceHolderText = props.local?.endPlaceHolderText ?? DEFAULTS.DATE_RANGE_PICKER.local.endPlaceHolderText;
   const setText = props.local?.setText ?? DEFAULTS.DATE_RANGE_PICKER.local.setText;
   const calendarLocale = props.local?.calendarLocale ?? DEFAULTS.DATE_RANGE_PICKER.local.calendarLocale;
+  const showTime = props.showTime ?? DEFAULTS.DATE_RANGE_PICKER.showTime;
 
   const locale = calendarLocale === SupportedLocales.HE ? he : enUS;
 
@@ -90,6 +91,8 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
     });
   };
 
+  const PickerComponent = showTime ? KeyboardDateTimePicker : KeyboardDatePicker;
+
   return (
     <ThemeProvider theme={themeMui}>
       <Box
@@ -99,7 +102,7 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
         width={flexDirection === 'column' ? props.contentWidth : 'unset'}
       >
         <MuiPickersUtilsProvider utils={DateFnsUtils} locale={locale}>
-          <KeyboardDateTimePicker
+          <PickerComponent
             variant="inline"
             placeholder={startPlaceHolderText}
             onChange={(date): void => setFrom(date as Date)}
@@ -109,7 +112,7 @@ export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
             maxDate={props.maxDate}
             minDate={props.minDate}
           />
-          <KeyboardDateTimePicker
+          <PickerComponent
             variant="inline"
             placeholder={endPlaceHolderText}
             className={classes.margin}
