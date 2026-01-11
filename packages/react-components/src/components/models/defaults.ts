@@ -26,7 +26,6 @@ const DEFAULTS = {
     renderAsButton: true,
     offset: 0,
     disableFuture: true,
-    showTime: true,
   },
 };
 
