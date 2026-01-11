@@ -31,7 +31,7 @@ const useStyle = makeStyles((theme: Theme) =>
   })
 );
 
-interface DateTimeRangePickerProps {
+interface DateRangePickerProps {
   onChange: (dateRange: { from?: Date; to?: Date }) => void;
   from?: Date;
   to?: Date;
@@ -50,7 +50,7 @@ interface DateTimeRangePickerProps {
   };
 }
 
-export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = (props) => {
+export const DateTimeRangePicker: React.FC<DateRangePickerProps> = (props) => {
   const classes = useStyle();
   const theme: { [key: string]: string } = useTheme();
   const themeMui = useMappedMuiTheme(theme);

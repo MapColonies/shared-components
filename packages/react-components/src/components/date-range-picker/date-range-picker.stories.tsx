@@ -18,6 +18,14 @@ DateTime.story = {
   name: 'Date time range',
 };
 
+export const DateOnly: CSFStory<JSX.Element> = () => (
+  <DateTimeRangePicker showTime={false} onChange={action('date changed')} />
+);
+
+DateOnly.story = {
+  name: 'Date range (date only)',
+};
+
 export const DateNoFutureLimitTime: CSFStory<JSX.Element> = () => <DateTimeRangePicker disableFuture={false} onChange={action('date changed')} />;
 
 DateNoFutureLimitTime.story = {
@@ -139,9 +147,9 @@ DateTimeLocalizedAsFormControl.argTypes = {
 
 export const DateTimeHebrewLocalizedAsFormControl: Story = (args: Record<string, unknown>) => {
   const local = {
-    setText: 'MySet',
-    startPlaceHolderText: 'MyStart',
-    endPlaceHolderText: 'MyEnd',
+    setText: 'אישור',
+    startPlaceHolderText: 'זמן התחלה',
+    endPlaceHolderText: 'זמן סיום',
     calendarLocale: SupportedLocales.HE,
   };
   return <DateTimeRangePickerFormControl local={local} renderAsButton={false} width={360} {...args} onChange={action('date changed')} />;
