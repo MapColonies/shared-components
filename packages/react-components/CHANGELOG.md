@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.1...@map-colonies/react-components@4.13.2) (2026-01-11)
+
+
+### Bug Fixes
+
+* build ([c077c28](https://github.com/MapColonies/shared-components/commit/c077c28dc04eb9e97715c89fbebf436302136d04))
+* close dialog when clicking outside ([82cae60](https://github.com/MapColonies/shared-components/commit/82cae60446aae3f128b3fd0d660bd4e958f625ac))
+* date range picker to support date only without time ([008a1c9](https://github.com/MapColonies/shared-components/commit/008a1c9d535c0c3208553de7f29f286d59dea14c))
+* date range picker without time only date ([2567061](https://github.com/MapColonies/shared-components/commit/25670616bb12c26bb25b26e06f17d977720e7e19))
+* fix ([4e1519c](https://github.com/MapColonies/shared-components/commit/4e1519cf76f40d1f44f3f71bed92c1f7d478622a))
+* pr ([70e4cdb](https://github.com/MapColonies/shared-components/commit/70e4cdba0ee77f2d7ba7c93d9a683fdf843f723d))
+* pr ([a40c493](https://github.com/MapColonies/shared-components/commit/a40c4931570fcc1925eb4e66943be3727f10f34b))
+* pr ([adfd9a6](https://github.com/MapColonies/shared-components/commit/adfd9a6f06a10c521f0031979a6e42a33e2d9041))
+* revert ([6f82721](https://github.com/MapColonies/shared-components/commit/6f82721b63fbc661b6096cb9ef367e8cd846f1e8))
+
+
+
+
+
 ## [4.13.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.0...@map-colonies/react-components@4.13.1) (2025-12-03)
 
 
