@@ -5,6 +5,7 @@
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
   "license": "MIT",
+  "description": "This package contains complex components like maps, datepicker, etc.",
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
