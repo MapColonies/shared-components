@@ -1,6 +1,6 @@
 {
   "name": "@map-colonies/react-components",
-  "version": "4.13.2",
+  "version": "4.13.3",
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
