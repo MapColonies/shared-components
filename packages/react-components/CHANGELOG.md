@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.4](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.3...@map-colonies/react-components@4.13.4) (2026-04-19)
+
+
+### Bug Fixes
+
+* add vector layer options ([1ccc4e4](https://github.com/MapColonies/shared-components/commit/1ccc4e4c39cb4985160420e025dcaa5f60d406d2))
+
+
+
+
+
 ## [4.13.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.2...@map-colonies/react-components@4.13.3) (2026-01-12)
 
 **Note:** Version bump only for package @map-colonies/react-components
