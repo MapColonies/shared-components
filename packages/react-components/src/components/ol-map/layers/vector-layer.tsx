@@ -1,6 +1,11 @@
 import React, { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react';
 import { Vector } from 'ol/layer';
+import { Options } from 'ol/layer/Base';
 import { useMap } from '../map';
+
+interface VectorLayerProps {
+  options?: Options;
+}
 
 const vectorLayerContext = createContext<Vector<any> | null>(null);
 const VectorLayerProvider = vectorLayerContext.Provider;
@@ -15,9 +20,9 @@ export const useVectorLayer = (): Vector<any> => {
   return layer;
 };
 
-export const VectorLayer: React.FC<PropsWithChildren> = ({ children }) => {
+export const VectorLayer: React.FC<PropsWithChildren<VectorLayerProps>> = ({ options, children }) => {
   const map = useMap();
-  const [vectorLayer] = useState(new Vector());
+  const [vectorLayer] = useState(new Vector(options));
 
   useEffect(() => {
     map.addLayer(vectorLayer);
