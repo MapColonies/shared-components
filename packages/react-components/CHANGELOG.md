@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.5](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.4...@map-colonies/react-components@4.13.5) (2026-05-12)
+
+
+### Bug Fixes
+
+* code review ([2f7ba00](https://github.com/MapColonies/shared-components/commit/2f7ba00150da4e3c004420e8bd021a46dc8ddb38))
+* missing key error in console ([e43c7ba](https://github.com/MapColonies/shared-components/commit/e43c7ba406b25090a4874a0f0b5491dcee233c5b))
+* property type was fixed to keep access to feature properties of clicked geometries on the map ([f6a0a41](https://github.com/MapColonies/shared-components/commit/f6a0a413bff9c38de5b7b3630b66096c4780b81d))
+
+
+
+
+
 ## [4.13.4](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.3...@map-colonies/react-components@4.13.4) (2026-04-19)
 
 
