@@ -349,7 +349,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
 
           <Box className="listsContainer">
             {options.map((option, index) => (
-              <List>
+              <List key={`option-${index}`}>
                 <Typography className="bold" tag="span">
                   {option.title ?? option.endPoint}
                 </Typography>
