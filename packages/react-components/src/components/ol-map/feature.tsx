@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react';
-import { Feature as GeoJSONFeatureObject, Geometry } from 'geojson';
+import { Feature, Geometry } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import { FitOptions } from 'ol/View';
 import { useVectorSource } from './source/vector-source';
@@ -7,7 +7,7 @@ import { useMap } from './map';
 import { Style } from 'ol/style';
 
 export interface FeatureProps {
-  geometry: Geometry | GeoJSONFeatureObject;
+  geometry: Geometry | Feature;
   fitOptions?: FitOptions;
   fit?: boolean;
   featureStyle?: Style;
