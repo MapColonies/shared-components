@@ -31,7 +31,7 @@ import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
-import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { DebuggerWidget } from './debug/debugger-widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
@@ -552,7 +552,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {props.geocoderPanel && <GeocoderWidget options={[...props.geocoderPanel]} locale={locale} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
+          {props.showDebuggerTool && <DebuggerWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element

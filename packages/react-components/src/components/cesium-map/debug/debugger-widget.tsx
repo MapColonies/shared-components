@@ -21,11 +21,11 @@ export type IActiveFeatureTypes = IFeatureTypeMetadata & {
   zoomLevel: number;
 };
 
-export interface IWFSDebugWidgetProps extends IWidgetProps {
+export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
-const WFSDebugComponent: React.FC<IWFSDebugWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
+const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
   const optimizationLabel = useMemo(() => get(locale, 'TILE_REQUESTS_OPTIMIZATION_CHECKBOX') ?? 'Tile requests optimization', [locale]);
@@ -125,4 +125,4 @@ const WFSDebugComponent: React.FC<IWFSDebugWidgetProps> = ({ locale, isOpen, set
   );
 };
 
-export const WFSDebugWidget = WidgetWrapper(WFSDebugComponent);
+export const DebuggerWidget = WidgetWrapper(DebuggerComponent);
