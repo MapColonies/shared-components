@@ -18,6 +18,10 @@ body[dir='rtl'] .cesium-viewer .cesium-viewer-toolbar {
 .cesium-viewer .widgetsContainer {
   top: 24px;
   left: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 body[dir='rtl'] .cesium-viewer .widgetsContainer {
