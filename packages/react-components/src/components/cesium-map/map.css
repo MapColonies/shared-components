@@ -29,6 +29,25 @@ body[dir='rtl'] .cesium-viewer .widgetsContainer {
   right: 10px;
 }
 
+.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-viewer-cesiumInspectorContainer {
+  left: 0;
+}
+
+body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-viewer-cesiumInspectorContainer {
+  left: unset;
+  right: 0;
+}
+
+.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-hidden {
+  width: 122px;
+  height: 17px;
+}
+
+.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-visible {
+  width: 185px;
+  height: auto;
+}
+
 .cesium-viewer .cesium-mc-tool {
   display: block;
   position: absolute;
@@ -151,7 +170,7 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
   right: unset;
 }
 
-/* #region for NATIVE CONTROLS */
+/* #region NATIVE CONTROLS */
 .cesium-viewer input[type='checkbox'] {
   accent-color: var(--mdc-theme-cesium-checkbox-color);
 }
@@ -182,10 +201,9 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
   background-color: #aaa;
   border-radius: 6px;
 }
-
 /* #endregion for NATIVE CONTROLS */
 
-/* #region for mdc-checkbox */
+/* #region mdc-checkbox */
 .cesium-viewer .mdc-checkbox .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
 .mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background,
 .mdc-checkbox .mdc-checkbox__native-control[data-indeterminate='true']:enabled ~ .mdc-checkbox__background {
@@ -220,7 +238,6 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
 .cesium-viewer .mdc-ripple-upgraded--unbounded {
   --mdc-ripple-fg-size: 0px !important;
 }
-
 /* #endregion mdc-checkbox */
 
 /* #region mdc-list */
@@ -242,7 +259,6 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
 .cesium-viewer .mdc-text-field--filled {
   height: 32px;
 }
-
 /* #endregion mdc-list */
 
 /* #region mdc-TextField */
@@ -266,7 +282,6 @@ body[dir='rtl'] .cesium-viewer .bottomToolsContainer {
 .cesium-viewer .mdc-line-ripple::after {
   border-bottom: none !important;
 }
-
 /* #endregion mdc-TextField */
 
 .cesium-viewer .disabled {
