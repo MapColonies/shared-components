@@ -38,14 +38,12 @@ body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-vie
   right: 0;
 }
 
-.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-hidden {
-  width: 122px;
-  height: 17px;
+.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector {
+  box-sizing: content-box;
 }
 
 .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-visible {
-  width: 185px;
-  height: auto;
+  width: auto;
 }
 
 .cesium-viewer .cesium-mc-tool {
