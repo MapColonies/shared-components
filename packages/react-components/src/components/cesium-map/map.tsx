@@ -566,11 +566,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
           {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
-          {viewState?.showCesiumInspector && (
-            <Box className="cesium-viewer-cesiumInspectorWrapper">
-              <InspectorTool />
-            </Box>
-          )}
+          {viewState?.showCesiumInspector && <InspectorTool />}
         </Box>,
         document.querySelector('.cesium-widget') as Element
       )
