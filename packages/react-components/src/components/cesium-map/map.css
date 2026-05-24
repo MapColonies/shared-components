@@ -42,6 +42,10 @@ body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-vie
   box-sizing: content-box;
 }
 
+.cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-hidden {
+  height: 16px;
+}
+
 .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-visible {
   width: auto;
 }
