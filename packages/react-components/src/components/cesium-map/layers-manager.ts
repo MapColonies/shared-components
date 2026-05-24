@@ -65,7 +65,7 @@ class LayerManager {
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
-  private readonly shouldOptimizedTileRequests?: boolean;
+  private shouldOptimizedTileRequests?: boolean;
 
   public constructor(
     mapViewer: CesiumViewer,
@@ -446,6 +446,10 @@ class LayerManager {
 
   public removeDataLayerUpdatedListener(callback: (meta: any) => void): void {
     this.dataLayerUpdated.removeEventListener(callback, this);
+  }
+
+  public setShouldOptimizedTileRequests(shouldOptimize: boolean): void {
+    this.shouldOptimizedTileRequests = shouldOptimize;
   }
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {

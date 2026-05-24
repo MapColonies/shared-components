@@ -325,6 +325,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.baseMaps, mapViewRef]);
 
   useEffect(() => {
+    if (mapViewRef?.layersManager) {
+      mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
+    }
+  }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
+
+  useEffect(() => {
     const newTerrains = props.terrains || ((mapViewRef && mapViewRef.terrainProvider) ? [{
       id: '1',
       url: DEFAULT_TERRAIN_PROVIDER_URL,
