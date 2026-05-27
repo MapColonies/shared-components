@@ -417,7 +417,7 @@ class LayerManager {
     // Worldwide transparent layer
     const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(
       new SingleTileImageryProvider({
-        url: './assets/img/transparent-tile.png',
+        url: window.location.origin + window.location.pathname + '/assets/img/transparent-tile.png',
         /* eslint-disable @typescript-eslint/no-magic-numbers */
         rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
         /* eslint-enable @typescript-eslint/no-magic-numbers */
