@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.14.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.5...@map-colonies/react-components@4.14.0) (2026-05-27)
+
+
+### Bug Fixes
+
+* cesium inspector hidden button css ([081f244](https://github.com/MapColonies/shared-components/commit/081f2442218e8a368e2ee1bd915347fbb4f10ac1))
+* code review ([cf3482a](https://github.com/MapColonies/shared-components/commit/cf3482a0ea6f2902e0996ce5a860d4d1c7119214))
+* code review ([f44066b](https://github.com/MapColonies/shared-components/commit/f44066b99a38dafd6b4c8e1414010f8df841188e))
+* height ([737dd16](https://github.com/MapColonies/shared-components/commit/737dd16cfbf4d18ab9e2f9e41267a7b1a4915927))
+* missing cesium inspector css ([6f58336](https://github.com/MapColonies/shared-components/commit/6f583368f459daed8ce0d936f6724c9060babfcb))
+* optimized tile requesting story ([c88f741](https://github.com/MapColonies/shared-components/commit/c88f741b8deb5441259fc9a44d7fec51b5587aa2))
+* setShouldOptimizedTileRequests ([2b6385e](https://github.com/MapColonies/shared-components/commit/2b6385e29245c50ead5f7e20076e8120d2f1305b))
+* transparent tile asset location ([4f3619f](https://github.com/MapColonies/shared-components/commit/4f3619fcee92414c75d1d8c659ae2db25a9c66c9))
+
+
+### Features
+
+* tiles optimization plus cesium inspector ([cb5871f](https://github.com/MapColonies/shared-components/commit/cb5871f2fddd20d4645b62c9baa1c6be6fa5cf20))
+
+
+
+
+
 ## [4.13.5](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.4...@map-colonies/react-components@4.13.5) (2026-05-12)
 
 
