@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap } from '../map';
+import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -11,19 +11,6 @@ export default {
   component: CesiumMap,
   parameters: {
     layout: 'fullscreen',
-  },
-  args: {
-    useOptimizedTileRequests: true,
-  },
-  argTypes: {
-    useOptimizedTileRequests: {
-      description:
-        'Should the viewer determine layer relevancy based on its visibility and presence in scene. (Improves bandwidth usage and overall performance)',
-      table: {
-        defaultValue: { summary: 'false' },
-      },
-      control: 'boolean',
-    },
   },
 } as Meta;
 
@@ -40,17 +27,14 @@ const mapViewProps: CesiumMapProps = {
   baseMaps: BASE_MAPS as IBaseMaps,
 };
 
-interface OptimizedTileRequestingMapStoryProps {
-  useOptimizedTileRequests: boolean;
-}
-
 interface LayerRelevancy {
   layerId?: string;
   isRelevant?: boolean;
 }
 
-const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({ useOptimizedTileRequests }) => {
+const RelevancyPresentor: React.FC = () => {
   const viewer = useCesiumMap();
+  const { viewState } = useCesiumMapViewstate();
   const [layersRelevancy, setLayersRelevancy] = useState<LayerRelevancy[]>([]);
 
   const updateLayerRelevancy = (): void => {
@@ -100,7 +84,7 @@ const RelevancyPresentor: React.FC<OptimizedTileRequestingMapStoryProps> = ({ us
           minHeight: '200px',
         }}
       >
-        <h3>{`Optimized Tile Requesting: ${useOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
+        <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
         {layersRelevancy.map((layer) => {
           return (
             <div>
@@ -197,16 +181,12 @@ const LayersContainer: React.FC = () => {
   );
 };
 
-export const OptimizedTileRequestingMap: Story<OptimizedTileRequestingMapStoryProps> = (args) => {
+export const OptimizedTileRequestingMap: Story = () => {
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...mapViewProps}
-        useOptimizedTileRequests={args.useOptimizedTileRequests}
-        key={args.useOptimizedTileRequests ? 'OPTIMIZED_MAP' : 'REGULAR_MAP'}
-      >
+      <CesiumMap {...mapViewProps} showDebuggerTool={true}>
         <LayersContainer />
-        <RelevancyPresentor useOptimizedTileRequests={args.useOptimizedTileRequests} />
+        <RelevancyPresentor />
       </CesiumMap>
     </div>
   );

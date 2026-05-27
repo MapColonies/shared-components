@@ -1,8 +1,20 @@
+.cesium-viewer .wfsContainer {
+  margin-top: 12px;
+}
+
 .cesium-viewer .wfsContainer .title {
   text-align: center;
   font-weight: bold;
   margin-bottom: 12px;
   width: 260px;
+}
+
+.cesium-viewer .optimizationCheckbox {
+  margin-bottom: 12px;
+}
+
+.cesium-viewer .cesiumInspectorCheckbox {
+  margin-bottom: 12px;
 }
 
 .cesium-viewer .wfsContainer .featureType {

@@ -31,7 +31,7 @@ import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
-import { WFSDebugWidget } from './debug/wfs-debug-widget';
+import { DebuggerWidget } from './debug/debugger-widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
@@ -40,6 +40,7 @@ import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
+import { InspectorTool } from './tools/inspector.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
 import { ZoomButtons } from './tools/zoom-buttons';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
@@ -81,6 +82,7 @@ export class CesiumViewer extends CesiumViewerCls {
 export type MapViewState = {
   currentZoomLevel: number;
   shouldOptimizedTileRequests: boolean;
+  showCesiumInspector: boolean;
 };
 
 interface IMapViewState {
@@ -156,7 +158,6 @@ export interface CesiumMapProps extends ViewerProps {
   locale?: { [key: string]: string };
   baseMaps?: IBaseMaps;
   terrains?: ITerrain[];
-  useOptimizedTileRequests?: boolean;
   terrainProvider?: TerrainProvider;
   imageryContextMenu?: React.ReactElement<IContextMenuData>;
   imageryContextMenuSize?: {
@@ -224,7 +225,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setViewState({
       currentZoomLevel: -1,
-      shouldOptimizedTileRequests: props.useOptimizedTileRequests ?? false,
+      shouldOptimizedTileRequests: false,
+      showCesiumInspector: false,
     });
   }, []);
 
@@ -312,7 +314,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         setViewState,
       };
     }
-  }, [props.useOptimizedTileRequests, props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
+  }, [props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
@@ -321,6 +323,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
   }, [props.baseMaps, mapViewRef]);
+
+  useEffect(() => {
+    if (mapViewRef?.layersManager) {
+      mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
+    }
+  }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
     const newTerrains = props.terrains || ((mapViewRef && mapViewRef.terrainProvider) ? [{
@@ -550,7 +558,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {props.geocoderPanel && <GeocoderWidget options={[...props.geocoderPanel]} locale={locale} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.showDebuggerTool && <WFSDebugWidget locale={locale} />}
+          {props.showDebuggerTool && <DebuggerWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         document.querySelector('.cesium-viewer-toolbar') as Element
@@ -564,11 +572,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       createPortal(
         <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
           {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
+          {viewState?.showCesiumInspector && <InspectorTool />}
         </Box>,
         document.querySelector('.cesium-widget') as Element
       )
     );
-  }, [mapViewRef, locale]);
+  }, [mapViewRef, locale, viewState?.showCesiumInspector]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
