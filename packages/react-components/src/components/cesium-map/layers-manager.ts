@@ -436,6 +436,8 @@ class LayerManager {
       this.bindRelevancyListeners();
       this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
       return;
     }
 
@@ -486,11 +488,17 @@ class LayerManager {
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
-      if (this.isBaseMapLayer(layer.meta)) {
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      if (layer.meta?.relevantToExtent !== layer.show && layer.imageryProvider.ready) {
-        layer.show = (layer.meta?.relevantToExtent as boolean | undefined) ?? true;
+
+      const relevantToExtent = layer.meta?.relevantToExtent;
+      if (typeof relevantToExtent !== 'boolean') {
+        continue;
+      }
+
+      if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
+        layer.show = relevantToExtent;
       }
     }
   }
@@ -553,6 +561,9 @@ class LayerManager {
   private markRelevantLayersForExtent(): void {
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
+      if (isEmpty(extent)) {
+        return;
+      }
 
       // Iterating in reverse order so that top layer is first.
       for (let i = this.layers.length - 1; i >= 0; i--) {

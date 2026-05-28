@@ -6,12 +6,12 @@ import { TileOsm } from '../osm';
 
 const wmtsOptions = getWMTSOptions({
   attributions: 'Tiles © ArcGIS',
-  url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
-  layer: '0',
+  url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS',
+  layer: 'USGSShadedReliefOnly',
   projection: 'EPSG:3857',
-  format: 'image/png',
+  format: 'image/jpeg',
   style: 'default',
-  matrixSet: 'EPSG:3857',
+  matrixSet: 'default028mm',
   heightWidthRatio: 1,
   requestEncoding: 'KVP',
 });
