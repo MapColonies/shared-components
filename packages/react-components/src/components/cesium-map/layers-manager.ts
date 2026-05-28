@@ -66,6 +66,8 @@ class LayerManager {
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
   private shouldOptimizedTileRequests?: boolean;
+  private relevancyListenersCleanup: Array<() => void>;
+  private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
 
   public constructor(
     mapViewer: CesiumViewer,
@@ -84,42 +86,15 @@ class LayerManager {
     this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
+    this.relevancyListenersCleanup = [];
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
     }
 
-    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
+    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled
     if (this.shouldOptimizedTileRequests) {
-      this.addLayerUpdatedListener((meta: Record<string, unknown>) => {
-        const newMetaKeys = Object.keys(meta);
-        const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
-        if (shouldTriggerRelevancyCheck) {
-          this.markRelevantLayersForExtent();
-          this.hideNonRelevantLayers();
-        }
-      });
-
-      this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
-        this.setLegends();
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.camera.moveEnd.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
+      this.bindRelevancyListeners();
     }
   }
 
@@ -144,7 +119,7 @@ class LayerManager {
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
     const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
 
-    Promise.all(layersReadyPromises).then((data) => {
+    Promise.all(layersReadyPromises).then(() => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -449,7 +424,20 @@ class LayerManager {
   }
 
   public setShouldOptimizedTileRequests(shouldOptimize: boolean): void {
+    if (this.shouldOptimizedTileRequests === shouldOptimize) {
+      return;
+    }
+
     this.shouldOptimizedTileRequests = shouldOptimize;
+
+    if (shouldOptimize) {
+      this.bindRelevancyListeners();
+      this.removeLayer(TRANSPARENT_LAYER_ID);
+      this.addTransparentImageryProvider();
+      return;
+    }
+
+    this.unbindRelevancyListeners();
   }
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
@@ -479,7 +467,7 @@ class LayerManager {
     });
   }
 
-  private updateLayersOrder(id: string, from: number, to: number): void {
+  private updateLayersOrder(_id: string, from: number, to: number): void {
     const move = from > to ? INC : DEC;
     const min = from < to ? from : to;
     const max = from < to ? to : from;
@@ -496,10 +484,68 @@ class LayerManager {
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
+      if (this.isBaseMapLayer(layer.meta)) {
+        continue;
+      }
       if (layer.meta?.relevantToExtent !== layer.show && layer.imageryProvider.ready) {
         layer.show = (layer.meta?.relevantToExtent as boolean | undefined) ?? true;
       }
     }
+  }
+
+  private bindRelevancyListeners(): void {
+    if (this.relevancyListenersCleanup.length > 0) {
+      return;
+    }
+
+    this.relevancyLayerUpdatedHandler = (meta: Record<string, unknown>) => {
+      const newMetaKeys = Object.keys(meta);
+      const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
+      if (shouldTriggerRelevancyCheck) {
+        this.markRelevantLayersForExtent();
+        this.hideNonRelevantLayers();
+      }
+    };
+
+    this.addLayerUpdatedListener(this.relevancyLayerUpdatedHandler);
+    this.relevancyListenersCleanup.push(() => {
+      if (this.relevancyLayerUpdatedHandler) {
+        this.removeLayerUpdatedListener(this.relevancyLayerUpdatedHandler);
+      }
+    });
+
+    const removeLayerRemovedListener = this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
+      this.setLegends();
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerRemovedListener);
+
+    const removeLayerMovedListener = this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerMovedListener);
+
+    const removeLayerAddedListener = this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerAddedListener);
+
+    const removeMoveEndListener = this.mapViewer.camera.moveEnd.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeMoveEndListener);
+  }
+
+  private unbindRelevancyListeners(): void {
+    this.relevancyListenersCleanup.forEach((cleanup) => {
+      cleanup();
+    });
+    this.relevancyListenersCleanup = [];
+    this.relevancyLayerUpdatedHandler = undefined;
   }
 
   private markRelevantLayersForExtent(): void {

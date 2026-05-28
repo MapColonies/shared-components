@@ -90,7 +90,7 @@ const RelevancyPresentor: React.FC = () => {
           return (
             <div key={`${layer.layerId ?? 'layer-'+index}`}>
               <p>Layer Id: {`${layer.layerId ?? 'layer-'+index}`}</p>
-              <p>Requesting tiles: {layer.isRelevant?.toString()}</p>
+              <p>Requesting tiles: {layer.isRelevant?.toString() ?? 'N/A (enable optimization)'}</p>
             </div>
           );
         })}
@@ -126,7 +126,7 @@ const LayersContainer: React.FC = () => {
   };
 
   const optionsXYZOpaque = {
-    url: 'http://stamen-tiles-b.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
+    url: 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png',
     footprint: {
       coordinates: [
         [
@@ -159,7 +159,7 @@ const LayersContainer: React.FC = () => {
             )
           }
         >
-          Layer With Transparency
+          Transparent layer
         </button>
 
         <button
