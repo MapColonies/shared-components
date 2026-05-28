@@ -383,16 +383,18 @@ class LayerManager {
         return layer2.meta?.zIndex - layer1.meta?.zIndex;
       });
     } else {
-      console.warn('[LayerManager] [findLayerByPOI]layerManagerFootprintMetaFieldPath is not defined');
+      console.warn('[LayerManager] [findLayerByPOI] layerManagerFootprintMetaFieldPath is not defined');
       return [];
     }
   }
 
   public addTransparentImageryProvider(): void {
     // Worldwide transparent layer
+    const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
+
     const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(
       new SingleTileImageryProvider({
-        url: window.location.origin + window.location.pathname + '/assets/img/transparent-tile.png',
+        url: transparentTileUrl,
         /* eslint-disable @typescript-eslint/no-magic-numbers */
         rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
         /* eslint-enable @typescript-eslint/no-magic-numbers */
