@@ -442,6 +442,9 @@ class LayerManager {
     }
 
     this.unbindRelevancyListeners();
+    this.removeLayer(TRANSPARENT_LAYER_ID);
+    this.restoreAllLayersVisibility();
+    this.clearLayersRelevancy();
   }
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
@@ -499,6 +502,30 @@ class LayerManager {
 
       if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
         layer.show = relevantToExtent;
+      }
+    }
+  }
+
+  private restoreAllLayersVisibility(): void {
+    for (const layer of this.layers) {
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+      if (layer.imageryProvider.ready) {
+        layer.show = true;
+      }
+    }
+  }
+
+  private clearLayersRelevancy(): void {
+    for (const layer of this.layers) {
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+      if (layer.meta && 'relevantToExtent' in layer.meta) {
+        const { relevantToExtent, ...restMeta } = layer.meta;
+        void relevantToExtent;
+        layer.meta = restMeta;
       }
     }
   }

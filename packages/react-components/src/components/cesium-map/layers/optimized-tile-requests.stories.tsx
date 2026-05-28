@@ -64,11 +64,22 @@ const RelevancyPresentor: React.FC = () => {
       updateLayerRelevancy();
     });
 
+    const handleLayerUpdated = (): void => {
+      updateLayerRelevancy();
+    };
+
+    viewer.layersManager?.addLayerUpdatedListener(handleLayerUpdated);
+
     return (): void => {
       removeTileLoad();
       removeMoveEnd();
+      viewer.layersManager?.removeLayerUpdatedListener(handleLayerUpdated);
     };
-  }, []);
+  }, [viewer]);
+
+  useEffect(() => {
+    updateLayerRelevancy();
+  }, [viewState?.shouldOptimizedTileRequests]);
 
   return (
     <>
