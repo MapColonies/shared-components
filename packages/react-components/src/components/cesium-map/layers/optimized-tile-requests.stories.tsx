@@ -65,6 +65,7 @@ const RelevancyPresentor: React.FC = () => {
     });
 
     return (): void => {
+      removeTileLoad();
       removeMoveEnd();
     };
   }, []);
@@ -85,10 +86,10 @@ const RelevancyPresentor: React.FC = () => {
         }}
       >
         <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {layersRelevancy.map((layer) => {
+        {layersRelevancy.map((layer, index) => {
           return (
-            <div>
-              <p>Layer Id: {layer.layerId}</p>
+            <div key={`${layer.layerId ?? 'layer-'+index}`}>
+              <p>Layer Id: {`${layer.layerId ?? 'layer-'+index}`}</p>
               <p>Requesting tiles: {layer.isRelevant?.toString()}</p>
             </div>
           );

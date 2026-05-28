@@ -21,5 +21,5 @@ export const CesiumXYZLayer: React.FC<RCesiumXYZLayerProps> = (props) => {
       : new UrlTemplateImageryProvider(options);
   }, [viewState.shouldOptimizedTileRequests]);
 
-  return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;
+  return <CesiumImageryLayer key={`xyz-${String(viewState.shouldOptimizedTileRequests)}`} {...restProps} imageryProvider={providerInstance} />;
 };
