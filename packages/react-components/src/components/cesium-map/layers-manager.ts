@@ -592,72 +592,49 @@ class LayerManager {
         return;
       }
 
-      // Iterating in reverse order so that top layer is first.
+      // Iterating in reverse order so that top layer is first
       for (let i = this.layers.length - 1; i >= 0; i--) {
         const layer = this.layers[i];
-        const intersectsExtent = !isEmpty(extent) && !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle);
+        const intersectsExtent = !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle) instanceof Rectangle;
 
-        // Iterating from top layer until the current. (inclusive)
-        for (let j = this.layers.length - 1; j >= i; j--) {
-          if (layer.meta?.skipRelevancyCheck === true) {
-            layer.meta = { ...layer.meta, relevantToExtent: true };
+        if (layer.meta?.skipRelevancyCheck === true) {
+          layer.meta = { ...layer.meta, relevantToExtent: true };
+          continue;
+        }
+
+        if (!intersectsExtent) {
+          layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
+          continue;
+        }
+
+        let isOccludedByOpaqueLayerAbove = false;
+
+        // Iterating from top layer until the current layer (exclusive)
+        for (let j = this.layers.length - 1; j > i; j--) {
+          const layerAbove = this.layers[j];
+
+          if (layerAbove.show === false) {
             continue;
           }
 
-          const layerAbove = this.layers[j];
           const layerAboveHasTransparency = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === true;
+          const layerAboveIsOpaque = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === false;
+          const layerAboveIntersectsExtent =
+            !isEmpty(layerAbove.rectangle) && Rectangle.intersection(extent, layerAbove.rectangle) instanceof Rectangle;
+          const layerAboveCoversCurrentExtent =
+            !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
 
-          if (layer !== layerAbove) {
-            // Layer is relevant if in extent and there is no layer above it which is opaque and contains it.
-            if (intersectsExtent instanceof Rectangle) {
-              if (cesiumRectangleContained(extent, layer.rectangle)) {
-                // Layer contains the extent.
-                if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
-                  layer.meta = {
-                    ...(layer.meta ?? {}),
-                    relevantToExtent: false,
-                  };
-                  break;
-                } else {
-                  layer.meta = {
-                    ...(layer.meta ?? {}),
-                    relevantToExtent: true,
-                  };
-                }
-              }
-
-              if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
-                layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
-                break;
-              }
-
-              if (cesiumRectangleContained(layer.rectangle, layerAbove.rectangle)) {
-                layer.meta = {
-                  ...(layer.meta ?? {}),
-                  relevantToExtent: layerAboveHasTransparency,
-                };
-
-                // Once there is layer above that hides it, no need to continue to check.
-                if (!layerAboveHasTransparency) {
-                  break;
-                }
-              } else {
-                // Not contained by layer above it, and inside the extent.
-                layer.meta = { ...(layer.meta ?? {}), relevantToExtent: true };
-              }
-            } else {
-              layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
-            }
-          } else {
-            // Handle top layer
-            if (i === this.layers.length - 1) {
-              layer.meta = {
-                ...(layer.meta ?? {}),
-                relevantToExtent: intersectsExtent instanceof Rectangle,
-              };
-            }
+          if (layerAboveIntersectsExtent && layerAboveCoversCurrentExtent && layerAboveIsOpaque && !layerAboveHasTransparency) {
+            isOccludedByOpaqueLayerAbove = true;
+            break;
           }
         }
+
+        // Layer is relevant if it intersects extent and has no opaque layer above it
+        layer.meta = {
+          ...(layer.meta ?? {}),
+          relevantToExtent: !isOccludedByOpaqueLayerAbove,
+        };
       }
     } catch (e) {
       console.error(e);
