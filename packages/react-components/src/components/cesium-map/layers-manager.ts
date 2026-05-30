@@ -66,6 +66,8 @@ class LayerManager {
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
   private shouldOptimizedTileRequests?: boolean;
+  private relevancyListenersCleanup: Array<() => void>;
+  private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
 
   public constructor(
     mapViewer: CesiumViewer,
@@ -84,42 +86,15 @@ class LayerManager {
     this.dataLayerUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
+    this.relevancyListenersCleanup = [];
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
     }
 
-    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled.
+    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled
     if (this.shouldOptimizedTileRequests) {
-      this.addLayerUpdatedListener((meta: Record<string, unknown>) => {
-        const newMetaKeys = Object.keys(meta);
-        const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
-        if (shouldTriggerRelevancyCheck) {
-          this.markRelevantLayersForExtent();
-          this.hideNonRelevantLayers();
-        }
-      });
-
-      this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
-        this.setLegends();
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
-
-      this.mapViewer.camera.moveEnd.addEventListener(() => {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
-      });
+      this.bindRelevancyListeners();
     }
   }
 
@@ -144,7 +119,7 @@ class LayerManager {
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
     const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
 
-    Promise.all(layersReadyPromises).then((data) => {
+    Promise.all(layersReadyPromises).then(() => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -408,16 +383,18 @@ class LayerManager {
         return layer2.meta?.zIndex - layer1.meta?.zIndex;
       });
     } else {
-      console.warn('[LayerManager] [findLayerByPOI]layerManagerFootprintMetaFieldPath is not defined');
+      console.warn('[LayerManager] [findLayerByPOI] layerManagerFootprintMetaFieldPath is not defined');
       return [];
     }
   }
 
   public addTransparentImageryProvider(): void {
     // Worldwide transparent layer
+    const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
+
     const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(
       new SingleTileImageryProvider({
-        url: window.location.origin + window.location.pathname + '/assets/img/transparent-tile.png',
+        url: transparentTileUrl,
         /* eslint-disable @typescript-eslint/no-magic-numbers */
         rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
         /* eslint-enable @typescript-eslint/no-magic-numbers */
@@ -449,7 +426,25 @@ class LayerManager {
   }
 
   public setShouldOptimizedTileRequests(shouldOptimize: boolean): void {
+    if (this.shouldOptimizedTileRequests === shouldOptimize) {
+      return;
+    }
+
     this.shouldOptimizedTileRequests = shouldOptimize;
+
+    if (shouldOptimize) {
+      this.bindRelevancyListeners();
+      this.removeLayer(TRANSPARENT_LAYER_ID);
+      this.addTransparentImageryProvider();
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+      return;
+    }
+
+    this.unbindRelevancyListeners();
+    this.removeLayer(TRANSPARENT_LAYER_ID);
+    this.restoreAllLayersVisibility();
+    this.clearLayersRelevancy();
   }
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
@@ -479,7 +474,7 @@ class LayerManager {
     });
   }
 
-  private updateLayersOrder(id: string, from: number, to: number): void {
+  private updateLayersOrder(_id: string, from: number, to: number): void {
     const move = from > to ? INC : DEC;
     const min = from < to ? from : to;
     const max = from < to ? to : from;
@@ -496,82 +491,150 @@ class LayerManager {
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.relevantToExtent !== layer.show && layer.imageryProvider.ready) {
-        layer.show = (layer.meta?.relevantToExtent as boolean | undefined) ?? true;
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+
+      const relevantToExtent = layer.meta?.relevantToExtent;
+      if (typeof relevantToExtent !== 'boolean') {
+        continue;
+      }
+
+      if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
+        layer.show = relevantToExtent;
       }
     }
+  }
+
+  private restoreAllLayersVisibility(): void {
+    for (const layer of this.layers) {
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+      if (layer.imageryProvider.ready) {
+        layer.show = true;
+      }
+    }
+  }
+
+  private clearLayersRelevancy(): void {
+    for (const layer of this.layers) {
+      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+      if (layer.meta && 'relevantToExtent' in layer.meta) {
+        const { relevantToExtent, ...restMeta } = layer.meta;
+        void relevantToExtent;
+        layer.meta = restMeta;
+      }
+    }
+  }
+
+  private bindRelevancyListeners(): void {
+    if (this.relevancyListenersCleanup.length > 0) {
+      return;
+    }
+
+    this.relevancyLayerUpdatedHandler = (meta: Record<string, unknown>) => {
+      const newMetaKeys = Object.keys(meta);
+      const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
+      if (shouldTriggerRelevancyCheck) {
+        this.markRelevantLayersForExtent();
+        this.hideNonRelevantLayers();
+      }
+    };
+
+    this.addLayerUpdatedListener(this.relevancyLayerUpdatedHandler);
+    this.relevancyListenersCleanup.push(() => {
+      if (this.relevancyLayerUpdatedHandler) {
+        this.removeLayerUpdatedListener(this.relevancyLayerUpdatedHandler);
+      }
+    });
+
+    const removeLayerRemovedListener = this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
+      this.setLegends();
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerRemovedListener);
+
+    const removeLayerMovedListener = this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerMovedListener);
+
+    const removeLayerAddedListener = this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeLayerAddedListener);
+
+    const removeMoveEndListener = this.mapViewer.camera.moveEnd.addEventListener(() => {
+      this.markRelevantLayersForExtent();
+      this.hideNonRelevantLayers();
+    });
+    this.relevancyListenersCleanup.push(removeMoveEndListener);
+  }
+
+  private unbindRelevancyListeners(): void {
+    this.relevancyListenersCleanup.forEach((cleanup) => {
+      cleanup();
+    });
+    this.relevancyListenersCleanup = [];
+    this.relevancyLayerUpdatedHandler = undefined;
   }
 
   private markRelevantLayersForExtent(): void {
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
+      if (isEmpty(extent)) {
+        return;
+      }
 
-      // Iterating in reverse order so that top layer is first.
+      // Iterating in reverse order so that top layer is first
       for (let i = this.layers.length - 1; i >= 0; i--) {
         const layer = this.layers[i];
-        const intersectsExtent = !isEmpty(extent) && !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle);
+        const intersectsExtent = !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle) instanceof Rectangle;
 
-        // Iterating from top layer until the current. (inclusive)
-        for (let j = this.layers.length - 1; j >= i; j--) {
-          if (layer.meta?.skipRelevancyCheck === true) {
-            layer.meta = { ...layer.meta, relevantToExtent: true };
+        if (layer.meta?.skipRelevancyCheck === true) {
+          layer.meta = { ...layer.meta, relevantToExtent: true };
+          continue;
+        }
+
+        if (!intersectsExtent) {
+          layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
+          continue;
+        }
+
+        let isOccludedByOpaqueLayerAbove = false;
+
+        // Iterating from top layer until the current layer (exclusive)
+        for (let j = this.layers.length - 1; j > i; j--) {
+          const layerAbove = this.layers[j];
+
+          if (layerAbove.show === false) {
             continue;
           }
 
-          const layerAbove = this.layers[j];
           const layerAboveHasTransparency = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === true;
+          const layerAboveIsOpaque = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === false;
+          const layerAboveIntersectsExtent =
+            !isEmpty(layerAbove.rectangle) && Rectangle.intersection(extent, layerAbove.rectangle) instanceof Rectangle;
+          const layerAboveCoversCurrentExtent =
+            !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
 
-          if (layer !== layerAbove) {
-            // Layer is relevant if in extent and there is no layer above it which is opaque and contains it.
-            if (intersectsExtent instanceof Rectangle) {
-              if (cesiumRectangleContained(extent, layer.rectangle)) {
-                // Layer contains the extent.
-                if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
-                  layer.meta = {
-                    ...(layer.meta ?? {}),
-                    relevantToExtent: false,
-                  };
-                  break;
-                } else {
-                  layer.meta = {
-                    ...(layer.meta ?? {}),
-                    relevantToExtent: true,
-                  };
-                }
-              }
-
-              if (cesiumRectangleContained(extent, layerAbove.rectangle) && !layerAboveHasTransparency) {
-                layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
-                break;
-              }
-
-              if (cesiumRectangleContained(layer.rectangle, layerAbove.rectangle)) {
-                layer.meta = {
-                  ...(layer.meta ?? {}),
-                  relevantToExtent: layerAboveHasTransparency,
-                };
-
-                // Once there is layer above that hides it, no need to continue to check.
-                if (!layerAboveHasTransparency) {
-                  break;
-                }
-              } else {
-                // Not contained by layer above it, and inside the extent.
-                layer.meta = { ...(layer.meta ?? {}), relevantToExtent: true };
-              }
-            } else {
-              layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
-            }
-          } else {
-            // Handle top layer
-            if (i === this.layers.length - 1) {
-              layer.meta = {
-                ...(layer.meta ?? {}),
-                relevantToExtent: intersectsExtent instanceof Rectangle,
-              };
-            }
+          if (layerAboveIntersectsExtent && layerAboveCoversCurrentExtent && layerAboveIsOpaque && !layerAboveHasTransparency) {
+            isOccludedByOpaqueLayerAbove = true;
+            break;
           }
         }
+
+        // Layer is relevant if it intersects extent and has no opaque layer above it
+        layer.meta = {
+          ...(layer.meta ?? {}),
+          relevantToExtent: !isOccludedByOpaqueLayerAbove,
+        };
       }
     } catch (e) {
       console.error(e);

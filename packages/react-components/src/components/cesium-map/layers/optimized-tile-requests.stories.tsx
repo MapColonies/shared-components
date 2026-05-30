@@ -64,10 +64,22 @@ const RelevancyPresentor: React.FC = () => {
       updateLayerRelevancy();
     });
 
-    return (): void => {
-      removeMoveEnd();
+    const handleLayerUpdated = (): void => {
+      updateLayerRelevancy();
     };
-  }, []);
+
+    viewer.layersManager?.addLayerUpdatedListener(handleLayerUpdated);
+
+    return (): void => {
+      removeTileLoad();
+      removeMoveEnd();
+      viewer.layersManager?.removeLayerUpdatedListener(handleLayerUpdated);
+    };
+  }, [viewer]);
+
+  useEffect(() => {
+    updateLayerRelevancy();
+  }, [viewState?.shouldOptimizedTileRequests]);
 
   return (
     <>
@@ -85,11 +97,11 @@ const RelevancyPresentor: React.FC = () => {
         }}
       >
         <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {layersRelevancy.map((layer) => {
+        {layersRelevancy.map((layer, index) => {
           return (
-            <div>
-              <p>Layer Id: {layer.layerId}</p>
-              <p>Requesting tiles: {layer.isRelevant?.toString()}</p>
+            <div key={`${layer.layerId ?? 'layer-'+index}`}>
+              <p>Layer Id: {`${layer.layerId ?? 'layer-'+index}`}</p>
+              <p>Requesting tiles: {layer.isRelevant?.toString() ?? 'N/A (enable optimization)'}</p>
             </div>
           );
         })}
@@ -125,7 +137,7 @@ const LayersContainer: React.FC = () => {
   };
 
   const optionsXYZOpaque = {
-    url: 'http://stamen-tiles-b.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
+    url: 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png',
     footprint: {
       coordinates: [
         [
@@ -158,7 +170,7 @@ const LayersContainer: React.FC = () => {
             )
           }
         >
-          Layer With Transparency
+          Transparent layer
         </button>
 
         <button
