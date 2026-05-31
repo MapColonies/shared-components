@@ -405,7 +405,6 @@ LocalizedMap.argTypes = {
       METERS_UNIT: "מ'",
       KILOMETERS_UNIT: "קמ'",
       ZOOM_LABEL: 'זום',
-      DEBUG_PANEL_TITLE: 'דיבאגר',
       TILE_REQUESTS_OPTIMIZATION_CHECKBOX: 'אופטימיזציית בקשות אריחים',
       CESIUM_INSPECTOR_CHECKBOX: 'כלי בדיקה של סזיום',
       SHOW_FEATURE_ON_MAP: "הראה על המפה",

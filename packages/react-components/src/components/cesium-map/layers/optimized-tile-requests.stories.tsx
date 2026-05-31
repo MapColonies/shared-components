@@ -100,7 +100,7 @@ const RelevancyPresentor: React.FC = () => {
         {layersMeta.map((layer, index) => {
           return (
             <div key={`${layer.layerId ?? 'LAYER-'+index}`}>
-              <p>{`${layer.layerId ?? 'LAYER-'+index}${layer.meta?.relevantToExtent === true ? ' --> show' : layer.meta?.relevantToExtent === false ? ' --> hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}</p>
+              <p>{`${layer.layerId ?? 'LAYER-'+index}${layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}</p>
             </div>
           );
         })}

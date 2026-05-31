@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { Checkbox } from '@map-colonies/react-core';
+import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
 import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { WFS } from './wfs';
+
+import './debugger-widget.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -25,14 +28,59 @@ export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
+interface LayerMetaItem {
+  layerId?: string;
+  meta?: Record<string, unknown>;
+}
+
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
+  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
+  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debug', [locale]);
+  const dataSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_DATA') ?? 'Data', [locale]);
+  const layersSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_LAYERS') ?? 'Layers', [locale]);
+  const toolsSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_TOOLS') ?? 'Tools', [locale]);
   const optimizationLabel = useMemo(() => get(locale, 'TILE_REQUESTS_OPTIMIZATION_CHECKBOX') ?? 'Tile requests optimization', [locale]);
   const cesiumInspectorLabel = useMemo(() => get(locale, 'CESIUM_INSPECTOR_CHECKBOX') ?? 'Cesium Inspector', [locale]);
 
   const mapViewer = useCesiumMap();
   const { viewState, setViewState } = useCesiumMapViewstate();
+
+  const updateLayerMeta = (): void => {
+    if (!mapViewer.layersManager?.layerList) return;
+    setLayersMeta(
+      mapViewer.layersManager.layerList
+        .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
+        .map(
+          (layer): LayerMetaItem => ({
+            layerId: layer.meta?.id as string | undefined,
+            meta: layer.meta as Record<string, unknown> | undefined,
+          })
+        )
+    );
+  };
+
+  useEffect(() => {
+    const removeTileLoad = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
+      if (tilesLoadingCount === 0) {
+        updateLayerMeta();
+        removeTileLoad();
+      }
+    });
+    const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
+      updateLayerMeta();
+    });
+    mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
+    return (): void => {
+      removeTileLoad();
+      removeMoveEnd();
+      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayerMeta);
+    };
+  }, []);
+
+  useEffect(() => {
+    updateLayerMeta();
+  }, [viewState?.shouldOptimizedTileRequests]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -95,31 +143,59 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         </svg>
       </CesiumIcon>
       <CesiumTool isVisible={isOpen} title={title}>
-        <Checkbox
-          className="optimizationCheckbox"
-          label={optimizationLabel}
-          checked={viewState?.shouldOptimizedTileRequests ?? false}
-          onClick={() => {
-            setViewState((prevState) => ({
-              currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-              shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
-              showCesiumInspector: prevState?.showCesiumInspector ?? false,
-            }));
-          }}
-        />
-        <Checkbox
-          className="cesiumInspectorCheckbox"
-          label={cesiumInspectorLabel}
-          checked={viewState?.showCesiumInspector ?? false}
-          onClick={() => {
-            setViewState((prevState) => ({
-              currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-              shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
-              showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
-            }));
-          }}
-        />
-        <WFS featureTypes={featureTypes} locale={locale} />
+        <Box className="debuggerWidgetSections">
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader">{dataSectionTitle}</Box>
+            <Box className="debuggerWidgetSectionContent">
+              <WFS featureTypes={featureTypes} locale={locale} />
+            </Box>
+          </Box>
+
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader">{layersSectionTitle}</Box>
+            <Box className="debuggerWidgetSectionContent">
+              <Checkbox
+                className="optimizationCheckbox"
+                label={optimizationLabel}
+                checked={viewState?.shouldOptimizedTileRequests ?? false}
+                onClick={() => {
+                  setViewState((prevState) => ({
+                    currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                    shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
+                    showCesiumInspector: prevState?.showCesiumInspector ?? false,
+                  }));
+                }}
+              />
+              {viewState?.shouldOptimizedTileRequests === true && (
+                <Box className="debuggerLayerList">
+                  {layersMeta.map((layer, index) => (
+                    <Box key={layer.layerId ?? `LAYER-${index}`} className="debuggerLayerItem">
+                      {`${layer.layerId ?? `LAYER-${index}`}${layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader">{toolsSectionTitle}</Box>
+            <Box className="debuggerWidgetSectionContent">
+              <Checkbox
+                className="cesiumInspectorCheckbox"
+                label={cesiumInspectorLabel}
+                checked={viewState?.showCesiumInspector ?? false}
+                onClick={() => {
+                  setViewState((prevState) => ({
+                    currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                    shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
+                    showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
+                  }));
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
       </CesiumTool>
     </>
   );

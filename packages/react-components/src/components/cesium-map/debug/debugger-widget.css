@@ -1,0 +1,56 @@
+.cesium-viewer .debuggerWidgetSections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cesium-viewer .debuggerWidgetSection {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.cesium-viewer .debuggerWidgetSectionHeader {
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: var(--mdc-theme-cesium-color);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.cesium-viewer .debuggerWidgetSectionContent {
+  padding: 8px;
+}
+
+.cesium-viewer .debuggerWidgetSectionContent .wfsContainer {
+  margin-top: 0;
+}
+
+.cesium-viewer .debuggerWidgetSectionContent .wfsContainer .title {
+  display: none;
+}
+
+.cesium-viewer .debuggerWidgetSectionContent .optimizationCheckbox,
+.cesium-viewer .debuggerWidgetSectionContent .cesiumInspectorCheckbox {
+  margin-bottom: 0;
+}
+
+.cesium-viewer .debuggerLayerList {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 6px;
+  text-align: left;
+  direction: ltr;
+}
+
+.cesium-viewer .debuggerLayerItem {
+  font-size: 11px;
+  line-height: 1.6;
+}
