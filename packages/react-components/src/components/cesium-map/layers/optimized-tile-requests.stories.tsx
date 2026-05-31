@@ -27,25 +27,25 @@ const mapViewProps: CesiumMapProps = {
   baseMaps: BASE_MAPS as IBaseMaps,
 };
 
-interface LayerRelevancy {
+interface LayerMetaItem {
   layerId?: string;
-  isRelevant?: boolean;
+  meta?: Record<string, unknown>;
 }
 
 const RelevancyPresentor: React.FC = () => {
   const viewer = useCesiumMap();
   const { viewState } = useCesiumMapViewstate();
-  const [layersRelevancy, setLayersRelevancy] = useState<LayerRelevancy[]>([]);
+  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
 
   const updateLayerRelevancy = (): void => {
     if (viewer.layersManager?.layerList) {
-      setLayersRelevancy(
+      setLayersMeta(
         viewer.layersManager.layerList
           .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
           .map(
-            (layer): LayerRelevancy => ({
+            (layer): LayerMetaItem => ({
               layerId: layer.meta?.id as string | undefined,
-              isRelevant: layer.meta?.relevantToExtent as boolean,
+              meta: layer.meta as Record<string, unknown> | undefined,
             })
           )
       );
@@ -97,11 +97,10 @@ const RelevancyPresentor: React.FC = () => {
         }}
       >
         <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {layersRelevancy.map((layer, index) => {
+        {layersMeta.map((layer, index) => {
           return (
-            <div key={`${layer.layerId ?? 'layer-'+index}`}>
-              <p>Layer Id: {`${layer.layerId ?? 'layer-'+index}`}</p>
-              <p>Requesting tiles: {layer.isRelevant?.toString() ?? 'N/A (enable optimization)'}</p>
+            <div key={`${layer.layerId ?? 'LAYER-'+index}`}>
+              <p>{`${layer.layerId ?? 'LAYER-'+index}${layer.meta?.relevantToExtent === true ? ' --> show' : layer.meta?.relevantToExtent === false ? ' --> hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}</p>
             </div>
           );
         })}

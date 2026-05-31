@@ -591,45 +591,36 @@ class LayerManager {
       if (isEmpty(extent)) {
         return;
       }
-
       // Iterating in reverse order so that top layer is first
       for (let i = this.layers.length - 1; i >= 0; i--) {
         const layer = this.layers[i];
         const intersectsExtent = !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle) instanceof Rectangle;
-
         if (layer.meta?.skipRelevancyCheck === true) {
           layer.meta = { ...layer.meta, relevantToExtent: true };
           continue;
         }
-
         if (!intersectsExtent) {
           layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
           continue;
         }
-
         let isOccludedByOpaqueLayerAbove = false;
-
         // Iterating from top layer until the current layer (exclusive)
         for (let j = this.layers.length - 1; j > i; j--) {
           const layerAbove = this.layers[j];
-
           if (layerAbove.show === false) {
             continue;
           }
-
           const layerAboveHasTransparency = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === true;
           const layerAboveIsOpaque = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === false;
           const layerAboveIntersectsExtent =
             !isEmpty(layerAbove.rectangle) && Rectangle.intersection(extent, layerAbove.rectangle) instanceof Rectangle;
           const layerAboveCoversCurrentExtent =
             !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
-
           if (layerAboveIntersectsExtent && layerAboveCoversCurrentExtent && layerAboveIsOpaque && !layerAboveHasTransparency) {
             isOccludedByOpaqueLayerAbove = true;
             break;
           }
         }
-
         // Layer is relevant if it intersects extent and has no opaque layer above it
         layer.meta = {
           ...(layer.meta ?? {}),
