@@ -71,10 +71,14 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
       updateLayerMeta();
     });
+    const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
+      updateLayerMeta();
+    });
     mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
     return (): void => {
       removeTileLoad();
       removeMoveEnd();
+      removeLayerRemoved();
       mapViewer.layersManager?.removeLayerUpdatedListener(updateLayerMeta);
     };
   }, []);
