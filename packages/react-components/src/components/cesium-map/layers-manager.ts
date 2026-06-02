@@ -53,7 +53,7 @@ export interface IVectorLayer {
 
 export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 
-const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
+export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 class LayerManager {
   public mapViewer: CesiumViewer;

@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
-import { Checkbox } from '@map-colonies/react-core';
+import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
+import { TRANSPARENT_LAYER_ID } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
@@ -50,7 +51,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     if (!mapViewer.layersManager?.layerList) return;
     setLayersMeta(
       mapViewer.layersManager.layerList
-        .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
+        .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
         .map(
           (layer): LayerMetaItem => ({
             layerId: layer.meta?.id as string | undefined,
@@ -168,11 +169,28 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
               />
               {viewState?.shouldOptimizedTileRequests === true && (
                 <Box className="debuggerLayerList">
-                  {layersMeta.map((layer, index) => (
-                    <Box key={layer.layerId ?? `LAYER-${index}`} className="debuggerLayerItem">
-                      {`${layer.layerId ?? `LAYER-${index}`}${layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}
-                    </Box>
-                  ))}
+                  {[...layersMeta].reverse().map((layer, index) => {
+                    const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
+                    const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
+                    const statusText =
+                      layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
+                    const transparencyText =
+                      layer.meta?.hasTransparency === true ? 'Has transparent tiles' : layer.meta?.hasTransparency === false ? 'No transparent tiles' : '';
+                    if (transparencyText === '') {
+                      return (
+                        <Box key={idText} className="debuggerLayerItem">
+                          {nameText + statusText}
+                        </Box>
+                      );
+                    }
+                    return (
+                      <Tooltip key={idText} content={transparencyText}>
+                        <Box className="debuggerLayerItem">
+                          {nameText + statusText}
+                        </Box>
+                      </Tooltip>
+                    );
+                  })}
                 </Box>
               )}
             </Box>

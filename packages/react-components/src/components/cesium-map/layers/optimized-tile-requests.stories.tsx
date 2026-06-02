@@ -1,8 +1,12 @@
-import { Rectangle } from 'cesium';
 import React, { ReactNode, useEffect, useState } from 'react';
+import { ImageryLayer, Rectangle } from 'cesium';
+import { get } from 'lodash';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
+import { Tooltip } from '@map-colonies/react-core';
+import { Box } from '../../box';
 import { BASE_MAPS } from '../helpers/constants';
+import { TRANSPARENT_LAYER_ID } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
@@ -41,7 +45,7 @@ const RelevancyPresentor: React.FC = () => {
     if (viewer.layersManager?.layerList) {
       setLayersMeta(
         viewer.layersManager.layerList
-          .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
+          .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
           .map(
             (layer): LayerMetaItem => ({
               layerId: layer.meta?.id as string | undefined,
@@ -97,11 +101,24 @@ const RelevancyPresentor: React.FC = () => {
         }}
       >
         <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {layersMeta.map((layer, index) => {
+        {[...layersMeta].reverse().map((layer, index) => {
+          const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
+          const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
+          const statusText = layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
+          const transparencyText = layer.meta?.hasTransparency === true ? 'Has transparent tiles' : layer.meta?.hasTransparency === false ? 'No transparent tiles' : '';
+          if (transparencyText === '') {
+            return (
+              <Box key={idText} className="debuggerLayerItem">
+                {nameText + statusText}
+              </Box>
+            );
+          }
           return (
-            <div key={`${layer.layerId ?? 'LAYER-'+index}`}>
-              <p>{`${layer.layerId ?? 'LAYER-'+index}${layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : ''}${layer.meta?.hasTransparency === true ? ' (transparent)' : layer.meta?.hasTransparency === false ? ' (opaque)' : ''}`}</p>
-            </div>
+            <Tooltip key={idText} content={transparencyText}>
+              <Box className="debuggerLayerItem">
+                {nameText + statusText}
+              </Box>
+            </Tooltip>
           );
         })}
       </div>
@@ -162,6 +179,9 @@ const LayersContainer: React.FC = () => {
                 meta={{
                   id: 'Transparent Layer',
                   options: { ...optionsXYZTransparency },
+                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
+                    get(layer, 'imageryProvider.url') === optionsXYZTransparency.url ||
+                    get(layer, 'imageryProvider._url') === optionsXYZTransparency.url,
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZTransparency.footprint))}
                 options={optionsXYZTransparency}
@@ -171,13 +191,18 @@ const LayersContainer: React.FC = () => {
         >
           Transparent layer
         </button>
-
         <button
           onClick={(): void =>
             setLayer(
               <CesiumXYZLayer
                 key="Opaque"
-                meta={{ id: 'Opaque Layer', options: { ...optionsXYZOpaque } }}
+                meta={{
+                  id: 'Opaque Layer',
+                  options: { ...optionsXYZOpaque },
+                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
+                    get(layer, 'imageryProvider.url') === optionsXYZOpaque.url ||
+                    get(layer, 'imageryProvider._url') === optionsXYZOpaque.url,
+                }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
               />
