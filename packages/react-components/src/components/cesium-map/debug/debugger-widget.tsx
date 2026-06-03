@@ -34,9 +34,16 @@ interface LayerMetaItem {
   meta?: Record<string, unknown>;
 }
 
+type DebuggerSectionId = 'data' | 'layers' | 'tools';
+
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
   const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
+  const [collapsedSections, setCollapsedSections] = useState<Record<DebuggerSectionId, boolean>>({
+    data: false,
+    layers: false,
+    tools: false,
+  });
   const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debug', [locale]);
   const dataSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_DATA') ?? 'Data', [locale]);
   const layersSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_LAYERS') ?? 'Layers', [locale]);
@@ -48,6 +55,13 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
 
   const mapViewer = useCesiumMap();
   const { viewState, setViewState } = useCesiumMapViewstate();
+
+  const toggleSection = (sectionId: DebuggerSectionId): void => {
+    setCollapsedSections((prevState) => ({
+      ...prevState,
+      [sectionId]: !prevState[sectionId],
+    }));
+  };
 
   const updateLayerMeta = (): void => {
     if (!mapViewer.layersManager?.layerList) return;
@@ -165,72 +179,87 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
       <CesiumTool isVisible={isOpen} title={title}>
         <Box className="debuggerWidgetSections">
           <Box className="debuggerWidgetSection">
-            <Box className="debuggerWidgetSectionHeader">{dataSectionTitle}</Box>
-            <Box className="debuggerWidgetSectionContent">
-              <WFS featureTypes={featureTypes} locale={locale} />
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('data')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.data ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{dataSectionTitle}</Box>
             </Box>
+            {!collapsedSections.data && (
+              <Box className="debuggerWidgetSectionContent">
+                <WFS featureTypes={featureTypes} locale={locale} />
+              </Box>
+            )}
           </Box>
 
           <Box className="debuggerWidgetSection">
-            <Box className="debuggerWidgetSectionHeader">{layersSectionTitle}</Box>
-            <Box className="debuggerWidgetSectionContent">
-              <Checkbox
-                className="optimizationCheckbox"
-                label={optimizationLabel}
-                checked={viewState?.shouldOptimizedTileRequests ?? false}
-                onClick={() => {
-                  setViewState((prevState) => ({
-                    currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-                    shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
-                    showCesiumInspector: prevState?.showCesiumInspector ?? false,
-                  }));
-                }}
-              />
-              {viewState?.shouldOptimizedTileRequests === true && (
-                <Box className="debuggerLayerList">
-                  {[...layersMeta].reverse().map((layer, index) => {
-                    const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
-                    const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
-                    const statusText =
-                      layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
-                    const transparencyText =
-                      layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
-                    if (transparencyText === '') {
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('layers')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.layers ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{layersSectionTitle}</Box>
+            </Box>
+            {!collapsedSections.layers && (
+              <Box className="debuggerWidgetSectionContent">
+                <Checkbox
+                  className="optimizationCheckbox"
+                  label={optimizationLabel}
+                  checked={viewState?.shouldOptimizedTileRequests ?? false}
+                  onClick={() => {
+                    setViewState((prevState) => ({
+                      currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                      shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
+                      showCesiumInspector: prevState?.showCesiumInspector ?? false,
+                    }));
+                  }}
+                />
+                {viewState?.shouldOptimizedTileRequests === true && (
+                  <Box className="debuggerLayerList">
+                    {[...layersMeta].reverse().map((layer, index) => {
+                      const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
+                      const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
+                      const statusText =
+                        layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
+                      const transparencyText =
+                        layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
+                      if (transparencyText === '') {
+                        return (
+                          <Box key={idText} className="debuggerLayerItem">
+                            {nameText + statusText}
+                          </Box>
+                        );
+                      }
                       return (
-                        <Box key={idText} className="debuggerLayerItem">
-                          {nameText + statusText}
-                        </Box>
+                        <Tooltip key={idText} content={transparencyText}>
+                          <Box className="debuggerLayerItem" data-has-tooltip="true">
+                            {nameText + statusText}
+                          </Box>
+                        </Tooltip>
                       );
-                    }
-                    return (
-                      <Tooltip key={idText} content={transparencyText}>
-                        <Box className="debuggerLayerItem" data-has-tooltip="true">
-                          {nameText + statusText}
-                        </Box>
-                      </Tooltip>
-                    );
-                  })}
-                </Box>
-              )}
-            </Box>
+                    })}
+                  </Box>
+                )}
+              </Box>
+            )}
           </Box>
 
           <Box className="debuggerWidgetSection">
-            <Box className="debuggerWidgetSectionHeader">{toolsSectionTitle}</Box>
-            <Box className="debuggerWidgetSectionContent">
-              <Checkbox
-                className="cesiumInspectorCheckbox"
-                label={cesiumInspectorLabel}
-                checked={viewState?.showCesiumInspector ?? false}
-                onClick={() => {
-                  setViewState((prevState) => ({
-                    currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-                    shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
-                    showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
-                  }));
-                }}
-              />
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('tools')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.tools ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{toolsSectionTitle}</Box>
             </Box>
+            {!collapsedSections.tools && (
+              <Box className="debuggerWidgetSectionContent">
+                <Checkbox
+                  className="cesiumInspectorCheckbox"
+                  label={cesiumInspectorLabel}
+                  checked={viewState?.showCesiumInspector ?? false}
+                  onClick={() => {
+                    setViewState((prevState) => ({
+                      currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                      shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
+                      showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
+                    }));
+                  }}
+                />
+              </Box>
+            )}
           </Box>
         </Box>
       </CesiumTool>

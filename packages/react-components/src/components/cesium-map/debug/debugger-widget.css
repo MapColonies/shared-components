@@ -1,3 +1,7 @@
+.cesium-viewer .cesium-mc-title {
+  cursor: text;
+}
+
 .cesium-viewer .debuggerWidgetSections {
   display: flex;
   flex-direction: column;
@@ -12,6 +16,9 @@
 }
 
 .cesium-viewer .debuggerWidgetSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   padding: 6px 8px;
   font-size: 13px;
   font-weight: 700;
@@ -20,6 +27,21 @@
   color: var(--mdc-theme-cesium-color);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  user-select: none;
+}
+
+.cesium-viewer .debuggerWidgetSectionHeaderLabel {
+  flex: 1;
+}
+
+.cesium-viewer .debuggerWidgetSectionHeaderToggle {
+  margin-right: 6px;
+}
+
+body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
+  margin-right: 0;
+  margin-left: 6px;
 }
 
 .cesium-viewer .debuggerWidgetSectionContent {
