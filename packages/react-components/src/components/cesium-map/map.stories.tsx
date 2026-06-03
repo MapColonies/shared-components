@@ -419,7 +419,7 @@ LocalizedMap.argTypes = {
       WFS_TITLE: 'שכבות מידע',
       WFS_CACHE: 'בזכרון',
       WFS_EXTENT: 'בתצוגה',
-      NO_DATA_LAYERS: 'לא נמצאו שכבות',
+      NO_DATA_LAYERS: 'לא נמצאו שכבות מידע בתצוגה',
       ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
       IMAGERY: 'ראסטר',
       DATA: 'מידע',

@@ -15,7 +15,7 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
   const title = useMemo(() => get(locale, 'WFS_TITLE') ?? 'Data Layers', [locale]);
   const cacheLabel = useMemo(() => get(locale, 'WFS_CACHE') ?? 'Cache', [locale]);
   const extentLabel = useMemo(() => get(locale, 'WFS_EXTENT') ?? 'Extent', [locale]);
-  const noDataLayers = useMemo(() => get(locale, 'NO_DATA_LAYERS') ?? 'No layers found', [locale]);
+  const noDataLayers = useMemo(() => get(locale, 'NO_DATA_LAYERS') ?? 'No DATA layers found', [locale]);
 
   const header = useMemo(() => {
     return <Box className="title">{title}</Box>;
@@ -45,7 +45,7 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
             </Box>
           ))
         ) : (
-          <Box>{noDataLayers}</Box>
+          <Box className="noDataLayers">{noDataLayers}</Box>
         )}
       </>
     );

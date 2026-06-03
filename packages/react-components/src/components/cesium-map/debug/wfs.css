@@ -44,6 +44,11 @@ body[dir='rtl'] .cesium-viewer .wfsContainer .featureType {
   margin: 0 20px;
 }
 
+.cesium-viewer .wfsContainer .noDataLayers {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
 .cesium-viewer .wfsContainer .blinking {
   animation: blink 1s infinite;
 }
