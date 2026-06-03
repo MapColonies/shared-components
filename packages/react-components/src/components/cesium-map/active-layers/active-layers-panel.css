@@ -11,6 +11,10 @@
   text-overflow: ellipsis;
 }
 
+.cesium-viewer .activeLayersPanel .name:not(.disabled) {
+  cursor: pointer;
+}
+
 .cesium-viewer .activeLayersPanel .name.disabled {
   opacity: 0.5;
   pointer-events: none;

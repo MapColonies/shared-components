@@ -54,3 +54,7 @@
   font-size: 11px;
   line-height: 1.6;
 }
+
+.cesium-viewer .debuggerLayerItem[data-has-tooltip='true'] {
+  cursor: pointer;
+}

@@ -192,7 +192,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                     const statusText =
                       layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
                     const transparencyText =
-                      layer.meta?.hasTransparency === true ? 'Has transparent tiles' : layer.meta?.hasTransparency === false ? 'No transparent tiles' : '';
+                      layer.meta?.hasTransparency === true ? 'Has tiles with transparency' : layer.meta?.hasTransparency === false ? 'No tiles with transparency' : '';
                     if (transparencyText === '') {
                       return (
                         <Box key={idText} className="debuggerLayerItem">
@@ -202,7 +202,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                     }
                     return (
                       <Tooltip key={idText} content={transparencyText}>
-                        <Box className="debuggerLayerItem">
+                        <Box className="debuggerLayerItem" data-has-tooltip="true">
                           {nameText + statusText}
                         </Box>
                       </Tooltip>
