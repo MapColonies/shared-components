@@ -62,6 +62,16 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
   };
 
   useEffect(() => {
+    let moveEndRefreshTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    const scheduleLayerMetaRefresh = (): void => {
+      if (moveEndRefreshTimeoutId !== undefined) {
+        clearTimeout(moveEndRefreshTimeoutId);
+      }
+      moveEndRefreshTimeoutId = setTimeout(() => {
+        updateLayerMeta();
+      }, 0);
+    };
+
     const removeTileLoad = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
       if (tilesLoadingCount === 0) {
         updateLayerMeta();
@@ -69,13 +79,16 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
       }
     });
     const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
-      updateLayerMeta();
+      scheduleLayerMetaRefresh();
     });
     const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
-      updateLayerMeta();
+      scheduleLayerMetaRefresh();
     });
     mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
     return (): void => {
+      if (moveEndRefreshTimeoutId !== undefined) {
+        clearTimeout(moveEndRefreshTimeoutId);
+      }
       removeTileLoad();
       removeMoveEnd();
       removeLayerRemoved();

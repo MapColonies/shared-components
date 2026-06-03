@@ -1,13 +1,10 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { ImageryLayer, Rectangle } from 'cesium';
 import { get } from 'lodash';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
-import { Tooltip } from '@map-colonies/react-core';
-import { Box } from '../../box';
 import { BASE_MAPS } from '../helpers/constants';
-import { TRANSPARENT_LAYER_ID } from '../layers-manager';
-import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap, useCesiumMapViewstate } from '../map';
+import { CesiumMap, CesiumMapProps, IBaseMaps } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -29,101 +26,6 @@ const mapViewProps: CesiumMapProps = {
   zoom: 14,
   imageryProvider: false,
   baseMaps: BASE_MAPS as IBaseMaps,
-};
-
-interface LayerMetaItem {
-  layerId?: string;
-  meta?: Record<string, unknown>;
-}
-
-const RelevancyPresentor: React.FC = () => {
-  const viewer = useCesiumMap();
-  const { viewState } = useCesiumMapViewstate();
-  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
-
-  const updateLayerRelevancy = (): void => {
-    if (viewer.layersManager?.layerList) {
-      setLayersMeta(
-        viewer.layersManager.layerList
-          .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
-          .map(
-            (layer): LayerMetaItem => ({
-              layerId: layer.meta?.id as string | undefined,
-              meta: layer.meta as Record<string, unknown> | undefined,
-            })
-          )
-      );
-    }
-  };
-
-  useEffect(() => {
-    const removeTileLoad = viewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
-      if (tilesLoadingCount === 0) {
-        updateLayerRelevancy();
-        removeTileLoad();
-      }
-    });
-
-    const removeMoveEnd = viewer.camera.moveEnd.addEventListener(() => {
-      updateLayerRelevancy();
-    });
-
-    const handleLayerUpdated = (): void => {
-      updateLayerRelevancy();
-    };
-
-    viewer.layersManager?.addLayerUpdatedListener(handleLayerUpdated);
-
-    return (): void => {
-      removeTileLoad();
-      removeMoveEnd();
-      viewer.layersManager?.removeLayerUpdatedListener(handleLayerUpdated);
-    };
-  }, [viewer]);
-
-  useEffect(() => {
-    updateLayerRelevancy();
-  }, [viewState?.shouldOptimizedTileRequests]);
-
-  return (
-    <>
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          zIndex: 999,
-          background: 'white',
-          padding: '20px',
-          fontFamily: 'Helvetica',
-          minWidth: '200px',
-          minHeight: '200px',
-        }}
-      >
-        <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {[...layersMeta].reverse().map((layer, index) => {
-          const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
-          const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
-          const statusText = layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
-          const transparencyText = layer.meta?.hasTransparency === true ? 'Has transparent tiles' : layer.meta?.hasTransparency === false ? 'No transparent tiles' : '';
-          if (transparencyText === '') {
-            return (
-              <Box key={idText} className="debuggerLayerItem">
-                {nameText + statusText}
-              </Box>
-            );
-          }
-          return (
-            <Tooltip key={idText} content={transparencyText}>
-              <Box className="debuggerLayerItem">
-                {nameText + statusText}
-              </Box>
-            </Tooltip>
-          );
-        })}
-      </div>
-    </>
-  );
 };
 
 const LayersContainer: React.FC = () => {
@@ -222,7 +124,6 @@ export const OptimizedTileRequestingMap: Story = () => {
     <div style={mapDivStyle}>
       <CesiumMap {...mapViewProps} showDebuggerTool={true}>
         <LayersContainer />
-        <RelevancyPresentor />
       </CesiumMap>
     </div>
   );
