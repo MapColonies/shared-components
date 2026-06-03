@@ -43,6 +43,8 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
   const toolsSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_TOOLS') ?? 'Tools', [locale]);
   const optimizationLabel = useMemo(() => get(locale, 'TILE_REQUESTS_OPTIMIZATION_CHECKBOX') ?? 'Tile requests optimization', [locale]);
   const cesiumInspectorLabel = useMemo(() => get(locale, 'CESIUM_INSPECTOR_CHECKBOX') ?? 'Cesium Inspector', [locale]);
+  const withTransparencyTiles = useMemo(() => get(locale, 'WITH_TRANSPARENCY_TOOLTIP') ?? 'This layer has tiles with transparency', [locale]);
+  const withoutTransparencyTiles = useMemo(() => get(locale, 'WITHOUT_TRANSPARENCY_TOOLTIP') ?? 'This layer has tiles WITHOUT transparency', [locale]);
 
   const mapViewer = useCesiumMap();
   const { viewState, setViewState } = useCesiumMapViewstate();
@@ -192,7 +194,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                     const statusText =
                       layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
                     const transparencyText =
-                      layer.meta?.hasTransparency === true ? 'Has tiles with transparency' : layer.meta?.hasTransparency === false ? 'No tiles with transparency' : '';
+                      layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
                     if (transparencyText === '') {
                       return (
                         <Box key={idText} className="debuggerLayerItem">
