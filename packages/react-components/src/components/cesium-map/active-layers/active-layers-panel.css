@@ -12,7 +12,7 @@
 }
 
 .cesium-viewer .activeLayersPanel .name:not(.disabled) {
-  cursor: pointer;
+  cursor: default;
 }
 
 .cesium-viewer .activeLayersPanel .name.disabled {

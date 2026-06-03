@@ -39,6 +39,11 @@
   margin-bottom: 0;
 }
 
+.cesium-viewer .debuggerWidgetSectionContent .optimizationCheckbox label,
+.cesium-viewer .debuggerWidgetSectionContent .cesiumInspectorCheckbox label {
+  cursor: pointer;
+}
+
 .cesium-viewer .debuggerLayerList {
   margin-top: 8px;
   display: flex;
@@ -53,8 +58,9 @@
 .cesium-viewer .debuggerLayerItem {
   font-size: 11px;
   line-height: 1.6;
+  cursor: text;
 }
 
 .cesium-viewer .debuggerLayerItem[data-has-tooltip='true'] {
-  cursor: pointer;
+  cursor: default;
 }
