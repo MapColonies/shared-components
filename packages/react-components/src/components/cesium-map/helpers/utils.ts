@@ -175,6 +175,25 @@ export const rectangle2bbox = (bbox: Rectangle): BBox => [
   CesiumMath.toDegrees(bbox.north),
 ];
 
+export const rectangle2Feature = (rect: Rectangle): Feature<Polygon> => {
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [CesiumMath.toDegrees(rect.west), CesiumMath.toDegrees(rect.north)],
+          [CesiumMath.toDegrees(rect.east), CesiumMath.toDegrees(rect.north)],
+          [CesiumMath.toDegrees(rect.east), CesiumMath.toDegrees(rect.south)],
+          [CesiumMath.toDegrees(rect.west), CesiumMath.toDegrees(rect.south)],
+          [CesiumMath.toDegrees(rect.west), CesiumMath.toDegrees(rect.north)], // close the ring
+        ],
+      ],
+    },
+  };
+};
+
 export const customComputeViewRectangle = (mapViewer: CesiumViewer) => {
   const scene = mapViewer.scene;
   const camera = mapViewer.camera;
@@ -330,7 +349,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
 export const createRectangleAround = (
   centerCartographic: { longitude: number; latitude: number },
   widthMeters: number,
-  heightMeters: number,
+  heightMeters: number
 ): Polygon => {
   const ellipsoid = Ellipsoid.WGS84;
   const lat = centerCartographic.latitude;
@@ -361,7 +380,14 @@ export const createRectangleAround = (
   };
 };
 
-export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: GeoJsonDataSource, processEntityIds: string[], color: string, extent?: BBox, labeling?: ICesiumWFSLayerLabelingOptions): void => {
+export const defaultVisualizationHandler = (
+  viewer: CesiumViewer,
+  dataSource: GeoJsonDataSource,
+  processEntityIds: string[],
+  color: string,
+  extent?: BBox,
+  labeling?: ICesiumWFSLayerLabelingOptions
+): void => {
   const is2D = viewer.scene.mode === SceneMode.SCENE2D;
 
   const getGeoJsonFromEntity = (entity: Entity): Polygon | undefined => {
@@ -413,11 +439,7 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
     return { widthMeters, heightMeters };
   };
 
-  const createRectangleAround = (
-    centerCartographic: { longitude: number; latitude: number },
-    widthMeters: number,
-    heightMeters: number
-  ): Polygon => {
+  const createRectangleAround = (centerCartographic: { longitude: number; latitude: number }, widthMeters: number, heightMeters: number): Polygon => {
     const ellipsoid = Ellipsoid.WGS84;
     const lat = centerCartographic.latitude;
     const lon = centerCartographic.longitude;
@@ -557,13 +579,13 @@ export const defaultVisualizationHandler = (viewer: CesiumViewer, dataSource: Ge
       .then((dataSource) => {
         dataSource?.entities.values.forEach((entity: Entity) => {
           entity.billboard = new BillboardGraphics({
-          image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
-          heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
-          scale: 1.0,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            image: entity.properties?.label.getValue(JulianDate.now()).dataURL,
+            heightReference: HeightReference.NONE, // Ensures it's not clamped and floats above
+            scale: 1.0,
+            disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          });
         });
       });
-    });
   }
 };
 
@@ -571,7 +593,7 @@ const DEFAULT_RECTANGLE_FACTOR = 0.2;
 
 export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FACTOR): CesiumRectangle => {
   if (rect.width === 0) {
-    rect.east = rect.east +   0.0001 * factor;
+    rect.east = rect.east + 0.0001 * factor;
     rect.west = rect.west - 0.0001 * factor;
     rect.south = rect.south - 0.0001 * factor;
     rect.north = rect.north + 0.0001 * factor;
@@ -584,4 +606,4 @@ export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FA
   rect.north = rect.north + rect.height * factor;
 
   return rect;
-}
+};
