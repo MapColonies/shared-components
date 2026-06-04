@@ -38,6 +38,11 @@ body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-vie
   right: 0;
 }
 
+body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-sectionHeader::before {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
 .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector {
   box-sizing: content-box;
 }
