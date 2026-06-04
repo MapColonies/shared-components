@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
+import { EXAMINED_TILES_META_PROP } from '../helpers/customImageryProviders';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
 import { TRANSPARENT_LAYER_ID } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
@@ -218,16 +219,40 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                         layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
                       const transparencyText =
                         layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
-                      if (transparencyText === '') {
+                      const tileCoordinatesFromMeta = get(layer.meta, EXAMINED_TILES_META_PROP) as
+                        | Array<{ x?: number; y?: number; level?: number }>
+                        | { x?: number; y?: number; level?: number }
+                        | undefined;
+                      const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
+                        ? tileCoordinatesFromMeta
+                        : tileCoordinatesFromMeta !== undefined
+                          ? [tileCoordinatesFromMeta]
+                          : [];
+                      const formattedTileCoordinates = tileCoordinatesList
+                        .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
+                        .map((tile) => `x: ${String(tile.x)}, y: ${String(tile.y)}, level: ${String(tile.level)}`);
+                      const tooltipContent =
+                        transparencyText === ''
+                          ? undefined
+                          : (
+                            <>
+                              <Box>{transparencyText}</Box>
+                              {formattedTileCoordinates.map((tileCoordinatesLine) => (
+                                <Box key={tileCoordinatesLine}>{tileCoordinatesLine}</Box>
+                              ))}
+                            </>
+                          );
+                      const isRelevant = layer.meta?.relevantToExtent !== false;
+                      if (tooltipContent === undefined) {
                         return (
-                          <Box key={idText} className="debuggerLayerItem">
+                          <Box key={idText} className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`}>
                             {nameText + statusText}
                           </Box>
                         );
                       }
                       return (
-                        <Tooltip key={idText} content={transparencyText}>
-                          <Box className="debuggerLayerItem" data-has-tooltip="true">
+                        <Tooltip key={idText} content={tooltipContent}>
+                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip="true">
                             {nameText + statusText}
                           </Box>
                         </Tooltip>

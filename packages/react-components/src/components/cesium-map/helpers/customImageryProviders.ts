@@ -15,12 +15,20 @@ import { imageHasTransparency } from './utils';
 export interface CustomImageryProvider extends ImageryProvider {
   readonly layerListInstance: ICesiumImageryLayer[];
   tileTransparencyCheckedCounter: number;
+  examinedTilesForTransparencyCheck: IExaminedTileCoordinates[];
   mapViewer: CesiumViewer;
   readonly maxTilesForTransparencyCheck: number;
 }
 
+interface IExaminedTileCoordinates {
+  x: number;
+  y: number;
+  level: number;
+}
+
 const NUMBER_OF_TILES_TO_CHECK = 3;
 export const HAS_TRANSPARENCY_META_PROP = 'hasTransparency';
+export const EXAMINED_TILES_META_PROP = 'examinedTiles';
 
 function customCommonRequestImage(
   this: CustomImageryProvider,
@@ -43,6 +51,17 @@ function customCommonRequestImage(
     const layerHasTransparency = get(requestedLayerMeta, HAS_TRANSPARENCY_META_PROP) === true;
 
     if (this.tileTransparencyCheckedCounter < NUMBER_OF_TILES_TO_CHECK && !layerHasTransparency) {
+      console.log(JSON.stringify({ x, y, level }));
+      this.examinedTilesForTransparencyCheck = [...this.examinedTilesForTransparencyCheck, { x, y, level }].slice(0, NUMBER_OF_TILES_TO_CHECK);
+
+      this.mapViewer.layersManager?.addMetaToLayer(
+        { [EXAMINED_TILES_META_PROP]: this.examinedTilesForTransparencyCheck },
+        /* eslint-disable */
+        (layer: ImageryLayer): boolean => {
+          return (layer as any)._imageryProvider._resource._url === (this as any)._resource._url;
+        }
+        /* eslint-enable */
+      );
       void imageHasTransparency(request?.url as string, this).then((hasTransparency) => {
         this.mapViewer.layersManager?.addMetaToLayer(
           { [HAS_TRANSPARENCY_META_PROP]: hasTransparency },
@@ -65,6 +84,7 @@ export class CustomUrlTemplateImageryProvider extends UrlTemplateImageryProvider
   public readonly maxTilesForTransparencyCheck = NUMBER_OF_TILES_TO_CHECK;
 
   public tileTransparencyCheckedCounter = 0;
+  public examinedTilesForTransparencyCheck: IExaminedTileCoordinates[] = [];
 
   public constructor(opts: UrlTemplateImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);
@@ -83,6 +103,7 @@ export class CustomWebMapServiceImageryProvider extends WebMapServiceImageryProv
   public readonly maxTilesForTransparencyCheck = NUMBER_OF_TILES_TO_CHECK;
 
   public tileTransparencyCheckedCounter = 0;
+  public examinedTilesForTransparencyCheck: IExaminedTileCoordinates[] = [];
 
   public constructor(opts: WebMapServiceImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);
@@ -101,6 +122,7 @@ export class CustomWebMapTileServiceImageryProvider extends WebMapTileServiceIma
   public readonly maxTilesForTransparencyCheck = NUMBER_OF_TILES_TO_CHECK;
 
   public tileTransparencyCheckedCounter = 0;
+  public examinedTilesForTransparencyCheck: IExaminedTileCoordinates[] = [];
 
   public constructor(opts: WebMapTileServiceImageryProvider.ConstructorOptions, mapViewer: CesiumViewer) {
     super(opts);

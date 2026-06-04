@@ -80,7 +80,14 @@ body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
 .cesium-viewer .debuggerLayerItem {
   font-size: 11px;
   line-height: 1.6;
+  font-weight: bold;
+  opacity: 0.5;
   cursor: text;
+}
+
+.cesium-viewer .debuggerLayerItem.relevant {
+  color: #AEF;
+  opacity: 1;
 }
 
 .cesium-viewer .debuggerLayerItem[data-has-tooltip='true'] {
