@@ -230,18 +230,11 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                           : [];
                       const formattedTileCoordinates = tileCoordinatesList
                         .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
-                        .map((tile) => `x: ${String(tile.x)}, y: ${String(tile.y)}, level: ${String(tile.level)}`);
+                        .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
                       const tooltipContent =
                         transparencyText === ''
                           ? undefined
-                          : (
-                            <>
-                              <Box>{transparencyText}</Box>
-                              {formattedTileCoordinates.map((tileCoordinatesLine) => (
-                                <Box key={tileCoordinatesLine}>{tileCoordinatesLine}</Box>
-                              ))}
-                            </>
-                          );
+                          : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
                       const isRelevant = layer.meta?.relevantToExtent !== false;
                       if (tooltipContent === undefined) {
                         return (
