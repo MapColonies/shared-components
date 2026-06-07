@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.14.0...@map-colonies/react-components@4.14.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* add examined tiles coordinates to tooltip ([dcf9ccd](https://github.com/MapColonies/shared-components/commit/dcf9ccd8051703c86ff83aeb161de6a969cc5c8a))
+* alternative service payload ([9044aea](https://github.com/MapColonies/shared-components/commit/9044aea0850a817273aefd4b9e16e1acdcda1ecf))
+* bind optimization layers dynamically at runtime and not only on init ([2ecebc8](https://github.com/MapColonies/shared-components/commit/2ecebc8d8f454841fbd652806e6f2fe42e3abb14))
+* cesium inspector collapsible sign ([b63ef17](https://github.com/MapColonies/shared-components/commit/b63ef17b88a4a5d4d59a5e7e31fdba9dfcadec53))
+* cesium inspector which is in english to always have ltr ([db03590](https://github.com/MapColonies/shared-components/commit/db0359036f1e133347126da023da4c5208f6a0d9))
+* code review ([65b4a0f](https://github.com/MapColonies/shared-components/commit/65b4a0f23b5a9f2d84a461f8903093809572bd6f))
+* collapsible ([8ff6c9d](https://github.com/MapColonies/shared-components/commit/8ff6c9d4532c50b9d850560e798b65a40e13bf6c))
+* coordinates order ([f82c024](https://github.com/MapColonies/shared-components/commit/f82c0245bc2735a64e258f10571ff7035e503a37))
+* cursor ([c7dcf14](https://github.com/MapColonies/shared-components/commit/c7dcf141b6e27f80005d51b46eb145c334dbd207))
+* cursor pointer ([12deb21](https://github.com/MapColonies/shared-components/commit/12deb2176e4b8f9565ed28ba874dc4cd36b0ac61))
+* hide also basemaps tiles ([76512bc](https://github.com/MapColonies/shared-components/commit/76512bc2e9550bd502fb19840353451551097f12))
+* imageryProvider warning ([760b643](https://github.com/MapColonies/shared-components/commit/760b64387a23674e26fee5cf1302cf540bc74793))
+* on layer removal ([523c314](https://github.com/MapColonies/shared-components/commit/523c314f537b57f9a9f7b7dd28913a56e003d51f))
+* only topmost basemap layer is shown ([898bf2a](https://github.com/MapColonies/shared-components/commit/898bf2aeb765cd4faf1e6086f6408544557c79df))
+* optimized story ([c704a5e](https://github.com/MapColonies/shared-components/commit/c704a5efd2d672758f5505bb3070d99e8a54f08b))
+* plus monis sign alignment ([5434791](https://github.com/MapColonies/shared-components/commit/5434791de210cfe14a3ce3f4a8bc7f5878967507))
+* redesign debugger tool ([5acc23b](https://github.com/MapColonies/shared-components/commit/5acc23bd81468c125632eb558fe694f33cceffdf))
+* stale layer status inside debugger widget and story duplication presenter ([56f10c7](https://github.com/MapColonies/shared-components/commit/56f10c73db129863b3627a461a57efbacac0f3b2))
+* toggle off ([3716758](https://github.com/MapColonies/shared-components/commit/3716758cbae7a1fd0a77115dd5e1dac468e37aa8))
+* translations ([670c73a](https://github.com/MapColonies/shared-components/commit/670c73a581112b74f6452bf09ccb002bfd3287ba))
+* translations ([d6cf0f0](https://github.com/MapColonies/shared-components/commit/d6cf0f01f0ae27df674e6c27ee3aad5c2ef41ff7))
+* transparent tile asset location ([3aa8875](https://github.com/MapColonies/shared-components/commit/3aa88754b4b127783db2954c6738c6ffefe4c916))
+
+
+
+
+
 # [4.14.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.13.5...@map-colonies/react-components@4.14.0) (2026-05-27)
 
 
