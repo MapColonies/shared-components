@@ -36,12 +36,7 @@
 }
 
 .cesium-viewer .debuggerWidgetSectionHeaderToggle {
-  margin-right: 6px;
-}
-
-body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
-  margin-right: 0;
-  margin-left: 6px;
+  margin-right: 5px;
 }
 
 .cesium-viewer .debuggerWidgetSectionContent {

@@ -38,7 +38,8 @@ body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-vie
   right: 0;
 }
 
-body[dir='rtl'] .cesium-viewer .cesium-viewer-cesiumInspectorWrapper .cesium-cesiumInspector-sectionHeader::before {
+body[dir='rtl'] .cesium-viewer [class*='sectionHeader']::before,
+body[dir='rtl'] .cesium-viewer [class*='SectionHeaderToggle'] {
   margin-right: 0;
   margin-left: 5px;
 }
