@@ -39,6 +39,11 @@
   margin-right: 5px;
 }
 
+body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
 .cesium-viewer .debuggerWidgetSectionContent {
   padding: 8px;
 }

@@ -1,3 +1,8 @@
+body[dir='rtl'] .cesium-viewer .activeLayersPanel .cesium-cesiumInspector-sectionHeader::before {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
 .cesium-viewer .activeLayersPanel .layer {
   display: flex;
   justify-content: space-between;
