@@ -18,7 +18,7 @@ import { get } from 'lodash';
 import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
 import booleanValid from '@turf/boolean-valid';
-import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler } from '../helpers/utils';
+import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2Feature } from '../helpers/utils';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
 export interface ICesiumWFSLayerLabelTextField {
@@ -27,6 +27,7 @@ export interface ICesiumWFSLayerLabelTextField {
   format?: string;
   predicate?: (value: any) => any;
 }
+
 export interface ICesiumWFSLayerLabelingOptions {
   dataSourcePrefix: string;
   text: {
@@ -41,9 +42,38 @@ export interface ICesiumWFSLayerLabelingOptions {
   lineWidth: number;
 }
 
+export interface IGqlServiceConfig {
+  query: string;
+  variablesDescriptor: {
+    featureProp: string;
+    startIndexProp: string;
+    countProp: string;
+    typeNameProp: string;
+  };
+  variables: {
+    data: Record<string, unknown>;
+  };
+}
+
+export interface IApiServiceConfig {
+  method?: 'GET' | 'POST';
+  headers?: Record<string, string>;
+}
+
+export type AlternativePayload =
+  | {
+      type: 'gql';
+      gql: IGqlServiceConfig;
+    }
+  | {
+      type: 'api';
+      api: IApiServiceConfig;
+    };
+
 export interface ICesiumWFSLayerOptions {
   url: string;
   featureType: string;
+  alternativePayload?: AlternativePayload;
   style: {
     color: string;
     hover: string;
@@ -72,7 +102,7 @@ interface IFetchMetadata {
 
 export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const { options, meta, visualizationHandler, withGeometryValidation = false } = props;
-  const { url, featureType, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;
+  const { url, featureType, alternativePayload, style, pageSize, zoomLevel, maxCacheSize, keyField, labeling } = options;
   const { color, hover } = style;
   const mapViewer = useCesiumMap();
   const mapViewState = useCesiumMapViewstate();
@@ -269,11 +299,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     updateMetadata(0, 0);
   };
 
-  const fetchWfsData = async (wfsDataUrl: string, method: string = 'GET', body?: string): Promise<any> => {
-    const options: RequestInit = { method };
-    if (body !== undefined) {
-      options.body = body;
-    }
+  const fetchWfsData = async (wfsDataUrl: string, options: RequestInit = { method: 'GET' }): Promise<any> => {
     const response = await fetch(wfsDataUrl, options);
     if (response.status === 200) {
       return await response.json();
@@ -534,15 +560,38 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const position: Feature<Point> = center(bbox);
 
       try {
-        const urlSeparator = url.includes('?') ? '&' : '?';
-        let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
-          ','
-        )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
-        if (keyField) {
-          wfsDataUrl += `&sortBy=${keyField}%20ASC`;
+        let wfsResponse = null;
+        if (alternativePayload) {
+          if (alternativePayload.type === 'gql') {
+            const { variablesDescriptor, ...payload } = alternativePayload.gql;
+            payload.variables.data[variablesDescriptor.featureProp] = rectangle2Feature(bbox);
+            payload.variables.data[variablesDescriptor.startIndexProp] = offset;
+            payload.variables.data[variablesDescriptor.typeNameProp] = featureType;
+            payload.variables.data[variablesDescriptor.countProp] = pageSize;
+
+            wfsResponse = await fetchWfsData(url, {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+            const queryName = payload.query.split('(')[0].replace('query ', ''); //strip queryName
+            await handleWfsResponse((wfsResponse as any)?.data[queryName], extent, offset, position);
+          } else {
+            throw 'API as alternative service still not supported';
+          }
+        } else {
+          const urlSeparator = url.includes('?') ? '&' : '?';
+          let wfsDataUrl = `${url}${urlSeparator}service=WFS&version=2.0.0&request=GetFeature&typeNames=${featureType}&outputFormat=application/json&bbox=${extent.join(
+            ','
+          )},EPSG:4326&startIndex=${offset}&count=${pageSize}`;
+          if (keyField) {
+            wfsDataUrl += `&sortBy=${keyField}%20ASC`;
+          }
+          wfsResponse = await fetchWfsData(wfsDataUrl);
+          await handleWfsResponse(wfsResponse, extent, offset, position);
         }
-        const wfsResponse = await fetchWfsData(wfsDataUrl);
-        await handleWfsResponse(wfsResponse, extent, offset, position);
       } catch (error) {
         console.error('Error fetching WFS data:', error);
         updateMetadata(-1, -1);
