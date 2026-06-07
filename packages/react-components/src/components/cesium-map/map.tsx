@@ -479,16 +479,14 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         });
       }
     };
-    if (mapViewRef) {
-      mapViewRef.scene.morphComplete.addEventListener(morphCompleteHandler);
-    }
+
+    const removeMorphCompleteListener = mapViewRef?.scene.morphComplete.addEventListener(morphCompleteHandler);
+
     return (): void => {
-      if (mapViewRef) {
-        try {
-          mapViewRef.scene.morphComplete.removeEventListener(morphCompleteHandler);
-        } catch (e) {
-          console.error('morphCompleteHandler event not cleaned');
-        }
+      try {
+        removeMorphCompleteListener?.();
+      } catch (e) {
+        console.error('morphCompleteHandler event not cleaned:', e);
       }
     };
   }, [mapViewRef]);

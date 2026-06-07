@@ -1,9 +1,10 @@
-import { Rectangle } from 'cesium';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
+import { ImageryLayer, Rectangle } from 'cesium';
+import { get } from 'lodash';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { CesiumMap, CesiumMapProps, IBaseMaps, useCesiumMap, useCesiumMapViewstate } from '../map';
+import { CesiumMap, CesiumMapProps, IBaseMaps } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -25,77 +26,6 @@ const mapViewProps: CesiumMapProps = {
   zoom: 14,
   imageryProvider: false,
   baseMaps: BASE_MAPS as IBaseMaps,
-};
-
-interface LayerRelevancy {
-  layerId?: string;
-  isRelevant?: boolean;
-}
-
-const RelevancyPresentor: React.FC = () => {
-  const viewer = useCesiumMap();
-  const { viewState } = useCesiumMapViewstate();
-  const [layersRelevancy, setLayersRelevancy] = useState<LayerRelevancy[]>([]);
-
-  const updateLayerRelevancy = (): void => {
-    if (viewer.layersManager?.layerList) {
-      setLayersRelevancy(
-        viewer.layersManager.layerList
-          .filter((layer): boolean => layer.meta?.id !== 'TRANSPARENT_BASE_LAYER')
-          .map(
-            (layer): LayerRelevancy => ({
-              layerId: layer.meta?.id as string | undefined,
-              isRelevant: layer.meta?.relevantToExtent as boolean,
-            })
-          )
-      );
-    }
-  };
-
-  useEffect(() => {
-    const removeTileLoad = viewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
-      if (tilesLoadingCount === 0) {
-        updateLayerRelevancy();
-        removeTileLoad();
-      }
-    });
-
-    const removeMoveEnd = viewer.camera.moveEnd.addEventListener(() => {
-      updateLayerRelevancy();
-    });
-
-    return (): void => {
-      removeMoveEnd();
-    };
-  }, []);
-
-  return (
-    <>
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          zIndex: 999,
-          background: 'white',
-          padding: '20px',
-          fontFamily: 'Helvetica',
-          minWidth: '200px',
-          minHeight: '200px',
-        }}
-      >
-        <h3>{`Optimized Tile Requesting: ${viewState?.shouldOptimizedTileRequests ? 'enabled' : 'disabled'}`}</h3>
-        {layersRelevancy.map((layer) => {
-          return (
-            <div>
-              <p>Layer Id: {layer.layerId}</p>
-              <p>Requesting tiles: {layer.isRelevant?.toString()}</p>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
 };
 
 const LayersContainer: React.FC = () => {
@@ -125,7 +55,7 @@ const LayersContainer: React.FC = () => {
   };
 
   const optionsXYZOpaque = {
-    url: 'http://stamen-tiles-b.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
+    url: 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png',
     footprint: {
       coordinates: [
         [
@@ -151,6 +81,9 @@ const LayersContainer: React.FC = () => {
                 meta={{
                   id: 'Transparent Layer',
                   options: { ...optionsXYZTransparency },
+                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
+                    get(layer, 'imageryProvider.url') === optionsXYZTransparency.url ||
+                    get(layer, 'imageryProvider._url') === optionsXYZTransparency.url,
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZTransparency.footprint))}
                 options={optionsXYZTransparency}
@@ -158,15 +91,20 @@ const LayersContainer: React.FC = () => {
             )
           }
         >
-          Layer With Transparency
+          Transparent layer
         </button>
-
         <button
           onClick={(): void =>
             setLayer(
               <CesiumXYZLayer
                 key="Opaque"
-                meta={{ id: 'Opaque Layer', options: { ...optionsXYZOpaque } }}
+                meta={{
+                  id: 'Opaque Layer',
+                  options: { ...optionsXYZOpaque },
+                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
+                    get(layer, 'imageryProvider.url') === optionsXYZOpaque.url ||
+                    get(layer, 'imageryProvider._url') === optionsXYZOpaque.url,
+                }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
               />
@@ -186,7 +124,6 @@ export const OptimizedTileRequestingMap: Story = () => {
     <div style={mapDivStyle}>
       <CesiumMap {...mapViewProps} showDebuggerTool={true}>
         <LayersContainer />
-        <RelevancyPresentor />
       </CesiumMap>
     </div>
   );

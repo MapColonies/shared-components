@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
 import { Box } from '../../box';
+import { TRANSPARENT_LAYER_ID } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
 import './active-layers-panel.css';
@@ -47,7 +48,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             rect: layer.rectangle,
             isBaseMap: mapViewer.layersManager?.isBaseMapLayer(meta) as boolean
           };
-        })
+        }).filter((layer) => layer.id !== TRANSPARENT_LAYER_ID)
       : [];
   };
 

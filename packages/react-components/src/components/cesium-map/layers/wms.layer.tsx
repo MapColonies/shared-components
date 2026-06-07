@@ -21,5 +21,5 @@ export const CesiumWMSLayer: React.FC<RCesiumWMSLayerProps> = (props) => {
       : new WebMapServiceImageryProvider(options);
   }, [viewState.shouldOptimizedTileRequests]);
 
-  return <CesiumImageryLayer {...restProps} imageryProvider={providerInstance} />;
+  return <CesiumImageryLayer key={`wms-${String(viewState.shouldOptimizedTileRequests)}`} {...restProps} imageryProvider={providerInstance} />;
 };

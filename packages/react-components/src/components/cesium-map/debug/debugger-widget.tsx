@@ -1,12 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
-import { Checkbox } from '@map-colonies/react-core';
+import { Checkbox, Tooltip } from '@map-colonies/react-core';
+import { Box } from '../../box';
+import { EXAMINED_TILES_META_PROP } from '../helpers/customImageryProviders';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
+import { TRANSPARENT_LAYER_ID } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
 import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { WFS } from './wfs';
+
+import './debugger-widget.css';
 
 interface IFeatureTypeMetadata {
   id: string;
@@ -25,14 +30,92 @@ export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
+interface LayerMetaItem {
+  layerId?: string;
+  meta?: Record<string, unknown>;
+}
+
+type DebuggerSectionId = 'data' | 'layers' | 'tools';
+
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debugger Tool', [locale]);
+  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
+  const [collapsedSections, setCollapsedSections] = useState<Record<DebuggerSectionId, boolean>>({
+    data: false,
+    layers: false,
+    tools: false,
+  });
+  const title = useMemo(() => get(locale, 'DEBUG_PANEL_TITLE') ?? 'Debug', [locale]);
+  const dataSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_DATA') ?? 'Data', [locale]);
+  const layersSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_LAYERS') ?? 'Layers', [locale]);
+  const toolsSectionTitle = useMemo(() => get(locale, 'DEBUG_SECTION_TOOLS') ?? 'Tools', [locale]);
   const optimizationLabel = useMemo(() => get(locale, 'TILE_REQUESTS_OPTIMIZATION_CHECKBOX') ?? 'Tile requests optimization', [locale]);
   const cesiumInspectorLabel = useMemo(() => get(locale, 'CESIUM_INSPECTOR_CHECKBOX') ?? 'Cesium Inspector', [locale]);
+  const withTransparencyTiles = useMemo(() => get(locale, 'WITH_TRANSPARENCY_TOOLTIP') ?? 'This layer has tiles with transparency', [locale]);
+  const withoutTransparencyTiles = useMemo(() => get(locale, 'WITHOUT_TRANSPARENCY_TOOLTIP') ?? 'This layer has tiles WITHOUT transparency', [locale]);
 
   const mapViewer = useCesiumMap();
   const { viewState, setViewState } = useCesiumMapViewstate();
+
+  const toggleSection = (sectionId: DebuggerSectionId): void => {
+    setCollapsedSections((prevState) => ({
+      ...prevState,
+      [sectionId]: !prevState[sectionId],
+    }));
+  };
+
+  const updateLayerMeta = (): void => {
+    if (!mapViewer.layersManager?.layerList) return;
+    setLayersMeta(
+      mapViewer.layersManager.layerList
+        .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
+        .map(
+          (layer): LayerMetaItem => ({
+            layerId: layer.meta?.id as string | undefined,
+            meta: layer.meta as Record<string, unknown> | undefined,
+          })
+        )
+    );
+  };
+
+  useEffect(() => {
+    let moveEndRefreshTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    const scheduleLayerMetaRefresh = (): void => {
+      if (moveEndRefreshTimeoutId !== undefined) {
+        clearTimeout(moveEndRefreshTimeoutId);
+      }
+      moveEndRefreshTimeoutId = setTimeout(() => {
+        updateLayerMeta();
+      }, 0);
+    };
+
+    const removeTileLoad = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
+      if (tilesLoadingCount === 0) {
+        updateLayerMeta();
+        removeTileLoad();
+      }
+    });
+    const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
+    const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
+    mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
+    return (): void => {
+      if (moveEndRefreshTimeoutId !== undefined) {
+        clearTimeout(moveEndRefreshTimeoutId);
+      }
+      removeTileLoad();
+      removeMoveEnd();
+      removeLayerRemoved();
+      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayerMeta);
+    };
+  }, []);
+
+  useEffect(() => {
+    updateLayerMeta();
+  }, [viewState?.shouldOptimizedTileRequests]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) return;
@@ -95,31 +178,108 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         </svg>
       </CesiumIcon>
       <CesiumTool isVisible={isOpen} title={title}>
-        <Checkbox
-          className="optimizationCheckbox"
-          label={optimizationLabel}
-          checked={viewState?.shouldOptimizedTileRequests ?? false}
-          onClick={() => {
-            setViewState((prevState) => ({
-              currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-              shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
-              showCesiumInspector: prevState?.showCesiumInspector ?? false,
-            }));
-          }}
-        />
-        <Checkbox
-          className="cesiumInspectorCheckbox"
-          label={cesiumInspectorLabel}
-          checked={viewState?.showCesiumInspector ?? false}
-          onClick={() => {
-            setViewState((prevState) => ({
-              currentZoomLevel: prevState?.currentZoomLevel ?? -1,
-              shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
-              showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
-            }));
-          }}
-        />
-        <WFS featureTypes={featureTypes} locale={locale} />
+        <Box className="debuggerWidgetSections">
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('data')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.data ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{dataSectionTitle}</Box>
+            </Box>
+            {!collapsedSections.data && (
+              <Box className="debuggerWidgetSectionContent">
+                <WFS featureTypes={featureTypes} locale={locale} />
+              </Box>
+            )}
+          </Box>
+
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('layers')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.layers ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{layersSectionTitle}</Box>
+            </Box>
+            {!collapsedSections.layers && (
+              <Box className="debuggerWidgetSectionContent">
+                <Checkbox
+                  className="optimizationCheckbox"
+                  label={optimizationLabel}
+                  checked={viewState?.shouldOptimizedTileRequests ?? false}
+                  onClick={() => {
+                    setViewState((prevState) => ({
+                      currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                      shouldOptimizedTileRequests: !(prevState?.shouldOptimizedTileRequests ?? false),
+                      showCesiumInspector: prevState?.showCesiumInspector ?? false,
+                    }));
+                  }}
+                />
+                {viewState?.shouldOptimizedTileRequests === true && (
+                  <Box className="debuggerLayerList">
+                    {[...layersMeta].reverse().map((layer, index) => {
+                      const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
+                      const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
+                      const statusText =
+                        layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
+                      const transparencyText =
+                        layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
+                      const tileCoordinatesFromMeta = get(layer.meta, EXAMINED_TILES_META_PROP) as
+                        | Array<{ x?: number; y?: number; level?: number }>
+                        | { x?: number; y?: number; level?: number }
+                        | undefined;
+                      const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
+                        ? tileCoordinatesFromMeta
+                        : tileCoordinatesFromMeta !== undefined
+                          ? [tileCoordinatesFromMeta]
+                          : [];
+                      const formattedTileCoordinates = tileCoordinatesList
+                        .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
+                        .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
+                      const tooltipContent =
+                        transparencyText === ''
+                          ? undefined
+                          : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
+                      const isRelevant = layer.meta?.relevantToExtent !== false;
+                      if (tooltipContent === undefined) {
+                        return (
+                          <Box key={idText} className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`}>
+                            {nameText + statusText}
+                          </Box>
+                        );
+                      }
+                      return (
+                        <Tooltip key={idText} content={tooltipContent}>
+                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip="true">
+                            {nameText + statusText}
+                          </Box>
+                        </Tooltip>
+                      );
+                    })}
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Box>
+
+          <Box className="debuggerWidgetSection">
+            <Box className="debuggerWidgetSectionHeader" onClick={() => toggleSection('tools')}>
+              <Box className="debuggerWidgetSectionHeaderToggle">{collapsedSections.tools ? '+' : '-'}</Box>
+              <Box className="debuggerWidgetSectionHeaderLabel">{toolsSectionTitle}</Box>
+            </Box>
+            {!collapsedSections.tools && (
+              <Box className="debuggerWidgetSectionContent">
+                <Checkbox
+                  className="cesiumInspectorCheckbox"
+                  label={cesiumInspectorLabel}
+                  checked={viewState?.showCesiumInspector ?? false}
+                  onClick={() => {
+                    setViewState((prevState) => ({
+                      currentZoomLevel: prevState?.currentZoomLevel ?? -1,
+                      shouldOptimizedTileRequests: prevState?.shouldOptimizedTileRequests ?? false,
+                      showCesiumInspector: !(prevState?.showCesiumInspector ?? false),
+                    }));
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+        </Box>
       </CesiumTool>
     </>
   );
