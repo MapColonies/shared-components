@@ -12,8 +12,8 @@ import './active-layers-panel.css';
 const IMAGERY = 'Imagery';
 const SERVICE = 'Service';
 const DATA = 'Data';
-const TRANSPARENT_LAYER = '### TRANSPARENT_LAYER_FOR_OPTIMIZATION ###';
-const SERVICE_LAYER = '### LAYER_WITH_NO_ID ###';
+const TRANSPARENT_LAYER = '# TRANSPARENT_LAYER_FOR_OPTIMIZATION #';
+const SERVICE_LAYER = '# LAYER_WITH_NO_ID #';
 
 interface IActiveLayer {
   id: string;

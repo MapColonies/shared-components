@@ -38,6 +38,11 @@ body[dir='rtl'] .cesium-viewer .activeLayersPanel .cesium-cesiumInspector-sectio
   cursor: pointer;
 }
 
+body[dir='rtl'] .activeLayersPanel .icon {
+  margin-left: unset;
+  margin-right: 8px;
+}
+
 .cesium-viewer .activeLayersPanel .icon.disabled {
   opacity: 0;
   pointer-events: none;
