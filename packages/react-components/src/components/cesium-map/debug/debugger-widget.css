@@ -58,11 +58,19 @@ body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
 
 .cesium-viewer .debuggerWidgetSectionContent .optimizationCheckbox,
 .cesium-viewer .debuggerWidgetSectionContent .cesiumInspectorCheckbox {
+  display: flex;
+  align-items: center;
+  width: 100%;
   margin-bottom: 0;
 }
 
 .cesium-viewer .debuggerWidgetSectionContent .optimizationCheckbox label,
 .cesium-viewer .debuggerWidgetSectionContent .cesiumInspectorCheckbox label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
 }
 

@@ -1,5 +1,5 @@
 import { Rectangle } from 'cesium';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
@@ -10,13 +10,16 @@ import { useCesiumMap } from '../map';
 import './active-layers-panel.css';
 
 const IMAGERY = 'Imagery';
+const SERVICE = 'Service';
 const DATA = 'Data';
+const TRANSPARENT_LAYER = '### TRANSPARENT_LAYER_FOR_OPTIMIZATION ###';
+const SERVICE_LAYER = '### LAYER_WITH_NO_ID ###';
 
 interface IActiveLayer {
   id: string;
   name: string;
   rect: Rectangle;
-  isBaseMap: boolean;
+  isDisabled: boolean;
 }
 
 interface ISection {
@@ -30,7 +33,7 @@ interface IActiveLayersPanelProps {
 
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, values: [] }, { id: DATA, values: [] } ]);
+  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, values: [] }, { id: SERVICE, values: [] }, { id: DATA, values: [] } ]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const getLabel = (key: string) => {
@@ -42,13 +45,42 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i) => {
           const layer = mapViewer.imageryLayers.get(i);
           const meta = (layer as any).meta;
+          const isImageryLayer = !isEmpty(meta?.id) && meta.id !== TRANSPARENT_LAYER_ID;
+          if (!isImageryLayer) {
+            return undefined;
+          }
           return {
-            id: meta?.id as string,
+            id: meta.id as string,
             name: (get(meta, 'layerRecord.productName') ?? meta?.id) as string,
             rect: layer.rectangle,
-            isBaseMap: mapViewer.layersManager?.isBaseMapLayer(meta) as boolean
+            isDisabled: mapViewer.layersManager?.isBaseMapLayer(meta) as boolean
           };
-        }).filter((layer) => layer.id !== TRANSPARENT_LAYER_ID)
+        }).filter((layer): layer is IActiveLayer => layer !== undefined)
+      : [];
+  };
+
+  const getServiceLayers = (): IActiveLayer[] => {
+    return mapViewer.imageryLayers
+      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i) => {
+          const layer = mapViewer.imageryLayers.get(i);
+          const meta = (layer as any).meta;
+          const isServiceLayer = isEmpty(meta?.id) || meta.id === TRANSPARENT_LAYER_ID;
+          if (!isServiceLayer) {
+            return undefined;
+          }
+          const isTransparentLayer = meta?.id === TRANSPARENT_LAYER_ID;
+          const providerName = (layer as any).imageryProvider?.constructor?.name as string | undefined;
+          const name = isTransparentLayer
+            ? TRANSPARENT_LAYER
+            : `${SERVICE_LAYER} ${String(i + 1)}`;
+
+          return {
+            id: (meta?.id as string | undefined) ?? `SERVICE_LAYER_${String(i)}`,
+            name: isTransparentLayer ? name : providerName ?? name,
+            rect: layer.rectangle,
+            isDisabled: true
+          };
+        }).filter((layer): layer is IActiveLayer => layer !== undefined)
       : [];
   };
 
@@ -58,7 +90,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         id: dataLayer.meta?.id as string,
         name: (get(dataLayer.meta, 'featureStructure.aliasLayerName') ?? dataLayer.meta.productName) as string,
         rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint)),
-        isBaseMap: false
+        isDisabled: false
       }; }) || [];
   };
 
@@ -68,6 +100,10 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         {
           id: IMAGERY,
           values: getImageryLayers()
+        },
+        {
+          id: SERVICE,
+          values: getServiceLayers()
         },
         {
           id: DATA,
@@ -90,15 +126,22 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
                 ...item,
                 values: getImageryLayers()
               }
+            : item.id === SERVICE
+              ? {
+                  ...item,
+                  values: getServiceLayers()
+                }
             : item
         )
       );
     };
     mapViewer.layersManager.addLayerUpdatedListener(handleLayerEvent);
+    mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
         mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerEvent);
+        mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
         mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
       }
     };
@@ -149,7 +192,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
                 section.values.map((activeLayer: IActiveLayer) => (
                   <Box key={activeLayer.id} className="layer">
                     <Tooltip content={activeLayer.name}>
-                      <Box className={`name ${activeLayer.isBaseMap ? 'disabled' : ''}`}>{activeLayer.name}</Box>
+                      <Box className={`name ${activeLayer.isDisabled ? 'disabled' : ''}`}><bdi>{activeLayer.name}</bdi></Box>
                     </Tooltip>
                     <Box className="icons">
                       <Tooltip content={get(locale, 'FLY_TO') ?? 'Fly To'}>
@@ -161,7 +204,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
                         </Box>
                       </Tooltip>
                       {/* <Tooltip content={get(locale, 'REMOVE') ?? 'Remove'}>
-                        <Box className={`icon ${activeLayer.isBaseMap ? 'disabled' : ''}`} onClick={(event) => { event.stopPropagation(); }}>
+                        <Box className={`icon ${activeLayer.isDisabled ? 'disabled' : ''}`} onClick={(event) => { event.stopPropagation(); }}>
                           <svg width="100%" height="100%" viewBox="0 0 16 16" fill="var(--mdc-theme-cesium-color)">
                             <path fillRule="evenodd" clipRule="evenodd" d="M10 3h3v1h-1v9l-1 1H4l-1-1V4H2V3h3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1zM9 2H6v1h3V2zM4 13h7V4H4v9zm2-8H5v7h1V5zm1 0h1v7H7V5zm2 0h1v7H9V5z"/>
                           </svg>

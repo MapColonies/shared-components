@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { EXAMINED_TILES_META_PROP } from '../helpers/customImageryProviders';
@@ -68,7 +68,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     if (!mapViewer.layersManager?.layerList) return;
     setLayersMeta(
       mapViewer.layersManager.layerList
-        .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
+        .filter((layer): boolean => !isEmpty(layer.meta?.id) && layer.meta?.id !== TRANSPARENT_LAYER_ID)
         .map(
           (layer): LayerMetaItem => ({
             layerId: layer.meta?.id as string | undefined,

@@ -422,6 +422,7 @@ LocalizedMap.argTypes = {
       NO_DATA_LAYERS: 'לא נמצאו שכבות מידע בתצוגה',
       ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
       IMAGERY: 'ראסטר',
+      SERVICE: 'שירות',
       DATA: 'מידע',
       FLY_TO: 'הצג מיקום',
       REMOVE: 'הסר',
