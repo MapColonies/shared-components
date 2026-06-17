@@ -48,14 +48,6 @@ const extractModelName = (rawUrl: string): string => {
   }
 };
 
-const getTilesetUrl = (tileset: Cesium3DTileset): string | undefined => {
-  const resourceUrl = get(tileset, 'resource.url');
-  if (typeof resourceUrl === 'string') {
-    return resourceUrl;
-  }
-  return undefined;
-};
-
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
   const [sections, setSections] = useState<ISection[]>([
@@ -135,7 +127,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         if (!isTileset) {
           return undefined;
         }
-        const modelUrl = getTilesetUrl(primitive as Cesium3DTileset);
+        const modelUrl = get(primitive, 'resource.url');
         const modelName = extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
         return {
           id: `3D_MODEL_${String(index)}`,
