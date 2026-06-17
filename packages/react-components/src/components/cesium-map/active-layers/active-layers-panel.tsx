@@ -49,26 +49,9 @@ const extractModelName = (rawUrl: string): string => {
 };
 
 const getTilesetUrl = (tileset: Cesium3DTileset): string | undefined => {
-  const directUrl = get(tileset, 'url');
-  if (typeof directUrl === 'string') {
-    return directUrl;
-  }
-  const nestedDirectUrl = get(tileset, 'url.url');
-  if (typeof nestedDirectUrl === 'string') {
-    return nestedDirectUrl;
-  }
   const resourceUrl = get(tileset, 'resource.url');
   if (typeof resourceUrl === 'string') {
     return resourceUrl;
-  }
-  const getUrlComponent = get(tileset, 'resource.getUrlComponent') as
-    | ((query?: boolean, proxy?: boolean) => string)
-    | undefined;
-  if (typeof getUrlComponent === 'function') {
-    const url = getUrlComponent(true, true);
-    if (typeof url === 'string' && url.length > 0) {
-      return url;
-    }
   }
   return undefined;
 };
