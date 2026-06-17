@@ -11,6 +11,12 @@ body[dir='rtl'] .cesium-viewer .activeLayersPanel .cesium-cesiumInspector-sectio
 }
 
 .cesium-viewer .activeLayersPanel .name {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cesium-viewer .activeLayersPanel .name bdi {
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -34,13 +40,8 @@ body[dir='rtl'] .cesium-viewer .activeLayersPanel .cesium-cesiumInspector-sectio
 .cesium-viewer .activeLayersPanel .icon {
   width: 17px;
   height: 17px;
-  margin-left: 8px;
+  margin: 0 8px;
   cursor: pointer;
-}
-
-body[dir='rtl'] .activeLayersPanel .icon {
-  margin-left: unset;
-  margin-right: 8px;
 }
 
 .cesium-viewer .activeLayersPanel .icon.disabled {
