@@ -33,6 +33,21 @@ interface IActiveLayersPanelProps {
   locale?: { [key: string]: string };
 }
 
+const GENERIC_PATH_SEGMENTS = new Set(['data', 'act', 'assets', 'cesium', 'tiles', 'tileset', '3d', 'model', 'models']);
+
+const extractModelName = (rawUrl: string): string => {
+  try {
+    const { hostname, pathname } = new URL(rawUrl);
+    const segments = pathname.split('/').filter((s) => s.length > 0 && !s.includes('.'));
+    const named = [...segments]
+      .reverse()
+      .find((s) => !GENERIC_PATH_SEGMENTS.has(s.toLowerCase()) && /[a-zA-Z]/.test(s));
+    return named ?? hostname;
+  } catch {
+    return rawUrl;
+  }
+};
+
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
   const [sections, setSections] = useState<ISection[]>([
@@ -115,12 +130,13 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         const modelUrl =
           (primitive as any).url as string | undefined ??
           (primitive as any)._url as string | undefined ??
+          (primitive as any).resource?.url as string | undefined ??
+          (primitive as any)._resource?.url as string | undefined ??
           (primitive as any)._resource?._url as string | undefined;
-        const modelName = modelUrl ?? `${get(locale, THREE_D) ?? '3D Model'} ${String(index + 1)}`;
+        const modelName = extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
         return {
-          id: `MODEL_3D_${String(index)}`,
+          id: `3D_MODEL_${String(index)}`,
           name: modelName,
-          rect: undefined,
           zoomToTarget: primitive as Cesium3DTileset,
           isDisabled: false,
         };
