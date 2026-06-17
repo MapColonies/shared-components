@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { viewerCesiumInspectorMixin } from 'cesium';
+import { viewerCesiumInspectorMixin, TileCoordinatesImageryProvider } from 'cesium';
 import { Box } from '../../box';
 import { CesiumViewer, useCesiumMap } from '../map';
 
@@ -17,6 +17,21 @@ const applyInspectorContainerStyles = (container: HTMLElement): void => {
   container.style.display = '';
   container.style.top = '0';
   container.style.position = 'relative';
+};
+
+const keepTileCoordinatesLayerOnTop = (viewer: CesiumViewer): void => {
+  const layers = viewer.imageryLayers;
+  const tileCoordinatesLayer = Array.from({ length: layers.length }, (_, index) => layers.get(index)).find((layer) => {
+    const provider = (layer as any).imageryProvider;
+    return provider instanceof TileCoordinatesImageryProvider || provider?.constructor?.name === 'TileCoordinatesImageryProvider';
+  });
+  if (tileCoordinatesLayer === undefined) {
+    return;
+  }
+  const topLayer = layers.get(layers.length - 1);
+  if (topLayer !== tileCoordinatesLayer) {
+    layers.raiseToTop(tileCoordinatesLayer);
+  }
 };
 
 export const InspectorTool: React.FC = () => {
@@ -40,7 +55,20 @@ export const InspectorTool: React.FC = () => {
       applyInspectorContainerStyles(inspectorContainer);
     }
 
+    const refreshTileCoordinatesOrder = (): void => {
+      keepTileCoordinatesLayerOnTop(mapViewer);
+    };
+
+    const removeLayerAdded = mapViewer.imageryLayers.layerAdded.addEventListener(refreshTileCoordinatesOrder);
+    const removeLayerMoved = mapViewer.imageryLayers.layerMoved.addEventListener(refreshTileCoordinatesOrder);
+    const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(refreshTileCoordinatesOrder);
+
+    setTimeout(refreshTileCoordinatesOrder, 0);
+
     return () => {
+      removeLayerAdded();
+      removeLayerMoved();
+      removeLayerRemoved();
       if (inspectorContainer) {
         inspectorContainer.style.display = 'none';
       }
