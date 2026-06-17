@@ -212,9 +212,6 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   useEffect(() => {
     const primitives = mapViewer.scene?.primitives as any;
-    if (primitives?.primitiveAdded === undefined || primitives?.primitiveRemoved === undefined) {
-      return;
-    }
     const handlePrimitiveEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
@@ -227,11 +224,17 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         )
       );
     };
-    primitives.primitiveAdded.addEventListener(handlePrimitiveEvent);
-    primitives.primitiveRemoved.addEventListener(handlePrimitiveEvent);
+    if (primitives?.primitiveAdded !== undefined && primitives?.primitiveRemoved !== undefined) {
+      primitives.primitiveAdded.addEventListener(handlePrimitiveEvent);
+      primitives.primitiveRemoved.addEventListener(handlePrimitiveEvent);
+      return () => {
+        primitives.primitiveAdded.removeEventListener(handlePrimitiveEvent);
+        primitives.primitiveRemoved.removeEventListener(handlePrimitiveEvent);
+      };
+    }
+    const intervalId = globalThis.setInterval(handlePrimitiveEvent, 1000);
     return () => {
-      primitives.primitiveAdded.removeEventListener(handlePrimitiveEvent);
-      primitives.primitiveRemoved.removeEventListener(handlePrimitiveEvent);
+      globalThis.clearInterval(intervalId);
     };
   }, [mapViewer.scene]);
 
