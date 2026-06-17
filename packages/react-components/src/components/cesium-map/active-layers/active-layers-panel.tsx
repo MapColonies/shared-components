@@ -48,6 +48,31 @@ const extractModelName = (rawUrl: string): string => {
   }
 };
 
+const getTilesetUrl = (tileset: Cesium3DTileset): string | undefined => {
+  const directUrl = get(tileset, 'url');
+  if (typeof directUrl === 'string') {
+    return directUrl;
+  }
+  const nestedDirectUrl = get(tileset, 'url.url');
+  if (typeof nestedDirectUrl === 'string') {
+    return nestedDirectUrl;
+  }
+  const resourceUrl = get(tileset, 'resource.url');
+  if (typeof resourceUrl === 'string') {
+    return resourceUrl;
+  }
+  const getUrlComponent = get(tileset, 'resource.getUrlComponent') as
+    | ((query?: boolean, proxy?: boolean) => string)
+    | undefined;
+  if (typeof getUrlComponent === 'function') {
+    const url = getUrlComponent(true, true);
+    if (typeof url === 'string' && url.length > 0) {
+      return url;
+    }
+  }
+  return undefined;
+};
+
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
   const [sections, setSections] = useState<ISection[]>([
@@ -127,12 +152,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         if (!isTileset) {
           return undefined;
         }
-        const modelUrl =
-          (primitive as any).url as string | undefined ??
-          (primitive as any)._url as string | undefined ??
-          (primitive as any).resource?.url as string | undefined ??
-          (primitive as any)._resource?.url as string | undefined ??
-          (primitive as any)._resource?._url as string | undefined;
+        const modelUrl = getTilesetUrl(primitive as Cesium3DTileset);
         const modelName = extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
         return {
           id: `3D_MODEL_${String(index)}`,
