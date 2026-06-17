@@ -424,6 +424,7 @@ LocalizedMap.argTypes = {
       IMAGERY: 'ראסטר',
       SERVICE: 'שירות',
       DATA: 'מידע',
+      '3D': 'תלת-מימד',
       FLY_TO: 'הצג מיקום',
       REMOVE: 'הסר',
       BASE_MAP_TITLE: 'מפות בסיס',

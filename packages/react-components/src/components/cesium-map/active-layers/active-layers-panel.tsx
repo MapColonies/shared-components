@@ -1,4 +1,4 @@
-import { Rectangle } from 'cesium';
+import { Cesium3DTileset, Rectangle } from 'cesium';
 import { get, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
@@ -12,13 +12,15 @@ import './active-layers-panel.css';
 const IMAGERY = 'Imagery';
 const SERVICE = 'Service';
 const DATA = 'Data';
-const TRANSPARENT_LAYER = '# TRANSPARENT_LAYER_FOR_OPTIMIZATION #';
-const SERVICE_LAYER = '# LAYER_WITH_NO_ID #';
+const THREE_D = '3D';
+const TRANSPARENT_LAYER = 'TRANSPARENT_LAYER_FOR_OPTIMIZATION';
+const SERVICE_LAYER = 'LAYER_WITH_NO_ID #';
 
 interface IActiveLayer {
   id: string;
   name: string;
-  rect: Rectangle;
+  rect?: Rectangle;
+  zoomToTarget?: Cesium3DTileset;
   isDisabled: boolean;
 }
 
@@ -33,7 +35,12 @@ interface IActiveLayersPanelProps {
 
 export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale }) => {
   const mapViewer = useCesiumMap();
-  const [sections, setSections] = useState<ISection[]>([ { id: IMAGERY, values: [] }, { id: SERVICE, values: [] }, { id: DATA, values: [] } ]);
+  const [sections, setSections] = useState<ISection[]>([
+    { id: IMAGERY, values: [] },
+    { id: SERVICE, values: [] },
+    { id: DATA, values: [] },
+    { id: THREE_D, values: [] }
+  ]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const getLabel = (key: string) => {
@@ -42,7 +49,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   const getImageryLayers = (): IActiveLayer[] => {
     return mapViewer.imageryLayers
-      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i) => {
+      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i): IActiveLayer | undefined => {
           const layer = mapViewer.imageryLayers.get(i);
           const meta = (layer as any).meta;
           const isImageryLayer = !isEmpty(meta?.id) && meta.id !== TRANSPARENT_LAYER_ID;
@@ -61,7 +68,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   const getServiceLayers = (): IActiveLayer[] => {
     return mapViewer.imageryLayers
-      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i) => {
+      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i): IActiveLayer | undefined => {
           const layer = mapViewer.imageryLayers.get(i);
           const meta = (layer as any).meta;
           const isServiceLayer = isEmpty(meta?.id) || meta.id === TRANSPARENT_LAYER_ID;
@@ -75,7 +82,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             : `${SERVICE_LAYER} ${String(i + 1)}`;
 
           return {
-            id: (meta?.id as string | undefined) ?? `SERVICE_LAYER_${String(i)}`,
+            id: `SERVICE_LAYER_${String(i)}`,
             name: isTransparentLayer ? name : providerName ?? name,
             rect: layer.rectangle,
             isDisabled: true
@@ -94,6 +101,33 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       }; }) || [];
   };
 
+  const get3DModels = (): IActiveLayer[] => {
+    const primitives = mapViewer.scene?.primitives as any;
+    if (primitives === undefined || typeof primitives.length !== 'number') {
+      return [];
+    }
+    return Array.from({ length: primitives.length }, (_, i) => primitives.get(i))
+      .map((primitive: any, index: number): IActiveLayer | undefined => {
+        const isTileset = primitive instanceof Cesium3DTileset || primitive?.constructor?.name === 'Cesium3DTileset';
+        if (!isTileset) {
+          return undefined;
+        }
+        const modelUrl =
+          (primitive as any).url as string | undefined ??
+          (primitive as any)._url as string | undefined ??
+          (primitive as any)._resource?._url as string | undefined;
+        const modelName = modelUrl ?? `${get(locale, THREE_D) ?? '3D Model'} ${String(index + 1)}`;
+        return {
+          id: `MODEL_3D_${String(index)}`,
+          name: modelName,
+          rect: undefined,
+          zoomToTarget: primitive as Cesium3DTileset,
+          isDisabled: false,
+        };
+      })
+      .filter((layer): layer is IActiveLayer => layer !== undefined);
+  };
+
   useEffect(() => {
     const updateSections = () => {
       const newSections = [
@@ -108,6 +142,10 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         {
           id: DATA,
           values: getDataLayers()
+        },
+        {
+          id: THREE_D,
+          values: get3DModels()
         },
       ];
       setSections(newSections);
@@ -130,6 +168,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
               ? {
                   ...item,
                   values: getServiceLayers()
+                }
+            : item.id === THREE_D
+              ? {
+                  ...item,
+                  values: get3DModels()
                 }
             : item
         )
@@ -167,12 +210,43 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     };
   }, [mapViewer.layersManager?.dataLayerList]);
 
+  useEffect(() => {
+    const primitives = mapViewer.scene?.primitives as any;
+    if (primitives?.primitiveAdded === undefined || primitives?.primitiveRemoved === undefined) {
+      return;
+    }
+    const handlePrimitiveEvent = (): void => {
+      setSections((prev) =>
+        prev.map((item) =>
+          item.id === THREE_D
+            ? {
+                ...item,
+                values: get3DModels()
+              }
+            : item
+        )
+      );
+    };
+    primitives.primitiveAdded.addEventListener(handlePrimitiveEvent);
+    primitives.primitiveRemoved.addEventListener(handlePrimitiveEvent);
+    return () => {
+      primitives.primitiveAdded.removeEventListener(handlePrimitiveEvent);
+      primitives.primitiveRemoved.removeEventListener(handlePrimitiveEvent);
+    };
+  }, [mapViewer.scene]);
+
   const toggleSection = (id: string) => {
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleFlyTo = (rect: Rectangle) => {
-    mapViewer.camera.flyTo({ destination: rect });
+  const handleFlyTo = (activeLayer: IActiveLayer) => {
+    if (activeLayer.zoomToTarget !== undefined) {
+      void mapViewer.zoomTo(activeLayer.zoomToTarget);
+      return;
+    }
+    if (activeLayer.rect !== undefined) {
+      mapViewer.camera.flyTo({ destination: activeLayer.rect });
+    }
   };
 
   return (
@@ -196,7 +270,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
                     </Tooltip>
                     <Box className="icons">
                       <Tooltip content={get(locale, 'FLY_TO') ?? 'Fly To'}>
-                        <Box className="icon" onClick={(event) => { event.stopPropagation(); handleFlyTo(activeLayer.rect); }}>
+                        <Box className="icon" onClick={(event) => { event.stopPropagation(); handleFlyTo(activeLayer); }}>
                           <svg fill="var(--mdc-theme-cesium-color)" width="100%" height="100%" viewBox="0 0 256 256">
                             <path d="M236,120H223.66406A96.15352,96.15352,0,0,0,136,32.33618V20a8,8,0,0,0-16,0V32.33618A96.15352,96.15352,0,0,0,32.33594,120H20a8,8,0,0,0,0,16H32.33594A96.15352,96.15352,0,0,0,120,223.66382V236a8,8,0,0,0,16,0V223.66382A96.15352,96.15352,0,0,0,223.66406,136H236a8,8,0,0,0,0-16Zm-40,16h11.59912A80.14164,80.14164,0,0,1,136,207.59912V196a8,8,0,0,0-16,0v11.59912A80.14164,80.14164,0,0,1,48.40088,136H60a8,8,0,0,0,0-16H48.40088A80.14164,80.14164,0,0,1,120,48.40088V60a8,8,0,0,0,16,0V48.40088A80.14164,80.14164,0,0,1,207.59912,120H196a8,8,0,0,0,0,16Z"/>
                             <polygon points="128,80 80,170 128,150 176,170" fill="var(--mdc-theme-cesium-color)"/>
