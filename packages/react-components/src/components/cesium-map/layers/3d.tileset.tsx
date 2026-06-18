@@ -16,8 +16,6 @@ export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = (props) => {
     <Resium3DTileset
       {...props}
       onReady={(tileset): void => {
-        // props.onReady?.(tileset);
-
         if (props.isZoomTo === true) {
           void mapViewer.zoomTo(tileset);
         }
@@ -31,6 +29,8 @@ export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = (props) => {
           const translation = Cartesian3.subtract(offset, surface, new Cartesian3());
           tileset.modelMatrix = Matrix4.fromTranslation(translation);
         }
+
+        props.onReady?.(tileset);
       }}
     />
   );

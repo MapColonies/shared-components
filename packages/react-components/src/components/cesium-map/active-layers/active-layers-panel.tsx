@@ -128,7 +128,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           return undefined;
         }
         const modelUrl = get(primitive, 'resource.url');
-        const modelName = get(primitive, 'productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
+        const modelName = get(primitive, 'properties.name') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
         return {
           id: `3D_MODEL_${String(index)}`,
           name: modelName,
