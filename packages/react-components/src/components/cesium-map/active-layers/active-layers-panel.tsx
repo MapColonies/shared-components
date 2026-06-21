@@ -19,9 +19,9 @@ const SERVICE_LAYER = 'LAYER_WITH_NO_ID #';
 interface IActiveLayer {
   id: string;
   name: string;
+  isDisabled: boolean;
   rect?: Rectangle;
   zoomToTarget?: Cesium3DTileset;
-  isDisabled: boolean;
 }
 
 interface ISection {
@@ -128,7 +128,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           return undefined;
         }
         const modelUrl = get(primitive, 'resource.url');
-        const modelName = get(primitive, 'properties.name') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
+        const modelName = get(primitive, 'meta.layerRecord.productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
         return {
           id: `3D_MODEL_${String(index)}`,
           name: modelName,
