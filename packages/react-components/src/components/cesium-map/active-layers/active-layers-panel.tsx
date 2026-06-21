@@ -1,10 +1,16 @@
 import { Cesium3DTileset, Rectangle } from 'cesium';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
 import { Box } from '../../box';
-import { TRANSPARENT_LAYER_ID } from '../layers-manager';
+import {
+  ICesiumImageryLayer,
+  TRANSPARENT_LAYER_ID,
+  getLayerId,
+  isServiceLayer,
+  isManagedImageryLayer
+} from '../layers-manager';
 import { useCesiumMap } from '../map';
 
 import './active-layers-panel.css';
@@ -62,36 +68,39 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return get(locale, key.toUpperCase()) ?? key;
   };
 
+  const getLayerList = (): ICesiumImageryLayer[] => {
+    return mapViewer.layersManager?.layerList ?? [];
+  };
+
   const getImageryLayers = (): IActiveLayer[] => {
-    return mapViewer.imageryLayers
-      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i): IActiveLayer | undefined => {
-          const layer = mapViewer.imageryLayers.get(i);
-          const meta = (layer as any).meta;
-          const isImageryLayer = !isEmpty(meta?.id) && meta.id !== TRANSPARENT_LAYER_ID;
-          if (!isImageryLayer) {
+    const layerList = getLayerList();
+    return layerList.length > 0
+      ? layerList.map((layer): IActiveLayer | undefined => {
+          const meta = get(layer, 'meta');
+          const layerId = getLayerId(layer);
+          if (!isManagedImageryLayer(layerId)) {
             return undefined;
           }
           return {
-            id: meta.id as string,
-            name: (get(meta, 'layerRecord.productName') ?? meta?.id) as string,
+            id: layerId as string,
+            name: (get(meta, 'layerRecord.productName') ?? layerId) as string,
             rect: layer.rectangle,
             isDisabled: mapViewer.layersManager?.isBaseMapLayer(meta) as boolean
           };
-        }).filter((layer): layer is IActiveLayer => layer !== undefined)
+        }).filter((item): item is IActiveLayer => item !== undefined)
       : [];
   };
 
   const getServiceLayers = (): IActiveLayer[] => {
-    return mapViewer.imageryLayers
-      ? Array.from({ length: mapViewer.imageryLayers.length }, (_, i): IActiveLayer | undefined => {
-          const layer = mapViewer.imageryLayers.get(i);
-          const meta = (layer as any).meta;
-          const isServiceLayer = isEmpty(meta?.id) || meta.id === TRANSPARENT_LAYER_ID;
-          if (!isServiceLayer) {
+    const layerList = getLayerList();
+    return layerList.length > 0
+      ? layerList.map((layer, i): IActiveLayer | undefined => {
+          const layerId = getLayerId(layer);
+          if (!isServiceLayer(layerId)) {
             return undefined;
           }
-          const isTransparentLayer = meta?.id === TRANSPARENT_LAYER_ID;
-          const providerName = (layer as any).imageryProvider?.constructor?.name as string | undefined;
+          const isTransparentLayer = layerId === TRANSPARENT_LAYER_ID;
+          const providerName = get(layer, 'imageryProvider.constructor.name') as string | undefined;
           const name = isTransparentLayer
             ? TRANSPARENT_LAYER
             : `${SERVICE_LAYER} ${String(i + 1)}`;
@@ -102,7 +111,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             rect: layer.rectangle,
             isDisabled: true
           };
-        }).filter((layer): layer is IActiveLayer => layer !== undefined)
+        }).filter((item): item is IActiveLayer => item !== undefined)
       : [];
   };
 

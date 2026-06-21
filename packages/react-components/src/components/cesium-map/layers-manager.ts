@@ -55,6 +55,18 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
+export const getLayerId = (layer: ICesiumImageryLayer): string | undefined => {
+  return get(layer, 'meta.id') as string | undefined;
+};
+
+export const isServiceLayer = (layerId: string | undefined): boolean => {
+  return isEmpty(layerId) || layerId === TRANSPARENT_LAYER_ID;
+};
+
+export const isManagedImageryLayer = (layerId: string | undefined): boolean => {
+  return !isServiceLayer(layerId);
+};
+
 class LayerManager {
   public mapViewer: CesiumViewer;
 
@@ -478,7 +490,6 @@ class LayerManager {
     const move = from > to ? INC : DEC;
     const min = from < to ? from : to;
     const max = from < to ? to : from;
-
     this.layers.forEach((layer) => {
       const parentId = get(layer.meta, 'parentBasetMapId') as string;
       if (!parentId) {
@@ -494,12 +505,10 @@ class LayerManager {
       if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
         continue;
       }
-
       const relevantToExtent = layer.meta?.relevantToExtent;
       if (typeof relevantToExtent !== 'boolean') {
         continue;
       }
-
       if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
         layer.show = relevantToExtent;
       }
