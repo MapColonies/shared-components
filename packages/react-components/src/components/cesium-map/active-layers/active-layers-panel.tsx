@@ -145,7 +145,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           isDisabled: false,
         };
       })
-      .filter((layer): layer is IActiveLayer => layer !== undefined);
+      .filter((item): item is IActiveLayer => item !== undefined);
   };
 
   useEffect(() => {
