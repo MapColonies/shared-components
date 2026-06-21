@@ -126,26 +126,16 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   };
 
   const get3DModels = (): IActiveLayer[] => {
-    const primitives = mapViewer.scene?.primitives as any;
-    if (primitives === undefined || typeof primitives.length !== 'number') {
-      return [];
-    }
-    return Array.from({ length: primitives.length }, (_, i) => primitives.get(i))
-      .map((primitive: any, index: number): IActiveLayer | undefined => {
-        const isTileset = primitive instanceof Cesium3DTileset || primitive?.constructor?.name === 'Cesium3DTileset';
-        if (!isTileset) {
-          return undefined;
-        }
-        const modelUrl = get(primitive, 'resource.url');
-        const modelName = get(primitive, 'meta.layerRecord.productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
-        return {
-          id: `3D_MODEL_${String(index)}`,
-          name: modelName,
-          zoomToTarget: primitive as Cesium3DTileset,
-          isDisabled: false,
-        };
-      })
-      .filter((item): item is IActiveLayer => item !== undefined);
+    return (mapViewer.layersManager?.modelList ?? []).map((model, index): IActiveLayer => {
+      const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
+      const modelName = (get(model.meta, 'layerRecord.productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`)) as string;
+      return {
+        id: (model.meta.id as string) ?? `3D_MODEL_${String(index)}`,
+        name: modelName,
+        zoomToTarget: model.tileset,
+        isDisabled: false,
+      };
+    });
   };
 
   useEffect(() => {
@@ -175,7 +165,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   }, []);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) return;
+    if (!mapViewer.layersManager) { return; }
     const handleLayerEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
@@ -189,12 +179,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
                   ...item,
                   values: getServiceLayers()
                 }
-            : item.id === THREE_D
-              ? {
-                  ...item,
-                  values: get3DModels()
-                }
-            : item
+              : item
         )
       );
     };
@@ -211,7 +196,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   }, [mapViewer.layersManager?.layerList]);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) return;
+    if (!mapViewer.layersManager) { return; }
     const handleDataLayerEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
@@ -231,8 +216,8 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   }, [mapViewer.layersManager?.dataLayerList]);
 
   useEffect(() => {
-    const primitives = mapViewer.scene?.primitives as any;
-    const handlePrimitiveEvent = (): void => {
+    if (!mapViewer.layersManager) { return; }
+    const handle3DModelEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === THREE_D
@@ -244,19 +229,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         )
       );
     };
-    if (primitives?.primitiveAdded !== undefined && primitives?.primitiveRemoved !== undefined) {
-      primitives.primitiveAdded.addEventListener(handlePrimitiveEvent);
-      primitives.primitiveRemoved.addEventListener(handlePrimitiveEvent);
-      return () => {
-        primitives.primitiveAdded.removeEventListener(handlePrimitiveEvent);
-        primitives.primitiveRemoved.removeEventListener(handlePrimitiveEvent);
-      };
-    }
-    const intervalId = globalThis.setInterval(handlePrimitiveEvent, 1000);
+    mapViewer.layersManager.addModelUpdatedListener(handle3DModelEvent);
     return () => {
-      globalThis.clearInterval(intervalId);
+      mapViewer.layersManager?.removeModelUpdatedListener(handle3DModelEvent);
     };
-  }, [mapViewer.scene]);
+  }, [mapViewer.layersManager?.modelList]);
 
   const toggleSection = (id: string) => {
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));

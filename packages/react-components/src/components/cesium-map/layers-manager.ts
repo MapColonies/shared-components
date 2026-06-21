@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  Cesium3DTileset as CesiumTileset,
   ImageryLayer,
   UrlTemplateImageryProvider,
   WebMapServiceImageryProvider,
@@ -44,6 +45,11 @@ export interface IRasterLayer {
   details?: Record<string, unknown>;
 }
 
+export interface ICesium3DModel {
+  tileset: CesiumTileset;
+  meta: Record<string, unknown>;
+}
+
 export interface IVectorLayer {
   id: string;
   opacity: number;
@@ -73,8 +79,10 @@ class LayerManager {
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
   public dataLayerUpdated: Event;
+  public modelUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
+  private readonly models: ICesium3DModel[];
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath: string | undefined;
   private shouldOptimizedTileRequests?: boolean;
@@ -92,10 +100,12 @@ class LayerManager {
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
     this.dataLayers = [];
+    this.models = [];
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
+    this.modelUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
@@ -116,6 +126,10 @@ class LayerManager {
 
   public get dataLayerList(): ICesiumWFSLayer[] {
     return this.dataLayers;
+  }
+
+  public get modelList(): ICesium3DModel[] {
+    return this.models;
   }
 
   public isBaseMapLayer(meta: any): boolean {
@@ -437,6 +451,14 @@ class LayerManager {
     this.dataLayerUpdated.removeEventListener(callback, this);
   }
 
+  public addModelUpdatedListener(callback: (models: ICesium3DModel[]) => void): void {
+    this.modelUpdated.addEventListener(callback, this);
+  }
+
+  public removeModelUpdatedListener(callback: (models: ICesium3DModel[]) => void): void {
+    this.modelUpdated.removeEventListener(callback, this);
+  }
+
   public setShouldOptimizedTileRequests(shouldOptimize: boolean): void {
     if (this.shouldOptimizedTileRequests === shouldOptimize) {
       return;
@@ -463,6 +485,26 @@ class LayerManager {
     return this.dataLayers.find((dataLayer) => {
       return dataLayer.meta.id === dataLayerId;
     });
+  }
+
+  public addModel(model: ICesium3DModel): void {
+    this.models.push({ ...model });
+    this.modelUpdated.raiseEvent(this.models);
+  }
+
+  public removeModel(modelId: string): void {
+    const model = this.findModelById(modelId);
+    if (model) {
+      const index = this.models.indexOf(model);
+      if (index > -1) {
+        this.models.splice(index, 1);
+      }
+      this.modelUpdated.raiseEvent(this.models);
+    }
+  }
+
+  public findModelById(modelId: string): ICesium3DModel | undefined {
+    return this.models.find((model) => model.meta.id === modelId);
   }
 
   private setLegends(): void {

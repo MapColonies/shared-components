@@ -13,9 +13,10 @@ import { CesiumViewer, useCesiumMap } from '../map';
 export interface Cesium3DTilesetWithUpdateProps {
   url: string;
   withUpdate?: boolean;
+  meta?: Record<string, unknown>;
 }
 
-export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({ url, withUpdate }) => {
+export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({ url, withUpdate, meta }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const scene = mapViewer.scene;
   const [cesium3DTileset] = useState<Cesium3DTileset>(
@@ -33,6 +34,16 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (meta === undefined) return;
+    mapViewer.layersManager?.addModel({ tileset, meta });
+    return () => {
+      if (meta.id !== undefined) {
+        mapViewer.layersManager?.removeModel(meta.id as string);
+      }
+    };
+  }, [mapViewer.layersManager]);
 
   const updateContent = (model: Cesium3DTileContent, boundingVolume: any): void => {
     const height = boundingVolume.minimumHeight ? boundingVolume.minimumHeight : boundingVolume.center.z - boundingVolume.radius;
