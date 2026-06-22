@@ -36,7 +36,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
   }, []);
 
   useEffect(() => {
-    if (meta === undefined) return;
+    if (meta === undefined) { return; }
     mapViewer.layersManager?.addModel({ tileset, meta });
     return () => {
       if (meta.id !== undefined) {
