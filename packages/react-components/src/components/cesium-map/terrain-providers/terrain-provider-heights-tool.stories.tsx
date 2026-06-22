@@ -120,7 +120,11 @@ export const QuantizedMeshHeightsTool: Story = () => {
         imageryProvider={false}
         baseMaps={BASE_MAPS}
       >
-        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} isZoomTo={true} />
+        <Cesium3DTileset
+          url={getValue('GLOBAL', '3D_MODEL')}
+          meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }}
+          isZoomTo={true}
+        />
         <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
         <TerrainianHeightTool />
         <InspectorTool />

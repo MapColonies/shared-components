@@ -28,8 +28,9 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset
-        isZoomTo={true}
         url={getValue('GLOBAL', '3D_MODEL')}
+        meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem A' } }}
+        isZoomTo={true}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -64,9 +65,10 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
       <Cesium3DTileset
+        url={getValue('GLOBAL', '3D_MODEL')}
+        meta={{ id: '2222222', layerRecord: { productName: 'Jerusalem B' } }}
         isZoomTo={false}
         heightFromGround={-10}
-        url={getValue('GLOBAL', '3D_MODEL')}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
         onTileFailed={action('onTileFailed')}
@@ -103,7 +105,11 @@ Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction 
 export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args}>
-      <Cesium3DTileset isZoomTo={true} url={getValue('GLOBAL', '3D_MODEL')} />
+      <Cesium3DTileset
+        url={getValue('GLOBAL', '3D_MODEL')}
+        meta={{ id: '3333333', layerRecord: { productName: 'Jerusalem C' } }}
+        isZoomTo={true}
+      />
     </CesiumMap>
   </div>
 );

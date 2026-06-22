@@ -136,7 +136,11 @@ export const QuantizedMeshProviders: Story = () => {
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
       >
-        <Cesium3DTileset isZoomTo={true} url={getValue('GLOBAL', '3D_MODEL')} />
+        <Cesium3DTileset
+          url={getValue('GLOBAL', '3D_MODEL')}
+          meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }}
+          isZoomTo={true}
+        />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
         <InspectorTool />
       </CesiumMap>

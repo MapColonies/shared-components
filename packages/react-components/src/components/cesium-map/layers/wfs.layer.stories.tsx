@@ -101,7 +101,11 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
+          meta={{ id: '1111111', layerRecord: { productName: 'Lebanon A' } }}
+          isZoomTo={true}
+        />
         <CesiumWFSLayer
           key={metaBuildings.id}
           options={optionsBuildings}
@@ -175,7 +179,11 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
+          meta={{ id: '2222222', layerRecord: { productName: 'Lebanon B' } }}
+          isZoomTo={false}
+        />
         <MyWFSLayer />
       </CesiumMap>
     </div>
@@ -210,7 +218,11 @@ export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknow
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')} />
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')}
+          meta={{ id: '3333333', layerRecord: { productName: 'Lebanon C' } }}
+          isZoomTo={true}
+        />
         <CesiumWFSLayer
           key={metaBuildings.id}
           options={optionsBuildings}
