@@ -9,7 +9,8 @@ import {
   TRANSPARENT_LAYER_ID,
   getLayerId,
   isServiceLayer,
-  isManagedImageryLayer
+  isManagedImageryLayer,
+  isBaseMapLayer
 } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
@@ -85,7 +86,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             id: layerId as string,
             name: (get(meta, 'layerRecord.productName') ?? layerId) as string,
             rect: layer.rectangle,
-            isDisabled: mapViewer.layersManager?.isBaseMapLayer(meta) as boolean
+            isDisabled: isBaseMapLayer(meta as Record<string, unknown>)
           };
         }).filter((item): item is IActiveLayer => item !== undefined)
       : [];

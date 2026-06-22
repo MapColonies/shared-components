@@ -73,6 +73,14 @@ export const isManagedImageryLayer = (layerId: string | undefined): boolean => {
   return !isServiceLayer(layerId);
 };
 
+export const getParentBaseMapId = (meta: Record<string, unknown> | undefined): string | undefined => {
+  return get(meta, 'parentBaseMapId') as string | undefined;
+};
+
+export const isBaseMapLayer = (meta: Record<string, unknown> | undefined): boolean => {
+  return !!getParentBaseMapId(meta);
+};
+
 class LayerManager {
   public mapViewer: CesiumViewer;
 
@@ -130,10 +138,6 @@ class LayerManager {
 
   public get modelList(): ICesium3DModel[] {
     return this.models;
-  }
-
-  public isBaseMapLayer(meta: any): boolean {
-    return !!get(meta, 'parentBasetMapId');
   }
 
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
@@ -229,7 +233,7 @@ class LayerManager {
     if (cesiumLayer) {
       cesiumLayer.alpha = layer.opacity;
       cesiumLayer.meta = {
-        parentBasetMapId: parentId,
+        parentBaseMapId: parentId,
         ...layer,
       };
       if (layer.show !== undefined) {
@@ -258,7 +262,7 @@ class LayerManager {
 
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      return this.isBaseMapLayer(layer.meta);
+      return isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -268,8 +272,7 @@ class LayerManager {
 
   public removeNotBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? false : true;
+      return !isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -347,8 +350,7 @@ class LayerManager {
 
   public showAllNotBase(isShow: boolean): void {
     const nonBaseLayers = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? false : true;
+      return !isBaseMapLayer(layer.meta);
     });
     nonBaseLayers.forEach((layer: ICesiumImageryLayer) => {
       this.show(layer.meta?.id as string, isShow);
@@ -369,8 +371,7 @@ class LayerManager {
 
     if (pickRay) {
       nonBaseLayers = this.mapViewer.imageryLayers.pickImageryLayers(pickRay, this.mapViewer.scene)?.filter((layer: ICesiumImageryLayer) => {
-        const parentId = get(layer.meta, 'parentBasetMapId') as string;
-        return parentId ? false : true;
+        return !isBaseMapLayer(layer.meta);
       });
     }
 
@@ -382,8 +383,7 @@ class LayerManager {
       const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
 
       const nonBaseLayers = this.layers.filter((layer) => {
-        const parentId = get(layer.meta, 'parentBasetMapId') as string;
-        return parentId ? false : true;
+        return !isBaseMapLayer(layer.meta);
       });
 
       const selectedVisibleLayers = nonBaseLayers.filter((layer) => {
@@ -431,7 +431,7 @@ class LayerManager {
     (transparentLayer as ICesiumImageryLayer).meta = {
       id: TRANSPARENT_LAYER_ID,
       skipRelevancyCheck: true,
-      parentBasetMapId: 'TRANSPARENT_LAYER',
+      parentBaseMapId: 'TRANSPARENT_LAYER',
     };
   }
 
@@ -515,8 +515,7 @@ class LayerManager {
 
   private getBaseLayersCount(): number {
     const baseLayers = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? true : false;
+      return isBaseMapLayer(layer.meta);
     });
     return baseLayers.length;
   }
@@ -533,8 +532,7 @@ class LayerManager {
     const min = from < to ? from : to;
     const max = from < to ? to : from;
     this.layers.forEach((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      if (!parentId) {
+      if (!isBaseMapLayer(layer.meta)) {
         const layerOrder = layer.meta?.zIndex as number;
         (layer.meta as Record<string, unknown>).zIndex =
           layerOrder >= min && layerOrder <= max && layerOrder !== from ? layerOrder + move : layerOrder === from ? to : layerOrder;
