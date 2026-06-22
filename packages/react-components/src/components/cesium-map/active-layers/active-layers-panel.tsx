@@ -5,12 +5,14 @@ import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
 import { Box } from '../../box';
 import {
-  ICesiumImageryLayer,
-  TRANSPARENT_LAYER_ID,
+  getImageryProvider,
+  getImageryProviderName,
   getLayerId,
-  isServiceLayer,
+  ICesiumImageryLayer,
+  isBaseMapLayer,
   isManagedImageryLayer,
-  isBaseMapLayer
+  isServiceLayer,
+  TRANSPARENT_LAYER_ID,
 } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
@@ -101,7 +103,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
             return undefined;
           }
           const isTransparentLayer = layerId === TRANSPARENT_LAYER_ID;
-          const providerName = get(layer, 'imageryProvider.constructor.name') as string | undefined;
+          const providerName = getImageryProviderName(getImageryProvider(layer));
           const name = isTransparentLayer
             ? TRANSPARENT_LAYER
             : `${SERVICE_LAYER} ${String(i + 1)}`;

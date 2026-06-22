@@ -5,6 +5,7 @@ import {
   Cartesian3,
   Cartographic,
   CesiumTerrainProvider,
+  Color,
   ConstantPositionProperty,
   ConstantProperty,
   Ellipsoid,
@@ -12,18 +13,18 @@ import {
   GeographicTilingScheme,
   HeightReference,
   HorizontalOrigin,
+  ImageryProvider,
   JulianDate,
   LabelStyle,
+  PolygonHierarchy,
   PolylineDashMaterialProperty,
   PolylineGraphics,
   PositionProperty,
   Rectangle,
   Resource,
-  VerticalOrigin,
-  SceneMode,
   Scene,
-  Color,
-  PolygonHierarchy,
+  SceneMode,
+  VerticalOrigin,
 } from 'cesium';
 
 // PROXIED CLASSES
@@ -66,6 +67,8 @@ export class CesiumColor extends Color {}
 export class CesiumPolygonHierarchy extends PolygonHierarchy {}
 
 export class CesiumScene extends Scene {}
+
+export class CesiumImageryProvider extends ImageryProvider {}
 
 // PROXIED ENUMS
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { viewerCesiumInspectorMixin, TileCoordinatesImageryProvider } from 'cesium';
 import { Box } from '../../box';
 import { CesiumViewer, useCesiumMap } from '../map';
+import { getImageryProvider, getImageryProviderName } from '../layers-manager';
 
 interface ICesiumInspectorInstance {
   container?: HTMLElement;
@@ -20,17 +21,17 @@ const applyInspectorContainerStyles = (container: HTMLElement): void => {
 };
 
 const keepTileCoordinatesLayerOnTop = (viewer: CesiumViewer): void => {
-  const layers = viewer.imageryLayers;
-  const tileCoordinatesLayer = Array.from({ length: layers.length }, (_, index) => layers.get(index)).find((layer) => {
-    const provider = (layer as any).imageryProvider;
-    return provider instanceof TileCoordinatesImageryProvider || provider?.constructor?.name === 'TileCoordinatesImageryProvider';
+  const layerList = viewer.layersManager?.layerList;
+  const tileCoordinatesLayer = layerList?.find((layer) => {
+    const provider = getImageryProvider(layer);
+    return provider instanceof TileCoordinatesImageryProvider || getImageryProviderName(provider) === 'TileCoordinatesImageryProvider';
   });
   if (tileCoordinatesLayer === undefined) {
     return;
   }
-  const topLayer = layers.get(layers.length - 1);
+  const topLayer = layerList?.[layerList.length - 1];
   if (topLayer !== tileCoordinatesLayer) {
-    layers.raiseToTop(tileCoordinatesLayer);
+    viewer.imageryLayers.raiseToTop(tileCoordinatesLayer);
   }
 };
 

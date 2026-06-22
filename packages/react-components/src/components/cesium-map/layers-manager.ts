@@ -12,19 +12,24 @@ import {
 import { get, isEmpty } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
-import { CesiumViewer, IBaseMap } from './map';
-import { pointToGeoJSON } from './helpers/geojson/point.geojson';
-import { IMapLegend } from './legend';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
   CustomWebMapTileServiceImageryProvider,
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
+import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained } from './helpers/utils';
+import {
+  RCesiumOSMLayerOptions,
+  RCesiumWMSLayerOptions,
+  RCesiumWMTSLayerOptions,
+  RCesiumXYZLayerOptions
+} from './layers';
 import { ICesiumWFSLayer } from './layers/wfs.layer';
-import { CesiumCartesian2 } from './proxied.types';
+import { IMapLegend } from './legend';
+import { CesiumViewer, IBaseMap } from './map';
+import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 
 const INC = 1;
 const DEC = -1;
@@ -79,6 +84,18 @@ export const getParentBaseMapId = (meta: Record<string, unknown> | undefined): s
 
 export const isBaseMapLayer = (meta: Record<string, unknown> | undefined): boolean => {
   return !!getParentBaseMapId(meta);
+};
+
+export const getImageryProvider = (layer: ICesiumImageryLayer): CesiumImageryProvider => {
+  return get(layer, 'imageryProvider');
+};
+
+export const getImageryProviderUrl = (layer: ICesiumImageryLayer): string | undefined => {
+  return get(layer, 'imageryProvider.url');
+};
+
+export const getImageryProviderName = (provider: CesiumImageryProvider): string => {
+  return provider.constructor.name;
 };
 
 class LayerManager {
