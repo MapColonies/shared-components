@@ -547,12 +547,12 @@ class LayerManager {
       if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      const relevantToExtent = layer.meta?.relevantToExtent;
-      if (typeof relevantToExtent !== 'boolean') {
+      const isRelevantToExtent = layer.meta?.isRelevantToExtent;
+      if (typeof isRelevantToExtent !== 'boolean') {
         continue;
       }
-      if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
-        layer.show = relevantToExtent;
+      if (isRelevantToExtent !== layer.show && layer.imageryProvider.ready) {
+        layer.show = isRelevantToExtent;
       }
     }
   }
@@ -573,9 +573,9 @@ class LayerManager {
       if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      if (layer.meta && 'relevantToExtent' in layer.meta) {
-        const { relevantToExtent, ...restMeta } = layer.meta;
-        void relevantToExtent;
+      if (layer.meta && 'isRelevantToExtent' in layer.meta) {
+        const { isRelevantToExtent, ...restMeta } = layer.meta;
+        void isRelevantToExtent;
         layer.meta = restMeta;
       }
     }
@@ -647,11 +647,11 @@ class LayerManager {
         const layer = this.layers[i];
         const intersectsExtent = !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle) instanceof Rectangle;
         if (layer.meta?.skipRelevancyCheck === true) {
-          layer.meta = { ...layer.meta, relevantToExtent: true };
+          layer.meta = { ...layer.meta, isRelevantToExtent: true };
           continue;
         }
         if (!intersectsExtent) {
-          layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
+          layer.meta = { ...(layer.meta ?? {}), isRelevantToExtent: false };
           continue;
         }
         let isOccludedByOpaqueLayerAbove = false;
@@ -675,7 +675,7 @@ class LayerManager {
         // Layer is relevant if it intersects extent and has no opaque layer above it
         layer.meta = {
           ...(layer.meta ?? {}),
-          relevantToExtent: !isOccludedByOpaqueLayerAbove,
+          isRelevantToExtent: !isOccludedByOpaqueLayerAbove,
         };
       }
     } catch (e) {

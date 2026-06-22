@@ -216,7 +216,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                       const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
                       const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
                       const statusText =
-                        layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
+                        layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
                       const transparencyText =
                         layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
                       const tileCoordinatesFromMeta = get(layer.meta, EXAMINED_TILES_META_PROP) as
@@ -235,7 +235,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                         transparencyText === ''
                           ? undefined
                           : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
-                      const isRelevant = layer.meta?.relevantToExtent !== false;
+                      const isRelevant = layer.meta?.isRelevantToExtent !== false;
                       if (tooltipContent === undefined) {
                         return (
                           <Box key={idText} className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`}>
