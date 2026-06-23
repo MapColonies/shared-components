@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { get, isEmpty } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { get } from 'lodash';
 import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { EXAMINED_TILES_META_PROP } from '../helpers/customImageryProviders';
+import { EXAMINED_TILES_META_PROP, HAS_TRANSPARENCY_META_PROP } from '../helpers/customImageryProviders';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { TRANSPARENT_LAYER_ID } from '../layers-manager';
+import { getLayerId, isManagedImageryLayer } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
@@ -30,16 +30,24 @@ export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
-interface LayerMetaItem {
-  layerId?: string;
-  meta?: Record<string, unknown>;
+interface LayerDebugMeta extends Record<string, unknown> {
+  id?: string;
+  layerRecord?: {
+    productName?: string;
+  };
+  isRelevantToExtent?: boolean;
+}
+
+interface LayerDebugItem {
+  layerId: string;
+  meta: LayerDebugMeta;
 }
 
 type DebuggerSectionId = 'data' | 'layers' | 'tools';
 
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
   const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
+  const [layersMeta, setLayersMeta] = useState<LayerDebugItem[]>([]);
   const [collapsedSections, setCollapsedSections] = useState<Record<DebuggerSectionId, boolean>>({
     data: false,
     layers: false,
@@ -64,19 +72,22 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     }));
   };
 
-  const updateLayerMeta = (): void => {
-    if (!mapViewer.layersManager?.layerList) return;
-    setLayersMeta(
-      mapViewer.layersManager.layerList
-        .filter((layer): boolean => !isEmpty(layer.meta?.id) && layer.meta?.id !== TRANSPARENT_LAYER_ID)
-        .map(
-          (layer): LayerMetaItem => ({
-            layerId: layer.meta?.id as string | undefined,
-            meta: layer.meta as Record<string, unknown> | undefined,
-          })
-        )
-    );
-  };
+  const updateLayersMeta = useCallback((): void => {
+    if (!mapViewer.layersManager?.layerList) { return; }
+    const nextLayersMeta = mapViewer.layersManager.layerList
+      .map((layer): LayerDebugItem | undefined => {
+        const layerId = getLayerId(layer);
+        if (layerId === undefined || !isManagedImageryLayer(layerId)) {
+          return undefined;
+        }
+        return {
+          layerId,
+          meta: (layer.meta ?? {}) as LayerDebugMeta,
+        };
+      })
+      .filter((item): item is LayerDebugItem => item !== undefined);
+    setLayersMeta(nextLayersMeta);
+  }, [mapViewer.layersManager]);
 
   useEffect(() => {
     let moveEndRefreshTimeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -85,13 +96,13 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         clearTimeout(moveEndRefreshTimeoutId);
       }
       moveEndRefreshTimeoutId = setTimeout(() => {
-        updateLayerMeta();
+        updateLayersMeta();
       }, 0);
     };
 
     const removeTileLoad = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
       if (tilesLoadingCount === 0) {
-        updateLayerMeta();
+        updateLayersMeta();
         removeTileLoad();
       }
     });
@@ -101,7 +112,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
       scheduleLayerMetaRefresh();
     });
-    mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
+    mapViewer.layersManager?.addLayerUpdatedListener(updateLayersMeta);
     return (): void => {
       if (moveEndRefreshTimeoutId !== undefined) {
         clearTimeout(moveEndRefreshTimeoutId);
@@ -109,27 +120,24 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
       removeTileLoad();
       removeMoveEnd();
       removeLayerRemoved();
-      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayerMeta);
+      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayersMeta);
     };
-  }, []);
+  }, [mapViewer, updateLayersMeta]);
 
   useEffect(() => {
-    updateLayerMeta();
-  }, [viewState?.shouldOptimizedTileRequests]);
+    updateLayersMeta();
+  }, [updateLayersMeta, viewState?.shouldOptimizedTileRequests]);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) return;
-
-    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], LayerId?: string | undefined): void => {
+    if (!mapViewer.layersManager) { return; }
+    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], layerId?: string | undefined): void => {
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
-        if (LayerId !== undefined && LayerId !== layer.meta.id) {
+        if (layerId !== undefined && layerId !== layer.meta.id) {
           return;
         }
-
         const { options, meta } = layer;
         const { zoomLevel } = options;
         const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as unknown as IFeatureTypeMetadata;
-
         setFeatureTypes((prevFeatureTypes) => {
           const existingIndex = prevFeatureTypes.findIndex((type) => type.id === id);
           if (existingIndex >= 0) {
@@ -147,14 +155,10 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
           return prevFeatureTypes;
         });
       });
-
       const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta.id));
-
       setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((type) => activeDataLayerIds.has(type.id)));
     };
-
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
-
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
@@ -212,14 +216,15 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                 />
                 {viewState?.shouldOptimizedTileRequests === true && (
                   <Box className="debuggerLayerList">
-                    {[...layersMeta].reverse().map((layer, index) => {
-                      const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
-                      const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
+                    {[...layersMeta].reverse().map((layer) => {
+                      const idText = layer.layerId;
+                      const nameText = layer.meta.layerRecord?.productName ?? idText;
                       const statusText =
                         layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
+                      const hasTransparency = layer.meta[HAS_TRANSPARENCY_META_PROP] as boolean | undefined;
                       const transparencyText =
-                        layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
-                      const tileCoordinatesFromMeta = get(layer.meta, EXAMINED_TILES_META_PROP) as
+                        hasTransparency === true ? withTransparencyTiles : hasTransparency === false ? withoutTransparencyTiles : '';
+                      const tileCoordinatesFromMeta = layer.meta[EXAMINED_TILES_META_PROP] as
                         | Array<{ x?: number; y?: number; level?: number }>
                         | { x?: number; y?: number; level?: number }
                         | undefined;
