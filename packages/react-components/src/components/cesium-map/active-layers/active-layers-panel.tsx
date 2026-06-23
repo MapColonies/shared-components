@@ -123,7 +123,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       return {
         id: getLayerId(dataLayer) as string,
         name: (get(dataLayer.meta, 'layerRecord.featureStructure.aliasLayerName') ?? get(dataLayer.meta, 'layerRecord.productName')) as string,
-        rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint)),
+        rect: Rectangle.fromDegrees(...bbox((dataLayer.meta?.layerRecord as Record<string, unknown>)?.footprint)),
         isDisabled: false
       }; }) || [];
   };
