@@ -91,7 +91,7 @@ export const getImageryProvider = (layer: ICesiumImageryLayer): CesiumImageryPro
 };
 
 export const getImageryProviderUrl = (layer: ICesiumImageryLayer): string | undefined => {
-  return get(layer, 'imageryProvider.url');
+  return get(layer, '_imageryProvider._resource._url');
 };
 
 export const getImageryProviderName = (provider: CesiumImageryProvider): string => {
