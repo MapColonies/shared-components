@@ -28,10 +28,10 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
           featureTypes.map((type, index) => (
             <Box key={index} className="featureType">
               <Tooltip
-                content={`${(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ${type.id} (${String(type.zoomLevel)})`}
+                content={`${(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ${type.id} (${String(get(type, 'layerRecord.zoomLevel'))})`}
               >
-                <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
-                  {(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ({String(type.zoomLevel)}):
+                <Box className={`name ${type.currentZoomLevel < (get(type, 'layerRecord.zoomLevel') as number) ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
+                  {(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ({String(get(type, 'layerRecord.zoomLevel'))}):
                 </Box>
               </Tooltip>
               <Box className="info">
