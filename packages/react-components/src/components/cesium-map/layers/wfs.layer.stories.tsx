@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { BBox } from 'geojson';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
@@ -491,112 +491,115 @@ const optionsPolygonParts = {
 
 const metaPolygonParts = {
   id: '00000000',
-  keywords: 'PolygonParts',
-  links: 'cyprus,,WFS,https://raster-pp-serving', // RASTER PP
-  type: 'RECORD_VECTOR',
-  classification: '5',
-  productName: 'בדיקות עדכון',
-  description: 'PolygonParts layer',
-  srsId: '4326',
-  srsName: '4326',
-  producerName: 'IDFMU',
-  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
-  productType: 'VECTOR_BEST',
-  featureStructure: {
-    layerName: 'polygonParts:layer',
-    aliasLayerName: 'בדיקות עדכון',
-    fields: [
-      {
-        fieldName: 'id',
-        aliasFieldName: 'id',
-        type: 'String',
-      },
-      {
-        fieldName: 'catalogId',
-        aliasFieldName: 'catalogId',
-        type: 'String',
-      },
-      {
-        fieldName: 'productId',
-        aliasFieldName: 'productId',
-        type: 'String',
-      },
-      {
-        fieldName: 'productType',
-        aliasFieldName: 'productType',
-        type: 'String',
-      },
-      {
-        fieldName: 'sourceId',
-        aliasFieldName: 'sourceId',
-        type: 'String',
-      },
-      {
-        fieldName: 'sourceName',
-        aliasFieldName: 'sourceName',
-        type: 'String',
-      },
-      {
-        fieldName: 'productVersion',
-        aliasFieldName: 'productVersion',
-        type: 'String',
-      },
-      {
-        fieldName: 'ingestionDateUTC',
-        aliasFieldName: 'ingestionDateUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'imagingTimeBeginUTC',
-        aliasFieldName: 'imagingTimeBeginUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'imagingTimeEndUTC',
-        aliasFieldName: 'imagingTimeEndUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'resolutionDegree',
-        aliasFieldName: 'resolutionDegree',
-        type: 'Number',
-      },
-      {
-        fieldName: 'resolutionMeter',
-        aliasFieldName: 'resolutionMeter',
-        type: 'Number',
-      },
-      {
-        fieldName: 'sourceResolutionMeter',
-        aliasFieldName: 'sourceResolutionMeter',
-        type: 'Number',
-      },
-      {
-        fieldName: 'horizontalAccuracyCe90',
-        aliasFieldName: 'horizontalAccuracyCe90',
-        type: 'Number',
-      },
-      {
-        fieldName: 'sensors',
-        aliasFieldName: 'sensors',
-        type: 'String',
-      },
-      {
-        fieldName: 'countries',
-        aliasFieldName: 'countries',
-        type: 'String',
-      },
-      {
-        fieldName: 'cities',
-        aliasFieldName: 'cities',
-        type: 'String',
-      },
-      {
-        fieldName: '_description',
-        aliasFieldName: 'description',
-        type: 'String',
-      },
-    ],
+  layerRecord: {
+    id: '00000000',
+    keywords: 'PolygonParts',
+    links: 'cyprus,,WFS,https://raster-pp-serving', // RASTER PP
+    type: 'RECORD_VECTOR',
+    classification: '5',
+    productName: 'בדיקות עדכון',
+    description: 'PolygonParts layer',
+    srsId: '4326',
+    srsName: '4326',
+    producerName: 'IDFMU',
+    footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
+    productType: 'VECTOR_BEST',
+    featureStructure: {
+      layerName: 'polygonParts:layer',
+      aliasLayerName: 'בדיקות עדכון',
+      fields: [
+        {
+          fieldName: 'id',
+          aliasFieldName: 'id',
+          type: 'String',
+        },
+        {
+          fieldName: 'catalogId',
+          aliasFieldName: 'catalogId',
+          type: 'String',
+        },
+        {
+          fieldName: 'productId',
+          aliasFieldName: 'productId',
+          type: 'String',
+        },
+        {
+          fieldName: 'productType',
+          aliasFieldName: 'productType',
+          type: 'String',
+        },
+        {
+          fieldName: 'sourceId',
+          aliasFieldName: 'sourceId',
+          type: 'String',
+        },
+        {
+          fieldName: 'sourceName',
+          aliasFieldName: 'sourceName',
+          type: 'String',
+        },
+        {
+          fieldName: 'productVersion',
+          aliasFieldName: 'productVersion',
+          type: 'String',
+        },
+        {
+          fieldName: 'ingestionDateUTC',
+          aliasFieldName: 'ingestionDateUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'imagingTimeBeginUTC',
+          aliasFieldName: 'imagingTimeBeginUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'imagingTimeEndUTC',
+          aliasFieldName: 'imagingTimeEndUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'resolutionDegree',
+          aliasFieldName: 'resolutionDegree',
+          type: 'Number',
+        },
+        {
+          fieldName: 'resolutionMeter',
+          aliasFieldName: 'resolutionMeter',
+          type: 'Number',
+        },
+        {
+          fieldName: 'sourceResolutionMeter',
+          aliasFieldName: 'sourceResolutionMeter',
+          type: 'Number',
+        },
+        {
+          fieldName: 'horizontalAccuracyCe90',
+          aliasFieldName: 'horizontalAccuracyCe90',
+          type: 'Number',
+        },
+        {
+          fieldName: 'sensors',
+          aliasFieldName: 'sensors',
+          type: 'String',
+        },
+        {
+          fieldName: 'countries',
+          aliasFieldName: 'countries',
+          type: 'String',
+        },
+        {
+          fieldName: 'cities',
+          aliasFieldName: 'cities',
+          type: 'String',
+        },
+        {
+          fieldName: '_description',
+          aliasFieldName: 'description',
+          type: 'String',
+        },
+      ],
+    },
   },
 };
 
@@ -873,57 +876,60 @@ const optionsBuildings = {
 
 const metaBuildings = {
   id: '1111111',
-  keywords: 'buildings, osm',
-  links: 'buildings,,WFS,http://geoserver-vector',
-  type: 'RECORD_VECTOR',
-  classification: '5',
-  productName: 'מבנים',
-  description: 'Buildings layer',
-  srsId: '4326',
-  srsName: '4326',
-  producerName: 'Moria',
-  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
-  productType: 'VECTOR_BEST',
-  featureStructure: {
-    layerName: 'buildings',
-    aliasLayerName: 'מבנים',
-    fields: [
-      {
-        fieldName: 'osm_id',
-        aliasFieldName: 'מזהה OSM',
-        type: 'String',
-      },
-      {
-        fieldName: 'id',
-        aliasFieldName: 'מזהה',
-        type: 'String',
-      },
-      {
-        fieldName: 'building_type',
-        aliasFieldName: 'סוג',
-        type: 'String',
-      },
-      {
-        fieldName: 'sensitivity',
-        aliasFieldName: 'רגישות',
-        type: 'String',
-      },
-      {
-        fieldName: 'entity_id',
-        aliasFieldName: 'מזהה יישות',
-        type: 'String',
-      },
-      {
-        fieldName: 'is_sensitive',
-        aliasFieldName: 'רגיש',
-        type: 'Boolean',
-      },
-      {
-        fieldName: 'date',
-        aliasFieldName: 'תאריך',
-        type: 'Date',
-      },
-    ],
+  layerRecord: {
+    id: '1111111',
+    keywords: 'buildings, osm',
+    links: 'buildings,,WFS,http://geoserver-vector',
+    type: 'RECORD_VECTOR',
+    classification: '5',
+    productName: 'מבנים',
+    description: 'Buildings layer',
+    srsId: '4326',
+    srsName: '4326',
+    producerName: 'Moria',
+    footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
+    productType: 'VECTOR_BEST',
+    featureStructure: {
+      layerName: 'buildings',
+      aliasLayerName: 'מבנים',
+      fields: [
+        {
+          fieldName: 'osm_id',
+          aliasFieldName: 'מזהה OSM',
+          type: 'String',
+        },
+        {
+          fieldName: 'id',
+          aliasFieldName: 'מזהה',
+          type: 'String',
+        },
+        {
+          fieldName: 'building_type',
+          aliasFieldName: 'סוג',
+          type: 'String',
+        },
+        {
+          fieldName: 'sensitivity',
+          aliasFieldName: 'רגישות',
+          type: 'String',
+        },
+        {
+          fieldName: 'entity_id',
+          aliasFieldName: 'מזהה יישות',
+          type: 'String',
+        },
+        {
+          fieldName: 'is_sensitive',
+          aliasFieldName: 'רגיש',
+          type: 'Boolean',
+        },
+        {
+          fieldName: 'date',
+          aliasFieldName: 'תאריך',
+          type: 'Date',
+        },
+      ],
+    },
   },
 };
 

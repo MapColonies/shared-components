@@ -130,7 +130,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const describe = (properties: Record<string, any>): string => {
     const rows: string[] = [];
-    const featureStructure = meta.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
+    const featureStructure = (meta.layerRecord as any)?.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
     if (featureStructure && featureStructure.fields) {
       for (const field of featureStructure.fields) {
         const { fieldName, aliasFieldName } = field;

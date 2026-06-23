@@ -122,7 +122,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
       return {
         id: getLayerId(dataLayer) as string,
-        name: (get(dataLayer.meta, 'featureStructure.aliasLayerName') ?? dataLayer.meta.productName) as string,
+        name: (get(dataLayer.meta, 'layerRecord.featureStructure.aliasLayerName') ?? get(dataLayer.meta, 'layerRecord.productName')) as string,
         rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint)),
         isDisabled: false
       }; }) || [];

@@ -19,7 +19,7 @@ interface IFeatureTypeMetadata {
   total: number;
   cache: number;
   currentZoomLevel: number;
-  featureStructure: Record<string, unknown>;
+  layerRecord: Record<string, unknown>;
 }
 
 export type IActiveFeatureTypes = IFeatureTypeMetadata & {
@@ -137,20 +137,20 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         }
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as unknown as IFeatureTypeMetadata;
+        const { id, items, total, cache, currentZoomLevel, layerRecord } = meta as unknown as IFeatureTypeMetadata;
         setFeatureTypes((prevFeatureTypes) => {
           const existingIndex = prevFeatureTypes.findIndex((type) => type.id === id);
           if (existingIndex >= 0) {
             if (
               JSON.stringify(prevFeatureTypes[existingIndex]) !==
-              JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel })
+              JSON.stringify({ id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel })
             ) {
               const updatedFeatureTypes = [...prevFeatureTypes];
-              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel };
+              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel };
               return updatedFeatureTypes;
             }
           } else {
-            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel }];
+            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel }];
           }
           return prevFeatureTypes;
         });
