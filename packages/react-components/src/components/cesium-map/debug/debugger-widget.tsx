@@ -77,11 +77,11 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     const nextLayersMeta = mapViewer.layersManager.layerList
       .map((layer): LayerDebugItem | undefined => {
         const layerId = getLayerId(layer);
-        if (layerId === undefined || !isManagedImageryLayer(layerId)) {
+        if (!isManagedImageryLayer(layerId)) {
           return undefined;
         }
         return {
-          layerId,
+          layerId: layerId as string,
           meta: (layer.meta ?? {}) as LayerDebugMeta,
         };
       })
@@ -132,7 +132,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     if (!mapViewer.layersManager) { return; }
     const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], layerId?: string | undefined): void => {
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
-        if (layerId !== undefined && layerId !== layer.meta.id) {
+        if (layerId !== undefined && layerId !== getLayerId(layer)) {
           return;
         }
         const { options, meta } = layer;
@@ -155,7 +155,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
           return prevFeatureTypes;
         });
       });
-      const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta.id));
+      const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => getLayerId(layer)));
       setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((type) => activeDataLayerIds.has(type.id)));
     };
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);

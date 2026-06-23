@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { get } from 'lodash';
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import { Story, Meta } from '@storybook/react';
 import { Box } from '../box';
 import { BASE_MAPS } from './helpers/constants';
-import { ICesiumImageryLayer, IRasterLayer } from './layers-manager';
+import { getLayerId, ICesiumImageryLayer, IRasterLayer } from './layers-manager';
 import { CesiumMap, IBaseMaps, IContextMenuData, useCesiumMap } from './map';
 import { CesiumCartesian2, CesiumSceneMode } from './proxied.types';
 
@@ -19,21 +20,26 @@ interface ILayersMozaikProps {
   layers: IRasterLayer[];
 }
 
+const getDebugLayerText = (layer: unknown): string => {
+  const imageryLayer = layer as ICesiumImageryLayer;
+  const layerId = getLayerId(imageryLayer) ?? 'UNKNOWN_LAYER_ID';
+  const zIndex = get(layer, 'meta.zIndex') ?? 'NA';
+  return `${layerId} <--> ${String(zIndex)}`;
+};
+
 const mapDivStyle = {
   height: '90%',
   width: '100%',
   position: 'absolute' as const,
 };
 
-const layers = [
+const layers: IRasterLayer[] = [
   {
     id: 'near_amphy',
     type: 'XYZ_LAYER',
+    zIndex: 0,
     opacity: 1,
     show: true,
-    meta: {
-      zIndex: 0,
-    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
     },
@@ -55,11 +61,9 @@ const layers = [
   {
     id: 'coin_zoom_17',
     type: 'XYZ_LAYER',
+    zIndex: 1,
     opacity: 1,
     show: true,
-    meta: {
-      zIndex: 1,
-    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
     },
@@ -81,11 +85,9 @@ const layers = [
   {
     id: 'biggest',
     type: 'XYZ_LAYER',
+    zIndex: 2,
     opacity: 1,
     show: true,
-    meta: {
-      zIndex: 2,
-    },
     options: {
       url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
     },
@@ -106,7 +108,7 @@ const layers = [
   },
 ];
 
-const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, handleClose }) => {
+const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handleClose }) => {
   const mapViewer = useCesiumMap();
   const [pickedLayers, setPickedLayers] = useState<ICesiumImageryLayer[] | undefined>();
 
@@ -142,9 +144,7 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
               <div style={{ paddingLeft: '30px' }}>
                 {data?.map((layer) => {
                   return (
-                    <p>{`${(layer as unknown as Record<string, unknown>).meta?.id} <--> ${
-                      (layer as unknown as Record<string, unknown>).meta?.meta?.zIndex
-                    }`}</p>
+                    <p>{getDebugLayerText(layer)}</p>
                   );
                 })}
               </div>
@@ -156,14 +156,12 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
           <div style={{ paddingLeft: '30px' }}>
             {pickedLayers?.map((layer) => {
               return (
-                <p>{`${(layer as unknown as Record<string, unknown>).meta?.id} <--> ${
-                  (layer as unknown as Record<string, unknown>).meta?.meta?.zIndex
-                }`}</p>
+                <p>{getDebugLayerText(layer)}</p>
               );
             })}
           </div>
           <MenuSurfaceAnchor>
-            <Menu open={true} onClose={(evt): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
+            <Menu open={true} onClose={(): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
               <MenuItem>
                 <Box></Box>
               </MenuItem>
@@ -183,7 +181,7 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, size, 
         >
           <h3>No data found</h3>
           <MenuSurfaceAnchor>
-            <Menu open={true} onClose={(evt): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
+            <Menu open={true} onClose={(): void => handleClose()} style={{ visibility: 'hidden', width: '100%' }}>
               <MenuItem>
                 <Box></Box>
               </MenuItem>

@@ -66,7 +66,7 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
-export const getLayerId = (layer: ICesiumImageryLayer): string | undefined => {
+export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
   return get(layer, 'meta.id') as string | undefined;
 };
 
@@ -370,7 +370,10 @@ class LayerManager {
       return !isBaseMapLayer(layer.meta);
     });
     nonBaseLayers.forEach((layer: ICesiumImageryLayer) => {
-      this.show(layer.meta?.id as string, isShow);
+      const layerId = getLayerId(layer);
+      if (layerId !== undefined) {
+        this.show(layerId, isShow);
+      }
     });
   }
 
@@ -500,7 +503,7 @@ class LayerManager {
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
     return this.dataLayers.find((dataLayer) => {
-      return dataLayer.meta.id === dataLayerId;
+      return getLayerId(dataLayer) === dataLayerId;
     });
   }
 
@@ -521,7 +524,7 @@ class LayerManager {
   }
 
   public findModelById(modelId: string): ICesium3DModel | undefined {
-    return this.models.find((model) => model.meta.id === modelId);
+    return this.models.find((model) => getLayerId(model) === modelId);
   }
 
   private setLegends(): void {
@@ -539,8 +542,7 @@ class LayerManager {
 
   private findLayerById(layerId: string): ICesiumImageryLayer | undefined {
     return this.layers.find((layer) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      return layer.meta !== undefined ? layer.meta.id === layerId : false;
+      return getLayerId(layer) === layerId;
     });
   }
 
@@ -559,7 +561,7 @@ class LayerManager {
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
       const isRelevantToExtent = layer.meta?.isRelevantToExtent;
@@ -574,7 +576,7 @@ class LayerManager {
 
   private restoreAllLayersVisibility(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
       if (layer.imageryProvider.ready) {
@@ -585,7 +587,7 @@ class LayerManager {
 
   private clearLayersRelevancy(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
       if (layer.meta && 'isRelevantToExtent' in layer.meta) {

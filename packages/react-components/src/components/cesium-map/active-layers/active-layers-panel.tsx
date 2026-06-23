@@ -121,7 +121,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   const getDataLayers = (): IActiveLayer[] => {
     return mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
       return {
-        id: dataLayer.meta?.id as string,
+        id: getLayerId(dataLayer) as string,
         name: (get(dataLayer.meta, 'featureStructure.aliasLayerName') ?? dataLayer.meta.productName) as string,
         rect: Rectangle.fromDegrees(...bbox(dataLayer.meta?.footprint)),
         isDisabled: false
@@ -133,7 +133,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
       const modelName = (get(model.meta, 'layerRecord.productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`)) as string;
       return {
-        id: (model.meta.id as string) ?? `3D_MODEL_${String(index)}`,
+        id: (getLayerId(model) as string) ?? `3D_MODEL_${String(index)}`,
         name: modelName,
         zoomToTarget: model.tileset,
         isDisabled: false,
