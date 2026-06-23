@@ -8,7 +8,7 @@ import {
   ImageryTypes,
 } from 'cesium';
 import { get } from 'lodash';
-import { ICesiumImageryLayer } from '../layers-manager';
+import { getImageryProviderUrl, ICesiumImageryLayer } from '../layers-manager';
 import { CesiumViewer } from '../map';
 import { imageHasTransparency } from './utils';
 
@@ -43,7 +43,7 @@ function customCommonRequestImage(
     const requestedLayerMeta = this.layerListInstance.find(
       /* eslint-disable */
       (layer: ImageryLayer): boolean => {
-        return (layer as any)._imageryProvider._resource?._url === (this as any)._resource?._url;
+        return getImageryProviderUrl(layer) === (this as any)._resource?._url;
       }
       /* eslint-enable */
     )?.meta;
@@ -58,7 +58,7 @@ function customCommonRequestImage(
         { [EXAMINED_TILES_META_PROP]: this.examinedTilesForTransparencyCheck },
         /* eslint-disable */
         (layer: ImageryLayer): boolean => {
-          return (layer as any)._imageryProvider._resource._url === (this as any)._resource._url;
+          return getImageryProviderUrl(layer) === (this as any)._resource._url;
         }
         /* eslint-enable */
       );
@@ -67,7 +67,7 @@ function customCommonRequestImage(
           { [HAS_TRANSPARENCY_META_PROP]: hasTransparency },
           /* eslint-disable */
           (layer: ImageryLayer): boolean => {
-            return (layer as any)._imageryProvider._resource._url === (this as any)._resource._url;
+            return getImageryProviderUrl(layer) === (this as any)._resource._url;
           }
           /* eslint-enable */
         );
