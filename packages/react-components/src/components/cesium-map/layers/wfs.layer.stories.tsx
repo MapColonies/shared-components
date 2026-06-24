@@ -60,7 +60,6 @@ const BRIGHT_PURPLE = '#B734EB';
 export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
-      <div style={{ zIndex: 2, color: 'white', position: 'fixed', paddingLeft: '50%', backgroundColor: 'black', width: '100%' }}>Go to ME</div>
       <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
         <CesiumWFSLayer
           key={metaPolygonParts.id}
@@ -262,7 +261,7 @@ MapWithWFSLayerWithVisualizer.storyName = 'WFS Vector layer (Visual)';
 
 const optionsPolygonParts = {
   url: getValue(MapWithPPWFSLayer.storyName as string, 'raster_pp_geoserver'),
-  featureType: 'polygonParts:ME_UPDATE_TESTS-Orthophoto',
+  featureType: 'polygonParts:iraq_9_12_2024-Orthophoto',
   style: {
     color: BRIGHT_GREEN,
     hover: LIGHT_BLUE,
@@ -497,16 +496,16 @@ const metaPolygonParts = {
     links: 'cyprus,,WFS,https://raster-pp-serving', // RASTER PP
     type: 'RECORD_VECTOR',
     classification: '5',
-    productName: 'בדיקות עדכון',
+    productName: 'PP example',
     description: 'PolygonParts layer',
     srsId: '4326',
     srsName: '4326',
     producerName: 'IDFMU',
-    footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
+    footprint: {"type":"Polygon","coordinates":[[[38.57245410498848,37.5107925437468],[49.25567711954761,37.489899433708345],[48.67159642592577,28.868039625498994],[39.06236587462536,28.91119199657423],[38.57245410498848,37.5107925437468]]]},
     productType: 'VECTOR_BEST',
     featureStructure: {
       layerName: 'polygonParts:layer',
-      aliasLayerName: 'בדיקות עדכון',
+      aliasLayerName: 'PP example',
       fields: [
         {
           fieldName: 'id',
