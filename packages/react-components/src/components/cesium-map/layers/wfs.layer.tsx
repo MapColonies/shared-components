@@ -300,11 +300,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   };
 
   const fetchWfsData = async (wfsDataUrl: string, options: RequestInit = { method: 'GET' }): Promise<any> => {
-    const response = await fetch(wfsDataUrl, options);
-    if (response.status === 200) {
-      return await response.json();
+    if (!wfsDataUrl) {
+      throw new Error('WFS request URL is missing');
     }
-    return undefined;
+    let response: Response;
+    try {
+      response = await fetch(wfsDataUrl, options);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`WFS network request failed for ${wfsDataUrl}: ${message}`);
+    }
+    if (!response.ok) {
+      throw new Error(`WFS request failed (${response.status} ${response.statusText}) for ${wfsDataUrl}`);
+    }
+    return await response.json();
   };
 
   // Create a temporary canvas to measure max width
@@ -602,6 +611,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const waitForTilesLoaded = () => {
     return new Promise<void>((resolve) => {
       const interval = setInterval(() => {
+        if (get(mapViewer, '_cesiumWidget') === undefined) {
+          clearInterval(interval);
+          resolve();
+          return;
+        }
         if (mapViewer.scene.globe.tilesLoaded) {
           clearInterval(interval);
           resolve();
@@ -617,11 +631,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   };
 
   useEffect((): void => {
+    if (!mapViewer?.scene || !mapViewer?.dataSources) {
+      return;
+    }
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
       applyVisualization(mapViewer, dataSource, [], undefined);
     }
-  }, [mapViewer.scene.mode]);
+  }, [mapViewer?.scene?.mode]);
 
   useEffect(() => {
     // Happens each time the metadata from STATE changes
@@ -640,6 +657,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
+    if (!mapViewer?.scene || !mapViewer?.dataSources) {
+      return;
+    }
     // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 
