@@ -7,23 +7,28 @@
 */
 
 import React, { useEffect, useState } from 'react';
-import { Cesium3DTileset, Cesium3DTile, Cartographic, Cartesian3, defined, sampleTerrainMostDetailed, Cesium3DTileContent } from 'cesium';
+import {
+  Cesium3DTileset,
+  Cesium3DTile,
+  Cartographic,
+  Cartesian3,
+  defined,
+  sampleTerrainMostDetailed,
+  Cesium3DTileContent
+} from 'cesium';
+import { ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
-export interface Cesium3DTilesetWithUpdateProps {
+export interface ICesium3DTilesetWithUpdate {
   url: string;
   withUpdate?: boolean;
-  meta?: Record<string, unknown>;
+  meta?: ICesium3DModelMeta;
 }
 
-export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({ url, withUpdate, meta }) => {
+export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = ({ url, withUpdate, meta }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const scene = mapViewer.scene;
-  const [cesium3DTileset] = useState<Cesium3DTileset>(
-    new Cesium3DTileset({
-      url: url,
-    })
-  );
+  const [cesium3DTileset] = useState<Cesium3DTileset>(new Cesium3DTileset({ url }));
   const [tileset] = useState<Cesium3DTileset>(scene.primitives.add(cesium3DTileset));
 
   useEffect(() => {

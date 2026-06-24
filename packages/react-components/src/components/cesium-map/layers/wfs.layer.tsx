@@ -19,6 +19,7 @@ import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
 import booleanValid from '@turf/boolean-valid';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2Feature } from '../helpers/utils';
+import { getDataLayerFields } from '../layers-manager';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
 export interface ICesiumWFSLayerLabelTextField {
@@ -85,9 +86,19 @@ export interface ICesiumWFSLayerOptions {
   labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
+export interface ICesiumWFSLayerMeta {
+  id: string;
+  items?: number;
+  total?: number;
+  cache?: number;
+  currentZoomLevel?: number;
+  zoomLevel?: number;
+  [key: string]: unknown;
+}
+
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
-  meta: Record<string, unknown>;
+  meta: ICesiumWFSLayerMeta;
   visualizationHandler?: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox) => void;
   withGeometryValidation?: boolean;
 }
@@ -130,27 +141,25 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const describe = (properties: Record<string, any>): string => {
     const rows: string[] = [];
-    const featureStructure = (meta.layerRecord as any)?.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
-    if (featureStructure && featureStructure.fields) {
-      for (const field of featureStructure.fields) {
-        const { fieldName, aliasFieldName } = field;
-        const key = aliasFieldName;
-        const value = properties[fieldName] ?? 'N/A';
-        const keyMaxWidth = Math.max(100, Math.min(180, key.length * 10));
-        const valueMaxWidth = '260px';
-        rows.push(`
-          <tr>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
-              <strong>${key}:</strong>
-            </td>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
-              ${value}
-            </td>
-          </tr>
-        `);
-      }
+    const dataLayerFields = getDataLayerFields(meta);
+    for (const field of dataLayerFields) {
+      const { fieldName, aliasFieldName } = field;
+      const key = aliasFieldName;
+      const value = properties[fieldName] ?? 'N/A';
+      const keyMaxWidth = Math.max(100, Math.min(180, key.length * 10));
+      const valueMaxWidth = '260px';
+      rows.push(`
+        <tr>
+          <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
+            <strong>${key}:</strong>
+          </td>
+          <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
+            ${value}
+          </td>
+        </tr>
+      `);
     }
-    const isRightToLeft = featureStructure.fields.some((field) => field.aliasFieldName !== field.fieldName);
+    const isRightToLeft = dataLayerFields.some((field) => field.aliasFieldName !== field.fieldName);
     return `
       <table style="width: 100%; direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
         <tbody>

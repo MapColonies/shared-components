@@ -73,7 +73,7 @@ export const MapWithSettings: Story = () => {
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...mapViewProps}>
-        <LayerViewer layer={layer as IRasterLayer} />
+        <LayerViewer layer={layer} />
       </CesiumMap>
     </div>
   );

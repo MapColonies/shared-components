@@ -7,7 +7,9 @@ import { Box } from '../../box';
 import {
   getImageryProvider,
   getImageryProviderName,
+  getDataLayerName,
   getLayerId,
+  getLayerName,
   ICesiumImageryLayer,
   isBaseMapLayer,
   isManagedImageryLayer,
@@ -86,7 +88,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           }
           return {
             id: layerId as string,
-            name: (get(meta, 'layerRecord.productName') ?? layerId) as string,
+            name: (getLayerName(layer) ?? layerId) as string,
             rect: layer.rectangle,
             isDisabled: isBaseMapLayer(meta as Record<string, unknown>)
           };
@@ -122,7 +124,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
       return {
         id: getLayerId(dataLayer) as string,
-        name: (get(dataLayer.meta, 'layerRecord.featureStructure.aliasLayerName') ?? get(dataLayer.meta, 'layerRecord.productName')) as string,
+        name: (getDataLayerName(dataLayer.meta) ?? getLayerName(dataLayer)) as string,
         rect: Rectangle.fromDegrees(...bbox((dataLayer.meta?.layerRecord as Record<string, unknown>)?.footprint)),
         isDisabled: false
       }; }) || [];
@@ -131,7 +133,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   const get3DModels = (): IActiveLayer[] => {
     return (mapViewer.layersManager?.modelList ?? []).map((model, index): IActiveLayer => {
       const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
-      const modelName = (get(model.meta, 'layerRecord.productName') ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`)) as string;
+      const modelName = (getLayerName(model) ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`)) as string;
       return {
         id: (getLayerId(model) as string) ?? `3D_MODEL_${String(index)}`,
         name: modelName,

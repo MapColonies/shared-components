@@ -8,8 +8,8 @@ import {
   ImageryTypes,
 } from 'cesium';
 import { get } from 'lodash';
-import { getImageryProviderUrl, ICesiumImageryLayer } from '../layers-manager';
-import { CesiumViewer } from '../map';
+import type { ICesiumImageryLayer } from '../layers-manager';
+import type { CesiumViewer } from '../map';
 import { imageHasTransparency } from './utils';
 
 export interface CustomImageryProvider extends ImageryProvider {
@@ -29,6 +29,10 @@ interface IExaminedTileCoordinates {
 const NUMBER_OF_TILES_TO_CHECK = 3;
 export const HAS_TRANSPARENCY_META_PROP = 'hasTransparency';
 export const EXAMINED_TILES_META_PROP = 'examinedTiles';
+
+const getImageryProviderUrl = (layer: ImageryLayer): string | undefined => {
+  return get(layer, '_imageryProvider._resource._url') as string | undefined;
+};
 
 function customCommonRequestImage(
   this: CustomImageryProvider,

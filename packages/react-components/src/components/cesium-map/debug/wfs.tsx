@@ -2,6 +2,8 @@ import { get } from 'lodash';
 import React, { useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
+import { ICesiumWFSLayerMeta } from '../layers/wfs.layer';
+import { getDataLayerName } from '../layers-manager';
 import { IActiveFeatureTypes } from './debugger-widget';
 
 import './wfs.css';
@@ -27,13 +29,18 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
         {featureTypes.length > 0 ? (
           featureTypes.map((type, index) => (
             <Box key={index} className="featureType">
+              {(() => {
+                const dataLayerName = getDataLayerName(type as unknown as ICesiumWFSLayerMeta) ?? '';
+                return (
               <Tooltip
-                content={`${(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ${type.id} (${String(type.zoomLevel)})`}
+                content={`${dataLayerName} ${type.id} (${String(type.zoomLevel)})`}
               >
                 <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
-                  {(get(type, 'layerRecord.featureStructure.aliasLayerName') ?? '') as string} ({String(type.zoomLevel)}):
+                  {dataLayerName} ({String(type.zoomLevel)}):
                 </Box>
               </Tooltip>
+                );
+              })()}
               <Box className="info">
                 <Box>
                   {cacheLabel}: {type.cache ?? 0}

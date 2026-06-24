@@ -1,24 +1,25 @@
 import React, { ComponentProps, useEffect, useRef } from 'react';
 import { Cartesian3, Cartographic, Matrix4, Cesium3DTileset as CesiumTileset } from 'cesium';
 import { Cesium3DTileset as Resium3DTileset } from 'resium';
+import { ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 const GROUND_LEVEL = 0.0;
 
-export interface RCesium3DTilesetProps extends ComponentProps<typeof Resium3DTileset> {
+export interface ICesium3DTileset extends ComponentProps<typeof Resium3DTileset> {
   isZoomTo?: boolean;
   heightFromGround?: number;
-  meta?: Record<string, unknown>;
+  meta?: ICesium3DModelMeta;
 }
 
-export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = ({ meta, ...props }) => {
+export const Cesium3DTileset: React.FC<ICesium3DTileset> = ({ meta, ...props }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const tilesetRef = useRef<CesiumTileset | null>(null);
 
   useEffect(() => {
     return () => {
       if (tilesetRef.current !== null && meta?.id !== undefined) {
-        mapViewer.layersManager?.removeModel(meta.id as string);
+        mapViewer.layersManager?.removeModel(meta.id);
       }
     };
   }, []);
@@ -44,7 +45,6 @@ export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = ({ meta, ...prop
           const translation = Cartesian3.subtract(offset, surface, new Cartesian3());
           tileset.modelMatrix = Matrix4.fromTranslation(translation);
         }
-
         props.onReady?.(tileset);
       }}
     />

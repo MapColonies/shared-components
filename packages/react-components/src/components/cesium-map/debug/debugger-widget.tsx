@@ -4,7 +4,7 @@ import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { EXAMINED_TILES_META_PROP, HAS_TRANSPARENCY_META_PROP } from '../helpers/customImageryProviders';
 import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { getLayerId, isManagedImageryLayer } from '../layers-manager';
+import { getLayerId, getLayerName, isManagedImageryLayer } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
@@ -30,16 +30,15 @@ export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
-interface LayerDebugMeta extends Record<string, unknown> {
+interface LayerDebugMeta {
   id?: string;
-  layerRecord?: {
-    productName?: string;
-  };
   isRelevantToExtent?: boolean;
+  [key: string]: unknown;
 }
 
 interface LayerDebugItem {
   layerId: string;
+  layerName?: string;
   meta: LayerDebugMeta;
 }
 
@@ -82,6 +81,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         }
         return {
           layerId: layerId as string,
+          layerName: getLayerName(layer),
           meta: (layer.meta ?? {}) as LayerDebugMeta,
         };
       })
@@ -218,7 +218,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                   <Box className="debuggerLayerList">
                     {[...layersMeta].reverse().map((layer) => {
                       const idText = layer.layerId;
-                      const nameText = layer.meta.layerRecord?.productName ?? idText;
+                      const nameText = layer.layerName ?? idText;
                       const statusText =
                         layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
                       const hasTransparency = layer.meta[HAS_TRANSPARENCY_META_PROP] as boolean | undefined;

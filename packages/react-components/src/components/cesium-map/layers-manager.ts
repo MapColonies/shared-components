@@ -26,16 +26,32 @@ import {
   RCesiumWMTSLayerOptions,
   RCesiumXYZLayerOptions
 } from './layers';
-import { ICesiumWFSLayer } from './layers/wfs.layer';
+import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
-import { CesiumViewer, IBaseMap } from './map';
+import type { CesiumViewer, IBaseMap } from './map';
 import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 
 const INC = 1;
 const DEC = -1;
 
+export interface ICesiumImageryLayerMeta {
+  id?: string;
+  parentBaseMapId?: string;
+  zIndex?: number;
+  type?: LayerType;
+  opacity?: number;
+  show?: boolean;
+  options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  details?: Record<string, unknown>;
+  skipRelevancyCheck?: boolean;
+  isRelevantToExtent?: boolean;
+  hasTransparency?: boolean;
+  examinedTiles?: Array<{ x?: number; y?: number; level?: number }>;
+  [key: string]: unknown;
+}
+
 export interface ICesiumImageryLayer extends InstanceType<typeof ImageryLayer> {
-  meta?: Record<string, unknown>;
+  meta?: ICesiumImageryLayerMeta;
 }
 
 export type LayerType = 'OSM_LAYER' | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER';
@@ -50,16 +66,20 @@ export interface IRasterLayer {
   details?: Record<string, unknown>;
 }
 
-export interface ICesium3DModel {
-  tileset: CesiumTileset;
-  meta: Record<string, unknown>;
+export interface ICesium3DModelMeta {
+  id?: string;
+  [key: string]: unknown;
 }
 
-export interface IVectorLayer {
-  id: string;
-  opacity: number;
-  zIndex: number;
-  url: string;
+export interface ICesium3DModel {
+  tileset: CesiumTileset;
+  meta: ICesium3DModelMeta;
+}
+
+export interface ICesiumDataLayerField {
+  fieldName: string;
+  aliasFieldName: string;
+  [key: string]: unknown;
 }
 
 export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
@@ -67,7 +87,19 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer, 'meta.id') as string | undefined;
+  return get(layer, 'meta.id');
+};
+
+export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
+  return get(layer, 'meta.layerRecord.productName');
+};
+
+export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
+  return get(meta, 'layerRecord.featureStructure.aliasLayerName') as string | undefined;
+};
+
+export const getDataLayerFields = (meta: ICesiumWFSLayerMeta | undefined): ICesiumDataLayerField[] => {
+  return (get(meta, 'layerRecord.featureStructure.fields') as ICesiumDataLayerField[] | undefined) ?? [];
 };
 
 export const isServiceLayer = (layerId: string | undefined): boolean => {
@@ -162,7 +194,7 @@ class LayerManager {
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
   }
 
-  // A general place to extend layer's data. Should be done when all providers(different types) are initialized
+  // A general place to extend layer's data. Should be done when all providers (different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
     const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
 
