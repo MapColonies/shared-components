@@ -32,7 +32,6 @@ import {
   CesiumEllipsoid,
   CesiumCesiumTerrainProvider,
 } from '../proxied.types';
-import { ZoomLevelTrackerTool } from '../tools/zoom-level-tracker.tool';
 import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
 import { Cesium3DTileset } from './3d.tileset';
 
@@ -62,8 +61,7 @@ export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
     <div style={mapDivStyle}>
       <div style={{ zIndex: 2, color: 'white', position: 'fixed', paddingLeft: '50%', backgroundColor: 'black', width: '100%' }}>Go to ME</div>
-      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D} showZoomLevel={false}>
-        <ZoomLevelTrackerTool valueBy="CALCULATION" />
+      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
         <CesiumWFSLayer
           key={metaPolygonParts.id}
           options={optionsPolygonParts}
