@@ -166,6 +166,10 @@ export interface CesiumMapProps extends ViewerProps {
     dynamicHeightIncrement?: number;
   };
   legends?: ILegends;
+  layerManagerLayerIdMetaFieldPath?: string;
+  layerManagerLayerNameMetaFieldPath?: string;
+  layerManagerDataLayerNameMetaFieldPath?: string;
+  layerManagerDataLayerFieldsMetaFieldPath?: string;
   layerManagerFootprintMetaFieldPath?: string;
   geocoderPanel?: GeocoderOptions[];
 }
@@ -304,6 +308,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
               () => {
                 setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
               },
+              props.layerManagerLayerIdMetaFieldPath,
+              props.layerManagerLayerNameMetaFieldPath,
+              props.layerManagerDataLayerNameMetaFieldPath,
+              props.layerManagerDataLayerFieldsMetaFieldPath,
               props.layerManagerFootprintMetaFieldPath,
               viewState?.shouldOptimizedTileRequests
             ),
@@ -314,7 +322,16 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         setViewState,
       };
     }
-  }, [props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
+  }, [
+    props.legends,
+    props.layerManagerLayerIdMetaFieldPath,
+    props.layerManagerLayerNameMetaFieldPath,
+    props.layerManagerDataLayerNameMetaFieldPath,
+    props.layerManagerDataLayerFieldsMetaFieldPath,
+    props.layerManagerFootprintMetaFieldPath,
+    mapViewRef,
+    viewState
+  ]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);

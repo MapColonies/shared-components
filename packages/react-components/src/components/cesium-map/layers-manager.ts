@@ -87,11 +87,11 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer, 'meta.id');
+  return get(layer.meta, 'id');
 };
 
 export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer, 'meta.layerRecord.productName');
+  return get(layer.meta, 'layerRecord.productName') as string | undefined;
 };
 
 export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
@@ -141,7 +141,11 @@ class LayerManager {
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly models: ICesium3DModel[];
   private readonly legendsExtractor?: LegendExtractor;
-  private readonly layerManagerFootprintMetaFieldPath: string | undefined;
+  private readonly layerManagerLayerIdMetaFieldPath?: string;
+  private readonly layerManagerLayerNameMetaFieldPath?: string;
+  private readonly layerManagerDataLayerNameMetaFieldPath?: string;
+  private readonly layerManagerDataLayerFieldsMetaFieldPath?: string;
+  private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
@@ -150,6 +154,10 @@ class LayerManager {
     mapViewer: CesiumViewer,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
+    layerManagerLayerIdMetaFieldPath?: string,
+    layerManagerLayerNameMetaFieldPath?: string,
+    layerManagerDataLayerNameMetaFieldPath?: string,
+    layerManagerDataLayerFieldsMetaFieldPath?: string,
     layerManagerFootprintMetaFieldPath?: string,
     shouldOptimizedTileRequests?: boolean
   ) {
@@ -163,6 +171,10 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
+    this.layerManagerLayerIdMetaFieldPath = layerManagerLayerIdMetaFieldPath;
+    this.layerManagerLayerNameMetaFieldPath = layerManagerLayerNameMetaFieldPath;
+    this.layerManagerDataLayerNameMetaFieldPath = layerManagerDataLayerNameMetaFieldPath;
+    this.layerManagerDataLayerFieldsMetaFieldPath = layerManagerDataLayerFieldsMetaFieldPath;
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
