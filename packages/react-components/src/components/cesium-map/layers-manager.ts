@@ -42,7 +42,7 @@ export interface ICesiumImageryLayerMeta {
   opacity?: number;
   show?: boolean;
   options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
-  details?: Record<string, unknown>;
+  layerRecord?: Record<string, unknown>;
   skipRelevancyCheck?: boolean;
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
@@ -61,9 +61,9 @@ export interface IRasterLayer {
   type: LayerType;
   opacity: number;
   zIndex: number;
-  show?: boolean;
   options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
-  details?: Record<string, unknown>;
+  show?: boolean;
+  layerRecord?: Record<string, unknown>;
 }
 
 export interface ICesium3DModelMeta {

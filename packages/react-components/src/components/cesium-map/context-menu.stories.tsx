@@ -43,7 +43,7 @@ const layers: IRasterLayer[] = [
     options: {
       url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
     },
-    details: {
+    layerRecord: {
       footprint: {
         type: 'Polygon',
         coordinates: [
@@ -67,7 +67,7 @@ const layers: IRasterLayer[] = [
     options: {
       url: 'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
     },
-    details: {
+    layerRecord: {
       footprint: {
         type: 'Polygon',
         coordinates: [
@@ -91,7 +91,7 @@ const layers: IRasterLayer[] = [
     options: {
       url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
     },
-    details: {
+    layerRecord: {
       footprint: {
         type: 'Polygon',
         coordinates: [
@@ -307,7 +307,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
-        layerManagerFootprintMetaFieldPath={'details.footprint'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
       >
         <LayersMozaik layers={layers} />
       </CesiumMap>
