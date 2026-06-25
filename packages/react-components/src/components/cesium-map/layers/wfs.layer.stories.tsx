@@ -9,6 +9,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL } from '../helpers/constants';
+import { getLayerIdFromMeta } from '../layers-manager';
 import { CesiumMap, CesiumViewer } from '../map';
 import {
   CesiumMath,
@@ -62,7 +63,7 @@ export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
     <div style={mapDivStyle}>
       <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
         <CesiumWFSLayer
-          key={metaPolygonParts.id}
+          key={getLayerIdFromMeta(metaPolygonParts)}
           options={optionsPolygonParts}
           meta={metaPolygonParts}
           visualizationHandler={handleVisualizationPolygonParts}
@@ -106,16 +107,16 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
           isZoomTo={true}
         />
         <CesiumWFSLayer
-          key={metaBuildings.id}
+          key={getLayerIdFromMeta(metaBuildings)}
           options={optionsBuildings}
           meta={metaBuildings}
           // visualizationHandler={handleVisualizationBuildings}
           withGeometryValidation={true}
         />
         {/* <CesiumWFSLayer
-          key={metaBuildings.id + '_2'}
+          key={getLayerIdFromMeta(metaBuildings) + '_2'}
           options={optionsBuildings}
-          meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
+          meta={{ ...metaBuildings, id: getLayerIdFromMeta(metaBuildings) + '_2' }}
           visualizationHandler={handleVisualizationBuildings}
           withGeometryValidation={true}
         /> */}
@@ -164,7 +165,7 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
         {
           show &&
           <CesiumWFSLayer
-            key={metaBuildings.id}
+            key={getLayerIdFromMeta(metaBuildings)}
             options={optionsBuildings}
             meta={metaBuildings}
             // visualizationHandler={handleVisualizationBuildings}
@@ -223,7 +224,7 @@ export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknow
           isZoomTo={true}
         />
         <CesiumWFSLayer
-          key={metaBuildings.id}
+          key={getLayerIdFromMeta(metaBuildings)}
           options={optionsBuildings}
           meta={metaBuildings}
           visualizationHandler={handleVisualizationBuildings}

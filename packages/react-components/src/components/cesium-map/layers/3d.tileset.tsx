@@ -1,7 +1,7 @@
 import React, { ComponentProps, useEffect, useRef } from 'react';
 import { Cartesian3, Cartographic, Matrix4, Cesium3DTileset as CesiumTileset } from 'cesium';
 import { Cesium3DTileset as Resium3DTileset } from 'resium';
-import { ICesium3DModelMeta } from '../layers-manager';
+import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 const GROUND_LEVEL = 0.0;
@@ -18,8 +18,9 @@ export const Cesium3DTileset: React.FC<ICesium3DTileset> = ({ meta, ...props }) 
 
   useEffect(() => {
     return () => {
-      if (tilesetRef.current !== null && meta?.id !== undefined) {
-        mapViewer.layersManager?.removeModel(meta.id);
+      const modelId = getLayerIdFromMeta(meta);
+      if (tilesetRef.current !== null && modelId !== undefined) {
+        mapViewer.layersManager?.removeModel(modelId);
       }
     };
   }, []);

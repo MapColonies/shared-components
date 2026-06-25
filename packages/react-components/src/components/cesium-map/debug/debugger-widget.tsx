@@ -3,8 +3,8 @@ import { get } from 'lodash';
 import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { EXAMINED_TILES_META_PROP, HAS_TRANSPARENCY_META_PROP } from '../helpers/customImageryProviders';
-import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { getLayerId, getLayerName, isManagedImageryLayer } from '../layers-manager';
+import { ICesiumWFSLayer, ICesiumWFSLayerMeta } from '../layers/wfs.layer';
+import { getLayerId, getLayerIdFromMeta, getLayerName, isManagedImageryLayer } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
@@ -12,19 +12,6 @@ import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
 import { WFS } from './wfs';
 
 import './debugger-widget.css';
-
-interface IFeatureTypeMetadata {
-  id: string;
-  items: number;
-  total: number;
-  cache: number;
-  currentZoomLevel: number;
-  layerRecord: Record<string, unknown>;
-}
-
-export type IActiveFeatureTypes = IFeatureTypeMetadata & {
-  zoomLevel: number;
-};
 
 export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
@@ -45,7 +32,7 @@ interface LayerDebugItem {
 type DebuggerSectionId = 'data' | 'layers' | 'tools';
 
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
-  const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
+  const [featureTypes, setFeatureTypes] = useState<ICesiumWFSLayerMeta[]>([]);
   const [layersMeta, setLayersMeta] = useState<LayerDebugItem[]>([]);
   const [collapsedSections, setCollapsedSections] = useState<Record<DebuggerSectionId, boolean>>({
     data: false,
@@ -137,9 +124,9 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         }
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache, currentZoomLevel, layerRecord } = meta as unknown as IFeatureTypeMetadata;
+        const { id, items, total, cache, currentZoomLevel, layerRecord } = meta;
         setFeatureTypes((prevFeatureTypes) => {
-          const existingIndex = prevFeatureTypes.findIndex((type) => type.id === id);
+          const existingIndex = prevFeatureTypes.findIndex((featureType) => getLayerIdFromMeta(featureType) === id);
           if (existingIndex >= 0) {
             if (
               JSON.stringify(prevFeatureTypes[existingIndex]) !==
@@ -156,7 +143,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         });
       });
       const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => getLayerId(layer)));
-      setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((type) => activeDataLayerIds.has(type.id)));
+      setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((featureType) => activeDataLayerIds.has(getLayerIdFromMeta(featureType))));
     };
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
     return () => {

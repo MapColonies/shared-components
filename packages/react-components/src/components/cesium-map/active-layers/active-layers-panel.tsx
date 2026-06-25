@@ -8,6 +8,7 @@ import {
   getImageryProvider,
   getImageryProviderName,
   getDataLayerName,
+  getLayerFootprint,
   getLayerId,
   getLayerName,
   ICesiumImageryLayer,
@@ -125,7 +126,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       return {
         id: getLayerId(dataLayer) as string,
         name: (getDataLayerName(dataLayer.meta) ?? getLayerName(dataLayer)) as string,
-        rect: Rectangle.fromDegrees(...bbox((dataLayer.meta?.layerRecord as Record<string, unknown>)?.footprint)),
+        rect: Rectangle.fromDegrees(...bbox(getLayerFootprint(dataLayer.meta))),
         isDisabled: false
       }; }) || [];
   };

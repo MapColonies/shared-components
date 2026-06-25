@@ -9,7 +9,7 @@ import {
   Rectangle,
   SingleTileImageryProvider,
 } from 'cesium';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import {
@@ -34,6 +34,52 @@ import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 const INC = 1;
 const DEC = -1;
 
+const DEFAULT_LAYER_ID_META_FIELD_PATH = 'id';
+const DEFAULT_LAYER_NAME_META_FIELD_PATH = 'layerRecord.productName';
+const DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH = 'layerRecord.featureStructure.aliasLayerName';
+const DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH = 'layerRecord.featureStructure.fields';
+const DEFAULT_FOOTPRINT_META_FIELD_PATH = 'layerRecord.footprint';
+
+export interface ILayerManagerMetaFieldPaths {
+  layerIdMetaFieldPath: string;
+  layerNameMetaFieldPath: string;
+  dataLayerNameMetaFieldPath: string;
+  dataLayerFieldsMetaFieldPath: string;
+  footprintMetaFieldPath: string;
+}
+
+const layerManagerMetaFieldPaths: ILayerManagerMetaFieldPaths = {
+  layerIdMetaFieldPath: DEFAULT_LAYER_ID_META_FIELD_PATH,
+  layerNameMetaFieldPath: DEFAULT_LAYER_NAME_META_FIELD_PATH,
+  dataLayerNameMetaFieldPath: DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH,
+  dataLayerFieldsMetaFieldPath: DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH,
+  footprintMetaFieldPath: DEFAULT_FOOTPRINT_META_FIELD_PATH,
+};
+
+const configureLayerManagerMetaFieldPaths = (
+  paths: Partial<ILayerManagerMetaFieldPaths>
+): void => {
+  if (paths.layerIdMetaFieldPath) {
+    layerManagerMetaFieldPaths.layerIdMetaFieldPath = paths.layerIdMetaFieldPath;
+  }
+  if (paths.layerNameMetaFieldPath) {
+    layerManagerMetaFieldPaths.layerNameMetaFieldPath = paths.layerNameMetaFieldPath;
+  }
+  if (paths.dataLayerNameMetaFieldPath) {
+    layerManagerMetaFieldPaths.dataLayerNameMetaFieldPath = paths.dataLayerNameMetaFieldPath;
+  }
+  if (paths.dataLayerFieldsMetaFieldPath) {
+    layerManagerMetaFieldPaths.dataLayerFieldsMetaFieldPath = paths.dataLayerFieldsMetaFieldPath;
+  }
+  if (paths.footprintMetaFieldPath) {
+    layerManagerMetaFieldPaths.footprintMetaFieldPath = paths.footprintMetaFieldPath;
+  }
+};
+
+export const getLayerManagerMetaFieldPaths = (): ILayerManagerMetaFieldPaths => {
+  return { ...layerManagerMetaFieldPaths };
+};
+
 export interface ICesiumImageryLayerMeta {
   id?: string;
   parentBaseMapId?: string;
@@ -42,7 +88,6 @@ export interface ICesiumImageryLayerMeta {
   opacity?: number;
   show?: boolean;
   options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
-  layerRecord?: Record<string, unknown>;
   skipRelevancyCheck?: boolean;
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
@@ -63,7 +108,7 @@ export interface IRasterLayer {
   zIndex: number;
   options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
   show?: boolean;
-  layerRecord?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface ICesium3DModelMeta {
@@ -87,19 +132,27 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, 'id');
+  return get(layer.meta, layerManagerMetaFieldPaths.layerIdMetaFieldPath) as string | undefined;
+};
+
+export const getLayerIdFromMeta = (meta: ICesiumImageryLayerMeta | ICesiumWFSLayerMeta | ICesium3DModelMeta | undefined): string | undefined => {
+  return get(meta, layerManagerMetaFieldPaths.layerIdMetaFieldPath) as string | undefined;
 };
 
 export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, 'layerRecord.productName') as string | undefined;
+  return get(layer.meta, layerManagerMetaFieldPaths.layerNameMetaFieldPath) as string | undefined;
+};
+
+export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
+  return get(meta, layerManagerMetaFieldPaths.footprintMetaFieldPath);
 };
 
 export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
-  return get(meta, 'layerRecord.featureStructure.aliasLayerName') as string | undefined;
+  return get(meta, layerManagerMetaFieldPaths.dataLayerNameMetaFieldPath) as string | undefined;
 };
 
 export const getDataLayerFields = (meta: ICesiumWFSLayerMeta | undefined): ICesiumDataLayerField[] => {
-  return (get(meta, 'layerRecord.featureStructure.fields') as ICesiumDataLayerField[] | undefined) ?? [];
+  return (get(meta, layerManagerMetaFieldPaths.dataLayerFieldsMetaFieldPath) as ICesiumDataLayerField[] | undefined) ?? [];
 };
 
 export const isServiceLayer = (layerId: string | undefined): boolean => {
@@ -141,10 +194,6 @@ class LayerManager {
   private readonly dataLayers: ICesiumWFSLayer[];
   private readonly models: ICesium3DModel[];
   private readonly legendsExtractor?: LegendExtractor;
-  private readonly layerManagerLayerIdMetaFieldPath?: string;
-  private readonly layerManagerLayerNameMetaFieldPath?: string;
-  private readonly layerManagerDataLayerNameMetaFieldPath?: string;
-  private readonly layerManagerDataLayerFieldsMetaFieldPath?: string;
   private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
   private relevancyListenersCleanup: Array<() => void>;
@@ -171,13 +220,17 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
-    this.layerManagerLayerIdMetaFieldPath = layerManagerLayerIdMetaFieldPath;
-    this.layerManagerLayerNameMetaFieldPath = layerManagerLayerNameMetaFieldPath;
-    this.layerManagerDataLayerNameMetaFieldPath = layerManagerDataLayerNameMetaFieldPath;
-    this.layerManagerDataLayerFieldsMetaFieldPath = layerManagerDataLayerFieldsMetaFieldPath;
     this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
+
+    configureLayerManagerMetaFieldPaths({
+      layerIdMetaFieldPath: layerManagerLayerIdMetaFieldPath,
+      layerNameMetaFieldPath: layerManagerLayerNameMetaFieldPath,
+      dataLayerNameMetaFieldPath: layerManagerDataLayerNameMetaFieldPath,
+      dataLayerFieldsMetaFieldPath: layerManagerDataLayerFieldsMetaFieldPath,
+      footprintMetaFieldPath: layerManagerFootprintMetaFieldPath,
+    });
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
@@ -221,10 +274,14 @@ class LayerManager {
   }
 
   public addMetaToDataLayer(meta: any): void {
-    const dataLayer = this.findDataLayerById(meta.id);
+    const dataLayerId = getLayerIdFromMeta(meta);
+    if (dataLayerId === undefined) {
+      return;
+    }
+    const dataLayer = this.findDataLayerById(dataLayerId);
     if (dataLayer) {
       dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
-      this.dataLayerUpdated.raiseEvent(this.dataLayers, meta.id);
+      this.dataLayerUpdated.raiseEvent(this.dataLayers, dataLayerId as any);
     }
   }
 
@@ -492,11 +549,12 @@ class LayerManager {
       0
     );
 
-    (transparentLayer as ICesiumImageryLayer).meta = {
-      id: TRANSPARENT_LAYER_ID,
+    const transparentLayerMeta: Record<string, unknown> = {
       skipRelevancyCheck: true,
       parentBaseMapId: 'TRANSPARENT_LAYER',
     };
+    set(transparentLayerMeta, layerManagerMetaFieldPaths.layerIdMetaFieldPath, TRANSPARENT_LAYER_ID);
+    (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
   }
 
   public addLayerUpdatedListener(callback: (meta: any) => void): void {

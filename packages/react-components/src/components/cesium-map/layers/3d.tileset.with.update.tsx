@@ -16,7 +16,7 @@ import {
   sampleTerrainMostDetailed,
   Cesium3DTileContent
 } from 'cesium';
-import { ICesium3DModelMeta } from '../layers-manager';
+import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface ICesium3DTilesetWithUpdate {
@@ -44,8 +44,9 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
     if (meta === undefined) { return; }
     mapViewer.layersManager?.addModel({ tileset, meta });
     return () => {
-      if (meta.id !== undefined) {
-        mapViewer.layersManager?.removeModel(meta.id as string);
+      const modelId = getLayerIdFromMeta(meta);
+      if (modelId !== undefined) {
+        mapViewer.layersManager?.removeModel(modelId);
       }
     };
   }, [mapViewer.layersManager]);
@@ -57,7 +58,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
     const normal = scene.globe.ellipsoid.geodeticSurfaceNormal(center, new Cartesian3());
     const offset = Cartesian3.multiplyByScalar(normal, height, new Cartesian3());
     const carto = Cartographic.fromCartesian(center);
-    void new Promise((resolve, reject) => {
+    void new Promise((resolve) => {
       // @ts-ignore
       if (scene.terrainProvider._ready !== true) {
         const result = { ...carto };

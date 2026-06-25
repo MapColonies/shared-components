@@ -19,7 +19,7 @@ import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
 import booleanValid from '@turf/boolean-valid';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2Feature } from '../helpers/utils';
-import { getDataLayerFields } from '../layers-manager';
+import { getDataLayerFields, getLayerIdFromMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
 export interface ICesiumWFSLayerLabelTextField {
@@ -122,6 +122,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
+  const dataLayerId = getLayerIdFromMeta(meta);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}_${uuidv4()}`, [featureType]);
   const hasRunFetchRef = useRef(false);
@@ -654,7 +655,8 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     if (
       mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
-      mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined
+      dataLayerId !== undefined &&
+      mapViewer.layersManager.findDataLayerById(dataLayerId) !== undefined
     ) {
       mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
@@ -695,7 +697,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         fetchMetadata.current.clear();
         mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
         mapViewer.dataSources.remove(wfsDataSource, true);
-        mapViewer.layersManager?.removeDataLayer(meta.id as string);
+        if (dataLayerId !== undefined) {
+          mapViewer.layersManager?.removeDataLayer(dataLayerId);
+        }
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
