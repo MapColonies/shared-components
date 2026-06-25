@@ -42,7 +42,11 @@ const optionsWMTS2 = {
 
 export const MapWithWMTSLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumWMTSLayer options={optionsWMTS} />
       <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} />
     </CesiumMap>

@@ -222,7 +222,13 @@ const LOCALIZED_GEOCODER_OPTIONS = [
 
 export const BaseMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
+    </CesiumMap>
   </div>
 );
 
@@ -258,7 +264,13 @@ BaseMap.argTypes = {
 
 export const ZoomedMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
+    </CesiumMap>
   </div>
 );
 
@@ -289,7 +301,13 @@ const cesiumTheme = {
 export const GeocoderPanel: Story = (args: CesiumMapProps) => (
   <ThemeProvider options={cesiumTheme}>
     <div style={mapDivStyle}>
-      <CesiumMap {...args}></CesiumMap>
+      <CesiumMap
+        {...args}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      >
+      </CesiumMap>
     </div>
   </ThemeProvider>
 );
@@ -324,7 +342,13 @@ GeocoderPanel.storyName = 'Geocoder';
 
 export const MapWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
+    </CesiumMap>
   </div>
 );
 
@@ -354,7 +378,13 @@ MapWithProjection.argTypes = {
 
 export const Map2DWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
+    </CesiumMap>
   </div>
 );
 
@@ -388,7 +418,13 @@ Map2DWithProjection.storyName = '2D Map With Projection';
 
 export const LocalizedMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}></CesiumMap>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
+    </CesiumMap>
   </div>
 );
 

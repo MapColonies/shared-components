@@ -50,7 +50,12 @@ const childLayerRect = Rectangle.fromDegrees(...bbox(optionsRectXYZ.footprint));
 
 export const MapWithXYZLayersAndRect: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap {...mapViewProps}>
+    <CesiumMap
+      {...mapViewProps}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} />
     </CesiumMap>
   </div>
@@ -72,7 +77,12 @@ export const MapWithSettings: Story = () => {
 
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...mapViewProps}>
+      <CesiumMap
+        {...mapViewProps}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      >
         <LayerViewer layer={layer} />
       </CesiumMap>
     </div>

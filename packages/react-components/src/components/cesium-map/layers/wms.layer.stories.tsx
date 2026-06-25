@@ -29,7 +29,11 @@ const optionsWMS2 = {
 
 export const MapWithWMSLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumWMSLayer options={optionsWMS} />
       <CesiumWMSLayer options={optionsWMS2} alpha={0.3} />
     </CesiumMap>

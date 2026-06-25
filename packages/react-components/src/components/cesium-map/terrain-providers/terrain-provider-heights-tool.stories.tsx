@@ -119,6 +119,9 @@ export const QuantizedMeshHeightsTool: Story = () => {
         zoom={5}
         imageryProvider={false}
         baseMaps={BASE_MAPS}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
       >
         <Cesium3DTileset
           url={getValue('GLOBAL', '3D_MODEL')}

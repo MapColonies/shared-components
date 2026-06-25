@@ -108,7 +108,12 @@ const onLoadAction = action('onLoad');
 
 export const MapWithGeojsonLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}>
+    <CesiumMap
+      {...args}
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumGeojsonLayer
         data={data}
         markerColor={Color.RED}

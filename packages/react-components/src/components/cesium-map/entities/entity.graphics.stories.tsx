@@ -22,7 +22,11 @@ const mapDivStyle = {
 
 export const Polygon: Story = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumEntity {...args} name="test">
         <CesiumEntityStaticDescription>
           <h1>Hello!</h1>

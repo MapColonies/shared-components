@@ -136,7 +136,14 @@ export const Drawings: Story = (args) => {
         Draw rectangle by coordinates
       </button>
       <div style={mapDivStyle}>
-        <CesiumMap center={center} sceneMode={CesiumSceneMode.SCENE2D} zoom={9}>
+        <CesiumMap
+          center={center}
+          sceneMode={CesiumSceneMode.SCENE2D}
+          zoom={9}
+          layerManagerLayerIdMetaFieldPath={'id'}
+          layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+          layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        >
           <CesiumDrawingsDataSource
             drawings={drawEntities}
             drawingMaterial={CesiumColor.RED.withAlpha(0.5)}

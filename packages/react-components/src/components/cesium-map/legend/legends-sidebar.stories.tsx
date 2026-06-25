@@ -49,6 +49,9 @@ export const MapWithLegends: Story = () => {
           title: 'Map Legends',
           emptyText: 'No legends for this basemap',
         }}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
       >
         <CesiumXYZLayer options={optionsXYZSanDiego} />
       </CesiumMap>

@@ -20,7 +20,11 @@ const mapDivStyle = {
 
 export const MapWithImageryLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumImageryLayer
         imageryProvider={
           new ArcGisMapServerImageryProvider({

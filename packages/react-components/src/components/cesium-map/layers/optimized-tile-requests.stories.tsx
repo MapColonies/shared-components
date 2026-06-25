@@ -120,7 +120,13 @@ const LayersContainer: React.FC = () => {
 export const OptimizedTileRequestingMap: Story = () => {
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...mapViewProps} showDebuggerTool={true}>
+      <CesiumMap
+        {...mapViewProps}
+        showDebuggerTool={true}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      >
         <LayersContainer />
       </CesiumMap>
     </div>

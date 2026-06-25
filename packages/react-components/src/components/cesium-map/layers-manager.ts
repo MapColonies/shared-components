@@ -34,11 +34,11 @@ import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 const INC = 1;
 const DEC = -1;
 
-const DEFAULT_LAYER_ID_META_FIELD_PATH = 'id';
-const DEFAULT_LAYER_NAME_META_FIELD_PATH = 'layerRecord.productName';
-const DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH = 'layerRecord.featureStructure.aliasLayerName';
-const DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH = 'layerRecord.featureStructure.fields';
-const DEFAULT_FOOTPRINT_META_FIELD_PATH = 'layerRecord.footprint';
+// const DEFAULT_LAYER_ID_META_FIELD_PATH = 'id';
+// const DEFAULT_LAYER_NAME_META_FIELD_PATH = 'layerRecord.productName';
+// const DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH = 'layerRecord.featureStructure.aliasLayerName';
+// const DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH = 'layerRecord.featureStructure.fields';
+// const DEFAULT_FOOTPRINT_META_FIELD_PATH = 'layerRecord.footprint';
 
 export interface ILayerManagerMetaFieldPaths {
   layerIdMetaFieldPath: string;
@@ -49,11 +49,11 @@ export interface ILayerManagerMetaFieldPaths {
 }
 
 const layerManagerMetaFieldPaths: ILayerManagerMetaFieldPaths = {
-  layerIdMetaFieldPath: DEFAULT_LAYER_ID_META_FIELD_PATH,
-  layerNameMetaFieldPath: DEFAULT_LAYER_NAME_META_FIELD_PATH,
-  dataLayerNameMetaFieldPath: DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH,
-  dataLayerFieldsMetaFieldPath: DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH,
-  footprintMetaFieldPath: DEFAULT_FOOTPRINT_META_FIELD_PATH,
+  layerIdMetaFieldPath: '',
+  layerNameMetaFieldPath: '',
+  dataLayerNameMetaFieldPath: '',
+  dataLayerFieldsMetaFieldPath: '',
+  footprintMetaFieldPath: '',
 };
 
 const configureLayerManagerMetaFieldPaths = (

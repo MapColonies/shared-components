@@ -27,7 +27,11 @@ const optionsXYZ2 = {
 
 export const MapWithXYZLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumXYZLayer options={optionsXYZ} />
       <CesiumXYZLayer options={optionsXYZ2} alpha={0.5} />
     </CesiumMap>

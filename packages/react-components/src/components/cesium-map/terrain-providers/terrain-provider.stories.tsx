@@ -135,6 +135,9 @@ export const QuantizedMeshProviders: Story = () => {
         imageryProvider={false}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
       >
         <Cesium3DTileset
           url={getValue('GLOBAL', '3D_MODEL')}

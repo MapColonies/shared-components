@@ -64,7 +64,11 @@ const CanvasEntity: React.FC<RCesiumEntityProps> = (props) => {
 
 export const Basic: Story = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumEntity
         {...args}
         name="test"
@@ -80,7 +84,11 @@ Basic.storyName = 'Basic Entity';
 export const WithDescription: Story<RCesiumEntityProps> = (args) => {
   const [count, setCount] = useState(0);
   return (
-    <CesiumMap>
+    <CesiumMap
+      layerManagerLayerIdMetaFieldPath={'id'}
+      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    >
       <CesiumEntity
         {...args}
         name="test1"
@@ -111,7 +119,11 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
 };
 
 export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
-  <CesiumMap>
+  <CesiumMap
+    layerManagerLayerIdMetaFieldPath={'id'}
+    layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+    layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+  >
     <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>
 );

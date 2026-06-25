@@ -30,7 +30,14 @@ export const MapWithOSMLayers: Story = (args) => {
   const [center] = useState<[number, number]>([34.82, 32.04]);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap center={center} sceneMode={CesiumSceneMode.SCENE2D} zoom={14}>
+      <CesiumMap
+        center={center}
+        sceneMode={CesiumSceneMode.SCENE2D}
+        zoom={14}
+        layerManagerLayerIdMetaFieldPath={'id'}
+        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
+        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      >
         <CesiumOSMLayer options={optionsOSM} />
         <CesiumXYZLayer options={optionsXYZ} />
       </CesiumMap>
