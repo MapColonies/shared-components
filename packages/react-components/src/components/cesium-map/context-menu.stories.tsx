@@ -307,6 +307,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
+        showDebuggerTool={true}
         layerManagerLayerIdMetaFieldPath={'id'}
         layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
         layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}

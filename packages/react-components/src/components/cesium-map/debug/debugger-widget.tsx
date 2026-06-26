@@ -96,6 +96,12 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
       scheduleLayerMetaRefresh();
     });
+    const removeLayerMoved = mapViewer.imageryLayers.layerMoved.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
+    const removeLayerAdded = mapViewer.imageryLayers.layerAdded.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
     const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
       scheduleLayerMetaRefresh();
     });
@@ -106,6 +112,8 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
       }
       removeTileLoad();
       removeMoveEnd();
+      removeLayerMoved();
+      removeLayerAdded();
       removeLayerRemoved();
       mapViewer.layersManager?.removeLayerUpdatedListener(updateLayersMeta);
     };
