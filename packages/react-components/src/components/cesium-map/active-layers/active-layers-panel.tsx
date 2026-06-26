@@ -144,62 +144,55 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     });
   };
 
+  const refreshSections = (): void => {
+    setSections([
+      {
+        id: IMAGERY,
+        values: getImageryLayers(),
+      },
+      {
+        id: SERVICE,
+        values: getServiceLayers(),
+      },
+      {
+        id: DATA,
+        values: getDataLayers(),
+      },
+      {
+        id: THREE_D,
+        values: get3DModels(),
+      },
+    ]);
+  };
+
   useEffect(() => {
-    const updateSections = () => {
-      const newSections = [
-        {
-          id: IMAGERY,
-          values: getImageryLayers()
-        },
-        {
-          id: SERVICE,
-          values: getServiceLayers()
-        },
-        {
-          id: DATA,
-          values: getDataLayers()
-        },
-        {
-          id: THREE_D,
-          values: get3DModels()
-        },
-      ];
-      setSections(newSections);
-      setCollapsedSections(newSections.reduce((acc, section) => ({ ...acc, [section.id]: true }), {}));
-    };
-    updateSections();
+    refreshSections();
+    setCollapsedSections({
+      [IMAGERY]: true,
+      [SERVICE]: true,
+      [DATA]: true,
+      [THREE_D]: true,
+    });
   }, []);
 
   useEffect(() => {
     if (!mapViewer.layersManager) { return; }
     const handleLayerEvent = (): void => {
-      setSections((prev) =>
-        prev.map((item) =>
-          item.id === IMAGERY
-            ? {
-                ...item,
-                values: getImageryLayers()
-              }
-            : item.id === SERVICE
-              ? {
-                  ...item,
-                  values: getServiceLayers()
-                }
-              : item
-        )
-      );
+      refreshSections();
     };
     mapViewer.layersManager.addLayerUpdatedListener(handleLayerEvent);
     mapViewer.imageryLayers.layerAdded.addEventListener(handleLayerEvent);
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
+    mapViewer.imageryLayers.layerMoved.addEventListener(handleLayerEvent);
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
         mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerEvent);
         mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
         mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
+        mapViewer.imageryLayers.layerMoved.removeEventListener(handleLayerEvent);
       }
     };
-  }, [mapViewer.layersManager?.layerList]);
+  }, [mapViewer.layersManager]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) { return; }
