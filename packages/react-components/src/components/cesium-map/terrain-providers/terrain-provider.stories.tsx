@@ -14,7 +14,6 @@ import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, useCesiumMap } from '../map';
-import { InspectorTool } from '../tools/inspector.tool';
 import QuantizedMeshTerrainProvider from './custom/quantized-mesh-terrain-provider';
 
 export default {
@@ -105,7 +104,11 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
   };
 
   return (
-    <>
+    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.4rem' }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+        <input type="checkbox" id="input" checked={depthTest} onChange={handleDepthTestChange} style={{ margin: 0 }} />
+        <label htmlFor="input" style={{ lineHeight: 1 }}>depthTestAgainstTerrain</label>
+      </div>
       <select
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
@@ -117,10 +120,7 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
           return <option key={provider.id}>{provider.id}</option>;
         })}
       </select>
-      <br />
-      <input type="checkbox" id="input" checked={depthTest} onChange={handleDepthTestChange} />
-      <label htmlFor="input">depthTestAgainstTerrain</label>
-    </>
+    </div>
   );
 };
 
@@ -135,6 +135,7 @@ export const QuantizedMeshProviders: Story = () => {
         imageryProvider={false}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
+        showDebuggerTool={true}
         layerManagerLayerIdMetaFieldPath={'id'}
         layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
         layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
@@ -145,7 +146,6 @@ export const QuantizedMeshProviders: Story = () => {
           isZoomTo={true}
         />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
-        <InspectorTool />
       </CesiumMap>
     </div>
   );

@@ -11,7 +11,6 @@ import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
 import { CesiumMap, CesiumViewer, useCesiumMap } from '../map';
-import { InspectorTool } from '../tools/inspector.tool';
 import { TerrainianHeightTool } from '../tools/terranian-height.tool';
 
 export default {
@@ -119,6 +118,7 @@ export const QuantizedMeshHeightsTool: Story = () => {
         zoom={5}
         imageryProvider={false}
         baseMaps={BASE_MAPS}
+        showDebuggerTool={true}
         layerManagerLayerIdMetaFieldPath={'id'}
         layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
         layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
@@ -130,7 +130,6 @@ export const QuantizedMeshHeightsTool: Story = () => {
         />
         <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
         <TerrainianHeightTool />
-        <InspectorTool />
       </CesiumMap>
     </div>
   );
