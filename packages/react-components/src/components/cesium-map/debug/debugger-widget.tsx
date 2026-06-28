@@ -209,10 +209,10 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                     }));
                   }}
                 />
-                {viewState?.shouldOptimizedTileRequests === true && (
+                {viewState?.shouldOptimizedTileRequests === true && layersMeta?.length > 0 && (
                   <Box className="debuggerLayers"> 
                     <Box className="debuggerLayersArrow">
-                      {layersMeta?.length > 0 && <Box className="debuggerLayersArrowLine" />}
+                      <Box className="debuggerLayersArrowLine" />
                     </Box>
                     <Box className="debuggerLayersList">
                       {[...layersMeta].reverse().map((layer) => {
