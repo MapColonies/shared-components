@@ -210,7 +210,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                   }}
                 />
                 {viewState?.shouldOptimizedTileRequests === true && layersMeta?.length > 0 && (
-                  <Box className="debuggerLayers"> 
+                  <Box className="debuggerLayers">
                     <Box className="debuggerLayersArrow">
                       <Box className="debuggerLayersArrowLine" />
                     </Box>
