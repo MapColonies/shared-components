@@ -15,7 +15,7 @@ const mapDivStyle = {
 };
 
 const story = {
-  title: 'Map/Map Tiles/XYZ',
+  title: 'OL Map/Map/Tiles/XYZ',
   component: TileXYZ,
 };
 

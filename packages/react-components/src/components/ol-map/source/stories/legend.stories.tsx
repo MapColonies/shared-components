@@ -11,7 +11,7 @@ import { TileOsm } from '..';
 import { VectorSource } from '../vector-source';
 
 export default {
-  title: 'Map/Map Tiles/Legend',
+  title: 'OL Map/Map/Tiles/Legend',
   component: Legend,
   subcomponents: GeoJSONFeature,
   parameters: {

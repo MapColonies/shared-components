@@ -19,7 +19,7 @@ const mapDivStyle = {
 };
 
 const story = {
-  title: 'Map/Map Tiles/WMS',
+  title: 'OL Map/Map/Tiles/WMS',
   component: TileWMS,
 };
 export default story;

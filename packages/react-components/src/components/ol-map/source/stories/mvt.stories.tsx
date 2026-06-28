@@ -8,7 +8,7 @@ import { MVTSource, getMVTOptions } from '../mvt';
 import { TileOsm } from '..';
 
 export default {
-  title: 'Map/Map Tiles/MVT',
+  title: 'OL Map/Map/Tiles/MVT',
   component: VectorTileLayer,
   subcomponents: MVTSource,
   parameters: {

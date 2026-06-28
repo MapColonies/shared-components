@@ -32,7 +32,7 @@ const mapDivStyle = {
 };
 
 const story = {
-  title: 'Map/Map Tiles/WMTS',
+  title: 'OL Map/Map/Tiles/WMTS',
   component: TileWMTS,
 };
 

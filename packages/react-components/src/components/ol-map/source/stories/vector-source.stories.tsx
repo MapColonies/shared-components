@@ -9,7 +9,7 @@ import { TileOsm } from '..';
 import { VectorSource } from '../vector-source';
 
 export default {
-  title: 'Map/Map Tiles/Geojson',
+  title: 'OL Map/Map/Tiles/Geojson',
   component: VectorLayer,
   subcomponents: GeoJSONFeature,
   parameters: {
