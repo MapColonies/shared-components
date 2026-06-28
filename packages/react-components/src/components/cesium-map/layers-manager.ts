@@ -34,12 +34,6 @@ import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 const INC = 1;
 const DEC = -1;
 
-// const DEFAULT_LAYER_ID_META_FIELD_PATH = 'id';
-// const DEFAULT_LAYER_NAME_META_FIELD_PATH = 'layerRecord.productName';
-// const DEFAULT_DATA_LAYER_NAME_META_FIELD_PATH = 'layerRecord.featureStructure.aliasLayerName';
-// const DEFAULT_DATA_LAYER_FIELDS_META_FIELD_PATH = 'layerRecord.featureStructure.fields';
-// const DEFAULT_FOOTPRINT_META_FIELD_PATH = 'layerRecord.footprint';
-
 export interface ILayerManagerMetaFieldPaths {
   layerIdMetaFieldPath: string;
   layerNameMetaFieldPath: string;
@@ -48,36 +42,26 @@ export interface ILayerManagerMetaFieldPaths {
   footprintMetaFieldPath: string;
 }
 
-const layerManagerMetaFieldPaths: ILayerManagerMetaFieldPaths = {
-  layerIdMetaFieldPath: '',
-  layerNameMetaFieldPath: '',
-  dataLayerNameMetaFieldPath: '',
-  dataLayerFieldsMetaFieldPath: '',
-  footprintMetaFieldPath: '',
+export interface ILayerManagerMetaMapping {
+  layer?: {
+    id?: string;
+    name?: string;
+    footprint?: string;
+  };
+  dataLayer?: {
+    name?: string;
+    fields?: string;
+  };
+}
+
+let mapping: ILayerManagerMetaMapping = {};
+
+const configureLayerManagerMetaMapping = (metaMapping: ILayerManagerMetaMapping): void => {
+  mapping = { ...metaMapping };
 };
 
-const configureLayerManagerMetaFieldPaths = (
-  paths: Partial<ILayerManagerMetaFieldPaths>
-): void => {
-  if (paths.layerIdMetaFieldPath) {
-    layerManagerMetaFieldPaths.layerIdMetaFieldPath = paths.layerIdMetaFieldPath;
-  }
-  if (paths.layerNameMetaFieldPath) {
-    layerManagerMetaFieldPaths.layerNameMetaFieldPath = paths.layerNameMetaFieldPath;
-  }
-  if (paths.dataLayerNameMetaFieldPath) {
-    layerManagerMetaFieldPaths.dataLayerNameMetaFieldPath = paths.dataLayerNameMetaFieldPath;
-  }
-  if (paths.dataLayerFieldsMetaFieldPath) {
-    layerManagerMetaFieldPaths.dataLayerFieldsMetaFieldPath = paths.dataLayerFieldsMetaFieldPath;
-  }
-  if (paths.footprintMetaFieldPath) {
-    layerManagerMetaFieldPaths.footprintMetaFieldPath = paths.footprintMetaFieldPath;
-  }
-};
-
-export const getLayerManagerMetaFieldPaths = (): ILayerManagerMetaFieldPaths => {
-  return { ...layerManagerMetaFieldPaths };
+export const getLayerManagerMetaMapping = (): ILayerManagerMetaMapping => {
+  return { ...mapping };
 };
 
 export interface ICesiumImageryLayerMeta {
@@ -132,27 +116,27 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, layerManagerMetaFieldPaths.layerIdMetaFieldPath) as string | undefined;
+  return get(layer.meta, mapping.layer?.id ?? '') as string | undefined;
 };
 
 export const getLayerIdFromMeta = (meta: ICesiumImageryLayerMeta | ICesiumWFSLayerMeta | ICesium3DModelMeta | undefined): string | undefined => {
-  return get(meta, layerManagerMetaFieldPaths.layerIdMetaFieldPath) as string | undefined;
+  return get(meta, mapping.layer?.id ?? '') as string | undefined;
 };
 
 export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, layerManagerMetaFieldPaths.layerNameMetaFieldPath) as string | undefined;
+  return get(layer.meta, mapping.layer?.name ?? '') as string | undefined;
 };
 
 export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
-  return get(meta, layerManagerMetaFieldPaths.footprintMetaFieldPath);
+  return get(meta, mapping.layer?.footprint ?? '');
 };
 
 export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
-  return get(meta, layerManagerMetaFieldPaths.dataLayerNameMetaFieldPath) as string | undefined;
+  return get(meta, mapping.dataLayer?.name ?? '') as string | undefined;
 };
 
 export const getDataLayerFields = (meta: ICesiumWFSLayerMeta | undefined): ICesiumDataLayerField[] => {
-  return (get(meta, layerManagerMetaFieldPaths.dataLayerFieldsMetaFieldPath) as ICesiumDataLayerField[] | undefined) ?? [];
+  return (get(meta, mapping.dataLayer?.fields ?? '') as ICesiumDataLayerField[] | undefined) ?? [];
 };
 
 export const isServiceLayer = (layerId: string | undefined): boolean => {
@@ -203,11 +187,7 @@ class LayerManager {
     mapViewer: CesiumViewer,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
-    layerManagerLayerIdMetaFieldPath?: string,
-    layerManagerLayerNameMetaFieldPath?: string,
-    layerManagerDataLayerNameMetaFieldPath?: string,
-    layerManagerDataLayerFieldsMetaFieldPath?: string,
-    layerManagerFootprintMetaFieldPath?: string,
+    layerManagerMetaMapping?: ILayerManagerMetaMapping,
     shouldOptimizedTileRequests?: boolean
   ) {
     this.mapViewer = mapViewer;
@@ -220,17 +200,11 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
-    this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
+    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping?.layer?.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
 
-    configureLayerManagerMetaFieldPaths({
-      layerIdMetaFieldPath: layerManagerLayerIdMetaFieldPath,
-      layerNameMetaFieldPath: layerManagerLayerNameMetaFieldPath,
-      dataLayerNameMetaFieldPath: layerManagerDataLayerNameMetaFieldPath,
-      dataLayerFieldsMetaFieldPath: layerManagerDataLayerFieldsMetaFieldPath,
-      footprintMetaFieldPath: layerManagerFootprintMetaFieldPath,
-    });
+    configureLayerManagerMetaMapping(layerManagerMetaMapping ?? {});
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
@@ -556,7 +530,7 @@ class LayerManager {
       skipRelevancyCheck: true,
       parentBaseMapId: 'TRANSPARENT_LAYER',
     };
-    set(transparentLayerMeta, layerManagerMetaFieldPaths.layerIdMetaFieldPath, TRANSPARENT_LAYER_ID);
+    set(transparentLayerMeta, mapping.layer?.id ?? '', TRANSPARENT_LAYER_ID);
     (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
   }
 
