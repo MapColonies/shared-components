@@ -1,14 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  ComponentProps,
-  MouseEvent,
-  useMemo
-} from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ComponentProps, MouseEvent, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Viewer, CesiumComponentRef } from 'resium';
 import {
@@ -213,7 +203,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const imageryMenuEvent = useRef<MouseEvent>();
   const [imageryMenuPosition, setImageryMenuPosition] = useState<Record<string, unknown> | undefined>(undefined);
   const [isLegendsSidebarOpen, setIsLegendsSidebarOpen] = useState<boolean>(false);
-  const [rightClickCoordinates, setRightClickCoordinates] = useState<{ longitude: number; latitude: number; }>();
+  const [rightClickCoordinates, setRightClickCoordinates] = useState<{ longitude: number; latitude: number }>();
   const [viewState, setViewState] = useState<MapViewState>();
   const theme = useTheme();
   const themeCesium = useMappedCesiumTheme(theme);
@@ -239,7 +229,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     navigationHelpButton: false,
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
-    imageryProvider: false,
     ...(props as ViewerProps),
   };
 
@@ -277,44 +266,71 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     [ref]
   );
 
-  useEffect(() => {
-    if (ref.current !== null) {
-      const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
-      if (props.imageryContextMenu) {
-        // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
-        // We need the native event for the new context menu component.
-        // This is a workaround.
+  // useEffect(() => {
+  //   if (ref.current !== null) {
+  //     const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
+  //     if (!viewer) return;
+  //     if (props.imageryContextMenu) {
+  //       // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
+  //       // We need the native event for the new context menu component.
+  //       // This is a workaround.
 
+  //       viewer.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
+
+  //       viewer.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
+  //     }
+  //   }
+  //   setMapViewRef(ref.current?.cesiumElement);
+  // }, [ref, props.imageryContextMenu]);
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkViewer = () => {
+      const viewer = ref.current?.cesiumElement;
+
+      if (!viewer || cancelled) {
+        requestAnimationFrame(checkViewer);
+        return;
+      }
+
+      // viewer is ready here
+      if (props.imageryContextMenu) {
         viewer.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
 
         viewer.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
       }
-    }
-    setMapViewRef(ref.current?.cesiumElement);
-  }, [ref, props.imageryContextMenu]);
+
+      setMapViewRef(viewer);
+    };
+
+    checkViewer();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [props.imageryContextMenu]);
 
   const contextValue = useMemo(() => {
-    if (mapViewRef) {
-      const mv = mapViewRef.layersManager
-        ? mapViewRef
-        : Object.assign(mapViewRef, {
-            layersManager: new LayerManager(
-              mapViewRef,
-              props.legends?.mapLegendsExtractor,
-              () => {
-                setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-              },
-              props.layerManagerFootprintMetaFieldPath,
-              viewState?.shouldOptimizedTileRequests
-            ),
-          });
-      return {
-        mapViewer: mv,
-        viewState,
-        setViewState,
-      };
+    if (!mapViewRef) return null;
+
+    if (!mapViewRef.layersManager) {
+      mapViewRef.layersManager = new LayerManager(
+        mapViewRef,
+        props.legends?.mapLegendsExtractor,
+        () => {
+          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+        },
+        props.layerManagerFootprintMetaFieldPath,
+        viewState?.shouldOptimizedTileRequests
+      );
     }
-  }, [props.legends, props.layerManagerFootprintMetaFieldPath, mapViewRef, viewState]);
+
+    return {
+      mapViewer: mapViewRef,
+      viewState,
+      setViewState,
+    };
+  }, [mapViewRef, props.legends, props.layerManagerFootprintMetaFieldPath, viewState]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
@@ -331,14 +347,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
 
   useEffect(() => {
-    const newTerrains = props.terrains || ((mapViewRef && mapViewRef.terrainProvider) ? [{
-      id: '1',
-      url: DEFAULT_TERRAIN_PROVIDER_URL,
-      title: 'Default Terrain',
-      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
-      isCurrent: true,
-      terrainProvider: mapViewRef.terrainProvider
-    }] : undefined);
+    const newTerrains =
+      props.terrains ||
+      (mapViewRef && mapViewRef.terrainProvider
+        ? [
+            {
+              id: '1',
+              url: DEFAULT_TERRAIN_PROVIDER_URL,
+              title: 'Default Terrain',
+              thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+              isCurrent: true,
+              terrainProvider: mapViewRef.terrainProvider,
+            },
+          ]
+        : undefined);
     setTerrains(newTerrains);
   }, [props.terrains, mapViewRef]);
 
@@ -395,10 +417,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
       // https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
       if (mapViewRef.scene.mode === SceneMode.SCENE3D) {
-        const windowPosition = new Cartesian2(
-          mapViewRef.container.clientWidth / TWO,
-          mapViewRef.container.clientHeight / TWO
-        );
+        const windowPosition = new Cartesian2(mapViewRef.container.clientWidth / TWO, mapViewRef.container.clientHeight / TWO);
         const pickRay = mapViewRef.scene.camera.getPickRay(windowPosition);
         const pickPosition = mapViewRef.scene.globe.pick(pickRay as Ray, mapViewRef.scene);
 
@@ -527,7 +546,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showZoomButtons]);
 
   const updateLegendToggle = () => {
-    setIsLegendsSidebarOpen(prev => !prev);
+    setIsLegendsSidebarOpen((prev) => !prev);
   };
 
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
@@ -580,53 +599,53 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
       <Viewer className="viewer" full ref={ref} {...viewerProps}>
-        <MapViewProvider value={contextValue as IMapContext}>
-          <LegendSidebar
-            title={props.legends?.title}
-            isOpen={isLegendsSidebarOpen}
-            toggleSidebar={updateLegendToggle}
-            noLegendsText={props.legends?.emptyText}
-            legends={props.legends?.legendsList ?? legendsList}
-            actionsTexts={props.legends?.actionsTexts}
-          />
-          {props.children}
-          {bindCustomToolsToViewer()}
-          {bindToolsToToolbar()}
-          {bindInspectorsToWidgets()}
-          {
-            props.imageryContextMenu &&
-            showImageryMenu &&
-            imageryMenuPosition &&
-            rightClickCoordinates &&
-            React.cloneElement(props.imageryContextMenu, {
-              data: mapViewRef?.layersManager?.findLayerByPOI(
-                imageryMenuPosition.x as number,
-                imageryMenuPosition.y as number,
-                false
-              ) as unknown as Record<string, unknown>[],
-              position: {
-                x: imageryMenuPosition.x as number,
-                y: imageryMenuPosition.y as number,
-              },
-              coordinates: rightClickCoordinates,
-              style: getImageryMenuStyle(
-                imageryMenuPosition.x as number,
-                imageryMenuPosition.y as number,
-                props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
-                props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
-                props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
-              ),
-              size: props.imageryContextMenuSize ?? {
-                height: DEFAULT_HEIGHT,
-                width: DEFAULT_WIDTH,
-              },
-              handleClose: () => {
-                setShowImageryMenu(!showImageryMenu);
-              },
-              contextEvt: imageryMenuEvent.current,
-            })
-          }
-        </MapViewProvider>
+        {contextValue && (
+          <MapViewProvider value={contextValue as IMapContext}>
+            <LegendSidebar
+              title={props.legends?.title}
+              isOpen={isLegendsSidebarOpen}
+              toggleSidebar={updateLegendToggle}
+              noLegendsText={props.legends?.emptyText}
+              legends={props.legends?.legendsList ?? legendsList}
+              actionsTexts={props.legends?.actionsTexts}
+            />
+            {props.children}
+            {bindCustomToolsToViewer()}
+            {bindToolsToToolbar()}
+            {bindInspectorsToWidgets()}
+            {props.imageryContextMenu &&
+              showImageryMenu &&
+              imageryMenuPosition &&
+              rightClickCoordinates &&
+              React.cloneElement(props.imageryContextMenu, {
+                data: mapViewRef?.layersManager?.findLayerByPOI(
+                  imageryMenuPosition.x as number,
+                  imageryMenuPosition.y as number,
+                  false
+                ) as unknown as Record<string, unknown>[],
+                position: {
+                  x: imageryMenuPosition.x as number,
+                  y: imageryMenuPosition.y as number,
+                },
+                coordinates: rightClickCoordinates,
+                style: getImageryMenuStyle(
+                  imageryMenuPosition.x as number,
+                  imageryMenuPosition.y as number,
+                  props.imageryContextMenuSize?.width ?? DEFAULT_WIDTH,
+                  props.imageryContextMenuSize?.height ?? DEFAULT_HEIGHT,
+                  props.imageryContextMenuSize?.dynamicHeightIncrement ?? DEFAULT_DYNAMIC_HEIGHT_INCREMENT
+                ),
+                size: props.imageryContextMenuSize ?? {
+                  height: DEFAULT_HEIGHT,
+                  width: DEFAULT_WIDTH,
+                },
+                handleClose: () => {
+                  setShowImageryMenu(!showImageryMenu);
+                },
+                contextEvt: imageryMenuEvent.current,
+              })}
+          </MapViewProvider>
+        )}
       </Viewer>
     </ThemeProvider>
   );

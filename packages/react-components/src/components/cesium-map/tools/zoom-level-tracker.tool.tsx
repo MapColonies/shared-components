@@ -89,9 +89,11 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
         cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(camera.positionWC).height;
         break;
       case CesiumSceneMode.SCENE2D:
-        cameraHeight =
-          ((camera.frustum as PerspectiveOffCenterFrustum).right - (camera.frustum as PerspectiveOffCenterFrustum).left) *
-          ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
+        const frustum = camera.frustum;
+
+        if (frustum && frustum instanceof PerspectiveOffCenterFrustum && frustum.left !== undefined && frustum.right !== undefined) {
+          cameraHeight = (frustum.right - frustum.left) * ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
+        }
         break;
       case CesiumSceneMode.COLUMBUS_VIEW:
         cameraHeight = camera.position.z;
@@ -127,10 +129,13 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
     }
   }, [mapViewer]);
 
-  const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(() => ({
-    CALCULATION: calculateZoomLevel,
-    RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles
-  }), [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]);
+  const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(
+    () => ({
+      CALCULATION: calculateZoomLevel,
+      RENDERED_TILES: extractMaxZoomLevelFromRenderedTiles,
+    }),
+    [calculateZoomLevel, extractMaxZoomLevelFromRenderedTiles]
+  );
 
   const zoomExtractionMethod = extractZoomMethods[valueBy];
 

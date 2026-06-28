@@ -184,7 +184,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       const worldPos = getEntityCenter(entity);
       if (!worldPos) return { entity, distance: Number.MAX_VALUE };
 
-      const screenPos = SceneTransforms.wgs84ToWindowCoordinates(mapViewer.scene, worldPos);
+      const screenPos = SceneTransforms.worldToWindowCoordinates(mapViewer.scene, worldPos);
       if (!screenPos) return { entity, distance: Number.MAX_VALUE };
 
       const dx = screenPosition.x - screenPos.x;
