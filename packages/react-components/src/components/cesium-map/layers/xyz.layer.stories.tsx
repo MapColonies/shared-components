@@ -1,4 +1,3 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
@@ -17,6 +16,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const optionsXYZ = {
   url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
 };
@@ -28,9 +34,7 @@ const optionsXYZ2 = {
 export const MapWithXYZLayers: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumXYZLayer options={optionsXYZ} />
       <CesiumXYZLayer options={optionsXYZ2} alpha={0.5} />

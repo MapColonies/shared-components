@@ -21,6 +21,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const mapViewProps: CesiumMapProps = {
   center: [34.811, 31.908],
   zoom: 14,
@@ -52,9 +59,7 @@ export const MapWithXYZLayersAndRect: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
       {...mapViewProps}
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} />
     </CesiumMap>
@@ -79,9 +84,7 @@ export const MapWithSettings: Story = () => {
     <div style={mapDivStyle}>
       <CesiumMap
         {...mapViewProps}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <LayerViewer layer={layer} />
       </CesiumMap>

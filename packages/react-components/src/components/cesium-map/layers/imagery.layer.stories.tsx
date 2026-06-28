@@ -18,12 +18,17 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 export const MapWithImageryLayers: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumImageryLayer
         imageryProvider={

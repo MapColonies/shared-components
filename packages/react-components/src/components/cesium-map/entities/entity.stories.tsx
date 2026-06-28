@@ -19,6 +19,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const initCanvas = (): HTMLCanvasElement => {
   const can = document.createElement('canvas');
   can.width = 100;
@@ -65,9 +72,7 @@ const CanvasEntity: React.FC<RCesiumEntityProps> = (props) => {
 export const Basic: Story = (args) => (
   <div style={mapDivStyle}>
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumEntity
         {...args}
@@ -85,9 +90,7 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
   const [count, setCount] = useState(0);
   return (
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumEntity
         {...args}
@@ -120,9 +123,7 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
 
 export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
   <CesiumMap
-    layerManagerLayerIdMetaFieldPath={'id'}
-    layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-    layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+    layerManagerMetaMapping={layerManagerMetaMapping}
   >
     <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>

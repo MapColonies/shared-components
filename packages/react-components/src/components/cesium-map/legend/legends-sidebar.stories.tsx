@@ -3,7 +3,6 @@ import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
 import { CesiumMap } from '../map';
-import { CesiumSceneMode } from '../proxied.types';
 
 export default {
   title: 'Cesium Map',
@@ -17,6 +16,13 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const optionsXYZSanDiego = {
@@ -49,9 +55,7 @@ export const MapWithLegends: Story = () => {
           title: 'Map Legends',
           emptyText: 'No legends for this basemap',
         }}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <CesiumXYZLayer options={optionsXYZSanDiego} />
       </CesiumMap>

@@ -19,6 +19,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const optionsOSM = {
   url: 'https://a.tile.openstreetmap.org/',
 };
@@ -34,9 +41,7 @@ export const MapWithOSMLayers: Story = (args) => {
         center={center}
         sceneMode={CesiumSceneMode.SCENE2D}
         zoom={14}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <CesiumOSMLayer options={optionsOSM} />
         <CesiumXYZLayer options={optionsXYZ} />

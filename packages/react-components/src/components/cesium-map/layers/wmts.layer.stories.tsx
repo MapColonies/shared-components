@@ -1,4 +1,3 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { Credit } from 'cesium';
 import { CesiumMap } from '../map';
@@ -16,6 +15,13 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const optionsWMTS = {
@@ -43,9 +49,7 @@ const optionsWMTS2 = {
 export const MapWithWMTSLayers: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumWMTSLayer options={optionsWMTS} />
       <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} />

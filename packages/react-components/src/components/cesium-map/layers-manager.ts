@@ -34,14 +34,6 @@ import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 const INC = 1;
 const DEC = -1;
 
-export interface ILayerManagerMetaFieldPaths {
-  layerIdMetaFieldPath: string;
-  layerNameMetaFieldPath: string;
-  dataLayerNameMetaFieldPath: string;
-  dataLayerFieldsMetaFieldPath: string;
-  footprintMetaFieldPath: string;
-}
-
 export interface ILayerManagerMetaMapping {
   layer?: {
     id?: string;

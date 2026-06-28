@@ -20,6 +20,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
   url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
 });
@@ -28,9 +35,7 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap
       {...args}
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}
@@ -70,9 +75,7 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
   <div style={mapDivStyle}>
     <CesiumMap
       {...args}
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}
@@ -116,9 +119,7 @@ export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) 
   <div style={mapDivStyle}>
     <CesiumMap
       {...args}
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}

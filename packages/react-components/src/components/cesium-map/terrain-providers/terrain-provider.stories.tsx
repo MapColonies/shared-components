@@ -30,6 +30,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const EllipsoidProvider = new EllipsoidTerrainProvider({});
 
 const CesiumProvider = new CesiumTerrainProvider({
@@ -136,9 +143,7 @@ export const QuantizedMeshProviders: Story = () => {
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
         showDebuggerTool={true}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset
           url={getValue('GLOBAL', '3D_MODEL')}

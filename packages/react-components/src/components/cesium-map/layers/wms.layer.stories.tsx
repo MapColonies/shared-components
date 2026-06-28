@@ -1,4 +1,3 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { CesiumMap } from '../map';
 import { CesiumWMSLayer } from './wms.layer';
@@ -17,6 +16,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const optionsWMS = {
   url: 'https://ahocevar.com/geoserver/wms',
   layers: 'ne:NE1_HR_LC_SR_W_DR',
@@ -30,9 +36,7 @@ const optionsWMS2 = {
 export const MapWithWMSLayers: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
-      layerManagerLayerIdMetaFieldPath={'id'}
-      layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-      layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+      layerManagerMetaMapping={layerManagerMetaMapping}
     >
       <CesiumWMSLayer options={optionsWMS} />
       <CesiumWMSLayer options={optionsWMS2} alpha={0.3} />

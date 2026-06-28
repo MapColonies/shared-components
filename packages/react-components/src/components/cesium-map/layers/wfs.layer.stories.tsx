@@ -57,6 +57,18 @@ const BRIGHT_GREEN = '#01FF1F';
 const LIGHT_BLUE = '#24AEE9';
 const BRIGHT_PURPLE = '#B734EB';
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+    footprint: 'layerRecord.footprint',
+  },
+  dataLayer: {
+    name: 'layerRecord.featureStructure.aliasLayerName',
+    fields: 'layerRecord.featureStructure.fields',
+  },
+};
+
 // #region STORY PP component
 export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
   return (
@@ -64,11 +76,7 @@ export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
       <CesiumMap
         {...args}
         sceneMode={CesiumSceneMode.SCENE2D}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
-        layerManagerDataLayerNameMetaFieldPath={'layerRecord.featureStructure.aliasLayerName'}
-        layerManagerDataLayerFieldsMetaFieldPath={'layerRecord.featureStructure.fields'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <CesiumWFSLayer
           key={getLayerIdFromMeta(metaPolygonParts)}
@@ -111,11 +119,7 @@ export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
       <CesiumMap
         {...args}
         sceneMode={CesiumSceneMode.SCENE2D}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
-        layerManagerDataLayerNameMetaFieldPath={'layerRecord.featureStructure.aliasLayerName'}
-        layerManagerDataLayerFieldsMetaFieldPath={'layerRecord.featureStructure.fields'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset
           url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
@@ -198,11 +202,7 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
         {...args}
         center={[35.0386, 32.77675]}
         sceneMode={CesiumSceneMode.SCENE2D}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
-        layerManagerDataLayerNameMetaFieldPath={'layerRecord.featureStructure.aliasLayerName'}
-        layerManagerDataLayerFieldsMetaFieldPath={'layerRecord.featureStructure.fields'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset
           url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
@@ -245,11 +245,7 @@ export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknow
       <CesiumMap
         {...args}
         sceneMode={CesiumSceneMode.SCENE2D}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
-        layerManagerDataLayerNameMetaFieldPath={'layerRecord.featureStructure.aliasLayerName'}
-        layerManagerDataLayerFieldsMetaFieldPath={'layerRecord.featureStructure.fields'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset
           url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')}

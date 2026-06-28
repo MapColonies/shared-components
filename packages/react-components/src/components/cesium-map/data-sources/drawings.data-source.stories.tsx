@@ -19,6 +19,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 interface IDrawingObject {
   type: DrawType;
   handler: (drawing: IDrawingEvent) => void;
@@ -140,9 +147,7 @@ export const Drawings: Story = (args) => {
           center={center}
           sceneMode={CesiumSceneMode.SCENE2D}
           zoom={9}
-          layerManagerLayerIdMetaFieldPath={'id'}
-          layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-          layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+          layerManagerMetaMapping={layerManagerMetaMapping}
         >
           <CesiumDrawingsDataSource
             drawings={drawEntities}

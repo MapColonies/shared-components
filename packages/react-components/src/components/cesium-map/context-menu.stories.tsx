@@ -33,6 +33,14 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+    footprint: 'layerRecord.footprint',
+  },
+};
+
 const layers: IRasterLayer[] = [
   {
     id: 'near_amphy',
@@ -366,9 +374,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
         showDebuggerTool={true}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <LayersMozaik layers={layers} />
       </CesiumMap>

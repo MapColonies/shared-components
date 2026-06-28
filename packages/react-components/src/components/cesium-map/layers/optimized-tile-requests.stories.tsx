@@ -21,6 +21,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const mapViewProps: CesiumMapProps = {
   center: [-117.30644008676421, 33.117098433617564],
   zoom: 14,
@@ -123,9 +130,7 @@ export const OptimizedTileRequestingMap: Story = () => {
       <CesiumMap
         {...mapViewProps}
         showDebuggerTool={true}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <LayersContainer />
       </CesiumMap>

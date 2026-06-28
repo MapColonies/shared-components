@@ -27,6 +27,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const EllipsoidProvider = new EllipsoidTerrainProvider({});
 
 //#region TILER MATERIALS
@@ -119,9 +126,7 @@ export const QuantizedMeshHeightsTool: Story = () => {
         imageryProvider={false}
         baseMaps={BASE_MAPS}
         showDebuggerTool={true}
-        layerManagerLayerIdMetaFieldPath={'id'}
-        layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
-        layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset
           url={getValue('GLOBAL', '3D_MODEL')}
