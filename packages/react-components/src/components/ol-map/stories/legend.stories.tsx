@@ -1,17 +1,16 @@
-import React from 'react';
 import { Geometries } from '@turf/helpers';
 import { Fill, Stroke, Style } from 'ol/style';
 import { Vector } from 'ol/layer';
-import { Proj } from '../../../utils/projections';
-import { Map } from '../../map';
-import { TileLayer, VectorLayer } from '../../layers';
-import { Legend, LegendItem } from '../../legend';
-import { GeoJSONFeature } from '../../feature';
-import { TileOsm } from '..';
-import { VectorSource } from '../vector-source';
+import { Proj } from '../../utils/projections';
+import { Map } from '../map';
+import { TileLayer, VectorLayer } from '../layers';
+import { Legend, LegendItem } from '../legend';
+import { GeoJSONFeature } from '../feature';
+import { TileOsm } from '../source';
+import { VectorSource } from '../source/vector-source';
 
 export default {
-  title: 'OL Map/Map/Tiles/Legend',
+  title: 'OL Map/Map',
   component: Legend,
   subcomponents: GeoJSONFeature,
   parameters: {
@@ -110,7 +109,7 @@ const LegendsArray: LegendItem[] = [
   },
 ];
 
-export const Basic = (): JSX.Element => (
+export const GeojsonFeaturesWithLegend = (): JSX.Element => (
   <div style={mapDivStyle}>
     <Map projection={Proj.WEB_MERCATOR}>
       <TileLayer>
@@ -128,3 +127,5 @@ export const Basic = (): JSX.Element => (
     </Map>
   </div>
 );
+
+GeojsonFeaturesWithLegend.storyName = 'GeoJSON Features with Legend';

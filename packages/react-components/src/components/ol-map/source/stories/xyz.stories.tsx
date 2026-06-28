@@ -15,13 +15,13 @@ const mapDivStyle = {
 };
 
 const story = {
-  title: 'OL Map/Map/Tiles/XYZ',
+  title: 'OL Map/Tiles/XYZ',
   component: TileXYZ,
 };
 
 export default story;
 
-export const Basic: CSFStory<JSX.Element> = () => (
+export const XyzTiles: CSFStory<JSX.Element> = () => (
   <div style={mapDivStyle}>
     <Map allowFullScreen={true} showMousePosition={true} projection={Proj.WEB_MERCATOR}>
       <TileLayer>
@@ -31,7 +31,7 @@ export const Basic: CSFStory<JSX.Element> = () => (
   </div>
 );
 
-Basic.argTypes = {
+XyzTiles.argTypes = {
   options: {
     description: `{ Options } from 'ol/source/XYZ'`,
     table: {

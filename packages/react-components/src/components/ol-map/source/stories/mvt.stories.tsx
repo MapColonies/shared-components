@@ -1,4 +1,3 @@
-import React from 'react';
 import { Style, Fill, Circle, Stroke } from 'ol/style';
 import { Proj } from '../../../utils/projections';
 import { VectorTileLayer } from '../../layers/vector-tile-layer';
@@ -8,7 +7,7 @@ import { MVTSource, getMVTOptions } from '../mvt';
 import { TileOsm } from '..';
 
 export default {
-  title: 'OL Map/Map/Tiles/MVT',
+  title: 'OL Map/Tiles/MVT',
   component: VectorTileLayer,
   subcomponents: MVTSource,
   parameters: {
@@ -22,7 +21,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export const Basic = (): JSX.Element => (
+export const VectorTiles = (): JSX.Element => (
   <div style={mapDivStyle}>
     <Map projection={Proj.WEB_MERCATOR}>
       <TileLayer>
