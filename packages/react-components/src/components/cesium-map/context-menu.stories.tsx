@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { get } from 'lodash';
-import { Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
+import { Button, Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import { Story, Meta } from '@storybook/react';
 import { Box } from '../box';
 import { BASE_MAPS } from './helpers/constants';
@@ -232,10 +232,57 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
     setAllShow(!allShow);
   };
 
+  const controlsContainerStyle = {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 12px',
+    borderRadius: '10px',
+    background: 'rgba(0, 0, 0, 0.75)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    color: 'white',
+    position: 'absolute' as const,
+    top: '10px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 2,
+    maxWidth: 'calc(100% - 20px)',
+  };
+
+  const messageStyle = {
+    margin: 0,
+    color: '#8dff9f',
+    fontSize: '18px',
+    fontWeight: 700,
+    flexBasis: '100%',
+  };
+
+  const fieldStyle = {
+    height: '30px',
+    borderRadius: '6px',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    background: 'rgba(255, 255, 255, 0.08)',
+    color: 'white',
+    padding: '0 8px',
+  };
+
+  const buttonStyle = {
+    height: '30px',
+    borderRadius: '6px',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
+    background: 'rgba(96, 165, 250, 0.25)',
+    color: 'white',
+    padding: '0 10px',
+    cursor: 'pointer',
+    fontWeight: 600,
+  };
+
   return (
-    <div style={{ height: '30px' }}>
-      <h3 style={{ color: 'green' }}>Change BASE MAP to see effective layers</h3>
+    <div style={controlsContainerStyle}>
+      <h3 style={messageStyle}>Change BASE MAP to see effective layers</h3>
       <select
+        style={fieldStyle}
         defaultValue={selectedLayer}
         onChange={(evt): void => {
           setSelectedLayer(evt.target.value);
@@ -248,47 +295,58 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
         ))}
       </select>
       <input
+        style={{ ...fieldStyle, width: '80px' }}
         type="number"
         value={times}
         onChange={(evt): void => {
           setTimes(parseInt(evt.target.value));
         }}
       ></input>
-      <button
+      <Button
+        outlined
+        style={buttonStyle}
         onClick={(): void => {
           handleRaise();
         }}
       >
         Raise
-      </button>
-      <button
+      </Button>
+      <Button
+        outlined
+        style={buttonStyle}
         onClick={(): void => {
           handleLower();
         }}
       >
         Lower
-      </button>
-      <button
+      </Button>
+      <Button
+        outlined
+        style={buttonStyle}
         onClick={(): void => {
           handleRaiseToTop();
         }}
       >
-        RaiseToTop
-      </button>
-      <button
+        Raise To Top
+      </Button>
+      <Button
+        outlined
+        style={buttonStyle}
         onClick={(): void => {
           handleLowerToBottom();
         }}
       >
-        LowerToBottom
-      </button>
-      <button
+        Lower To Bottom
+      </Button>
+      <Button
+        outlined
+        style={{ ...buttonStyle, background: 'rgba(74, 222, 128, 0.25)' }}
         onClick={(): void => {
           handleToglleAll();
         }}
       >
         Toggle All
-      </button>
+      </Button>
     </div>
   );
 };
@@ -317,3 +375,5 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
     </div>
   );
 };
+
+MapWithLayersManagerAndContextMenu.storyName = 'Layers Manager and Context Menu';

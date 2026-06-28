@@ -45,16 +45,17 @@ interface IActiveLayersPanelProps {
   locale?: { [key: string]: string };
 }
 
-const GENERIC_PATH_SEGMENTS = new Set(['data', 'act', 'assets', 'cesium', 'tiles', 'tileset', '3d', 'model', 'models']);
-
 const extractModelName = (rawUrl: string): string => {
   try {
     const { hostname, pathname } = new URL(rawUrl);
-    const segments = pathname.split('/').filter((s) => s.length > 0 && !s.includes('.'));
-    const named = [...segments]
-      .reverse()
-      .find((s) => !GENERIC_PATH_SEGMENTS.has(s.toLowerCase()) && /[a-zA-Z]/.test(s));
-    return named ?? hostname;
+    const segments = pathname.split('/').filter((s) => s.length > 0);
+    if (segments.length >= 2) {
+      return `${segments[segments.length - 2]}/${segments[segments.length - 1]}`;
+    }
+    if (segments.length === 1) {
+      return segments[0];
+    }
+    return hostname;
   } catch {
     return rawUrl;
   }
@@ -134,7 +135,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   const get3DModels = (): IActiveLayer[] => {
     return (mapViewer.layersManager?.modelList ?? []).map((model, index): IActiveLayer => {
       const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
-      const modelName = (getLayerName(model) ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`)) as string;
+      const modelName = getLayerName(model) ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
       return {
         id: (getLayerId(model) as string) ?? `3D_MODEL_${String(index)}`,
         name: modelName,

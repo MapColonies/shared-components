@@ -210,47 +210,51 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                   }}
                 />
                 {viewState?.shouldOptimizedTileRequests === true && (
-                  <Box className="debuggerLayerList">
-                    {[...layersMeta].reverse().map((layer) => {
-                      const idText = layer.layerId;
-                      const nameText = layer.layerName ?? idText;
-                      const statusText =
-                        layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
-                      const hasTransparency = layer.meta[HAS_TRANSPARENCY_META_PROP] as boolean | undefined;
-                      const transparencyText =
-                        hasTransparency === true ? withTransparencyTiles : hasTransparency === false ? withoutTransparencyTiles : '';
-                      const tileCoordinatesFromMeta = layer.meta[EXAMINED_TILES_META_PROP] as
-                        | Array<{ x?: number; y?: number; level?: number }>
-                        | { x?: number; y?: number; level?: number }
-                        | undefined;
-                      const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
-                        ? tileCoordinatesFromMeta
-                        : tileCoordinatesFromMeta !== undefined
-                          ? [tileCoordinatesFromMeta]
-                          : [];
-                      const formattedTileCoordinates = tileCoordinatesList
-                        .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
-                        .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
-                      const tooltipContent =
-                        transparencyText === ''
-                          ? undefined
-                          : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
-                      const isRelevant = layer.meta?.isRelevantToExtent !== false;
-                      if (tooltipContent === undefined) {
-                        return (
-                          <Box key={idText} className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`}>
-                            {nameText + statusText}
+                  <Box className="debuggerLayers">
+                    <Box className="debuggerLayersArrow">
+                      <Box className="debuggerLayersArrowLine" />
+                    </Box>
+                    <Box className="debuggerLayersList">
+                      {[...layersMeta].reverse().map((layer) => {
+                        const idText = layer.layerId;
+                        const nameText = layer.layerName ?? idText;
+                        const statusText =
+                          layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
+                        const hasTransparency = layer.meta[HAS_TRANSPARENCY_META_PROP] as boolean | undefined;
+                        const transparencyText =
+                          hasTransparency === true ? withTransparencyTiles : hasTransparency === false ? withoutTransparencyTiles : '';
+                        const tileCoordinatesFromMeta = layer.meta[EXAMINED_TILES_META_PROP] as
+                          | Array<{ x?: number; y?: number; level?: number }>
+                          | { x?: number; y?: number; level?: number }
+                          | undefined;
+                        const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
+                          ? tileCoordinatesFromMeta
+                          : tileCoordinatesFromMeta !== undefined
+                            ? [tileCoordinatesFromMeta]
+                            : [];
+                        const formattedTileCoordinates = tileCoordinatesList
+                          .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
+                          .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
+                        const tooltipContent =
+                          transparencyText === ''
+                            ? undefined
+                            : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
+                        const isRelevant = layer.meta?.isRelevantToExtent !== false;
+                        const itemContent = (
+                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip={tooltipContent !== undefined ? 'true' : undefined}>
+                            <Box className="debuggerLayerText">{nameText + statusText}</Box>
                           </Box>
                         );
-                      }
-                      return (
-                        <Tooltip key={idText} content={tooltipContent}>
-                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip="true">
-                            {nameText + statusText}
-                          </Box>
-                        </Tooltip>
-                      );
-                    })}
+                        if (tooltipContent === undefined) {
+                          return <React.Fragment key={idText}>{itemContent}</React.Fragment>;
+                        }
+                        return (
+                          <Tooltip key={idText} content={tooltipContent}>
+                            {itemContent}
+                          </Tooltip>
+                        );
+                      })}
+                    </Box>
                   </Box>
                 )}
               </Box>

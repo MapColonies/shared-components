@@ -74,8 +74,45 @@ body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
   cursor: pointer;
 }
 
-.cesium-viewer .debuggerLayerList {
+.cesium-viewer .debuggerLayers {
   margin-top: 8px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.cesium-viewer .debuggerLayersArrow {
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--mdc-theme-cesium-color);
+  opacity: 0.85;
+  padding-top: 13px;
+}
+
+.cesium-viewer .debuggerLayersArrowLine {
+  position: relative;
+  flex: 1;
+  width: 1px;
+  margin: 0;
+  background: linear-gradient(to bottom, rgba(170, 238, 255, 0.95), rgba(174, 238, 255, 0.1));
+}
+
+.cesium-viewer .debuggerLayersArrowLine::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 6px solid rgba(170, 238, 255, 0.95);
+}
+
+.cesium-viewer .debuggerLayersList {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -86,6 +123,8 @@ body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
 }
 
 .cesium-viewer .debuggerLayerItem {
+  display: flex;
+  align-items: center;
   font-size: 11px;
   line-height: 1.6;
   font-weight: bold;
@@ -93,11 +132,18 @@ body[dir='rtl'] .cesium-viewer .debuggerWidgetSectionHeaderToggle {
   cursor: text;
 }
 
+.cesium-viewer .debuggerLayerItem[data-has-tooltip='true'] {
+  cursor: default;
+}
+
+.cesium-viewer .debuggerLayerText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cesium-viewer .debuggerLayerItem.relevant {
   color: #AEF;
   opacity: 1;
-}
-
-.cesium-viewer .debuggerLayerItem[data-has-tooltip='true'] {
-  cursor: default;
 }
