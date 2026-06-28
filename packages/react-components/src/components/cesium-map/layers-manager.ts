@@ -409,6 +409,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, order + positions);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public lower(layerId: string, positions = 1): void {
@@ -428,6 +429,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, order - positions);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public raiseToTop(layerId: string): void {
@@ -439,6 +441,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public lowerToBottom(layerId: string): void {
@@ -753,6 +756,14 @@ class LayerManager {
     });
     this.relevancyListenersCleanup = [];
     this.relevancyLayerUpdatedHandler = undefined;
+  }
+
+  private reinvokeOptimizationAfterOrderChange(): void {
+    if (!this.shouldOptimizedTileRequests) {
+      return;
+    }
+    this.markRelevantLayersForExtent();
+    this.hideNonRelevantLayers();
   }
 
   private markRelevantLayersForExtent(): void {
