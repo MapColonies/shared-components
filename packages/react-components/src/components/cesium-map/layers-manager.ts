@@ -35,7 +35,7 @@ const INC = 1;
 const DEC = -1;
 
 export interface ILayerManagerMetaMapping {
-  layer?: {
+  layer: {
     id: string;
     name: string;
     footprint?: string;
@@ -46,7 +46,12 @@ export interface ILayerManagerMetaMapping {
   };
 }
 
-let mapping: ILayerManagerMetaMapping = {};
+let mapping: ILayerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'name',
+  },
+};
 
 const configureLayerManagerMetaMapping = (metaMapping: ILayerManagerMetaMapping): void => {
   mapping = { ...metaMapping };
@@ -108,19 +113,19 @@ export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
 export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, mapping.layer?.id ?? '') as string | undefined;
+  return get(layer.meta, mapping.layer.id) as string | undefined;
 };
 
 export const getLayerIdFromMeta = (meta: ICesiumImageryLayerMeta | ICesiumWFSLayerMeta | ICesium3DModelMeta | undefined): string | undefined => {
-  return get(meta, mapping.layer?.id ?? '') as string | undefined;
+  return get(meta, mapping.layer.id) as string | undefined;
 };
 
 export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
-  return get(layer.meta, mapping.layer?.name ?? '') as string | undefined;
+  return get(layer.meta, mapping.layer.name) as string | undefined;
 };
 
 export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
-  return get(meta, mapping.layer?.footprint ?? '');
+  return get(meta, mapping.layer.footprint ?? '');
 };
 
 export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
@@ -192,7 +197,7 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
-    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer?.footprint;
+    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
 
@@ -522,7 +527,7 @@ class LayerManager {
       skipRelevancyCheck: true,
       parentBaseMapId: 'TRANSPARENT_LAYER',
     };
-    set(transparentLayerMeta, mapping.layer?.id ?? '', TRANSPARENT_LAYER_ID);
+    set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
     (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
   }
 
