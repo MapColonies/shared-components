@@ -54,7 +54,10 @@ const xyzLayerMeta2 = {
 
 export const MapWithXYZLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
+    <CesiumMap
+      baseMaps={BASE_MAPS}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
       <CesiumXYZLayer options={optionsXYZ} meta={xyzLayerMeta} />
       <CesiumXYZLayer options={optionsXYZ2} alpha={0.5} meta={xyzLayerMeta2} />
     </CesiumMap>

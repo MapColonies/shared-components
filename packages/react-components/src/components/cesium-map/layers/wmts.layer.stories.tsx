@@ -69,7 +69,10 @@ const wmtsLayerMeta2 = {
 
 export const MapWithWMTSLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
+    <CesiumMap
+      baseMaps={BASE_MAPS}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
       <CesiumWMTSLayer options={optionsWMTS} meta={wmtsLayerMeta} />
       <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} meta={wmtsLayerMeta2} />
     </CesiumMap>

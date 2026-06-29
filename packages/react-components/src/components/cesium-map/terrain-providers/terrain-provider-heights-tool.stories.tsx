@@ -136,7 +136,6 @@ export const QuantizedMeshHeightsTool: Story = () => {
       <CesiumMap
         center={center}
         zoom={5}
-        baseLayer={false}
         baseMaps={BASE_MAPS}
         showDebuggerTool={true}
         layerManagerMetaMapping={layerManagerMetaMapping}

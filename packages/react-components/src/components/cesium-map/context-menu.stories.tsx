@@ -363,9 +363,8 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
       <CesiumMap
         center={center}
         zoom={14}
-        baseLayer={false}
         sceneMode={CesiumSceneMode.SCENE2D}
-        baseMaps={BASE_MAPS as IBaseMaps}
+        baseMaps={BASE_MAPS}
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}

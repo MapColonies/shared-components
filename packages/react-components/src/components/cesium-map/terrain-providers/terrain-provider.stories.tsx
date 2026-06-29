@@ -141,7 +141,6 @@ export const QuantizedMeshProviders: Story = () => {
       <CesiumMap
         center={center}
         zoom={5}
-        baseLayer={false}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
         showDebuggerTool={true}

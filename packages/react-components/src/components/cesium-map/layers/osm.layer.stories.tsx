@@ -60,7 +60,6 @@ export const MapWithOSMLayers: Story = () => {
     <div style={mapDivStyle}>
       <CesiumMap
         center={center}
-        baseLayer={false}
         baseMaps={BASE_MAPS}
         sceneMode={CesiumSceneMode.SCENE2D}
         zoom={14}
