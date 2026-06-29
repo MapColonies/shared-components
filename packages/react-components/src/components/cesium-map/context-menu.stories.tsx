@@ -150,9 +150,9 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
                 From POI <span style={{ color: 'red' }}>{data.length}</span> layers overlapping
               </h3>
               <div style={{ paddingLeft: '30px' }}>
-                {data?.map((layer) => {
+                {data?.map((layer, index) => {
                   return (
-                    <p>{getDebugLayerText(layer)}</p>
+                    <p key={`poi-layer-${index}`}>{getDebugLayerText(layer)}</p>
                   );
                 })}
               </div>
@@ -162,9 +162,9 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
             From PICK API <span style={{ color: 'red' }}>{pickedLayers?.length}</span> layers at point
           </h3>
           <div style={{ paddingLeft: '30px' }}>
-            {pickedLayers?.map((layer) => {
+            {pickedLayers?.map((layer, index) => {
               return (
-                <p>{getDebugLayerText(layer)}</p>
+                <p key={`picked-layer-${index}`}>{getDebugLayerText(layer)}</p>
               );
             })}
           </div>
