@@ -27,6 +27,12 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const terrainControlsStyle = {
+  display: 'flex',
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start',
+};
+
 const layerManagerMetaMapping = {
   layer: {
     id: 'id',
@@ -100,8 +106,15 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
   const mapViewer: CesiumViewer = useCesiumMap();
 
   return (
-    <>
+    <div>
       <select
+        style={{
+          display: 'block',
+          marginTop: '8px',
+          height: '32px',
+          maxHeight: '32px',
+          width: 'auto',
+        }}
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
           const selected = terrainProviderList.find((item) => item.id === evt.target.value);
@@ -112,7 +125,7 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
           return <option key={provider.id}>{provider.id}</option>;
         })}
       </select>
-    </>
+    </div>
   );
 };
 
@@ -133,8 +146,10 @@ export const QuantizedMeshHeightsTool: Story = () => {
           meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }}
           isZoomTo={true}
         />
-        <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
-        <TerrainianHeightTool />
+        <div style={terrainControlsStyle}>
+          <TerrainianHeightTool />
+          <TerrainProviderSelector terrainProviderList={terrainProviderListQmesh} />
+        </div>
       </CesiumMap>
     </div>
   );
