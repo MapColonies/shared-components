@@ -47,7 +47,7 @@ export const MapWithLegends: Story = () => {
       <CesiumMap
         center={center}
         zoom={14}
-        imageryProvider={false}
+        baseLayer={false}
         // @ts-ignore
         baseMaps={BASE_MAPS}
         legends={{

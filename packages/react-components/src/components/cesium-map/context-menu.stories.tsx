@@ -151,9 +151,7 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
               </h3>
               <div style={{ paddingLeft: '30px' }}>
                 {data?.map((layer, index) => {
-                  return (
-                    <p key={`poi-layer-${index}`}>{getDebugLayerText(layer)}</p>
-                  );
+                  return <p key={`poi-layer-${index}`}>{getDebugLayerText(layer)}</p>;
                 })}
               </div>
             </>
@@ -163,9 +161,7 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
           </h3>
           <div style={{ paddingLeft: '30px' }}>
             {pickedLayers?.map((layer, index) => {
-              return (
-                <p key={`picked-layer-${index}`}>{getDebugLayerText(layer)}</p>
-              );
+              return <p key={`picked-layer-${index}`}>{getDebugLayerText(layer)}</p>;
             })}
           </div>
           <MenuSurfaceAnchor>
@@ -367,7 +363,7 @@ export const MapWithLayersManagerAndContextMenu: Story = () => {
       <CesiumMap
         center={center}
         zoom={14}
-        imageryProvider={false}
+        baseLayer={false}
         sceneMode={CesiumSceneMode.SCENE2D}
         baseMaps={BASE_MAPS as IBaseMaps}
         // @ts-ignore

@@ -114,7 +114,9 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
     <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.4rem' }}>
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
         <input type="checkbox" id="input" checked={depthTest} onChange={handleDepthTestChange} style={{ margin: 0 }} />
-        <label htmlFor="input" style={{ lineHeight: 1 }}>depthTestAgainstTerrain</label>
+        <label htmlFor="input" style={{ lineHeight: 1 }}>
+          depthTestAgainstTerrain
+        </label>
       </div>
       <select
         defaultValue={terrainProviderList[0].id}
@@ -139,17 +141,13 @@ export const QuantizedMeshProviders: Story = () => {
       <CesiumMap
         center={center}
         zoom={5}
-        imageryProvider={false}
+        baseLayer={false}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
         showDebuggerTool={true}
         layerManagerMetaMapping={layerManagerMetaMapping}
       >
-        <Cesium3DTileset
-          url={getValue('GLOBAL', '3D_MODEL')}
-          meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }}
-          isZoomTo={true}
-        />
+        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }} isZoomTo={true} />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
       </CesiumMap>
     </div>

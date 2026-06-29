@@ -72,11 +72,7 @@ const CanvasEntity: React.FC<RCesiumEntityProps> = (props) => {
 
 export const Basic: Story = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      imageryProvider={false}
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity
         {...args}
         name="test"
@@ -92,11 +88,7 @@ Basic.storyName = 'Basic Entity';
 export const WithDescription: Story<RCesiumEntityProps> = (args) => {
   const [count, setCount] = useState(0);
   return (
-    <CesiumMap
-      imageryProvider={false}
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity
         {...args}
         name="test1"
@@ -127,11 +119,7 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
 };
 
 export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
-  <CesiumMap
-    imageryProvider={false}
-    baseMaps={BASE_MAPS}
-    layerManagerMetaMapping={layerManagerMetaMapping}
-  >
+  <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
     <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>
 );

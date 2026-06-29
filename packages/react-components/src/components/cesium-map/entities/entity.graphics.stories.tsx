@@ -29,11 +29,7 @@ const layerManagerMetaMapping = {
 
 export const Polygon: Story = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      imageryProvider={false}
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseLayer={false} baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity {...args} name="test">
         <CesiumEntityStaticDescription>
           <h1>Hello!</h1>

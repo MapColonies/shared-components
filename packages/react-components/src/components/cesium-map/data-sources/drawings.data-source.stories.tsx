@@ -148,7 +148,7 @@ export const Drawings: Story = (args) => {
           center={center}
           sceneMode={CesiumSceneMode.SCENE2D}
           zoom={9}
-          imageryProvider={false}
+          baseLayer={false}
           baseMaps={BASE_MAPS}
           layerManagerMetaMapping={layerManagerMetaMapping}
         >

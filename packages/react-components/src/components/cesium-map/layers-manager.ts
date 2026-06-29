@@ -20,12 +20,7 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained } from './helpers/utils';
-import {
-  RCesiumOSMLayerOptions,
-  RCesiumWMSLayerOptions,
-  RCesiumWMTSLayerOptions,
-  RCesiumXYZLayerOptions
-} from './layers';
+import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
@@ -232,9 +227,7 @@ class LayerManager {
 
   // A general place to extend layer's data. Should be done when all providers (different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
-
-    Promise.all(layersReadyPromises).then(() => {
+    Promise.resolve().then(() => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -475,7 +468,8 @@ class LayerManager {
 
   public findLayerByPOI(x: number, y: number, onlyShown = true): ICesiumImageryLayer[] | undefined {
     if (this.layerManagerFootprintMetaFieldPath) {
-      const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
+      const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point> | undefined;
+      if (position === undefined) return undefined;
 
       const nonBaseLayers = this.layers.filter((layer) => {
         return !isBaseMapLayer(layer.meta);
@@ -512,23 +506,20 @@ class LayerManager {
   public addTransparentImageryProvider(): void {
     // Worldwide transparent layer
     const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
+    /* eslint-disable @typescript-eslint/no-magic-numbers */
+    const rectangle = new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966);
+    /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-    const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(
-      new SingleTileImageryProvider({
-        url: transparentTileUrl,
-        /* eslint-disable @typescript-eslint/no-magic-numbers */
-        rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
-        /* eslint-enable @typescript-eslint/no-magic-numbers */
-      }),
-      0
-    );
+    void SingleTileImageryProvider.fromUrl(transparentTileUrl, { rectangle }).then((provider) => {
+      const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(provider, 0);
 
-    const transparentLayerMeta: Record<string, unknown> = {
-      skipRelevancyCheck: true,
-      parentBaseMapId: 'TRANSPARENT_LAYER',
-    };
-    set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
-    (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+      const transparentLayerMeta: Record<string, unknown> = {
+        skipRelevancyCheck: true,
+        parentBaseMapId: 'TRANSPARENT_LAYER',
+      };
+      set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
+      (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+    });
   }
 
   public addLayerUpdatedListener(callback: (meta: any) => void): void {
@@ -644,7 +635,8 @@ class LayerManager {
       if (typeof isRelevantToExtent !== 'boolean') {
         continue;
       }
-      if (isRelevantToExtent !== layer.show && layer.imageryProvider.ready) {
+
+      if (isRelevantToExtent !== layer.show) {
         layer.show = isRelevantToExtent;
       }
     }
@@ -655,9 +647,7 @@ class LayerManager {
       if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      if (layer.imageryProvider.ready) {
-        layer.show = true;
-      }
+      layer.show = true;
     }
   }
 
@@ -766,8 +756,7 @@ class LayerManager {
           const layerAboveIsOpaque = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === false;
           const layerAboveIntersectsExtent =
             !isEmpty(layerAbove.rectangle) && Rectangle.intersection(extent, layerAbove.rectangle) instanceof Rectangle;
-          const layerAboveCoversCurrentExtent =
-            !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
+          const layerAboveCoversCurrentExtent = !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
           if (layerAboveIntersectsExtent && layerAboveCoversCurrentExtent && layerAboveIsOpaque && !layerAboveHasTransparency) {
             isOccludedByOpaqueLayerAbove = true;
             break;

@@ -1,12 +1,52 @@
 import { Feature } from 'geojson';
+import React, { useState, useEffect } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
-import { CesiumMap, CesiumMapProps } from './map';
+import { CesiumMap, CesiumMapProps, ITerrain } from './map';
 import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
+
+const useTerrains = (): ITerrain[] | undefined => {
+  const [terrains, setTerrains] = useState<ITerrain[] | undefined>(undefined);
+  useEffect(() => {
+    void Promise.all([
+      CesiumCesiumTerrainProvider.fromUrl(DEFAULT_TERRAIN_PROVIDER_URL),
+      CesiumCesiumTerrainProvider.fromUrl(TERRAIN_SRTM100),
+      CesiumCesiumTerrainProvider.fromUrl(TERRAIN_COMBINED),
+    ]).then(([p1, p2, p3]) => {
+      setTerrains([
+        {
+          id: '1',
+          url: DEFAULT_TERRAIN_PROVIDER_URL,
+          title: 'Default Terrain',
+          thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+          isCurrent: true,
+          terrainProvider: p1,
+        },
+        {
+          id: '2',
+          url: TERRAIN_SRTM100,
+          title: 'srtm100',
+          thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+          isCurrent: false,
+          terrainProvider: p2,
+        },
+        {
+          id: '3',
+          url: TERRAIN_COMBINED,
+          title: 'combined_srtm_30_100_il_ever',
+          thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
+          isCurrent: false,
+          terrainProvider: p3,
+        },
+      ]);
+    });
+  }, []);
+  return terrains;
+};
 
 export default {
   title: 'Cesium Map',
@@ -35,8 +75,10 @@ const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number)
   const properties = data.properties;
   const requestId = properties?.headers['request_id'];
 
-  if(!requestId) {
-    console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
+  if (!requestId) {
+    console.warn(
+      'GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".'
+    );
   }
 
   if (!baseUrl || !properties) return;
@@ -44,14 +86,14 @@ const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number)
   const body = {
     request_id: requestId,
     chosen_result_id: i,
-    user_id: 'catalog-app@mapcolonies.net'
-  }
+    user_id: 'catalog-app@mapcolonies.net',
+  };
 
   const url = `${baseUrl}?token=${getValue('GLOBAL', 'TOKEN')}`;
 
   fetch(url, {
     method: 'POST',
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 };
 
@@ -65,7 +107,7 @@ const GEOCODER_OPTIONS = [
         queryText: 'query',
         geoContext: {
           name: 'geo_context',
-          relatedParams: [['geo_context_mode', 'filter']],  
+          relatedParams: [['geo_context_mode', 'filter']],
         },
       },
       static: [
@@ -75,7 +117,9 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Location',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -96,7 +140,9 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Control Tiles',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -117,7 +163,9 @@ const GEOCODER_OPTIONS = [
       ],
     },
     title: 'Control Data',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -131,13 +179,13 @@ const GEOCODER_OPTIONS = [
           relatedParams: [['geo_context_mode', 'filter']],
         },
       },
-      static: [
-        ['token', getValue('GLOBAL', 'TOKEN')],
-      ]
+      static: [['token', getValue('GLOBAL', 'TOKEN')]],
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'Control Routes',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
 ] satisfies GeocoderOptions[];
 
@@ -161,7 +209,9 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'מיקום',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -182,7 +232,9 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'אריחי שליטה (נצ"א)',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -203,7 +255,9 @@ const LOCALIZED_GEOCODER_OPTIONS = [
       ],
     },
     title: 'נתוני שליטה',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
   {
     baseUrl: getValue('GEOCODER', 'URL'),
@@ -217,63 +271,34 @@ const LOCALIZED_GEOCODER_OPTIONS = [
           relatedParams: [['geo_context_mode', 'filter']],
         },
       },
-      static: [
-        ['token', getValue('GLOBAL', 'TOKEN')],
-      ]
+      static: [['token', getValue('GLOBAL', 'TOKEN')]],
       // "geo_context": { "bbox": [-180, -90, 180, 90] },
     },
     title: 'צירי שליטה',
-    callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
+    callbackFunc: (data, options, i) => {
+      triggerCallbackFunc(data, options, i);
+    },
   },
 ] satisfies GeocoderOptions[];
 
-export const BaseMap: Story = (args: CesiumMapProps) => (
-  <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
-    </CesiumMap>
-  </div>
-);
+export const BaseMap: Story = (args: CesiumMapProps) => {
+  const terrains = useTerrains();
+  return (
+    <div style={mapDivStyle}>
+      <CesiumMap {...args} terrains={terrains} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
+    </div>
+  );
+};
 
 BaseMap.argTypes = {
   baseMaps: {
     defaultValue: BASE_MAPS,
   },
-  terrains: {
-    defaultValue: [{
-      id: '1',
-      url: DEFAULT_TERRAIN_PROVIDER_URL,
-      title: 'Default Terrain',
-      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
-      isCurrent: true,
-      terrainProvider: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL })
-    },{
-      id: '2',
-      url: TERRAIN_SRTM100,
-      title: 'srtm100',
-      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
-      isCurrent: false,
-      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_SRTM100 })
-    },{
-      id: '3',
-      url: TERRAIN_COMBINED,
-      title: 'combined_srtm_30_100_il_ever',
-      thumbnail: 'Cesium/Widgets/Images/TerrainProviders/Ellipsoid.png',
-      isCurrent: false,
-      terrainProvider: new CesiumCesiumTerrainProvider({ url: TERRAIN_COMBINED })
-    }],
-  },
 };
 
 export const ZoomedMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
-    </CesiumMap>
+    <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
@@ -304,11 +329,7 @@ const cesiumTheme = {
 export const GeocoderPanel: Story = (args: CesiumMapProps) => (
   <ThemeProvider options={cesiumTheme}>
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...args}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
-      </CesiumMap>
+      <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
     </div>
   </ThemeProvider>
 );
@@ -343,11 +364,7 @@ GeocoderPanel.storyName = 'Geocoder';
 
 export const MapWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
-    </CesiumMap>
+    <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
@@ -377,11 +394,7 @@ MapWithProjection.argTypes = {
 
 export const Map2DWithProjection: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
-    </CesiumMap>
+    <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
@@ -415,11 +428,7 @@ Map2DWithProjection.storyName = '2D Map With Projection';
 
 export const LocalizedMap: Story = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
-    </CesiumMap>
+    <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
@@ -443,7 +452,7 @@ LocalizedMap.argTypes = {
       CESIUM_INSPECTOR_CHECKBOX: 'כלי בדיקה של סזיום',
       WITH_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים עם שקיפות',
       WITHOUT_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים ללא שקיפות',
-      SHOW_FEATURE_ON_MAP: "הראה על המפה",
+      SHOW_FEATURE_ON_MAP: 'הראה על המפה',
       IN_MAP_EXTENT: 'חיפוש בתיחום נוכחי',
       SEARCH_PLACEHOLDER: 'חיפוש...',
       NO_RESULTS: 'אין תוצאות',

@@ -7,15 +7,7 @@
 */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Cesium3DTileset,
-  Cesium3DTile,
-  Cartographic,
-  Cartesian3,
-  defined,
-  sampleTerrainMostDetailed,
-  Cesium3DTileContent
-} from 'cesium';
+import { Cesium3DTileset, Cesium3DTile, Cartographic, Cartesian3, defined, sampleTerrainMostDetailed, Cesium3DTileContent } from 'cesium';
 import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
@@ -28,20 +20,30 @@ export interface ICesium3DTilesetWithUpdate {
 export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = ({ url, withUpdate, meta }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const scene = mapViewer.scene;
-  const [cesium3DTileset] = useState<Cesium3DTileset>(new Cesium3DTileset({ url }));
-  const [tileset] = useState<Cesium3DTileset>(scene.primitives.add(cesium3DTileset));
+  const [tileset, setTileset] = useState<Cesium3DTileset | undefined>(undefined);
 
   useEffect(() => {
-    scene.globe.depthTestAgainstTerrain = true;
-    void mapViewer.zoomTo(tileset);
-    if (withUpdate === true) {
-      updateTileset(tileset);
-    }
+    let cancelled = false;
+    void Cesium3DTileset.fromUrl(url).then((ts) => {
+      if (cancelled) return;
+      const added = scene.primitives.add(ts) as Cesium3DTileset;
+      setTileset(added);
+      scene.globe.depthTestAgainstTerrain = true;
+      void mapViewer.zoomTo(added);
+      if (withUpdate === true) {
+        updateTileset(added);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [url]);
 
   useEffect(() => {
-    if (meta === undefined) { return; }
+    if (meta === undefined || tileset === undefined) {
+      return;
+    }
     mapViewer.layersManager?.addModel({ tileset, meta });
     return () => {
       const modelId = getLayerIdFromMeta(meta);
@@ -81,25 +83,23 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
     });
   };
 
-  const updateTile = (tile: Cesium3DTile): void => {
+  const updateTile = (ts: Cesium3DTileset, tile: Cesium3DTile): void => {
     if (tile.content !== undefined) {
       // @ts-ignore
       updateContent(tile.content, tile.boundingVolume.boundingVolume);
     } else {
-      const listener = tileset.tileLoad.addEventListener((t) => {
+      const listener = ts.tileLoad.addEventListener((t) => {
         if (t === tile) {
           updateContent(t.content, t.boundingVolume.boundingVolume);
           listener();
         }
       });
     }
-    tile.children.forEach((child) => updateTile(child));
+    tile.children.forEach((child) => updateTile(ts, child));
   };
 
-  const updateTileset = (tileset: Cesium3DTileset): void => {
-    void tileset.readyPromise.then(() => {
-      updateTile(tileset.root);
-    });
+  const updateTileset = (ts: Cesium3DTileset): void => {
+    updateTile(ts, ts.root);
   };
 
   return <></>;
