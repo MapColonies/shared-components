@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BboxCorner, DrawType } from '../../models';
+import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumColor, CesiumSceneMode } from '../proxied.types';
 import { CesiumDrawingsDataSource, IDrawing, IDrawingEvent } from './drawings.data-source';
@@ -36,7 +37,7 @@ export const Drawings: Story = (args) => {
   const [drawPrimitive, setDrawPrimitive] = useState<IDrawingObject>({
     type: DrawType.UNKNOWN,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    handler: (drawing: IDrawingEvent) => {},
+    handler: (_drawing: IDrawingEvent) => {},
   });
   const [drawEntities, setDrawEntities] = useState<IDrawing[]>([
     {
@@ -95,7 +96,7 @@ export const Drawings: Story = (args) => {
           setDrawPrimitive({
             type: DrawType.UNKNOWN,
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            handler: (drawing: IDrawingEvent) => {},
+            handler: (_drawing: IDrawingEvent) => {},
           });
         }}
       >
@@ -147,6 +148,8 @@ export const Drawings: Story = (args) => {
           center={center}
           sceneMode={CesiumSceneMode.SCENE2D}
           zoom={9}
+          imageryProvider={false}
+          baseMaps={BASE_MAPS}
           layerManagerMetaMapping={layerManagerMetaMapping}
         >
           <CesiumDrawingsDataSource
