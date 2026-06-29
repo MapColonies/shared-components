@@ -1,9 +1,9 @@
-import { Rectangle } from 'cesium';
+import { ImageryLayer, Rectangle } from 'cesium';
 import React, { useLayoutEffect } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { IRasterLayer, LayerType } from '../layers-manager';
+import { getImageryProviderUrl, IRasterLayer, LayerType } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
@@ -55,13 +55,22 @@ const optionsRectXYZ = {
 
 const childLayerRect = Rectangle.fromDegrees(...bbox(optionsRectXYZ.footprint));
 
+const layerMetaRectXYZ = {
+  id: 'xyz-rect-layer',
+  layerRecord: {
+    productName: 'XYZ Rect Layer',
+  },
+  options: { ...optionsRectXYZ },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsRectXYZ.url,
+};
+
 export const MapWithXYZLayersAndRect: Story = () => (
   <div style={mapDivStyle}>
     <CesiumMap
       {...mapViewProps}
       layerManagerMetaMapping={layerManagerMetaMapping}
     >
-      <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} />
+      <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} meta={layerMetaRectXYZ} />
     </CesiumMap>
   </div>
 );
@@ -103,7 +112,7 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
 
   // For testing the exposure of current zoom level on map viewer
   setInterval(() => {
-    console.log('######################### Zoom level: ', mapViewer.currentZoomLevel);
+    console.log('######################### Zoom level: ', (mapViewer as { currentZoomLevel?: number }).currentZoomLevel);
   }, 2000);
 
   // Mockin footprint data on layer meta

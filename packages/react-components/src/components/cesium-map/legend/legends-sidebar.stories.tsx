@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { ImageryLayer } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
+import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
 import { CesiumMap } from '../map';
 
@@ -27,6 +29,15 @@ const layerManagerMetaMapping = {
 
 const optionsXYZSanDiego = {
   url: 'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
+};
+
+const layerMetaSanDiego = {
+  id: 'layer-san-diego',
+  layerRecord: {
+    productName: 'San Diego Layer',
+  },
+  options: { ...optionsXYZSanDiego },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZSanDiego.url,
 };
 
 export const MapWithLegends: Story = () => {
@@ -57,7 +68,7 @@ export const MapWithLegends: Story = () => {
         }}
         layerManagerMetaMapping={layerManagerMetaMapping}
       >
-        <CesiumXYZLayer options={optionsXYZSanDiego} />
+        <CesiumXYZLayer options={optionsXYZSanDiego} meta={layerMetaSanDiego} />
       </CesiumMap>
     </div>
   );
