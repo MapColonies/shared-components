@@ -144,6 +144,7 @@ interface ILegends {
 }
 
 export interface CesiumMapProps extends ViewerProps {
+  layerManagerMetaMapping: ILayerManagerMetaMapping;
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
   showScale?: boolean;
@@ -166,7 +167,6 @@ export interface CesiumMapProps extends ViewerProps {
     dynamicHeightIncrement?: number;
   };
   legends?: ILegends;
-  layerManagerMetaMapping?: ILayerManagerMetaMapping;
   geocoderPanel?: GeocoderOptions[];
 }
 
@@ -300,11 +300,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         : Object.assign(mapViewRef, {
             layersManager: new LayerManager(
               mapViewRef,
+              props.layerManagerMetaMapping,
               props.legends?.mapLegendsExtractor,
               () => {
                 setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
               },
-              props.layerManagerMetaMapping,
               viewState?.shouldOptimizedTileRequests
             ),
           });

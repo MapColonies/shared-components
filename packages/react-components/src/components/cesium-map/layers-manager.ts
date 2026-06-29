@@ -177,9 +177,9 @@ class LayerManager {
 
   public constructor(
     mapViewer: CesiumViewer,
+    layerManagerMetaMapping: ILayerManagerMetaMapping,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
-    layerManagerMetaMapping?: ILayerManagerMetaMapping,
     shouldOptimizedTileRequests?: boolean
   ) {
     this.mapViewer = mapViewer;
@@ -192,11 +192,11 @@ class LayerManager {
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
-    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping?.layer?.footprint;
+    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer?.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
 
-    configureLayerManagerMetaMapping(layerManagerMetaMapping ?? {});
+    configureLayerManagerMetaMapping(layerManagerMetaMapping);
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
