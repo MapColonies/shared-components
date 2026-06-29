@@ -117,9 +117,7 @@ class LayerManager {
 
   // A general place to extend layer's data. Should be done when all providers(different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const layersReadyPromises = this.layers.map((item) => item.imageryProvider.readyPromise);
-
-    Promise.all(layersReadyPromises).then(() => {
+    Promise.resolve().then(() => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
@@ -500,7 +498,7 @@ class LayerManager {
         continue;
       }
 
-      if (relevantToExtent !== layer.show && layer.imageryProvider.ready) {
+      if (relevantToExtent !== layer.show) {
         layer.show = relevantToExtent;
       }
     }
@@ -511,9 +509,7 @@ class LayerManager {
       if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      if (layer.imageryProvider.ready) {
-        layer.show = true;
-      }
+      layer.show = true;
     }
   }
 
@@ -614,8 +610,7 @@ class LayerManager {
           const layerAboveIsOpaque = layerAbove.meta?.[HAS_TRANSPARENCY_META_PROP] === false;
           const layerAboveIntersectsExtent =
             !isEmpty(layerAbove.rectangle) && Rectangle.intersection(extent, layerAbove.rectangle) instanceof Rectangle;
-          const layerAboveCoversCurrentExtent =
-            !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
+          const layerAboveCoversCurrentExtent = !isEmpty(layerAbove.rectangle) && cesiumRectangleContained(extent, layerAbove.rectangle as Rectangle);
           if (layerAboveIntersectsExtent && layerAboveCoversCurrentExtent && layerAboveIsOpaque && !layerAboveHasTransparency) {
             isOccludedByOpaqueLayerAbove = true;
             break;
