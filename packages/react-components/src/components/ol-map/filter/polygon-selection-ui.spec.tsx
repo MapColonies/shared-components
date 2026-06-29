@@ -1,7 +1,6 @@
-import React from 'react';
 import { shallow } from 'enzyme';
 import { MenuItem, Menu, Button } from '@map-colonies/react-core';
-import { DrawType } from '../models';
+import { DrawType } from '../../models';
 import { PolygonSelectionUi } from './polygon-selection-ui';
 
 const startDraw = jest.fn();

@@ -5,3 +5,4 @@ export * from './feature';
 export * from './map';
 export * from '../utils/projections';
 export * from './legend';
+export * from './filter';

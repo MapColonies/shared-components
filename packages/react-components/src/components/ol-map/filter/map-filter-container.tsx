@@ -2,9 +2,9 @@ import React, { PropsWithChildren, useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { Paper } from '@material-ui/core';
 import { Polygon } from 'geojson';
-import { DrawType } from '../models/enums';
-import { PolygonSelectionUi } from './polygon-selection-ui';
+import { DrawType } from '../../models/enums';
 import { ContainerMap } from './container-map';
+import { PolygonSelectionUi } from './polygon-selection-ui';
 
 const PLACEMENT_SPACING_FACTOR = 1.5;
 const WIDTH_SPACING_FACTOR = 80;

@@ -1,14 +1,14 @@
 import { action } from '@storybook/addon-actions';
 import { Button, Typography } from '@map-colonies/react-core';
 import { MapFilterContainer } from '../map-filter-container';
-import { CSFStory } from '../../utils/story';
-import { Box } from '../..';
-import { VectorLayer } from '../../ol-map/layers/vector-layer';
-import { VectorSource } from '../../ol-map/source/vector-source';
-import { GeoJSONFeature } from '../../ol-map/feature';
+import { CSFStory } from '../../../utils/story';
+import { Box } from '../../..';
+import { GeoJSONFeature } from '../../feature';
+import { VectorLayer } from '../../layers/vector-layer';
+import { VectorSource } from '../../source/vector-source';
 
 const story = {
-  title: 'Map Filter Container',
+  title: 'OL Map/Map/Filter',
   component: MapFilterContainer,
   parameters: {
     layout: 'fullscreen',
