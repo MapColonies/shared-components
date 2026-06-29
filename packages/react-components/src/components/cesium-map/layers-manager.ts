@@ -147,6 +147,10 @@ export const isBaseMapLayer = (meta: Record<string, unknown> | undefined): boole
   return !!getParentBaseMapId(meta);
 };
 
+export const isTransparentImageryLayer = (layer: ICesiumImageryLayer): boolean => {
+  return layer.meta?.hasTransparency === true || getLayerId(layer) === TRANSPARENT_LAYER_ID;
+};
+
 export const getImageryProvider = (layer: ICesiumImageryLayer): CesiumImageryProvider => {
   return get(layer, 'imageryProvider');
 };
@@ -249,6 +253,21 @@ class LayerManager {
     }
   }
 
+  private syncModelImageryLayers(): void {
+    const activeLayers = this.layers.filter((layer) => {
+      return layer.show !== false && isTransparentImageryLayer(layer);
+    });
+    this.models.forEach((model) => {
+      const imageryLayers = model.tileset.imageryLayers;
+      imageryLayers.removeAll();
+      activeLayers.forEach((layer, index) => {
+        const overlayLayer = imageryLayers.addImageryProvider(getImageryProvider(layer), index);
+        overlayLayer.alpha = layer.alpha ?? overlayLayer.alpha;
+        overlayLayer.show = layer.show !== false;
+      });
+    });
+  }
+
   public setBaseMapLayers(baseMap: IBaseMap): void {
     const sortedBaseMapLayers = baseMap.baseRasterLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
@@ -272,6 +291,8 @@ class LayerManager {
       this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
     }
+
+    this.syncModelImageryLayers();
   }
 
   public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
@@ -322,6 +343,8 @@ class LayerManager {
         cesiumLayer.show = layer.show;
       }
     }
+
+    this.syncModelImageryLayers();
   }
 
   public removeLayer(layerId: string): void {
@@ -329,6 +352,8 @@ class LayerManager {
     if (layer) {
       this.mapViewer.imageryLayers.remove(layer, true);
     }
+
+    this.syncModelImageryLayers();
   }
 
   public removeDataLayer(dataLayerId: string): void {
@@ -350,6 +375,7 @@ class LayerManager {
       this.mapViewer.imageryLayers.remove(layer, true);
     });
     // TODO: remove vector layers
+    this.syncModelImageryLayers();
   }
 
   public removeNotBaseMapLayers(): void {
@@ -360,6 +386,7 @@ class LayerManager {
       this.mapViewer.imageryLayers.remove(layer, true);
     });
     // TODO: remove vector layers
+    this.syncModelImageryLayers();
   }
 
   public raise(layerId: string, positions = 1): void {
@@ -374,6 +401,7 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order + positions);
     this.reinvokeOptimizationAfterOrderChange();
+    this.syncModelImageryLayers();
   }
 
   public lower(layerId: string, positions = 1): void {
@@ -394,6 +422,7 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order - positions);
     this.reinvokeOptimizationAfterOrderChange();
+    this.syncModelImageryLayers();
   }
 
   public raiseToTop(layerId: string): void {
@@ -406,6 +435,7 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
     this.reinvokeOptimizationAfterOrderChange();
+    this.syncModelImageryLayers();
   }
 
   public lowerToBottom(layerId: string): void {
@@ -420,6 +450,7 @@ class LayerManager {
     // }
 
     // this.updateLayersOrder(layerId, order, 0);
+    this.syncModelImageryLayers();
   }
 
   public length(): number {
@@ -431,6 +462,8 @@ class LayerManager {
     if (layer !== undefined) {
       layer.show = isShow;
     }
+
+    this.syncModelImageryLayers();
   }
 
   public showAllNotBase(isShow: boolean): void {
@@ -443,6 +476,8 @@ class LayerManager {
         this.show(layerId, isShow);
       }
     });
+
+    this.syncModelImageryLayers();
   }
 
   public get(layerId: string): ICesiumImageryLayer | undefined {
@@ -519,6 +554,7 @@ class LayerManager {
       };
       set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
       (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+      this.syncModelImageryLayers();
     });
   }
 
@@ -559,6 +595,7 @@ class LayerManager {
       this.addTransparentImageryProvider();
       this.markRelevantLayersForExtent();
       this.hideNonRelevantLayers();
+      this.syncModelImageryLayers();
       return;
     }
 
@@ -566,6 +603,7 @@ class LayerManager {
     this.removeLayer(TRANSPARENT_LAYER_ID);
     this.restoreAllLayersVisibility();
     this.clearLayersRelevancy();
+    this.syncModelImageryLayers();
   }
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
@@ -576,6 +614,7 @@ class LayerManager {
 
   public addModel(model: ICesium3DModel): void {
     this.models.push({ ...model });
+    this.syncModelImageryLayers();
     this.modelUpdated.raiseEvent(this.models);
   }
 
