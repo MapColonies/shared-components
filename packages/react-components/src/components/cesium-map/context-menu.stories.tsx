@@ -293,13 +293,13 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
         }}
       >
         {layers?.map((layer) => (
-          <option key={layer.id} defaultValue={layer.id}>
+          <option key={layer.id} value={layer.id} style={{ background: '#3f3f3f', color: 'white' }}>
             {layer.id}
           </option>
         ))}
       </select>
       <input
-        style={{ ...fieldStyle, width: '80px' }}
+        style={{ ...fieldStyle, width: '40px' }}
         type="number"
         value={times}
         onChange={(evt): void => {
