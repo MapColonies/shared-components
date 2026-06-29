@@ -82,7 +82,7 @@
     "jest-enzyme": "^7.1.2",
     "storybook": "6.5.16",
     "typescript": "4.9.5",
-    "vite-plugin-cesium": "1.2.22"
+    "vite-plugin-cesium": "1.2.23"
   },
   "files": [
     "dist"

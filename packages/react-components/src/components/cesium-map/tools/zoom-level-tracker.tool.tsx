@@ -89,11 +89,9 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
         cameraHeight = mapViewer.scene.mapProjection.ellipsoid.cartesianToCartographic(camera.positionWC).height;
         break;
       case CesiumSceneMode.SCENE2D:
-        const frustum = camera.frustum;
-
-        if (frustum && frustum instanceof PerspectiveOffCenterFrustum && frustum.left !== undefined && frustum.right !== undefined) {
-          cameraHeight = (frustum.right - frustum.left) * ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
-        }
+        cameraHeight =
+          (((camera.frustum as PerspectiveOffCenterFrustum).right ?? 0) - ((camera.frustum as PerspectiveOffCenterFrustum).left ?? 0)) *
+          ORTHOPHOTO_HEIGHT_FRUSTRUM_FACTOR;
         break;
       case CesiumSceneMode.COLUMBUS_VIEW:
         cameraHeight = camera.position.z;

@@ -278,7 +278,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   }
 
   // Calculate the Field of View (FOV) of the camera
-  const fov = camera.frustum instanceof PerspectiveFrustum ? camera.frustum.fov ?? Math.PI / 3 : Math.PI / 3; // Default FOV if not PerspectiveFrustum
+  const fov = camera.frustum instanceof PerspectiveFrustum ? camera.frustum.fov ?? Math.PI / 3 : Math.PI / 3;
 
   // Apply zoom scaling based on camera height and FOV
   let zoomFactor = 1.0;

@@ -117,12 +117,14 @@ class LayerManager {
 
   // A general place to extend layer's data. Should be done when all providers(different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    const layer = this.layers.find(layerPredicate);
-    if (layer) {
-      layer.meta = { ...(layer.meta ?? {}), ...meta };
-      this.setLegends();
-      this.layerUpdated.raiseEvent(meta);
-    }
+    Promise.resolve().then(() => {
+      const layer = this.layers.find(layerPredicate);
+      if (layer) {
+        layer.meta = { ...(layer.meta ?? {}), ...meta };
+        this.setLegends();
+        this.layerUpdated.raiseEvent(meta);
+      }
+    });
   }
 
   public addMetaToDataLayer(meta: any): void {

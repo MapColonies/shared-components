@@ -163,7 +163,7 @@ export interface CesiumMapProps extends ViewerProps {
 export const useCesiumMap = (): CesiumViewer => {
   const mapViewer = useContext(mapContext);
 
-  if (mapViewer === null) {
+  if (mapViewer == null) {
     throw new Error('map context is null, please check the provider');
   }
 
@@ -220,6 +220,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     });
   }, []);
 
+  // In resium v1.23, cesiumElement is set asynchronously — extend is called by Cesium after the
+  // viewer is fully created, making it the reliable "onReady" hook.
+  const onViewerReady = useCallback((viewer: CesiumViewerCls) => {
+    setMapViewRef(viewer as CesiumViewer);
+  }, []);
+
+  const userExtend = (props as ViewerProps).extend;
+  const mergedExtend = userExtend ? (Array.isArray(userExtend) ? [...userExtend, onViewerReady] : [userExtend, onViewerReady]) : onViewerReady;
+
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
     timeline: false,
@@ -229,7 +238,9 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     navigationHelpButton: false,
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
+    baseLayer: false,
     ...(props as ViewerProps),
+    extend: mergedExtend,
   };
 
   const getImageryMenuStyle = (
@@ -251,64 +262,31 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   const contextMenuHandler = useCallback(
     (evt: any) => {
-      if (ref.current !== null) {
-        const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
-
+      if (mapViewRef) {
         const pos = { x: evt.offsetX, y: evt.offsetY } as Record<string, unknown>;
 
         setShowImageryMenu(false);
         setImageryMenuPosition(pos);
-        setRightClickCoordinates(pointToLonLat(viewer, pos.x as number, pos.y as number));
+        setRightClickCoordinates(pointToLonLat(mapViewRef, pos.x as number, pos.y as number));
         setShowImageryMenu(true);
         imageryMenuEvent.current = evt as unknown as MouseEvent;
       }
     },
-    [ref]
+    [mapViewRef]
   );
 
-  // useEffect(() => {
-  //   if (ref.current !== null) {
-  //     const viewer: CesiumViewer = ref.current.cesiumElement as CesiumViewer;
-  //     if (!viewer) return;
-  //     if (props.imageryContextMenu) {
-  //       // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
-  //       // We need the native event for the new context menu component.
-  //       // This is a workaround.
-
-  //       viewer.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
-
-  //       viewer.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
-  //     }
-  //   }
-  //   setMapViewRef(ref.current?.cesiumElement);
-  // }, [ref, props.imageryContextMenu]);
   useEffect(() => {
-    let cancelled = false;
-
-    const checkViewer = () => {
-      const viewer = ref.current?.cesiumElement;
-
-      if (!viewer || cancelled) {
-        requestAnimationFrame(checkViewer);
-        return;
-      }
-
-      // viewer is ready here
-      if (props.imageryContextMenu) {
-        viewer.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
-
-        viewer.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
-      }
-
-      setMapViewRef(viewer);
-    };
-
-    checkViewer();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [props.imageryContextMenu]);
+    if (mapViewRef && props.imageryContextMenu) {
+      // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
+      // We need the native event for the new context menu component.
+      // This is a workaround.
+      mapViewRef.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
+      mapViewRef.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
+      return () => {
+        mapViewRef.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
+      };
+    }
+  }, [mapViewRef, props.imageryContextMenu, contextMenuHandler]);
 
   const contextValue = useMemo(() => {
     if (!mapViewRef) return null;

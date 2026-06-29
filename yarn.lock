@@ -18013,9 +18013,9 @@ property-information@^5.0.0, property-information@^5.3.0:
     xtend "^4.0.0"
 
 protobufjs@^8.5.0:
-  version "8.6.4"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-8.6.4.tgz#61c1589f095d096cf89e77d1e6dfa5ca1c0d70bf"
-  integrity sha512-/+XMv9JalknuncEJSwsyEVlwcxVLKx2iaoSUXFZA86MJkdqyOdfrlB1sB7S6aKyUk9tl20YY+SgQe5J2sJHTcg==
+  version "8.6.5"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-8.6.5.tgz#7709c9ff77914c00010129888e620c9ccf7c294c"
+  integrity sha512-zeE5LPpencAGXvsxyOYmEgJhxzHY8IsmPAFzstZVhDSVT8QH03q6gMZwZRaQGApevZbAL6u28ugs4CC+YKB2jQ==
   dependencies:
     long "^5.3.2"
 
@@ -21526,10 +21526,10 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vite-plugin-cesium@1.2.22:
-  version "1.2.22"
-  resolved "https://registry.yarnpkg.com/vite-plugin-cesium/-/vite-plugin-cesium-1.2.22.tgz#55dc6d7dba6f8c28ee815e0d70359d67ef763694"
-  integrity sha512-OnS+VKNGck4kUu4/67Fdfhz0/zF9mDVNUp9hUWtX19C38O0mJsJy2MH1ev2QcrVLf6VieJ7vCGxkLchdB1n1HQ==
+vite-plugin-cesium@1.2.23:
+  version "1.2.23"
+  resolved "https://registry.yarnpkg.com/vite-plugin-cesium/-/vite-plugin-cesium-1.2.23.tgz#fa6ef37c045fe7863901b383a23e7f72e59e7539"
+  integrity sha512-x9A8ZCEoegceXg/E+LnxKr0XBsI9CR4cgYWQ2Dd3cUEYwKcTnHQ3kBfpol7BUcGtgQnQos/mtVrRmuVQBXFjHw==
   dependencies:
     fs-extra "^9.1.0"
     rollup-plugin-external-globals "^0.6.1"
