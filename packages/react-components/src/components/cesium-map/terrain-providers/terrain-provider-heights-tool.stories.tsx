@@ -42,45 +42,9 @@ const layerManagerMetaMapping = {
 
 const EllipsoidProvider = new EllipsoidTerrainProvider({});
 
-//#region TILER MATERIALS
-// const TTCesiumProviderSrtm30 = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:8002/srtm30',
-//   }),
-// });
-// const TTCesiumProviderSrtm100 = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:8002/srtm100',
-//   }),
-// });
-// const TTCesiumProviderMergedDescending = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:8002/mergedDescending',
-//   }),
-// });
-//#endregion
-
-//#region CTBD MATERIALS
-// const CTBDCesiumProviderSrtm30 = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:3000/srtm30',
-//   }),
-// });
-// const CTBDCesiumProviderSrtm100 = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:3000/srtm100',
-//   }),
-// });
-// const CTBDCesiumProviderMergedAscending = new CesiumTerrainProvider({
-//   url: new Resource({
-//     url: 'http://localhost:3000/mergedAscending',
-//   }),
-// });
-//#endregion
-
-const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
-  url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
-});
+const ArcGisProvider = ArcGISTiledElevationTerrainProvider.fromUrl(
+  'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'
+);
 
 const terrainProviderListQmesh = [
   {
@@ -95,7 +59,7 @@ const terrainProviderListQmesh = [
 
 interface ITerrainProviderItem {
   id: string;
-  value: TerrainProvider | undefined;
+  value: TerrainProvider | Promise<TerrainProvider> | undefined;
 }
 
 interface ITerrainProviderSelectorProps {
@@ -118,7 +82,17 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
           const selected = terrainProviderList.find((item) => item.id === evt.target.value);
-          mapViewer.terrainProvider = (selected as ITerrainProviderItem).value as TerrainProvider;
+          const provider = selected?.value;
+          if (!provider) {
+            return;
+          }
+          if (provider instanceof Promise) {
+            void provider.then((resolvedProvider) => {
+              mapViewer.terrainProvider = resolvedProvider;
+            });
+            return;
+          }
+          mapViewer.terrainProvider = provider;
         }}
       >
         {terrainProviderList.map((provider) => {

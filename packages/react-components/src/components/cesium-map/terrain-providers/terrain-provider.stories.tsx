@@ -39,22 +39,36 @@ const layerManagerMetaMapping = {
 
 const EllipsoidProvider = new EllipsoidTerrainProvider({});
 
-const CesiumProvider = new CesiumTerrainProvider({
-  url: new Resource({
-    url: 'https://my-assets.cesium.com/1',
-    headers: {
-      authorization: 'Bearer <my-access-token>',
-    },
-  }),
-});
+const withFallbackProvider = (providerPromise: Promise<TerrainProvider>, providerName: string): Promise<TerrainProvider> => {
+  return providerPromise.catch((error) => {
+    console.warn(`[TerrainProvider] Failed to initialize ${providerName}. Falling back to Ellipsoid terrain.`, error);
+    return EllipsoidProvider;
+  });
+};
 
-const VRTheWorldProvider = new VRTheWorldTerrainProvider({
-  url: 'http://www.vr-theworld.com/vr-theworld/tiles1.0.0/73/',
-});
+const CesiumProvider = withFallbackProvider(
+  CesiumTerrainProvider.fromUrl(
+    new Resource({
+      url: 'https://my-assets.cesium.com/1',
+      headers: {
+        authorization: 'Bearer <my-access-token>',
+      },
+    })
+  ),
+  'Cesium Terrain Provider'
+);
 
-const ArcGisProvider = new ArcGISTiledElevationTerrainProvider({
-  url: 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
-});
+const VRTheWorldProvider = withFallbackProvider(
+  VRTheWorldTerrainProvider.fromUrl('https://www.vr-theworld.com/vr-theworld/tiles1.0.0/73/'),
+  'VR The World Terrain Provider'
+);
+
+const ArcGisProvider = withFallbackProvider(
+  ArcGISTiledElevationTerrainProvider.fromUrl(
+    'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'
+  ),
+  'ArcGIS Terrain Provider'
+);
 
 const QuantizedMeshProvider = new QuantizedMeshTerrainProvider({
   getUrl: (x: number, y: number, level: number): string => {
@@ -92,7 +106,7 @@ const terrainProviderList = [
 
 interface ITerrainProviderItem {
   id: string;
-  value: TerrainProvider | undefined;
+  value: TerrainProvider | QuantizedMeshTerrainProvider | Promise<TerrainProvider> | undefined;
 }
 
 interface ITerrainProviderSelectorProps {
@@ -122,7 +136,17 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
           const selected = terrainProviderList.find((item) => item.id === evt.target.value);
-          mapViewer.terrainProvider = (selected as ITerrainProviderItem).value as TerrainProvider;
+          const provider = selected?.value;
+          if (!provider) {
+            return;
+          }
+          if (provider instanceof Promise) {
+            void provider.then((resolvedProvider) => {
+              mapViewer.terrainProvider = resolvedProvider;
+            });
+            return;
+          }
+          mapViewer.terrainProvider = provider as unknown as TerrainProvider;
         }}
       >
         {terrainProviderList.map((provider) => {
