@@ -35,9 +35,9 @@ const INC = 1;
 const DEC = -1;
 
 export interface ILayerManagerMetaMapping {
-  layer: {
-    id: string;
-    name: string;
+  layer?: {
+    id?: string;
+    name?: string;
     footprint?: string;
   };
   dataLayer?: {
