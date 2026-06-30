@@ -26,7 +26,7 @@ import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
-import LayerManager, { IRasterLayer, LegendExtractor } from './layers-manager';
+import LayerManager, { IRasterLayer, LegendExtractor, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -134,6 +134,7 @@ interface ILegends {
 }
 
 export interface CesiumMapProps extends ViewerProps {
+  layerManagerMetaMapping: ILayerManagerMetaMapping;
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
   showScale?: boolean;
@@ -156,7 +157,6 @@ export interface CesiumMapProps extends ViewerProps {
     dynamicHeightIncrement?: number;
   };
   legends?: ILegends;
-  layerManagerFootprintMetaFieldPath?: string;
   geocoderPanel?: GeocoderOptions[];
 }
 
@@ -292,15 +292,17 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     if (!mapViewRef) return null;
 
     if (!mapViewRef.layersManager) {
-      mapViewRef.layersManager = new LayerManager(
-        mapViewRef,
-        props.legends?.mapLegendsExtractor,
-        () => {
-          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-        },
-        props.layerManagerFootprintMetaFieldPath,
-        viewState?.shouldOptimizedTileRequests
-      );
+      Object.assign(mapViewRef, {
+        layersManager: new LayerManager(
+          mapViewRef,
+          props.layerManagerMetaMapping,
+          props.legends?.mapLegendsExtractor,
+          () => {
+            setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+          },
+          viewState?.shouldOptimizedTileRequests
+        ),
+      });
     }
 
     return {
@@ -308,7 +310,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       viewState,
       setViewState,
     };
-  }, [mapViewRef, props.legends, props.layerManagerFootprintMetaFieldPath, viewState]);
+  }, [props.legends, props.layerManagerMetaMapping, mapViewRef, viewState]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);

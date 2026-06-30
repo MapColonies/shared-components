@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BboxCorner, DrawType } from '../../models';
+import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumColor, CesiumSceneMode } from '../proxied.types';
 import { CesiumDrawingsDataSource, IDrawing, IDrawingEvent } from './drawings.data-source';
@@ -19,6 +20,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 interface IDrawingObject {
   type: DrawType;
   handler: (drawing: IDrawingEvent) => void;
@@ -29,7 +37,7 @@ export const Drawings: Story = (args) => {
   const [drawPrimitive, setDrawPrimitive] = useState<IDrawingObject>({
     type: DrawType.UNKNOWN,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    handler: (drawing: IDrawingEvent) => {},
+    handler: (_drawing: IDrawingEvent) => {},
   });
   const [drawEntities, setDrawEntities] = useState<IDrawing[]>([
     {
@@ -88,7 +96,7 @@ export const Drawings: Story = (args) => {
           setDrawPrimitive({
             type: DrawType.UNKNOWN,
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            handler: (drawing: IDrawingEvent) => {},
+            handler: (_drawing: IDrawingEvent) => {},
           });
         }}
       >
@@ -136,7 +144,13 @@ export const Drawings: Story = (args) => {
         Draw rectangle by coordinates
       </button>
       <div style={mapDivStyle}>
-        <CesiumMap center={center} sceneMode={CesiumSceneMode.SCENE2D} zoom={9}>
+        <CesiumMap
+          center={center}
+          sceneMode={CesiumSceneMode.SCENE2D}
+          zoom={9}
+          baseMaps={BASE_MAPS}
+          layerManagerMetaMapping={layerManagerMetaMapping}
+        >
           <CesiumDrawingsDataSource
             drawings={drawEntities}
             drawingMaterial={CesiumColor.RED.withAlpha(0.5)}

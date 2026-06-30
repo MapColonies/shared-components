@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Cartesian3, Color } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
+import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumEntity, RCesiumEntityProps } from './entity';
 import { CesiumEntityDescription, CesiumEntityStaticDescription } from './entity.description';
@@ -17,6 +18,13 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const initCanvas = (): HTMLCanvasElement => {
@@ -64,7 +72,10 @@ const CanvasEntity: React.FC<RCesiumEntityProps> = (props) => {
 
 export const Basic: Story = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap>
+    <CesiumMap
+      baseMaps={BASE_MAPS}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
       <CesiumEntity
         {...args}
         name="test"
@@ -80,7 +91,10 @@ Basic.storyName = 'Basic Entity';
 export const WithDescription: Story<RCesiumEntityProps> = (args) => {
   const [count, setCount] = useState(0);
   return (
-    <CesiumMap>
+    <CesiumMap
+      baseMaps={BASE_MAPS}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
       <CesiumEntity
         {...args}
         name="test1"
@@ -111,7 +125,10 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
 };
 
 export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
-  <CesiumMap>
+  <CesiumMap
+    baseMaps={BASE_MAPS}
+    layerManagerMetaMapping={layerManagerMetaMapping}
+  >
     <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>
 );

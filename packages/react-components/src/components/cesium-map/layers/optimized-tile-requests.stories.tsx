@@ -1,9 +1,9 @@
 import React, { ReactNode, useState } from 'react';
 import { ImageryLayer, Rectangle } from 'cesium';
-import { get } from 'lodash';
 import { Story, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
+import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, IBaseMaps } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
@@ -19,6 +19,13 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const mapViewProps: CesiumMapProps = {
@@ -82,8 +89,7 @@ const LayersContainer: React.FC = () => {
                   id: 'Transparent Layer',
                   options: { ...optionsXYZTransparency },
                   searchLayerPredicate: (layer: ImageryLayer): boolean =>
-                    get(layer, 'imageryProvider.url') === optionsXYZTransparency.url ||
-                    get(layer, 'imageryProvider._url') === optionsXYZTransparency.url,
+                    getImageryProviderUrl(layer) === optionsXYZTransparency.url
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZTransparency.footprint))}
                 options={optionsXYZTransparency}
@@ -102,8 +108,7 @@ const LayersContainer: React.FC = () => {
                   id: 'Opaque Layer',
                   options: { ...optionsXYZOpaque },
                   searchLayerPredicate: (layer: ImageryLayer): boolean =>
-                    get(layer, 'imageryProvider.url') === optionsXYZOpaque.url ||
-                    get(layer, 'imageryProvider._url') === optionsXYZOpaque.url,
+                    getImageryProviderUrl(layer) === optionsXYZOpaque.url
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
@@ -122,7 +127,11 @@ const LayersContainer: React.FC = () => {
 export const OptimizedTileRequestingMap: Story = () => {
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...mapViewProps} showDebuggerTool={true}>
+      <CesiumMap
+        {...mapViewProps}
+        showDebuggerTool={true}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+      >
         <LayersContainer />
       </CesiumMap>
     </div>

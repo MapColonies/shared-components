@@ -19,6 +19,7 @@ import pMap from 'p-map';
 import { v4 as uuidv4 } from 'uuid';
 import booleanValid from '@turf/boolean-valid';
 import { distance, center, rectangle2bbox, computeLimitedViewRectangle, defaultVisualizationHandler, rectangle2Feature } from '../helpers/utils';
+import { getDataLayerFields, getLayerIdFromMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 
 export interface ICesiumWFSLayerLabelTextField {
@@ -85,9 +86,19 @@ export interface ICesiumWFSLayerOptions {
   labeling?: ICesiumWFSLayerLabelingOptions;
 }
 
+export interface ICesiumWFSLayerMeta {
+  id: string;
+  items?: number;
+  total?: number;
+  cache?: number;
+  currentZoomLevel?: number;
+  zoomLevel?: number;
+  [key: string]: unknown;
+}
+
 export interface ICesiumWFSLayer extends React.Attributes {
   options: ICesiumWFSLayerOptions;
-  meta: Record<string, unknown>;
+  meta: ICesiumWFSLayerMeta;
   visualizationHandler?: (mapViewer: CesiumViewer, wfsDataSource: GeoJsonDataSource, processEntityIds: string[], extent?: BBox) => void;
   withGeometryValidation?: boolean;
 }
@@ -111,6 +122,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const wfsCache = useRef(new Set<string>());
   const page = useRef(0);
   const [metadata, setMetadata] = useState(meta);
+  const dataLayerId = getLayerIdFromMeta(meta);
   const geojsonHoveredColor = useMemo(() => CesiumColor.fromCssColorString((hover as string) ?? '#24AEE9').withAlpha(0.5), [hover]);
   const dataSourceName = useMemo(() => `wfs_${featureType}_${uuidv4()}`, [featureType]);
   const hasRunFetchRef = useRef(false);
@@ -130,27 +142,25 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
   const describe = (properties: Record<string, any>): string => {
     const rows: string[] = [];
-    const featureStructure = meta.featureStructure as { fields: { fieldName: string; aliasFieldName: string; type: string }[] };
-    if (featureStructure && featureStructure.fields) {
-      for (const field of featureStructure.fields) {
-        const { fieldName, aliasFieldName } = field;
-        const key = aliasFieldName;
-        const value = properties[fieldName] ?? 'N/A';
-        const keyMaxWidth = Math.max(100, Math.min(180, key.length * 10));
-        const valueMaxWidth = '260px';
-        rows.push(`
-          <tr>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
-              <strong>${key}:</strong>
-            </td>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
-              ${value}
-            </td>
-          </tr>
-        `);
-      }
+    const dataLayerFields = getDataLayerFields(meta);
+    for (const field of dataLayerFields) {
+      const { fieldName, aliasFieldName } = field;
+      const key = aliasFieldName;
+      const value = properties[fieldName] ?? 'N/A';
+      const keyMaxWidth = Math.max(100, Math.min(180, key.length * 10));
+      const valueMaxWidth = '260px';
+      rows.push(`
+        <tr>
+          <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${keyMaxWidth}px; display: table-cell;">
+            <strong>${key}:</strong>
+          </td>
+          <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: ${valueMaxWidth}; display: table-cell;" title="${value}">
+            ${value}
+          </td>
+        </tr>
+      `);
     }
-    const isRightToLeft = featureStructure.fields.some((field) => field.aliasFieldName !== field.fieldName);
+    const isRightToLeft = dataLayerFields.some((field) => field.aliasFieldName !== field.fieldName);
     return `
       <table style="width: 100%; direction: ${isRightToLeft ? 'rtl' : 'ltr'};">
         <tbody>
@@ -300,11 +310,20 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   };
 
   const fetchWfsData = async (wfsDataUrl: string, options: RequestInit = { method: 'GET' }): Promise<any> => {
-    const response = await fetch(wfsDataUrl, options);
-    if (response.status === 200) {
-      return await response.json();
+    if (!wfsDataUrl) {
+      throw new Error('WFS request URL is missing');
     }
-    return undefined;
+    let response: Response;
+    try {
+      response = await fetch(wfsDataUrl, options);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`WFS network request failed for ${wfsDataUrl}: ${message}`);
+    }
+    if (!response.ok) {
+      throw new Error(`WFS request failed (${response.status} ${response.statusText}) for ${wfsDataUrl}`);
+    }
+    return await response.json();
   };
 
   // Create a temporary canvas to measure max width
@@ -602,6 +621,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   const waitForTilesLoaded = () => {
     return new Promise<void>((resolve) => {
       const interval = setInterval(() => {
+        if (get(mapViewer, '_cesiumWidget') === undefined) {
+          clearInterval(interval);
+          resolve();
+          return;
+        }
         if (mapViewer.scene.globe.tilesLoaded) {
           clearInterval(interval);
           resolve();
@@ -617,18 +641,22 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   };
 
   useEffect((): void => {
+    if (!mapViewer?.scene || !mapViewer?.dataSources) {
+      return;
+    }
     const dataSource = mapViewer.dataSources.getByName(dataSourceName)[0] as GeoJsonDataSource;
     if (dataSource) {
       applyVisualization(mapViewer, dataSource, [], undefined);
     }
-  }, [mapViewer.scene.mode]);
+  }, [mapViewer?.scene?.mode]);
 
   useEffect(() => {
     // Happens each time the metadata from STATE changes
     if (
       mapViewer.layersManager &&
       mapViewer.layersManager.dataLayerList.length > 0 &&
-      mapViewer.layersManager.findDataLayerById(meta.id as string) !== undefined
+      dataLayerId !== undefined &&
+      mapViewer.layersManager.findDataLayerById(dataLayerId) !== undefined
     ) {
       mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
@@ -640,6 +668,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
+    if (!mapViewer?.scene || !mapViewer?.dataSources) {
+      return;
+    }
     // DataSource
     mapViewer.dataSources.add(wfsDataSource);
 
@@ -666,7 +697,9 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         fetchMetadata.current.clear();
         mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
         mapViewer.dataSources.remove(wfsDataSource, true);
-        mapViewer.layersManager?.removeDataLayer(meta.id as string);
+        if (dataLayerId !== undefined) {
+          mapViewer.layersManager?.removeDataLayer(dataLayerId);
+        }
         mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }

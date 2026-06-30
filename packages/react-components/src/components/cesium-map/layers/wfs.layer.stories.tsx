@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { TerrainProvider } from 'cesium';
 import { BBox } from 'geojson';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
@@ -9,6 +10,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL } from '../helpers/constants';
+import { getLayerIdFromMeta } from '../layers-manager';
 import { CesiumMap, CesiumViewer } from '../map';
 import {
   CesiumMath,
@@ -35,6 +37,14 @@ import {
 import { CesiumWFSLayer, ICesiumWFSLayerLabelTextField } from './wfs.layer';
 import { Cesium3DTileset } from './3d.tileset';
 
+const useCesiumTerrainProvider = (url: string): TerrainProvider | undefined => {
+  const [provider, setProvider] = useState<TerrainProvider | undefined>(undefined);
+  useEffect(() => {
+    void CesiumCesiumTerrainProvider.fromUrl(url).then(setProvider);
+  }, [url]);
+  return provider;
+};
+
 export default {
   title: 'Cesium Map/Layers/WFSLayer',
   component: CesiumWFSLayer,
@@ -56,14 +66,26 @@ const BRIGHT_GREEN = '#01FF1F';
 const LIGHT_BLUE = '#24AEE9';
 const BRIGHT_PURPLE = '#B734EB';
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+    footprint: 'layerRecord.footprint',
+  },
+  dataLayer: {
+    name: 'layerRecord.featureStructure.aliasLayerName',
+    fields: 'layerRecord.featureStructure.fields',
+  },
+};
+
 // #region STORY PP component
 export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
+  const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>
-      <div style={{ zIndex: 2, color: 'white', position: 'fixed', paddingLeft: '50%', backgroundColor: 'black', width: '100%' }}>Go to ME</div>
-      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
+      <CesiumMap {...args} terrainProvider={terrainProvider} sceneMode={CesiumSceneMode.SCENE2D} layerManagerMetaMapping={layerManagerMetaMapping}>
         <CesiumWFSLayer
-          key={metaPolygonParts.id}
+          key={getLayerIdFromMeta(metaPolygonParts)}
           options={optionsPolygonParts}
           meta={metaPolygonParts}
           visualizationHandler={handleVisualizationPolygonParts}
@@ -88,9 +110,6 @@ MapWithPPWFSLayer.argTypes = {
   showDebuggerTool: {
     defaultValue: SHOW_DEBUGGER_TOOL,
   },
-  terrainProvider: {
-    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
-  },
 };
 
 MapWithPPWFSLayer.storyName = 'WFS PP layer';
@@ -98,21 +117,26 @@ MapWithPPWFSLayer.storyName = 'WFS PP layer';
 
 // #region STORY VECTOR component (NO VISUALIZER)
 export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
+  const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+      <CesiumMap {...args} terrainProvider={terrainProvider} sceneMode={CesiumSceneMode.SCENE2D} layerManagerMetaMapping={layerManagerMetaMapping}>
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
+          meta={{ id: '1111111', layerRecord: { productName: 'Lebanon A' } }}
+          isZoomTo={true}
+        />
         <CesiumWFSLayer
-          key={metaBuildings.id}
+          key={getLayerIdFromMeta(metaBuildings)}
           options={optionsBuildings}
           meta={metaBuildings}
           // visualizationHandler={handleVisualizationBuildings}
           withGeometryValidation={true}
         />
         {/* <CesiumWFSLayer
-          key={metaBuildings.id + '_2'}
+          key={getLayerIdFromMeta(metaBuildings) + '_2'}
           options={optionsBuildings}
-          meta={{ ...metaBuildings, id: metaBuildings.id + '_2' }}
+          meta={{ ...metaBuildings, id: getLayerIdFromMeta(metaBuildings) + '_2' }}
           visualizationHandler={handleVisualizationBuildings}
           withGeometryValidation={true}
         /> */}
@@ -136,9 +160,6 @@ MapWithWFSLayer.argTypes = {
   showDebuggerTool: {
     defaultValue: SHOW_DEBUGGER_TOOL,
   },
-  terrainProvider: {
-    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
-  },
 };
 
 MapWithWFSLayer.storyName = 'WFS Vector layer';
@@ -146,6 +167,7 @@ MapWithWFSLayer.storyName = 'WFS Vector layer';
 
 // #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
 export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
+  const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   function MyWFSLayer() {
     const [show, setShow] = useState(false);
     return (
@@ -158,24 +180,33 @@ export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>)
           value={`SHOW WFS LAYER (${show})`}
           style={{ zIndex: '2', position: 'absolute' }}
         ></input>
-        {
-          show &&
+        {show && (
           <CesiumWFSLayer
-            key={metaBuildings.id}
+            key={getLayerIdFromMeta(metaBuildings)}
             options={optionsBuildings}
             meta={metaBuildings}
             // visualizationHandler={handleVisualizationBuildings}
             withGeometryValidation={true}
           />
-        }
+        )}
       </>
     );
   }
 
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} center={[35.0386, 32.77675]} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={false} url={getValue(MapWithWFSLayer.storyName as string, '3d_model')} />
+      <CesiumMap
+        {...args}
+        terrainProvider={terrainProvider}
+        center={[35.0386, 32.77675]}
+        sceneMode={CesiumSceneMode.SCENE2D}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+      >
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayer.storyName as string, '3d_model')}
+          meta={{ id: '2222222', layerRecord: { productName: 'Lebanon B' } }}
+          isZoomTo={false}
+        />
         <MyWFSLayer />
       </CesiumMap>
     </div>
@@ -197,9 +228,6 @@ MapWithWFSLayerAPPScenario.argTypes = {
   showDebuggerTool: {
     defaultValue: SHOW_DEBUGGER_TOOL,
   },
-  terrainProvider: {
-    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
-  },
 };
 
 MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';
@@ -207,12 +235,17 @@ MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';
 
 // #region STORY VECTOR component (CUSTOM VISUALIZER)
 export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknown>) => {
+  const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} sceneMode={CesiumSceneMode.SCENE2D}>
-        <Cesium3DTileset isZoomTo={true} url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')} />
+      <CesiumMap {...args} terrainProvider={terrainProvider} sceneMode={CesiumSceneMode.SCENE2D} layerManagerMetaMapping={layerManagerMetaMapping}>
+        <Cesium3DTileset
+          url={getValue(MapWithWFSLayerWithVisualizer.storyName as string, '3d_model')}
+          meta={{ id: '3333333', layerRecord: { productName: 'Lebanon C' } }}
+          isZoomTo={true}
+        />
         <CesiumWFSLayer
-          key={metaBuildings.id}
+          key={getLayerIdFromMeta(metaBuildings)}
           options={optionsBuildings}
           meta={metaBuildings}
           visualizationHandler={handleVisualizationBuildings}
@@ -238,9 +271,6 @@ MapWithWFSLayerWithVisualizer.argTypes = {
   showDebuggerTool: {
     defaultValue: SHOW_DEBUGGER_TOOL,
   },
-  terrainProvider: {
-    defaultValue: new CesiumCesiumTerrainProvider({ url: DEFAULT_TERRAIN_PROVIDER_URL }),
-  },
 };
 
 MapWithWFSLayerWithVisualizer.storyName = 'WFS Vector layer (Visual)';
@@ -250,7 +280,7 @@ MapWithWFSLayerWithVisualizer.storyName = 'WFS Vector layer (Visual)';
 
 const optionsPolygonParts = {
   url: getValue(MapWithPPWFSLayer.storyName as string, 'raster_pp_geoserver'),
-  featureType: 'polygonParts:ME_UPDATE_TESTS-Orthophoto',
+  featureType: 'polygonParts:iraq_9_12_2024-Orthophoto',
   style: {
     color: BRIGHT_GREEN,
     hover: LIGHT_BLUE,
@@ -479,112 +509,126 @@ const optionsPolygonParts = {
 
 const metaPolygonParts = {
   id: '00000000',
-  keywords: 'PolygonParts',
-  links: 'cyprus,,WFS,https://raster-pp-serving', // RASTER PP
-  type: 'RECORD_VECTOR',
-  classification: '5',
-  productName: 'בדיקות עדכון',
-  description: 'PolygonParts layer',
-  srsId: '4326',
-  srsName: '4326',
-  producerName: 'IDFMU',
-  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
-  productType: 'VECTOR_BEST',
-  featureStructure: {
-    layerName: 'polygonParts:layer',
-    aliasLayerName: 'בדיקות עדכון',
-    fields: [
-      {
-        fieldName: 'id',
-        aliasFieldName: 'id',
-        type: 'String',
-      },
-      {
-        fieldName: 'catalogId',
-        aliasFieldName: 'catalogId',
-        type: 'String',
-      },
-      {
-        fieldName: 'productId',
-        aliasFieldName: 'productId',
-        type: 'String',
-      },
-      {
-        fieldName: 'productType',
-        aliasFieldName: 'productType',
-        type: 'String',
-      },
-      {
-        fieldName: 'sourceId',
-        aliasFieldName: 'sourceId',
-        type: 'String',
-      },
-      {
-        fieldName: 'sourceName',
-        aliasFieldName: 'sourceName',
-        type: 'String',
-      },
-      {
-        fieldName: 'productVersion',
-        aliasFieldName: 'productVersion',
-        type: 'String',
-      },
-      {
-        fieldName: 'ingestionDateUTC',
-        aliasFieldName: 'ingestionDateUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'imagingTimeBeginUTC',
-        aliasFieldName: 'imagingTimeBeginUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'imagingTimeEndUTC',
-        aliasFieldName: 'imagingTimeEndUTC',
-        type: 'Date',
-      },
-      {
-        fieldName: 'resolutionDegree',
-        aliasFieldName: 'resolutionDegree',
-        type: 'Number',
-      },
-      {
-        fieldName: 'resolutionMeter',
-        aliasFieldName: 'resolutionMeter',
-        type: 'Number',
-      },
-      {
-        fieldName: 'sourceResolutionMeter',
-        aliasFieldName: 'sourceResolutionMeter',
-        type: 'Number',
-      },
-      {
-        fieldName: 'horizontalAccuracyCe90',
-        aliasFieldName: 'horizontalAccuracyCe90',
-        type: 'Number',
-      },
-      {
-        fieldName: 'sensors',
-        aliasFieldName: 'sensors',
-        type: 'String',
-      },
-      {
-        fieldName: 'countries',
-        aliasFieldName: 'countries',
-        type: 'String',
-      },
-      {
-        fieldName: 'cities',
-        aliasFieldName: 'cities',
-        type: 'String',
-      },
-      {
-        fieldName: '_description',
-        aliasFieldName: 'description',
-        type: 'String',
-      },
-    ],
+  layerRecord: {
+    id: '00000000',
+    keywords: 'PolygonParts',
+    links: 'cyprus,,WFS,https://raster-pp-serving', // RASTER PP
+    type: 'RECORD_VECTOR',
+    classification: '5',
+    productName: 'PP example',
+    description: 'PolygonParts layer',
+    srsId: '4326',
+    srsName: '4326',
+    producerName: 'IDFMU',
+    footprint: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [38.57245410498848, 37.5107925437468],
+          [49.25567711954761, 37.489899433708345],
+          [48.67159642592577, 28.868039625498994],
+          [39.06236587462536, 28.91119199657423],
+          [38.57245410498848, 37.5107925437468],
+        ],
+      ],
+    },
+    productType: 'VECTOR_BEST',
+    featureStructure: {
+      layerName: 'polygonParts:layer',
+      aliasLayerName: 'PP example',
+      fields: [
+        {
+          fieldName: 'id',
+          aliasFieldName: 'id',
+          type: 'String',
+        },
+        {
+          fieldName: 'catalogId',
+          aliasFieldName: 'catalogId',
+          type: 'String',
+        },
+        {
+          fieldName: 'productId',
+          aliasFieldName: 'productId',
+          type: 'String',
+        },
+        {
+          fieldName: 'productType',
+          aliasFieldName: 'productType',
+          type: 'String',
+        },
+        {
+          fieldName: 'sourceId',
+          aliasFieldName: 'sourceId',
+          type: 'String',
+        },
+        {
+          fieldName: 'sourceName',
+          aliasFieldName: 'sourceName',
+          type: 'String',
+        },
+        {
+          fieldName: 'productVersion',
+          aliasFieldName: 'productVersion',
+          type: 'String',
+        },
+        {
+          fieldName: 'ingestionDateUTC',
+          aliasFieldName: 'ingestionDateUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'imagingTimeBeginUTC',
+          aliasFieldName: 'imagingTimeBeginUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'imagingTimeEndUTC',
+          aliasFieldName: 'imagingTimeEndUTC',
+          type: 'Date',
+        },
+        {
+          fieldName: 'resolutionDegree',
+          aliasFieldName: 'resolutionDegree',
+          type: 'Number',
+        },
+        {
+          fieldName: 'resolutionMeter',
+          aliasFieldName: 'resolutionMeter',
+          type: 'Number',
+        },
+        {
+          fieldName: 'sourceResolutionMeter',
+          aliasFieldName: 'sourceResolutionMeter',
+          type: 'Number',
+        },
+        {
+          fieldName: 'horizontalAccuracyCe90',
+          aliasFieldName: 'horizontalAccuracyCe90',
+          type: 'Number',
+        },
+        {
+          fieldName: 'sensors',
+          aliasFieldName: 'sensors',
+          type: 'String',
+        },
+        {
+          fieldName: 'countries',
+          aliasFieldName: 'countries',
+          type: 'String',
+        },
+        {
+          fieldName: 'cities',
+          aliasFieldName: 'cities',
+          type: 'String',
+        },
+        {
+          fieldName: '_description',
+          aliasFieldName: 'description',
+          type: 'String',
+        },
+      ],
+    },
   },
 };
 
@@ -625,7 +669,9 @@ const handleVisualizationPolygonParts = (
   ): { widthMeters: number; heightMeters: number } | null => {
     const screenPosition = CesiumSceneTransforms.wgs84ToWindowCoordinates(scene, position);
 
-    if (!screenPosition) return null;
+    if (!screenPosition) {
+      return null;
+    }
 
     const xRight = screenPosition.x + pixelWidth;
     const yBottom = screenPosition.y + pixelHeight;
@@ -861,57 +907,71 @@ const optionsBuildings = {
 
 const metaBuildings = {
   id: '1111111',
-  keywords: 'buildings, osm',
-  links: 'buildings,,WFS,http://geoserver-vector',
-  type: 'RECORD_VECTOR',
-  classification: '5',
-  productName: 'מבנים',
-  description: 'Buildings layer',
-  srsId: '4326',
-  srsName: '4326',
-  producerName: 'Moria',
-  footprint: {"type":"Polygon","coordinates":[[[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]]]},
-  productType: 'VECTOR_BEST',
-  featureStructure: {
-    layerName: 'buildings',
-    aliasLayerName: 'מבנים',
-    fields: [
-      {
-        fieldName: 'osm_id',
-        aliasFieldName: 'מזהה OSM',
-        type: 'String',
-      },
-      {
-        fieldName: 'id',
-        aliasFieldName: 'מזהה',
-        type: 'String',
-      },
-      {
-        fieldName: 'building_type',
-        aliasFieldName: 'סוג',
-        type: 'String',
-      },
-      {
-        fieldName: 'sensitivity',
-        aliasFieldName: 'רגישות',
-        type: 'String',
-      },
-      {
-        fieldName: 'entity_id',
-        aliasFieldName: 'מזהה יישות',
-        type: 'String',
-      },
-      {
-        fieldName: 'is_sensitive',
-        aliasFieldName: 'רגיש',
-        type: 'Boolean',
-      },
-      {
-        fieldName: 'date',
-        aliasFieldName: 'תאריך',
-        type: 'Date',
-      },
-    ],
+  layerRecord: {
+    id: '1111111',
+    keywords: 'buildings, osm',
+    links: 'buildings,,WFS,http://geoserver-vector',
+    type: 'RECORD_VECTOR',
+    classification: '5',
+    productName: 'מבנים',
+    description: 'Buildings layer',
+    srsId: '4326',
+    srsName: '4326',
+    producerName: 'Moria',
+    footprint: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [-180, -90],
+          [180, -90],
+          [180, 90],
+          [-180, 90],
+          [-180, -90],
+        ],
+      ],
+    },
+    productType: 'VECTOR_BEST',
+    featureStructure: {
+      layerName: 'buildings',
+      aliasLayerName: 'מבנים',
+      fields: [
+        {
+          fieldName: 'osm_id',
+          aliasFieldName: 'מזהה OSM',
+          type: 'String',
+        },
+        {
+          fieldName: 'id',
+          aliasFieldName: 'מזהה',
+          type: 'String',
+        },
+        {
+          fieldName: 'building_type',
+          aliasFieldName: 'סוג',
+          type: 'String',
+        },
+        {
+          fieldName: 'sensitivity',
+          aliasFieldName: 'רגישות',
+          type: 'String',
+        },
+        {
+          fieldName: 'entity_id',
+          aliasFieldName: 'מזהה יישות',
+          type: 'String',
+        },
+        {
+          fieldName: 'is_sensitive',
+          aliasFieldName: 'רגיש',
+          type: 'Boolean',
+        },
+        {
+          fieldName: 'date',
+          aliasFieldName: 'תאריך',
+          type: 'Date',
+        },
+      ],
+    },
   },
 };
 

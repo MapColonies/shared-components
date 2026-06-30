@@ -1,10 +1,8 @@
 import React from 'react';
 import { Menu, MenuItem, Button, Tooltip } from '@map-colonies/react-core';
-
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-
-import { DrawType } from '../models/enums';
-import { Box } from '../box';
+import { DrawType } from '../../models/enums';
+import { Box } from '../../box';
 
 const WIDTH_SPACING_FACTOR = 18;
 const useStyle = makeStyles((theme: Theme) =>

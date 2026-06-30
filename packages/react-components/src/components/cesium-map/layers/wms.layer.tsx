@@ -6,7 +6,7 @@ import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
 export interface RCesiumWMSLayerOptions extends WebMapServiceImageryProvider.ConstructorOptions {}
 
-export interface RCesiumWMSLayerProps extends Partial<RCesiumImageryLayerProps> {
+export interface RCesiumWMSLayerProps extends Omit<RCesiumImageryLayerProps, 'imageryProvider'> {
   options: RCesiumWMSLayerOptions;
 }
 

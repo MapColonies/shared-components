@@ -5,7 +5,7 @@ import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
 export interface RCesiumOSMLayerOptions extends OpenStreetMapImageryProvider.ConstructorOptions {}
 
-export interface RCesiumOSMLayerProps extends Partial<RCesiumImageryLayerProps> {
+export interface RCesiumOSMLayerProps extends Omit<RCesiumImageryLayerProps, 'imageryProvider'> {
   options: RCesiumOSMLayerOptions;
 }
 

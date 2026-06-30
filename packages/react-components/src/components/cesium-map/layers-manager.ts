@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  Cesium3DTileset as CesiumTileset,
   ImageryLayer,
   UrlTemplateImageryProvider,
   WebMapServiceImageryProvider,
@@ -8,28 +9,70 @@ import {
   Rectangle,
   SingleTileImageryProvider,
 } from 'cesium';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
-import { CesiumViewer, IBaseMap } from './map';
-import { pointToGeoJSON } from './helpers/geojson/point.geojson';
-import { IMapLegend } from './legend';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
   CustomWebMapTileServiceImageryProvider,
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
+import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained } from './helpers/utils';
-import { ICesiumWFSLayer } from './layers/wfs.layer';
-import { CesiumCartesian2 } from './proxied.types';
+import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
+import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
+import { IMapLegend } from './legend';
+import type { CesiumViewer, IBaseMap } from './map';
+import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 
 const INC = 1;
 const DEC = -1;
 
+export interface ILayerManagerMetaMapping {
+  layer: {
+    id: string;
+    name: string;
+    footprint?: string;
+  };
+  dataLayer?: {
+    name?: string;
+    fields?: string;
+  };
+}
+
+let mapping: ILayerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'name',
+  },
+};
+
+const configureLayerManagerMetaMapping = (metaMapping: ILayerManagerMetaMapping): void => {
+  mapping = { ...metaMapping };
+};
+
+export const getLayerManagerMetaMapping = (): ILayerManagerMetaMapping => {
+  return { ...mapping };
+};
+
+export interface ICesiumImageryLayerMeta {
+  id?: string;
+  parentBaseMapId?: string;
+  zIndex?: number;
+  type?: LayerType;
+  opacity?: number;
+  show?: boolean;
+  options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  skipRelevancyCheck?: boolean;
+  isRelevantToExtent?: boolean;
+  hasTransparency?: boolean;
+  examinedTiles?: Array<{ x?: number; y?: number; level?: number }>;
+  [key: string]: unknown;
+}
+
 export interface ICesiumImageryLayer extends InstanceType<typeof ImageryLayer> {
-  meta?: Record<string, unknown>;
+  meta?: ICesiumImageryLayerMeta;
 }
 
 export type LayerType = 'OSM_LAYER' | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER';
@@ -39,21 +82,82 @@ export interface IRasterLayer {
   type: LayerType;
   opacity: number;
   zIndex: number;
-  show?: boolean;
   options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
-  details?: Record<string, unknown>;
+  show?: boolean;
+  [key: string]: unknown;
 }
 
-export interface IVectorLayer {
-  id: string;
-  opacity: number;
-  zIndex: number;
-  url: string;
+export interface ICesium3DModelMeta {
+  id?: string;
+  [key: string]: unknown;
+}
+
+export interface ICesium3DModel {
+  tileset: CesiumTileset;
+  meta: ICesium3DModelMeta;
+}
+
+export interface ICesiumDataLayerField {
+  fieldName: string;
+  aliasFieldName: string;
+  [key: string]: unknown;
 }
 
 export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
 
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
+
+export const getLayerId = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
+  return get(layer.meta, mapping.layer.id) as string | undefined;
+};
+
+export const getLayerIdFromMeta = (meta: ICesiumImageryLayerMeta | ICesiumWFSLayerMeta | ICesium3DModelMeta | undefined): string | undefined => {
+  return get(meta, mapping.layer.id) as string | undefined;
+};
+
+export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICesium3DModel): string | undefined => {
+  return get(layer.meta, mapping.layer.name) as string | undefined;
+};
+
+export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
+  return get(meta, mapping.layer.footprint ?? '');
+};
+
+export const getDataLayerName = (meta: ICesiumWFSLayerMeta): string | undefined => {
+  return get(meta, mapping.dataLayer?.name ?? '') as string | undefined;
+};
+
+export const getDataLayerFields = (meta: ICesiumWFSLayerMeta | undefined): ICesiumDataLayerField[] => {
+  return (get(meta, mapping.dataLayer?.fields ?? '') as ICesiumDataLayerField[] | undefined) ?? [];
+};
+
+export const isServiceLayer = (layerId: string | undefined): boolean => {
+  return isEmpty(layerId) || layerId === TRANSPARENT_LAYER_ID;
+};
+
+export const isManagedImageryLayer = (layerId: string | undefined): boolean => {
+  return !isServiceLayer(layerId);
+};
+
+export const getParentBaseMapId = (meta: Record<string, unknown> | undefined): string | undefined => {
+  return get(meta, 'parentBaseMapId') as string | undefined;
+};
+
+export const isBaseMapLayer = (meta: Record<string, unknown> | undefined): boolean => {
+  return !!getParentBaseMapId(meta);
+};
+
+export const getImageryProvider = (layer: ICesiumImageryLayer): CesiumImageryProvider => {
+  return get(layer, 'imageryProvider');
+};
+
+export const getImageryProviderUrl = (layer: ICesiumImageryLayer): string | undefined => {
+  return get(layer, '_imageryProvider._resource._url');
+};
+
+export const getImageryProviderName = (provider: CesiumImageryProvider): string => {
+  return provider.constructor.name;
+};
 
 class LayerManager {
   public mapViewer: CesiumViewer;
@@ -61,32 +165,38 @@ class LayerManager {
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
   public dataLayerUpdated: Event;
+  public modelUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
   private readonly dataLayers: ICesiumWFSLayer[];
+  private readonly models: ICesium3DModel[];
   private readonly legendsExtractor?: LegendExtractor;
-  private readonly layerManagerFootprintMetaFieldPath: string | undefined;
+  private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
 
   public constructor(
     mapViewer: CesiumViewer,
+    layerManagerMetaMapping: ILayerManagerMetaMapping,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
-    layerManagerFootprintMetaFieldPath?: string,
     shouldOptimizedTileRequests?: boolean
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
     this.layers = (this.mapViewer.imageryLayers as any)._layers;
     this.dataLayers = [];
+    this.models = [];
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
     this.dataLayerUpdated = new Event();
-    this.layerManagerFootprintMetaFieldPath = layerManagerFootprintMetaFieldPath;
+    this.modelUpdated = new Event();
+    this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
+
+    configureLayerManagerMetaMapping(layerManagerMetaMapping);
 
     if (onLayersUpdate) {
       this.addLayerUpdatedListener(onLayersUpdate);
@@ -106,8 +216,8 @@ class LayerManager {
     return this.dataLayers;
   }
 
-  public isBaseMapLayer(meta: any): boolean {
-    return !!get(meta, 'parentBasetMapId');
+  public get modelList(): ICesium3DModel[] {
+    return this.models;
   }
 
   public addDataLayer(dataLayer: ICesiumWFSLayer): void {
@@ -115,7 +225,7 @@ class LayerManager {
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
   }
 
-  // A general place to extend layer's data. Should be done when all providers(different types) are initialized
+  // A general place to extend layer's data. Should be done when all providers (different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
     Promise.resolve().then(() => {
       const layer = this.layers.find(layerPredicate);
@@ -128,10 +238,14 @@ class LayerManager {
   }
 
   public addMetaToDataLayer(meta: any): void {
-    const dataLayer = this.findDataLayerById(meta.id);
+    const dataLayerId = getLayerIdFromMeta(meta);
+    if (dataLayerId === undefined) {
+      return;
+    }
+    const dataLayer = this.findDataLayerById(dataLayerId);
     if (dataLayer) {
       dataLayer.meta = { ...(dataLayer.meta ?? {}), ...meta };
-      this.dataLayerUpdated.raiseEvent(this.dataLayers, meta.id);
+      this.dataLayerUpdated.raiseEvent(this.dataLayers, dataLayerId as any);
     }
   }
 
@@ -201,7 +315,7 @@ class LayerManager {
     if (cesiumLayer) {
       cesiumLayer.alpha = layer.opacity;
       cesiumLayer.meta = {
-        parentBasetMapId: parentId,
+        parentBaseMapId: parentId,
         ...layer,
       };
       if (layer.show !== undefined) {
@@ -230,7 +344,7 @@ class LayerManager {
 
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      return this.isBaseMapLayer(layer.meta);
+      return isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -240,8 +354,7 @@ class LayerManager {
 
   public removeNotBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? false : true;
+      return !isBaseMapLayer(layer.meta);
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -260,6 +373,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, order + positions);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public lower(layerId: string, positions = 1): void {
@@ -279,6 +393,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, order - positions);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public raiseToTop(layerId: string): void {
@@ -290,6 +405,7 @@ class LayerManager {
     }
 
     this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
+    this.reinvokeOptimizationAfterOrderChange();
   }
 
   public lowerToBottom(layerId: string): void {
@@ -319,11 +435,13 @@ class LayerManager {
 
   public showAllNotBase(isShow: boolean): void {
     const nonBaseLayers = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? false : true;
+      return !isBaseMapLayer(layer.meta);
     });
     nonBaseLayers.forEach((layer: ICesiumImageryLayer) => {
-      this.show(layer.meta?.id as string, isShow);
+      const layerId = getLayerId(layer);
+      if (layerId !== undefined) {
+        this.show(layerId, isShow);
+      }
     });
   }
 
@@ -341,8 +459,7 @@ class LayerManager {
 
     if (pickRay) {
       nonBaseLayers = this.mapViewer.imageryLayers.pickImageryLayers(pickRay, this.mapViewer.scene)?.filter((layer: ICesiumImageryLayer) => {
-        const parentId = get(layer.meta, 'parentBasetMapId') as string;
-        return parentId ? false : true;
+        return !isBaseMapLayer(layer.meta);
       });
     }
 
@@ -351,11 +468,11 @@ class LayerManager {
 
   public findLayerByPOI(x: number, y: number, onlyShown = true): ICesiumImageryLayer[] | undefined {
     if (this.layerManagerFootprintMetaFieldPath) {
-      const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point>;
+      const position = pointToGeoJSON(this.mapViewer, x, y) as Feature<Point> | undefined;
+      if (position === undefined) return undefined;
 
       const nonBaseLayers = this.layers.filter((layer) => {
-        const parentId = get(layer.meta, 'parentBasetMapId') as string;
-        return parentId ? false : true;
+        return !isBaseMapLayer(layer.meta);
       });
 
       const selectedVisibleLayers = nonBaseLayers.filter((layer) => {
@@ -389,22 +506,20 @@ class LayerManager {
   public addTransparentImageryProvider(): void {
     // Worldwide transparent layer
     const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
+    /* eslint-disable @typescript-eslint/no-magic-numbers */
+    const rectangle = new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966);
+    /* eslint-enable @typescript-eslint/no-magic-numbers */
 
-    const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(
-      new SingleTileImageryProvider({
-        url: transparentTileUrl,
-        /* eslint-disable @typescript-eslint/no-magic-numbers */
-        rectangle: new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966),
-        /* eslint-enable @typescript-eslint/no-magic-numbers */
-      }),
-      0
-    );
+    void SingleTileImageryProvider.fromUrl(transparentTileUrl, { rectangle }).then((provider) => {
+      const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(provider, 0);
 
-    (transparentLayer as ICesiumImageryLayer).meta = {
-      id: TRANSPARENT_LAYER_ID,
-      skipRelevancyCheck: true,
-      parentBasetMapId: 'TRANSPARENT_LAYER',
-    };
+      const transparentLayerMeta: Record<string, unknown> = {
+        skipRelevancyCheck: true,
+        parentBaseMapId: 'TRANSPARENT_LAYER',
+      };
+      set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
+      (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+    });
   }
 
   public addLayerUpdatedListener(callback: (meta: any) => void): void {
@@ -421,6 +536,14 @@ class LayerManager {
 
   public removeDataLayerUpdatedListener(callback: (meta: any) => void): void {
     this.dataLayerUpdated.removeEventListener(callback, this);
+  }
+
+  public addModelUpdatedListener(callback: (models: ICesium3DModel[]) => void): void {
+    this.modelUpdated.addEventListener(callback, this);
+  }
+
+  public removeModelUpdatedListener(callback: (models: ICesium3DModel[]) => void): void {
+    this.modelUpdated.removeEventListener(callback, this);
   }
 
   public setShouldOptimizedTileRequests(shouldOptimize: boolean): void {
@@ -447,8 +570,28 @@ class LayerManager {
 
   public findDataLayerById(dataLayerId: string): ICesiumWFSLayer | undefined {
     return this.dataLayers.find((dataLayer) => {
-      return dataLayer.meta.id === dataLayerId;
+      return getLayerId(dataLayer) === dataLayerId;
     });
+  }
+
+  public addModel(model: ICesium3DModel): void {
+    this.models.push({ ...model });
+    this.modelUpdated.raiseEvent(this.models);
+  }
+
+  public removeModel(modelId: string): void {
+    const model = this.findModelById(modelId);
+    if (model) {
+      const index = this.models.indexOf(model);
+      if (index > -1) {
+        this.models.splice(index, 1);
+      }
+      this.modelUpdated.raiseEvent(this.models);
+    }
+  }
+
+  public findModelById(modelId: string): ICesium3DModel | undefined {
+    return this.models.find((model) => getLayerId(model) === modelId);
   }
 
   private setLegends(): void {
@@ -459,16 +602,14 @@ class LayerManager {
 
   private getBaseLayersCount(): number {
     const baseLayers = this.layers.filter((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      return parentId ? true : false;
+      return isBaseMapLayer(layer.meta);
     });
     return baseLayers.length;
   }
 
   private findLayerById(layerId: string): ICesiumImageryLayer | undefined {
     return this.layers.find((layer) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      return layer.meta !== undefined ? layer.meta.id === layerId : false;
+      return getLayerId(layer) === layerId;
     });
   }
 
@@ -476,10 +617,8 @@ class LayerManager {
     const move = from > to ? INC : DEC;
     const min = from < to ? from : to;
     const max = from < to ? to : from;
-
     this.layers.forEach((layer) => {
-      const parentId = get(layer.meta, 'parentBasetMapId') as string;
-      if (!parentId) {
+      if (!isBaseMapLayer(layer.meta)) {
         const layerOrder = layer.meta?.zIndex as number;
         (layer.meta as Record<string, unknown>).zIndex =
           layerOrder >= min && layerOrder <= max && layerOrder !== from ? layerOrder + move : layerOrder === from ? to : layerOrder;
@@ -489,24 +628,23 @@ class LayerManager {
 
   private hideNonRelevantLayers(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
+        continue;
+      }
+      const isRelevantToExtent = layer.meta?.isRelevantToExtent;
+      if (typeof isRelevantToExtent !== 'boolean') {
         continue;
       }
 
-      const relevantToExtent = layer.meta?.relevantToExtent;
-      if (typeof relevantToExtent !== 'boolean') {
-        continue;
-      }
-
-      if (relevantToExtent !== layer.show) {
-        layer.show = relevantToExtent;
+      if (isRelevantToExtent !== layer.show) {
+        layer.show = isRelevantToExtent;
       }
     }
   }
 
   private restoreAllLayersVisibility(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
       layer.show = true;
@@ -515,12 +653,12 @@ class LayerManager {
 
   private clearLayersRelevancy(): void {
     for (const layer of this.layers) {
-      if (layer.meta?.id === TRANSPARENT_LAYER_ID) {
+      if (getLayerId(layer) === TRANSPARENT_LAYER_ID) {
         continue;
       }
-      if (layer.meta && 'relevantToExtent' in layer.meta) {
-        const { relevantToExtent, ...restMeta } = layer.meta;
-        void relevantToExtent;
+      if (layer.meta && 'isRelevantToExtent' in layer.meta) {
+        const { isRelevantToExtent, ...restMeta } = layer.meta;
+        void isRelevantToExtent;
         layer.meta = restMeta;
       }
     }
@@ -581,6 +719,14 @@ class LayerManager {
     this.relevancyLayerUpdatedHandler = undefined;
   }
 
+  private reinvokeOptimizationAfterOrderChange(): void {
+    if (!this.shouldOptimizedTileRequests) {
+      return;
+    }
+    this.markRelevantLayersForExtent();
+    this.hideNonRelevantLayers();
+  }
+
   private markRelevantLayersForExtent(): void {
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
@@ -592,11 +738,11 @@ class LayerManager {
         const layer = this.layers[i];
         const intersectsExtent = !isEmpty(layer.rectangle) && Rectangle.intersection(extent, layer.rectangle) instanceof Rectangle;
         if (layer.meta?.skipRelevancyCheck === true) {
-          layer.meta = { ...layer.meta, relevantToExtent: true };
+          layer.meta = { ...layer.meta, isRelevantToExtent: true };
           continue;
         }
         if (!intersectsExtent) {
-          layer.meta = { ...(layer.meta ?? {}), relevantToExtent: false };
+          layer.meta = { ...(layer.meta ?? {}), isRelevantToExtent: false };
           continue;
         }
         let isOccludedByOpaqueLayerAbove = false;
@@ -619,7 +765,7 @@ class LayerManager {
         // Layer is relevant if it intersects extent and has no opaque layer above it
         layer.meta = {
           ...(layer.meta ?? {}),
-          relevantToExtent: !isOccludedByOpaqueLayerAbove,
+          isRelevantToExtent: !isOccludedByOpaqueLayerAbove,
         };
       }
     } catch (e) {

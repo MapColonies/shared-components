@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { viewerCesiumInspectorMixin } from 'cesium';
+import { viewerCesiumInspectorMixin, TileCoordinatesImageryProvider } from 'cesium';
 import { Box } from '../../box';
 import { CesiumViewer, useCesiumMap } from '../map';
+import { getImageryProvider, getImageryProviderName } from '../layers-manager';
 
 interface ICesiumInspectorInstance {
   container?: HTMLElement;
@@ -17,6 +18,21 @@ const applyInspectorContainerStyles = (container: HTMLElement): void => {
   container.style.display = '';
   container.style.top = '0';
   container.style.position = 'relative';
+};
+
+const keepTileCoordinatesLayerOnTop = (viewer: CesiumViewer): void => {
+  const layerList = viewer.layersManager?.layerList;
+  const tileCoordinatesLayer = layerList?.find((layer) => {
+    const provider = getImageryProvider(layer);
+    return provider instanceof TileCoordinatesImageryProvider || getImageryProviderName(provider) === 'TileCoordinatesImageryProvider';
+  });
+  if (tileCoordinatesLayer === undefined) {
+    return;
+  }
+  const topLayer = layerList?.[layerList.length - 1];
+  if (topLayer !== tileCoordinatesLayer) {
+    viewer.imageryLayers.raiseToTop(tileCoordinatesLayer);
+  }
 };
 
 export const InspectorTool: React.FC = () => {
@@ -40,7 +56,20 @@ export const InspectorTool: React.FC = () => {
       applyInspectorContainerStyles(inspectorContainer);
     }
 
+    const refreshTileCoordinatesOrder = (): void => {
+      keepTileCoordinatesLayerOnTop(mapViewer);
+    };
+
+    const removeLayerAdded = mapViewer.imageryLayers.layerAdded.addEventListener(refreshTileCoordinatesOrder);
+    const removeLayerMoved = mapViewer.imageryLayers.layerMoved.addEventListener(refreshTileCoordinatesOrder);
+    const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(refreshTileCoordinatesOrder);
+
+    setTimeout(refreshTileCoordinatesOrder, 0);
+
     return () => {
+      removeLayerAdded();
+      removeLayerMoved();
+      removeLayerRemoved();
       if (inspectorContainer) {
         inspectorContainer.style.display = 'none';
       }

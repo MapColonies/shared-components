@@ -19,6 +19,13 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const data = {
   type: 'FeatureCollection',
   features: [
@@ -108,7 +115,10 @@ const onLoadAction = action('onLoad');
 
 export const MapWithGeojsonLayer: Story = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
-    <CesiumMap {...args}>
+    <CesiumMap
+      {...args}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
       <CesiumGeojsonLayer
         data={data}
         markerColor={Color.RED}

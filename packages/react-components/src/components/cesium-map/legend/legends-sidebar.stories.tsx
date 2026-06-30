@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { ImageryLayer } from 'cesium';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { BASE_MAPS } from '../helpers/constants';
+import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
 import { CesiumMap } from '../map';
-import { CesiumSceneMode } from '../proxied.types';
 
 export default {
   title: 'Cesium Map',
@@ -19,8 +20,24 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
+};
+
 const optionsXYZSanDiego = {
   url: 'https://tiles.openaerialmap.org/5d73614588556200055f10d6/0/5d73614588556200055f10d7/{z}/{x}/{y}',
+};
+
+const layerMetaSanDiego = {
+  id: 'layer-san-diego',
+  layerRecord: {
+    productName: 'San Diego Layer',
+  },
+  options: { ...optionsXYZSanDiego },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZSanDiego.url,
 };
 
 export const MapWithLegends: Story = () => {
@@ -30,8 +47,6 @@ export const MapWithLegends: Story = () => {
       <CesiumMap
         center={center}
         zoom={14}
-        imageryProvider={false}
-        // @ts-ignore
         baseMaps={BASE_MAPS}
         legends={{
           legendsList: [
@@ -49,8 +64,9 @@ export const MapWithLegends: Story = () => {
           title: 'Map Legends',
           emptyText: 'No legends for this basemap',
         }}
+        layerManagerMetaMapping={layerManagerMetaMapping}
       >
-        <CesiumXYZLayer options={optionsXYZSanDiego} />
+        <CesiumXYZLayer options={optionsXYZSanDiego} meta={layerMetaSanDiego} />
       </CesiumMap>
     </div>
   );

@@ -2,12 +2,13 @@ import { get } from 'lodash';
 import React, { useMemo } from 'react';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { IActiveFeatureTypes } from './debugger-widget';
+import { ICesiumWFSLayerMeta } from '../layers/wfs.layer';
+import { getDataLayerName, getLayerIdFromMeta } from '../layers-manager';
 
 import './wfs.css';
 
 interface IWFSProps {
-  featureTypes: IActiveFeatureTypes[];
+  featureTypes: ICesiumWFSLayerMeta[];
   locale?: { [key: string]: string };
 }
 
@@ -25,20 +26,28 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
     return (
       <>
         {featureTypes.length > 0 ? (
-          featureTypes.map((type, index) => (
+          featureTypes.map((featureType, index) => (
             <Box key={index} className="featureType">
-              <Tooltip content={`${type.featureStructure.aliasLayerName as string} ${type.id} (${String(type.zoomLevel)})`}>
-                <Box className={`name ${type.currentZoomLevel < type.zoomLevel ? 'warning blinking' : type.total === -1 ? 'error blinking' : ''}`}>
-                  {type.featureStructure.aliasLayerName as string} ({String(type.zoomLevel)}):
+              {(() => {
+                const dataLayerName = getDataLayerName(featureType) ?? '';
+                const zoomLevel = featureType.zoomLevel ?? 0;
+                return (
+              <Tooltip
+                content={`${dataLayerName} ${getLayerIdFromMeta(featureType)} (${zoomLevel})`}
+              >
+                <Box className={`name ${(featureType.currentZoomLevel ?? 0) < zoomLevel ? 'warning blinking' : featureType.total === -1 ? 'error blinking' : ''}`}>
+                  {dataLayerName} ({zoomLevel}):
                 </Box>
               </Tooltip>
+                );
+              })()}
               <Box className="info">
                 <Box>
-                  {cacheLabel}: {type.cache ?? 0}
+                  {cacheLabel}: {featureType.cache ?? 0}
                 </Box>
-                {type.total > 0 && (
+                {(featureType.total ?? 0) > 0 && (
                   <Box className="spacer">
-                    {extentLabel}: {type.items} / {type.total}
+                    {extentLabel}: {featureType.items} / {featureType.total}
                   </Box>
                 )}
               </Box>

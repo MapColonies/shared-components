@@ -8,14 +8,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { Cesium3DTileset, Cesium3DTile, Cartographic, Cartesian3, defined, sampleTerrainMostDetailed, Cesium3DTileContent } from 'cesium';
+import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
-export interface Cesium3DTilesetWithUpdateProps {
+export interface ICesium3DTilesetWithUpdate {
   url: string;
   withUpdate?: boolean;
+  meta?: ICesium3DModelMeta;
 }
 
-export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps> = ({ url, withUpdate }) => {
+export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = ({ url, withUpdate, meta }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const scene = mapViewer.scene;
   const [tileset, setTileset] = useState<Cesium3DTileset | undefined>(undefined);
@@ -38,6 +40,19 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
+  useEffect(() => {
+    if (meta === undefined || tileset === undefined) {
+      return;
+    }
+    mapViewer.layersManager?.addModel({ tileset, meta });
+    return () => {
+      const modelId = getLayerIdFromMeta(meta);
+      if (modelId !== undefined) {
+        mapViewer.layersManager?.removeModel(modelId);
+      }
+    };
+  }, [mapViewer.layersManager]);
+
   const updateContent = (model: Cesium3DTileContent, boundingVolume: any): void => {
     const height = boundingVolume.minimumHeight ? boundingVolume.minimumHeight : boundingVolume.center.z - boundingVolume.radius;
     // @ts-ignore
@@ -45,7 +60,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<Cesium3DTilesetWithUpdateProps>
     const normal = scene.globe.ellipsoid.geodeticSurfaceNormal(center, new Cartesian3());
     const offset = Cartesian3.multiplyByScalar(normal, height, new Cartesian3());
     const carto = Cartographic.fromCartesian(center);
-    void new Promise((resolve, reject) => {
+    void new Promise((resolve) => {
       // @ts-ignore
       if (scene.terrainProvider._ready !== true) {
         const result = { ...carto };

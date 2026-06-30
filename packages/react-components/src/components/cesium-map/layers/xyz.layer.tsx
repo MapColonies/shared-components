@@ -6,7 +6,7 @@ import { CesiumImageryLayer, RCesiumImageryLayerProps } from './imagery.layer';
 
 export interface RCesiumXYZLayerOptions extends UrlTemplateImageryProvider.ConstructorOptions {}
 
-export interface RCesiumXYZLayerProps extends Partial<RCesiumImageryLayerProps> {
+export interface RCesiumXYZLayerProps extends Omit<RCesiumImageryLayerProps, 'imageryProvider'> {
   options: UrlTemplateImageryProvider.ConstructorOptions;
 }
 

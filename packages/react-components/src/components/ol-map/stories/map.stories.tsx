@@ -1,4 +1,3 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { Map } from '../map';
 import { TileOsm } from '../source';
@@ -6,7 +5,7 @@ import { TileLayer } from '../layers';
 import { Proj } from '../../utils/projections';
 
 export default {
-  title: 'Map',
+  title: 'OL Map/Map',
   component: Map,
   parameters: {
     layout: 'fullscreen',
@@ -49,12 +48,11 @@ BaseMap.argTypes = {
 
 export const ConfiguredMap: Story = () => (
   <div style={mapDivStyle}>
-    <Map zoom={3} center={[0, 0]}>
+    <Map zoom={5} center={[30, 40]}>
       <TileLayer>
         <TileOsm />
       </TileLayer>
     </Map>
   </div>
 );
-
-ConfiguredMap.storyName = 'with zoom and center';
+ConfiguredMap.storyName = 'Map with Zoom and Center';

@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { Checkbox, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
-import { EXAMINED_TILES_META_PROP } from '../helpers/customImageryProviders';
-import { ICesiumWFSLayer } from '../layers/wfs.layer';
-import { TRANSPARENT_LAYER_ID } from '../layers-manager';
+import { EXAMINED_TILES_META_PROP, HAS_TRANSPARENCY_META_PROP } from '../helpers/customImageryProviders';
+import { ICesiumWFSLayer, ICesiumWFSLayerMeta } from '../layers/wfs.layer';
+import { getLayerId, getLayerIdFromMeta, getLayerName, isManagedImageryLayer } from '../layers-manager';
 import { useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
@@ -13,33 +13,27 @@ import { WFS } from './wfs';
 
 import './debugger-widget.css';
 
-interface IFeatureTypeMetadata {
-  id: string;
-  items: number;
-  total: number;
-  cache: number;
-  currentZoomLevel: number;
-  featureStructure: Record<string, unknown>;
-}
-
-export type IActiveFeatureTypes = IFeatureTypeMetadata & {
-  zoomLevel: number;
-};
-
 export interface IDebuggerWidgetProps extends IWidgetProps {
   locale?: { [key: string]: string };
 }
 
-interface LayerMetaItem {
-  layerId?: string;
-  meta?: Record<string, unknown>;
+interface LayerDebugMeta {
+  id?: string;
+  isRelevantToExtent?: boolean;
+  [key: string]: unknown;
+}
+
+interface LayerDebugItem {
+  layerId: string;
+  layerName?: string;
+  meta: LayerDebugMeta;
 }
 
 type DebuggerSectionId = 'data' | 'layers' | 'tools';
 
 const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, setIsOpen }) => {
-  const [featureTypes, setFeatureTypes] = useState<IActiveFeatureTypes[]>([]);
-  const [layersMeta, setLayersMeta] = useState<LayerMetaItem[]>([]);
+  const [featureTypes, setFeatureTypes] = useState<ICesiumWFSLayerMeta[]>([]);
+  const [layersMeta, setLayersMeta] = useState<LayerDebugItem[]>([]);
   const [collapsedSections, setCollapsedSections] = useState<Record<DebuggerSectionId, boolean>>({
     data: false,
     layers: false,
@@ -64,19 +58,23 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     }));
   };
 
-  const updateLayerMeta = (): void => {
-    if (!mapViewer.layersManager?.layerList) return;
-    setLayersMeta(
-      mapViewer.layersManager.layerList
-        .filter((layer): boolean => layer.meta?.id !== TRANSPARENT_LAYER_ID)
-        .map(
-          (layer): LayerMetaItem => ({
-            layerId: layer.meta?.id as string | undefined,
-            meta: layer.meta as Record<string, unknown> | undefined,
-          })
-        )
-    );
-  };
+  const updateLayersMeta = useCallback((): void => {
+    if (!mapViewer.layersManager?.layerList) { return; }
+    const nextLayersMeta = mapViewer.layersManager.layerList
+      .map((layer): LayerDebugItem | undefined => {
+        const layerId = getLayerId(layer);
+        if (!isManagedImageryLayer(layerId)) {
+          return undefined;
+        }
+        return {
+          layerId: layerId as string,
+          layerName: getLayerName(layer),
+          meta: (layer.meta ?? {}) as LayerDebugMeta,
+        };
+      })
+      .filter((item): item is LayerDebugItem => item !== undefined);
+    setLayersMeta(nextLayersMeta);
+  }, [mapViewer.layersManager]);
 
   useEffect(() => {
     let moveEndRefreshTimeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -85,76 +83,77 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
         clearTimeout(moveEndRefreshTimeoutId);
       }
       moveEndRefreshTimeoutId = setTimeout(() => {
-        updateLayerMeta();
+        updateLayersMeta();
       }, 0);
     };
 
     const removeTileLoad = mapViewer.scene.globe.tileLoadProgressEvent.addEventListener((tilesLoadingCount) => {
       if (tilesLoadingCount === 0) {
-        updateLayerMeta();
+        updateLayersMeta();
         removeTileLoad();
       }
     });
     const removeMoveEnd = mapViewer.camera.moveEnd.addEventListener(() => {
       scheduleLayerMetaRefresh();
     });
+    const removeLayerMoved = mapViewer.imageryLayers.layerMoved.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
+    const removeLayerAdded = mapViewer.imageryLayers.layerAdded.addEventListener(() => {
+      scheduleLayerMetaRefresh();
+    });
     const removeLayerRemoved = mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
       scheduleLayerMetaRefresh();
     });
-    mapViewer.layersManager?.addLayerUpdatedListener(updateLayerMeta);
+    mapViewer.layersManager?.addLayerUpdatedListener(updateLayersMeta);
     return (): void => {
       if (moveEndRefreshTimeoutId !== undefined) {
         clearTimeout(moveEndRefreshTimeoutId);
       }
       removeTileLoad();
       removeMoveEnd();
+      removeLayerMoved();
+      removeLayerAdded();
       removeLayerRemoved();
-      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayerMeta);
+      mapViewer.layersManager?.removeLayerUpdatedListener(updateLayersMeta);
     };
-  }, []);
+  }, [mapViewer, updateLayersMeta]);
 
   useEffect(() => {
-    updateLayerMeta();
-  }, [viewState?.shouldOptimizedTileRequests]);
+    updateLayersMeta();
+  }, [updateLayersMeta, viewState?.shouldOptimizedTileRequests]);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) return;
-
-    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], LayerId?: string | undefined): void => {
+    if (!mapViewer.layersManager) { return; }
+    const handleDataLayerUpdated = (dataLayers: ICesiumWFSLayer[], layerId?: string | undefined): void => {
       dataLayers.forEach((layer: ICesiumWFSLayer): void => {
-        if (LayerId !== undefined && LayerId !== layer.meta.id) {
+        if (layerId !== undefined && layerId !== getLayerId(layer)) {
           return;
         }
-
         const { options, meta } = layer;
         const { zoomLevel } = options;
-        const { id, items, total, cache, currentZoomLevel, featureStructure } = meta as unknown as IFeatureTypeMetadata;
-
+        const { id, items, total, cache, currentZoomLevel, layerRecord } = meta;
         setFeatureTypes((prevFeatureTypes) => {
-          const existingIndex = prevFeatureTypes.findIndex((type) => type.id === id);
+          const existingIndex = prevFeatureTypes.findIndex((featureType) => getLayerIdFromMeta(featureType) === id);
           if (existingIndex >= 0) {
             if (
               JSON.stringify(prevFeatureTypes[existingIndex]) !==
-              JSON.stringify({ id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel })
+              JSON.stringify({ id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel })
             ) {
               const updatedFeatureTypes = [...prevFeatureTypes];
-              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel };
+              updatedFeatureTypes[existingIndex] = { id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel };
               return updatedFeatureTypes;
             }
           } else {
-            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, featureStructure, zoomLevel }];
+            return [...prevFeatureTypes, { id, items, total, cache, currentZoomLevel, layerRecord, zoomLevel }];
           }
           return prevFeatureTypes;
         });
       });
-
-      const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => layer.meta.id));
-
-      setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((type) => activeDataLayerIds.has(type.id)));
+      const activeDataLayerIds = new Set(mapViewer.layersManager?.dataLayerList.map((layer) => getLayerId(layer)));
+      setFeatureTypes((prevFeatureTypes) => prevFeatureTypes.filter((featureType) => activeDataLayerIds.has(getLayerIdFromMeta(featureType))));
     };
-
     mapViewer.layersManager.addDataLayerUpdatedListener(handleDataLayerUpdated);
-
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
@@ -210,47 +209,52 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
                     }));
                   }}
                 />
-                {viewState?.shouldOptimizedTileRequests === true && (
-                  <Box className="debuggerLayerList">
-                    {[...layersMeta].reverse().map((layer, index) => {
-                      const idText = layer.layerId ?? `LAYER-${layersMeta.length - index}`;
-                      const nameText = (get(layer.meta, 'layerRecord.productName') as string | undefined) ?? idText;
-                      const statusText =
-                        layer.meta?.relevantToExtent === true ? ' → show' : layer.meta?.relevantToExtent === false ? ' → hide' : '';
-                      const transparencyText =
-                        layer.meta?.hasTransparency === true ? withTransparencyTiles : layer.meta?.hasTransparency === false ? withoutTransparencyTiles : '';
-                      const tileCoordinatesFromMeta = get(layer.meta, EXAMINED_TILES_META_PROP) as
-                        | Array<{ x?: number; y?: number; level?: number }>
-                        | { x?: number; y?: number; level?: number }
-                        | undefined;
-                      const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
-                        ? tileCoordinatesFromMeta
-                        : tileCoordinatesFromMeta !== undefined
-                          ? [tileCoordinatesFromMeta]
-                          : [];
-                      const formattedTileCoordinates = tileCoordinatesList
-                        .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
-                        .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
-                      const tooltipContent =
-                        transparencyText === ''
-                          ? undefined
-                          : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
-                      const isRelevant = layer.meta?.relevantToExtent !== false;
-                      if (tooltipContent === undefined) {
-                        return (
-                          <Box key={idText} className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`}>
-                            {nameText + statusText}
+                {viewState?.shouldOptimizedTileRequests === true && layersMeta?.length > 0 && (
+                  <Box className="debuggerLayers">
+                    <Box className="debuggerLayersArrow">
+                      <Box className="debuggerLayersArrowLine" />
+                    </Box>
+                    <Box className="debuggerLayersList">
+                      {[...layersMeta].reverse().map((layer) => {
+                        const idText = layer.layerId;
+                        const nameText = layer.layerName ?? idText;
+                        const statusText =
+                          layer.meta?.isRelevantToExtent === true ? ' → show' : layer.meta?.isRelevantToExtent === false ? ' → hide' : '';
+                        const hasTransparency = layer.meta[HAS_TRANSPARENCY_META_PROP] as boolean | undefined;
+                        const transparencyText =
+                          hasTransparency === true ? withTransparencyTiles : hasTransparency === false ? withoutTransparencyTiles : '';
+                        const tileCoordinatesFromMeta = layer.meta[EXAMINED_TILES_META_PROP] as
+                          | Array<{ x?: number; y?: number; level?: number }>
+                          | { x?: number; y?: number; level?: number }
+                          | undefined;
+                        const tileCoordinatesList = Array.isArray(tileCoordinatesFromMeta)
+                          ? tileCoordinatesFromMeta
+                          : tileCoordinatesFromMeta !== undefined
+                            ? [tileCoordinatesFromMeta]
+                            : [];
+                        const formattedTileCoordinates = tileCoordinatesList
+                          .filter((tile) => tile.x !== undefined && tile.y !== undefined && tile.level !== undefined)
+                          .map((tile) => `( L: ${String(tile.level)}, X: ${String(tile.x)}, Y: ${String(tile.y)} )`);
+                        const tooltipContent =
+                          transparencyText === ''
+                            ? undefined
+                            : <Box>{transparencyText}: {formattedTileCoordinates.join(', ')}</Box>;
+                        const isRelevant = layer.meta?.isRelevantToExtent !== false;
+                        const itemContent = (
+                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip={tooltipContent !== undefined ? 'true' : undefined}>
+                            <Box className="debuggerLayerText">{nameText + statusText}</Box>
                           </Box>
                         );
-                      }
-                      return (
-                        <Tooltip key={idText} content={tooltipContent}>
-                          <Box className={`debuggerLayerItem ${isRelevant ? 'relevant' : ''}`} data-has-tooltip="true">
-                            {nameText + statusText}
-                          </Box>
-                        </Tooltip>
-                      );
-                    })}
+                        if (tooltipContent === undefined) {
+                          return <React.Fragment key={idText}>{itemContent}</React.Fragment>;
+                        }
+                        return (
+                          <Tooltip key={idText} content={tooltipContent}>
+                            {itemContent}
+                          </Tooltip>
+                        );
+                      })}
+                    </Box>
                   </Box>
                 )}
               </Box>

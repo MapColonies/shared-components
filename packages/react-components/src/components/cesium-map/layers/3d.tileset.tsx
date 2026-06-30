@@ -1,23 +1,38 @@
-import React, { ComponentProps } from 'react';
-import { Cartesian3, Cartographic, Matrix4 } from 'cesium';
+import React, { ComponentProps, useEffect, useRef } from 'react';
+import { Cartesian3, Cartographic, Matrix4, Cesium3DTileset as CesiumTileset } from 'cesium';
 import { Cesium3DTileset as Resium3DTileset } from 'resium';
+import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 const GROUND_LEVEL = 0.0;
 
-export interface RCesium3DTilesetProps extends ComponentProps<typeof Resium3DTileset> {
+export interface ICesium3DTileset extends ComponentProps<typeof Resium3DTileset> {
   isZoomTo?: boolean;
   heightFromGround?: number;
+  meta?: ICesium3DModelMeta;
 }
 
-export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = (props) => {
+export const Cesium3DTileset: React.FC<ICesium3DTileset> = ({ meta, ...props }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
+  const tilesetRef = useRef<CesiumTileset | null>(null);
+
+  useEffect(() => {
+    return () => {
+      const modelId = getLayerIdFromMeta(meta);
+      if (tilesetRef.current !== null && modelId !== undefined) {
+        mapViewer.layersManager?.removeModel(modelId);
+      }
+    };
+  }, []);
+
   return (
     <Resium3DTileset
       {...props}
       onReady={(tileset): void => {
-        // props.onReady?.(tileset);
-
+        tilesetRef.current = tileset;
+        if (meta !== undefined) {
+          mapViewer.layersManager?.addModel({ tileset, meta });
+        }
         if (props.isZoomTo === true) {
           void mapViewer.zoomTo(tileset);
         }
@@ -31,6 +46,7 @@ export const Cesium3DTileset: React.FC<RCesium3DTilesetProps> = (props) => {
           const translation = Cartesian3.subtract(offset, surface, new Cartesian3());
           tileset.modelMatrix = Matrix4.fromTranslation(translation);
         }
+        props.onReady?.(tileset);
       }}
     />
   );

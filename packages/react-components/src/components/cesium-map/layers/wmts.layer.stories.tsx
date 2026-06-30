@@ -1,6 +1,8 @@
-import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import { Credit } from 'cesium';
+import { ImageryLayer } from 'cesium';
+import { BASE_MAPS } from '../helpers/constants';
+import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumMap } from '../map';
 import { CesiumWMTSLayer } from './wmts.layer';
 
@@ -16,6 +18,13 @@ const mapDivStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const optionsWMTS = {
@@ -40,11 +49,32 @@ const optionsWMTS2 = {
   credit: new Credit('U. S. Geological Survey'),
 };
 
+const wmtsLayerMeta = {
+  id: 'wmts-layer',
+  layerRecord: {
+    productName: 'WMTS Layer',
+  },
+  options: { ...optionsWMTS },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsWMTS.url,
+};
+
+const wmtsLayerMeta2 = {
+  id: 'wmts-layer-2',
+  layerRecord: {
+    productName: 'WMTS Layer 2',
+  },
+  options: { ...optionsWMTS2 },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsWMTS2.url,
+};
+
 export const MapWithWMTSLayers: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap>
-      <CesiumWMTSLayer options={optionsWMTS} />
-      <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} />
+    <CesiumMap
+      baseMaps={BASE_MAPS}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
+      <CesiumWMTSLayer options={optionsWMTS} meta={wmtsLayerMeta} />
+      <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} meta={wmtsLayerMeta2} />
     </CesiumMap>
   </div>
 );

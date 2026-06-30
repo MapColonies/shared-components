@@ -1,9 +1,9 @@
-import { Rectangle } from 'cesium';
+import { ImageryLayer, Rectangle } from 'cesium';
 import React, { useLayoutEffect } from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
-import { IRasterLayer, LayerType } from '../layers-manager';
+import { getImageryProviderUrl, IRasterLayer, LayerType } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
@@ -19,6 +19,13 @@ const mapDivStyle = {
   height: '90%',
   width: '100%',
   position: 'absolute' as const,
+};
+
+const layerManagerMetaMapping = {
+  layer: {
+    id: 'id',
+    name: 'layerRecord.productName',
+  },
 };
 
 const mapViewProps: CesiumMapProps = {
@@ -48,10 +55,22 @@ const optionsRectXYZ = {
 
 const childLayerRect = Rectangle.fromDegrees(...bbox(optionsRectXYZ.footprint));
 
+const layerMetaRectXYZ = {
+  id: 'xyz-rect-layer',
+  layerRecord: {
+    productName: 'XYZ Rect Layer',
+  },
+  options: { ...optionsRectXYZ },
+  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsRectXYZ.url,
+};
+
 export const MapWithXYZLayersAndRect: Story = () => (
   <div style={mapDivStyle}>
-    <CesiumMap {...mapViewProps}>
-      <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} />
+    <CesiumMap
+      {...mapViewProps}
+      layerManagerMetaMapping={layerManagerMetaMapping}
+    >
+      <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} meta={layerMetaRectXYZ} />
     </CesiumMap>
   </div>
 );
@@ -72,8 +91,11 @@ export const MapWithSettings: Story = () => {
 
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...mapViewProps}>
-        <LayerViewer layer={layer as IRasterLayer} />
+      <CesiumMap
+        {...mapViewProps}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+      >
+        <LayerViewer layer={layer} />
       </CesiumMap>
     </div>
   );
@@ -90,7 +112,7 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
 
   // For testing the exposure of current zoom level on map viewer
   setInterval(() => {
-    console.log('######################### Zoom level: ', mapViewer.currentZoomLevel);
+    console.log('######################### Zoom level: ', (mapViewer as { currentZoomLevel?: number }).currentZoomLevel);
   }, 2000);
 
   // Mockin footprint data on layer meta
