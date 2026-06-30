@@ -1,25 +1,28 @@
+import type { StorybookConfig } from '@storybook/react-vite';
 import { mergeConfig } from 'vite';
 import cesium from 'vite-plugin-cesium';
 import commonConfig from '../../../.storybook/main';
 
-const config = {
-  ...commonConfig,
-  staticDirs: [...(commonConfig.staticDirs as string[]), '../public'],
-  core: {
-    builder: '@storybook/builder-vite',
-  },
+const config: StorybookConfig = {
+  ...(commonConfig as StorybookConfig),
+  staticDirs: [...((commonConfig.staticDirs ?? []) as string[]), '../public'],
   stories: ['../src/**/*.stories.@(js|ts|tsx|mdx)'],
-  addons: ['@storybook/addon-storysource'],
-  viteFinal: async (config: Record<string, unknown>) => {
-    const conf = await (commonConfig as any).viteFinal(config);
+  // @storybook/addon-storysource is not yet compatible with Storybook 10.
+  // TODO: Re-add when addon-storysource releases a Storybook 10-compatible version.
+  addons: [...((commonConfig.addons ?? []) as string[])],
+  viteFinal: async (config) => {
+    const base = await (commonConfig.viteFinal as NonNullable<StorybookConfig['viteFinal']>)(config);
 
-    return mergeConfig(config, {
-      ...conf,
+    return mergeConfig(base, {
       base: '',
-      // Cesium is installed in the main node_modules folder, need to configure the routes for cesium vite plugin.
-      plugins: [cesium({ cesiumBuildPath: '../../node_modules/cesium/Build/Cesium', cesiumBuildRootPath: '../../node_modules/cesium/Build' })],
+      plugins: [
+        cesium({
+          cesiumBuildPath: '../../node_modules/cesium/Build/Cesium',
+          cesiumBuildRootPath: '../../node_modules/cesium/Build',
+        }),
+      ],
     });
   },
 };
 
-module.exports = config;
+export default config;

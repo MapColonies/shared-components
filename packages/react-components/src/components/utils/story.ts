@@ -1,9 +1,9 @@
-import { DecoratorFunction, ArgTypes } from '@storybook/addons';
+import type { Decorator, ArgTypes } from '@storybook/react';
 
 export interface CSFStory<StoryFnReturnType = unknown> {
   story?: {
     name?: string;
-    decorators?: DecoratorFunction<StoryFnReturnType>[];
+    decorators?: Decorator<StoryFnReturnType>[];
     parameters?: { [name: string]: unknown };
   };
   argTypes?: ArgTypes;

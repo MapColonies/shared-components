@@ -52,7 +52,8 @@ export interface FilePickerTheme {
 
 // IMPLEMENTATION NOTES: Currently FilePicker component works with his own icon set.
 // In future might be tweaked.
-setChonkyDefaults({ iconComponent: ChonkyIconFA });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+setChonkyDefaults({ iconComponent: ChonkyIconFA as any });
 
 export interface FilePickerProps extends Partial<FileBrowserProps> {
   theme?: FilePickerTheme;
@@ -144,6 +145,7 @@ export const FilePicker = React.memo(
             ...themeObject,
           }}
         >
+          {/* @ts-ignore chonky bundles its own @types/react incompatible with React 18 */}
           <FullFileBrowser
             ref={ref}
             files={files ?? []}

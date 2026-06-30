@@ -1,14 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "noImplicitAny": false,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -25,10 +21,6 @@
     "downlevelIteration": true,
     "types": ["node", "vite/client", "@types/jest"]
   },
-  "include": [
-    "src/components"
-  ],
-  "exclude": [
-    "**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*"
-  ]
+  "include": ["src/components"],
+  "exclude": ["**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*"]
 }
