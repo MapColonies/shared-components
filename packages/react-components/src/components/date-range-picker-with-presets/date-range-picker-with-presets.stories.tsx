@@ -1,5 +1,5 @@
-import { DateRangePicker as DateRangePickerWithPresets} from '.';
-import { Meta, Story } from '@storybook/react';
+import { DateRangePicker as DateRangePickerWithPresets } from '.';
+import type { Meta, StoryFn } from '@storybook/react';
 import './styles';
 import { endOfWeek, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 
@@ -8,7 +8,7 @@ const meta: Meta<typeof DateRangePickerWithPresets> = {
   component: DateRangePickerWithPresets,
 };
 
-export const DateRangePickerExample: Story = (args: Record<string, unknown>) => {
+export const DateRangePickerExample: StoryFn = (args: Record<string, unknown>) => {
   return (
     <>
       <DateRangePickerWithPresets
@@ -25,16 +25,16 @@ export const DateRangePickerExample: Story = (args: Record<string, unknown>) => 
         placeholderText="Pick date and time range"
         maxDate={new Date()}
         withShortcuts={[
-          {id: "1", label: 'היום', startDate: new Date(), endDate: new Date()},
-          {id: "2", label: 'מתחילת השבוע', startDate: startOfWeek(new Date(), {weekStartsOn: 0}), endDate: new Date()},
+          { id: '1', label: 'היום', startDate: new Date(), endDate: new Date() },
+          { id: '2', label: 'מתחילת השבוע', startDate: startOfWeek(new Date(), { weekStartsOn: 0 }), endDate: new Date() },
           () => {
             const lastWeekStart = startOfWeek(subWeeks(new Date(), 1));
             const lastWeekEnd = endOfWeek(lastWeekStart);
 
-            return { id: "3", label: 'שבוע שעבר', startDate: lastWeekStart, endDate: lastWeekEnd }
+            return { id: '3', label: 'שבוע שעבר', startDate: lastWeekStart, endDate: lastWeekEnd };
           },
-          {id: "4", label: 'מתחילת החודש', startDate: startOfMonth(new Date()), endDate: new Date()},
-          {id: "5", label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date()},
+          { id: '4', label: 'מתחילת החודש', startDate: startOfMonth(new Date()), endDate: new Date() },
+          { id: '5', label: 'מתחילת השנה', startDate: startOfYear(new Date()), endDate: new Date() },
         ]}
         isClearable
         showMonthYearDropdown
@@ -47,7 +47,6 @@ export const DateRangePickerExample: Story = (args: Record<string, unknown>) => 
       </div>
     </>
   );
-}
-
+};
 
 export default meta;

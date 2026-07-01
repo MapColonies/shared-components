@@ -7,7 +7,7 @@ import centroid from '@turf/centroid';
 import { Feature, Polygon, Properties } from '@turf/helpers';
 import * as turf from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL } from '../helpers/constants';
 import { getLayerIdFromMeta } from '../layers-manager';
@@ -79,7 +79,7 @@ const layerManagerMetaMapping = {
 };
 
 // #region STORY PP component
-export const MapWithPPWFSLayer: Story = (args: Record<string, unknown>) => {
+export const MapWithPPWFSLayer: StoryFn = (args: Record<string, unknown>) => {
   const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>
@@ -116,7 +116,7 @@ MapWithPPWFSLayer.storyName = 'WFS PP layer';
 // #endregion
 
 // #region STORY VECTOR component (NO VISUALIZER)
-export const MapWithWFSLayer: Story = (args: Record<string, unknown>) => {
+export const MapWithWFSLayer: StoryFn = (args: Record<string, unknown>) => {
   const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>
@@ -166,7 +166,7 @@ MapWithWFSLayer.storyName = 'WFS Vector layer';
 // #endregion
 
 // #region STORY VECTOR APP SCENARIO component (NO VISUALIZER)
-export const MapWithWFSLayerAPPScenario: Story = (args: Record<string, unknown>) => {
+export const MapWithWFSLayerAPPScenario: StoryFn = (args: Record<string, unknown>) => {
   const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   function MyWFSLayer() {
     const [show, setShow] = useState(false);
@@ -234,7 +234,7 @@ MapWithWFSLayerAPPScenario.storyName = 'WFS Vector layer(APP Scenario)';
 // #endregion
 
 // #region STORY VECTOR component (CUSTOM VISUALIZER)
-export const MapWithWFSLayerWithVisualizer: Story = (args: Record<string, unknown>) => {
+export const MapWithWFSLayerWithVisualizer: StoryFn = (args: Record<string, unknown>) => {
   const terrainProvider = useCesiumTerrainProvider(DEFAULT_TERRAIN_PROVIDER_URL);
   return (
     <div style={mapDivStyle}>

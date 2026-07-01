@@ -10,7 +10,7 @@ const meta: Meta<typeof Switch> = {
 
 type Story = StoryObj<typeof Switch>;
 
-export const switchStory: Story = {
+export const switchStory: StoryFn = {
   render: () => (
     <div style={{ display: 'flex', gap: 20 }}>
       <Switch label="Basic" />

@@ -10,7 +10,7 @@ const meta: Meta<typeof TextField> = {
 
 type Story = StoryObj<typeof TextField>;
 
-export const textFieldStory: Story = {
+export const textFieldStory: StoryFn = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <TextField icon="search" trailingIcon="close" label="icon..." />
@@ -29,7 +29,7 @@ export const textFieldStory: Story = {
   ),
 };
 
-export const textAreaStory: Story = {
+export const textAreaStory: StoryFn = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <TextField

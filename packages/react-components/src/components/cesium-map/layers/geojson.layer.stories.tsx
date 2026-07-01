@@ -1,6 +1,6 @@
 import { Color } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
-import { action } from '@storybook/addon-actions';
+import type { StoryFn, Meta } from '@storybook/react';
+import { action } from 'storybook/actions';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumGeojsonLayer } from './geojson.layer';
@@ -113,12 +113,9 @@ const data = {
 
 const onLoadAction = action('onLoad');
 
-export const MapWithGeojsonLayer: Story = (args: Record<string, unknown>) => (
+export const MapWithGeojsonLayer: StoryFn = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...args}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumGeojsonLayer
         data={data}
         markerColor={Color.RED}

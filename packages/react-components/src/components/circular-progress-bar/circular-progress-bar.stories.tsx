@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { Story } from '@storybook/react/types-6-0';
+import type { StoryFn } from '@storybook/react';
 import { AnimatedValuesProvider } from '../animated';
 import { Box } from '../box';
 import { CircularProgressBar } from './circular-progress-bar';
@@ -14,29 +14,25 @@ export default story;
 
 const percentage = 66;
 
-export const Default: Story = () => (
+export const Default: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar value={percentage} text={`${percentage}%`} />
   </Box>
 );
 
-export const StrokeWidth: Story = () => (
+export const StrokeWidth: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar value={percentage} text={`${percentage}%`} strokeWidth={5} />
   </Box>
 );
 
-export const SquareLinecaps: Story = () => (
+export const SquareLinecaps: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={percentage}
-      text={`${percentage}%`}
-      styles={{ strokeLinecap: 'butt' }}
-    />
+    <CircularProgressBar value={percentage} text={`${percentage}%`} styles={{ strokeLinecap: 'butt' }} />
   </Box>
 );
 
-export const CustomColors: Story = () => (
+export const CustomColors: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar
       value={percentage}
@@ -50,107 +46,67 @@ export const CustomColors: Story = () => (
   </Box>
 );
 
-export const TextSize: Story = () => (
+export const TextSize: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={percentage}
-      text={`${percentage}%`}
-      styles={{ textSize: '14px' }}
-    />
+    <CircularProgressBar value={percentage} text={`${percentage}%`} styles={{ textSize: '14px' }} />
   </Box>
 );
 
-export const Rotation: Story = () => (
+export const Rotation: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={percentage}
-      text={`${percentage}%`}
-      styles={{ rotation: 0.5 + (1 - percentage / 100) / 2 }}
-    />
+    <CircularProgressBar value={percentage} text={`${percentage}%`} styles={{ rotation: 0.5 + (1 - percentage / 100) / 2 }} />
   </Box>
 );
 
 // Animation stories
-export const DefaultAnimationSpeed: Story = () => (
+export const DefaultAnimationSpeed: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <AnimatedValuesProvider values={[0, 20, 40, 60, 80, 100]}>
-      {
-        (percentage) => (
-          <CircularProgressBar value={percentage} text={`${percentage}%`} />
-        )
-      }
+      {(percentage) => <CircularProgressBar value={percentage} text={`${percentage}%`} />}
     </AnimatedValuesProvider>
   </Box>
 );
 
-export const CustomAnimationSpeed: Story = () => (
+export const CustomAnimationSpeed: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <AnimatedValuesProvider values={[0, 20, 40, 60, 80, 100]}>
-      {
-        (percentage) => (
-          <CircularProgressBar
-            value={percentage}
-            text={`${percentage}%`}
-            styles={{ pathTransitionDuration: 0.15 }}
-          />
-        )
-      }
+      {(percentage) => <CircularProgressBar value={percentage} text={`${percentage}%`} styles={{ pathTransitionDuration: 0.15 }} />}
     </AnimatedValuesProvider>
   </Box>
 );
 
-export const NoAnimationWhenReturningToZero: Story = () => (
+export const NoAnimationWhenReturningToZero: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <AnimatedValuesProvider values={[0, 100]}>
-      {
-        (percentage) => (
-          <CircularProgressBar
-            value={percentage}
-            text={`${percentage}%`}
-            styles={{
-              pathTransition: percentage === 0 ? 'none' : 'stroke-dashoffset 0.5s ease 0s',
-            }}
-          />
-        )
-      }
+      {(percentage) => (
+        <CircularProgressBar
+          value={percentage}
+          text={`${percentage}%`}
+          styles={{
+            pathTransition: percentage === 0 ? 'none' : 'stroke-dashoffset 0.5s ease 0s',
+          }}
+        />
+      )}
     </AnimatedValuesProvider>
   </Box>
 );
 
 // Additional Stories
-export const TextAnimation: Story = () => (
+export const TextAnimation: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <AnimatedValuesProvider 
-      valueStart={0}
-      valueEnd={66}
-      duration={1.4}
-      easingFunction={(t: number) => t * t * t}
-      repeat
-    >
-      {
-        (value) => {
-          const roundedValue = Math.round(value);
-          return (
-            <CircularProgressBar
-              value={value}
-              text={`${roundedValue}%`}
-              styles={{ pathTransition: 'none' }}
-            />
-          );
-        }
-      }
+    <AnimatedValuesProvider valueStart={0} valueEnd={66} duration={1.4} easingFunction={(t: number) => t * t * t} repeat>
+      {(value) => {
+        const roundedValue = Math.round(value);
+        return <CircularProgressBar value={value} text={`${roundedValue}%`} styles={{ pathTransition: 'none' }} />;
+      }}
     </AnimatedValuesProvider>
   </Box>
 );
 
-export const ArbitraryContent: Story = () => (
+export const ArbitraryContent: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar value={66}>
-      <img
-        style={{ width: 40, marginTop: -5 }}
-        src="https://i.imgur.com/b9NyUGm.png"
-        alt="doge"
-      />
+      <img style={{ width: 40, marginTop: -5 }} src="https://i.imgur.com/b9NyUGm.png" alt="doge" />
       <Box style={{ fontSize: 12, marginTop: -5 }}>
         <strong>66%</strong> mate
       </Box>
@@ -158,7 +114,7 @@ export const ArbitraryContent: Story = () => (
   </Box>
 );
 
-export const MultipleOverlappingPaths: Story = () => (
+export const MultipleOverlappingPaths: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar
       value={80}
@@ -179,7 +135,7 @@ export const MultipleOverlappingPaths: Story = () => (
   </Box>
 );
 
-export const MultipleConcentricPaths: Story = () => (
+export const MultipleConcentricPaths: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar
       value={75}
@@ -201,7 +157,7 @@ export const MultipleConcentricPaths: Story = () => (
   </Box>
 );
 
-export const Background: Story = () => (
+export const Background: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <CircularProgressBar
       value={percentage}
@@ -218,23 +174,15 @@ export const Background: Story = () => (
   </Box>
 );
 
-export const Counterclockwise: Story = () => (
+export const Counterclockwise: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={percentage}
-      text={`${percentage}%`}
-      counterClockwise
-    />
+    <CircularProgressBar value={percentage} text={`${percentage}%`} counterClockwise />
   </Box>
 );
 
-export const PieChart: Story = () => (
+export const PieChart: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={percentage}
-      strokeWidth={50}
-      styles={{ strokeLinecap: 'butt' }}
-    />
+    <CircularProgressBar value={percentage} strokeWidth={50} styles={{ strokeLinecap: 'butt' }} />
   </Box>
 );
 
@@ -246,8 +194,8 @@ const Separator: React.FC<SeparatorProps> = ({ turns, style }) => {
   return (
     <Box
       style={{
-        position: "absolute",
-        height: "100%",
+        position: 'absolute',
+        height: '100%',
         transform: `rotate(${turns}turn)`,
       }}
     >
@@ -263,22 +211,15 @@ const RadialSeparators: React.FC<RadialSeparatorsProps> = ({ count, style }) => 
   const turns = 1 / count;
   return (
     <>
-      {
-        _.range(count).map((index) => (
-          <Separator key={index} turns={index * turns} style={style} />
-        ))
-      }
+      {_.range(count).map((index) => (
+        <Separator key={index} turns={index * turns} style={style} />
+      ))}
     </>
   );
 };
-export const ProgressBarWithSeparators: Story = () => (
+export const ProgressBarWithSeparators: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
-    <CircularProgressBar
-      value={80}
-      text={`${80}%`}
-      strokeWidth={10}
-      styles={{ strokeLinecap: 'butt' }}
-    >
+    <CircularProgressBar value={80} text={`${80}%`} strokeWidth={10} styles={{ strokeLinecap: 'butt' }}>
       <RadialSeparators
         count={12}
         style={{
@@ -291,23 +232,21 @@ export const ProgressBarWithSeparators: Story = () => (
   </Box>
 );
 
-export const DashboardSpeedometer: Story = () => (
+export const DashboardSpeedometer: StoryFn = () => (
   <Box style={{ width: '200px', height: '200px' }}>
     <AnimatedValuesProvider values={[0, 20, 80]}>
-      {
-        (value) => (
-          <CircularProgressBar
-            value={value}
-            text={`${value}%`}
-            circleRatio={0.75}
-            styles={{
-              rotation: 1 / 2 + 1 / 8,
-              strokeLinecap: 'butt',
-              trailColor: '#EEE',
-            }}
-          />
-        )
-      }
+      {(value) => (
+        <CircularProgressBar
+          value={value}
+          text={`${value}%`}
+          circleRatio={0.75}
+          styles={{
+            rotation: 1 / 2 + 1 / 8,
+            strokeLinecap: 'butt',
+            trailColor: '#EEE',
+          }}
+        />
+      )}
     </AnimatedValuesProvider>
   </Box>
 );

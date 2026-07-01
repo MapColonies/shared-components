@@ -20,8 +20,9 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
           exclude: ['/virtual:/', '/node_modules/'],
         }),
         dts({
-          include: ['src/components'],
+          include: ['src'],
           tsconfigPath: 'tsconfig-build.json',
+          rollupTypes: true,
         }),
         cssInjectedByJsPlugin(),
         ...plugins,

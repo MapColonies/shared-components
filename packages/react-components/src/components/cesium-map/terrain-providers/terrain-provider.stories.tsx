@@ -9,7 +9,7 @@ import {
   WebMercatorTilingScheme,
 } from 'cesium';
 import React, { ChangeEvent, useState } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
@@ -64,9 +64,7 @@ const VRTheWorldProvider = withFallbackProvider(
 );
 
 const ArcGisProvider = withFallbackProvider(
-  ArcGISTiledElevationTerrainProvider.fromUrl(
-    'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'
-  ),
+  ArcGISTiledElevationTerrainProvider.fromUrl('https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer'),
   'ArcGIS Terrain Provider'
 );
 
@@ -157,7 +155,7 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
   );
 };
 
-export const QuantizedMeshProviders: Story = () => {
+export const QuantizedMeshProviders: StoryFn = () => {
   // const [center] = useState<[number, number]>([24, -200]);
   const [center] = useState<[number, number]>([-122, 43]);
   return (

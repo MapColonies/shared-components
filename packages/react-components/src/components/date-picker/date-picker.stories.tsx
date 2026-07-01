@@ -1,6 +1,6 @@
 import React from 'react';
-import { action } from '@storybook/addon-actions';
-import { Story } from '@storybook/react/types-6-0';
+import { action } from 'storybook/actions';
+import type { StoryFn } from '@storybook/react';
 import { CSFStory } from '../utils/story';
 import { SupportedLocales } from '../models/enums';
 import { DateTimePicker } from './date-picker';
@@ -84,7 +84,7 @@ DateMinMaxLimitTimeWithOnBlur.story = {
   name: 'Date time with OnBlur ',
 };
 
-export const DateTimeWithControlArgs: Story = (args: Record<string, unknown>) => {
+export const DateTimeWithControlArgs: StoryFn = (args: Record<string, unknown>) => {
   return <DateTimePicker {...args} value={TODAY} onChange={action('date changed')} />;
 };
 
@@ -98,7 +98,7 @@ DateTimeWithControlArgs.argTypes = {
   },
 };
 
-export const DateTimeHebrewLocalized: Story = (args: Record<string, unknown>) => {
+export const DateTimeHebrewLocalized: StoryFn = (args: Record<string, unknown>) => {
   const local = {
     placeHolderText: 'הכנס תאריך',
     calendarLocale: SupportedLocales.HE,

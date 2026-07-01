@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { getBaseConfig } from '../../vite.config';
+import { getBaseConfig } from '../../vite.config.mts';
 import { LibraryOptions } from 'vite';
 
 export default getBaseConfig({

@@ -23,7 +23,7 @@
   "filesGlob": [
     "**/*.ts"
   ],
-  "include": ["packages/react-components", "packages/react-ui-components", "vite.config.ts"],
+  "include": ["packages/react-components", "packages/react-ui-components", "vite.config.mts"],
   "exclude": ["node_modules", ".storybook"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

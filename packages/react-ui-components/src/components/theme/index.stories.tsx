@@ -20,7 +20,7 @@ const themeStyle = {
   verticalAlign: 'top',
 };
 
-export const themeStory: Story = {
+export const themeStory: StoryFn = {
   render: () => (
     <>
       <div style={{ backgroundColor: '#ddd' }}>

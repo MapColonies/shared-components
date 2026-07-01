@@ -9,9 +9,7 @@ logger.warn = (msg, options) => {
 };
 
 const config: StorybookConfig = {
-  addons: [
-    'storybook-addon-mock',
-  ],
+  addons: [],
   framework: {
     name: '@storybook/react-vite',
     options: {},

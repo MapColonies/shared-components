@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageryLayer } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumMap } from '../map';
@@ -54,17 +54,11 @@ const xyzLayerMeta = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ.url,
 };
 
-export const MapWithOSMLayers: Story = () => {
+export const MapWithOSMLayers: StoryFn = () => {
   const [center] = useState<[number, number]>([34.82, 32.04]);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        center={center}
-        baseMaps={BASE_MAPS}
-        sceneMode={CesiumSceneMode.SCENE2D}
-        zoom={14}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
+      <CesiumMap center={center} baseMaps={BASE_MAPS} sceneMode={CesiumSceneMode.SCENE2D} zoom={14} layerManagerMetaMapping={layerManagerMetaMapping}>
         <CesiumOSMLayer options={optionsOSM} meta={osmLayerMeta} />
         <CesiumXYZLayer options={optionsXYZ} meta={xyzLayerMeta} />
       </CesiumMap>

@@ -11,7 +11,7 @@ const meta: Meta<typeof Drawer> = {
 
 type Story = StoryObj<typeof Drawer>;
 
-export const drawerStory: Story = {
+export const drawerStory: StoryFn = {
   render: () => (
     <>
       <Drawer>

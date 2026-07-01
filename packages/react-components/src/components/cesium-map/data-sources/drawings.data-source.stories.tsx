@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { BboxCorner, DrawType } from '../../models';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
@@ -32,7 +32,7 @@ interface IDrawingObject {
   handler: (drawing: IDrawingEvent) => void;
 }
 
-export const Drawings: Story = (args) => {
+export const Drawings: StoryFn = (args) => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [drawPrimitive, setDrawPrimitive] = useState<IDrawingObject>({
     type: DrawType.UNKNOWN,

@@ -10,7 +10,7 @@ const meta: Meta<typeof Avatar> = {
 
 type Story = StoryObj<typeof Avatar>;
 
-export const avatarStory: Story = {
+export const avatarStory: StoryFn = {
   render: () => (
     <>
       <Avatar src="./favicon.ico" contain interactive size="xsmall" name="xsmall" />
@@ -22,7 +22,7 @@ export const avatarStory: Story = {
   ),
 };
 
-export const avatarGroupStory: Story = {
+export const avatarGroupStory: StoryFn = {
   render: () => (
     <>
       <AvatarGroup dense>

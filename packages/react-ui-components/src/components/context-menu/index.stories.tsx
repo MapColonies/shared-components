@@ -16,8 +16,8 @@ function ContextMenuExample() {
   const { show } = useContextMenu({
     id: MENU_ID,
     locale: {
-      dir: 'ltr'
-    }
+      dir: 'ltr',
+    },
   });
 
   const handleItemClick = ({ event, props, triggerEvent, data }: ItemParams) => {
@@ -31,17 +31,16 @@ function ContextMenuExample() {
     fontFamily: 'Helvetica',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   };
 
   return (
     <div style={containerStyle} className="menuContainer" onContextMenu={(e) => show({ event: e })}>
       Right click anywhere
-      <ContextMenu animation={{enter: 'scale', exit: 'fade'}} id={MENU_ID}>
+      <ContextMenu animation={{ enter: 'scale', exit: 'fade' }} id={MENU_ID}>
         <Item onClick={handleItemClick}>
-          Item 1
-          <RightSlot>With Right Slot</RightSlot>
-         </Item>
+          Item 1<RightSlot>With Right Slot</RightSlot>
+        </Item>
         <Item onClick={handleItemClick}>Item 2</Item>
         <Separator />
         <Item disabled>Disabled</Item>
@@ -49,25 +48,25 @@ function ContextMenuExample() {
         <Submenu label="Submenu" arrow="🦄">
           <Item onClick={handleItemClick}>Sub Item 1</Item>
           <Item onClick={handleItemClick}>Sub Item 3</Item>
-            <Submenu label="Submenu" arrow="🤘">
-              <Item onClick={handleItemClick}>Sub Item 4</Item>
-              <Item onClick={handleItemClick}>Sub Item 5</Item>
-            </Submenu>
+          <Submenu label="Submenu" arrow="🤘">
+            <Item onClick={handleItemClick}>Sub Item 4</Item>
+            <Item onClick={handleItemClick}>Sub Item 5</Item>
+          </Submenu>
         </Submenu>
         <Submenu label="Submenu" arrow=">">
           <Item onClick={handleItemClick}>Sub Item 1</Item>
           <Item onClick={handleItemClick}>Sub Item 3</Item>
-            <Submenu label="Submenu" arrow="🤘">
-              <Item onClick={handleItemClick}>Sub Item 4</Item>
-              <Item onClick={handleItemClick}>Sub Item 5</Item>
-            </Submenu>
+          <Submenu label="Submenu" arrow="🤘">
+            <Item onClick={handleItemClick}>Sub Item 4</Item>
+            <Item onClick={handleItemClick}>Sub Item 5</Item>
+          </Submenu>
         </Submenu>
       </ContextMenu>
     </div>
   );
 }
 
-export const contextMenuStory: Story = {
+export const contextMenuStory: StoryFn = {
   render: () => (
     <>
       <ContextMenuExample />

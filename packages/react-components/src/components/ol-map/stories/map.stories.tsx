@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { Map } from '../map';
 import { TileOsm } from '../source';
 import { TileLayer } from '../layers';
@@ -18,7 +18,7 @@ const mapDivStyle = {
   position: 'absolute' as const,
 };
 
-export const BaseMap: Story = (args: Record<string, unknown>) => (
+export const BaseMap: StoryFn = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <Map {...args}>
       <TileLayer>
@@ -46,7 +46,7 @@ BaseMap.argTypes = {
   },
 };
 
-export const ConfiguredMap: Story = () => (
+export const ConfiguredMap: StoryFn = () => (
   <div style={mapDivStyle}>
     <Map zoom={5} center={[30, 40]}>
       <TileLayer>

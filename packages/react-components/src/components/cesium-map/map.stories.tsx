@@ -1,6 +1,6 @@
 import { Feature } from 'geojson';
 import React, { useState, useEffect } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
@@ -281,7 +281,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
   },
 ] satisfies GeocoderOptions[];
 
-export const BaseMap: Story = (args: CesiumMapProps) => {
+export const BaseMap: StoryFn = (args: CesiumMapProps) => {
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
@@ -296,7 +296,7 @@ BaseMap.argTypes = {
   },
 };
 
-export const ZoomedMap: Story = (args: CesiumMapProps) => (
+export const ZoomedMap: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
@@ -326,7 +326,7 @@ const cesiumTheme = {
   '--mdc-theme-gc-warning-high': '#FFA032',
 };
 
-export const GeocoderPanel: Story = (args: CesiumMapProps) => (
+export const GeocoderPanel: StoryFn = (args: CesiumMapProps) => (
   <ThemeProvider options={cesiumTheme}>
     <div style={mapDivStyle}>
       <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
@@ -362,7 +362,7 @@ GeocoderPanel.argTypes = {
 };
 GeocoderPanel.storyName = 'Geocoder';
 
-export const MapWithProjection: Story = (args: CesiumMapProps) => (
+export const MapWithProjection: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
@@ -392,7 +392,7 @@ MapWithProjection.argTypes = {
   },
 };
 
-export const Map2DWithProjection: Story = (args: CesiumMapProps) => (
+export const Map2DWithProjection: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
@@ -426,7 +426,7 @@ Map2DWithProjection.argTypes = {
 };
 Map2DWithProjection.storyName = '2D Map With Projection';
 
-export const LocalizedMap: Story = (args: CesiumMapProps) => (
+export const LocalizedMap: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>

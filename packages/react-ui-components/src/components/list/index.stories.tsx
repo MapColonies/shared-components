@@ -10,7 +10,7 @@ const meta: Meta<typeof List> = {
 
 type Story = StoryObj<typeof List>;
 
-export const listStory: Story = {
+export const listStory: StoryFn = {
   render: () => (
     <>
       <List twoLine>

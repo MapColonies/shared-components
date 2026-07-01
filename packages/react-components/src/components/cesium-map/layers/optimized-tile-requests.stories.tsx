@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { ImageryLayer, Rectangle } from 'cesium';
-import { Story, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
@@ -88,8 +88,7 @@ const LayersContainer: React.FC = () => {
                 meta={{
                   id: 'Transparent Layer',
                   options: { ...optionsXYZTransparency },
-                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
-                    getImageryProviderUrl(layer) === optionsXYZTransparency.url
+                  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZTransparency.url,
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZTransparency.footprint))}
                 options={optionsXYZTransparency}
@@ -107,8 +106,7 @@ const LayersContainer: React.FC = () => {
                 meta={{
                   id: 'Opaque Layer',
                   options: { ...optionsXYZOpaque },
-                  searchLayerPredicate: (layer: ImageryLayer): boolean =>
-                    getImageryProviderUrl(layer) === optionsXYZOpaque.url
+                  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZOpaque.url,
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
@@ -124,14 +122,10 @@ const LayersContainer: React.FC = () => {
   );
 };
 
-export const OptimizedTileRequestingMap: Story = () => {
+export const OptimizedTileRequestingMap: StoryFn = () => {
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...mapViewProps}
-        showDebuggerTool={true}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
+      <CesiumMap {...mapViewProps} showDebuggerTool={true} layerManagerMetaMapping={layerManagerMetaMapping}>
         <LayersContainer />
       </CesiumMap>
     </div>

@@ -1,6 +1,6 @@
 import { ImageryLayer, Rectangle } from 'cesium';
 import React, { useLayoutEffect } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl, IRasterLayer, LayerType } from '../layers-manager';
@@ -64,12 +64,9 @@ const layerMetaRectXYZ = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsRectXYZ.url,
 };
 
-export const MapWithXYZLayersAndRect: Story = () => (
+export const MapWithXYZLayersAndRect: StoryFn = () => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...mapViewProps}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} meta={layerMetaRectXYZ} />
     </CesiumMap>
   </div>
@@ -77,7 +74,7 @@ export const MapWithXYZLayersAndRect: Story = () => (
 
 MapWithXYZLayersAndRect.storyName = 'XYZ child layer with rect';
 
-export const MapWithSettings: Story = () => {
+export const MapWithSettings: StoryFn = () => {
   const layer = {
     id: '2_raster_ext',
     type: 'XYZ_LAYER' as LayerType,
@@ -91,10 +88,7 @@ export const MapWithSettings: Story = () => {
 
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...mapViewProps}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
+      <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
         <LayerViewer layer={layer} />
       </CesiumMap>
     </div>

@@ -10,7 +10,7 @@ const meta: Meta<typeof Button> = {
 
 type Story = StoryObj<typeof Button>;
 
-export const primary: Story = {
+export const primary: StoryFn = {
   render: () => (
     <Button ripple={false} raised trailingIcon="home">
       Primary Button
@@ -18,7 +18,7 @@ export const primary: Story = {
   ),
 };
 
-export const disabled: Story = {
+export const disabled: StoryFn = {
   render: () => (
     <Button ripple={false} outlined trailingIcon="home" disabled>
       Disabled Button

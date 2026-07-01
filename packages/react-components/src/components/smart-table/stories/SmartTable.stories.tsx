@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { button } from '@storybook/addon-knobs';
-import { action } from '@storybook/addon-actions';
-
+import { action } from 'storybook/actions';
 import { SmartTable, CellMetadata } from '..';
 import { CSFStory } from '../../utils/story';
 
@@ -81,10 +79,6 @@ const TableStory: React.FC<TableStroyProps> = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [items, setItems] = useState([...new Array<undefined>(props.numberOfItems)].map(getRandomPerson));
-
-  button('ADD ITEM', () => setItems([...items, getRandomPerson()]));
-  button('REMOVE ITEM', () => setItems(items.slice(0, -1))); //remove last
-  button('CLEAR TABLE', () => setItems([]));
 
   return (
     <SmartTable

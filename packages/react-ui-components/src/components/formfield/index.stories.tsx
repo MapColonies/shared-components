@@ -10,7 +10,7 @@ const meta: Meta<typeof FormField> = {
 
 type Story = StoryObj<typeof FormField>;
 
-export const formFieldStory: Story = {
+export const formFieldStory: StoryFn = {
   render: () => (
     <>
       <FormField>

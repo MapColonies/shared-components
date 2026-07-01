@@ -73,7 +73,7 @@ const DialogQueueExample: React.FC = () => {
   );
 };
 
-export const dialogStory: Story = {
+export const dialogStory: StoryFn = {
   render: () => (
     <>
       <StandardDialog />
@@ -81,7 +81,7 @@ export const dialogStory: Story = {
   ),
 };
 
-export const dialogQueueStory: Story = {
+export const dialogQueueStory: StoryFn = {
   render: () => (
     <>
       <DialogQueueExample />
