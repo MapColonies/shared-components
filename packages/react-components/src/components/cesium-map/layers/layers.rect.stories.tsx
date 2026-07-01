@@ -1,5 +1,5 @@
 import { ImageryLayer, Rectangle } from 'cesium';
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
@@ -110,18 +110,21 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
   }, 2000);
 
   // Mockin footprint data on layer meta
-  const layerFootprint = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [34.8099445223518, 31.9061345394902],
-        [34.8200994167574, 31.9061345394902],
-        [34.8200994167574, 31.9106311613979],
-        [34.8099445223518, 31.9106311613979],
-        [34.8099445223518, 31.9061345394902],
+  const layerFootprint = useMemo(
+    () => ({
+      type: 'Polygon',
+      coordinates: [
+        [
+          [34.8099445223518, 31.9061345394902],
+          [34.8200994167574, 31.9061345394902],
+          [34.8200994167574, 31.9106311613979],
+          [34.8099445223518, 31.9106311613979],
+          [34.8099445223518, 31.9061345394902],
+        ],
       ],
-    ],
-  };
+    }),
+    []
+  );
 
   useLayoutEffect(() => {
     const layerManagerRect = Rectangle.fromDegrees(...bbox(layerFootprint));

@@ -6,10 +6,11 @@ import { CSFStory } from '../utils/story';
 
 import Autocomplete from './autocomplete';
 
-export default {
+const meta = {
   title: 'Autocomplete',
   component: Autocomplete,
 };
+export default meta;
 
 export const AutocpmleteTextArea: CSFStory<JSX.Element> = () => (
   <>

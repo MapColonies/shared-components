@@ -7,10 +7,11 @@ import { DateTimePicker } from './date-picker';
 
 const TODAY = new Date();
 
-export default {
+const meta = {
   title: 'Date Picker',
   component: DateTimePicker,
 };
+export default meta;
 
 export const DatePickerDefault: CSFStory<JSX.Element> = () => <DateTimePicker onChange={action('date changed')} value={TODAY} />;
 
