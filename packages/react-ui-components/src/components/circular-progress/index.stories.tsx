@@ -10,7 +10,7 @@ const meta: Meta<typeof CircularProgress> = {
 
 type Story = StoryObj<typeof CircularProgress>;
 
-export const circularProgressStory: StoryFn = {
+export const circularProgressStory: Story = {
   render: () => (
     <>
       <CircularProgress size="xsmall" />
@@ -22,7 +22,7 @@ export const circularProgressStory: StoryFn = {
   ),
 };
 
-export const circularProgressManualStory: StoryFn = {
+export const circularProgressManualStory: Story = {
   render: () => (
     <>
       <CircularProgress progress={0.3} />

@@ -29,7 +29,7 @@ const SnackbarExample: React.FC = () => {
   );
 };
 
-export const snackbarStory: StoryFn = {
+export const snackbarStory: Story = {
   render: () => (
     <>
       <SnackbarExample />

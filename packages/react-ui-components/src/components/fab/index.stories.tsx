@@ -10,7 +10,7 @@ const meta: Meta<typeof Fab> = {
 
 type Story = StoryObj<typeof Fab>;
 
-export const fabStory: StoryFn = {
+export const fabStory: Story = {
   render: () => (
     <>
       <Fab icon="add" label="Create" />

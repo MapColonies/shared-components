@@ -66,7 +66,7 @@ function ContextMenuExample() {
   );
 }
 
-export const contextMenuStory: StoryFn = {
+export const contextMenuStory: Story = {
   render: () => (
     <>
       <ContextMenuExample />

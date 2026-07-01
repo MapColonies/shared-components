@@ -11,7 +11,7 @@ const meta: Meta<typeof Tooltip> = {
 
 type Story = StoryObj<typeof Tooltip>;
 
-export const tooltipStory: StoryFn = {
+export const tooltipStory: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: 20 }}>
       <Tooltip content="Cookies">

@@ -10,7 +10,7 @@ const meta: Meta<typeof Select> = {
 
 type Story = StoryObj<typeof Select>;
 
-export const selectStory: StoryFn = {
+export const selectStory: Story = {
   render: () => (
     <>
       <Select label="Standard" options={['Cookies', 'Pizza', 'Icecream']} />

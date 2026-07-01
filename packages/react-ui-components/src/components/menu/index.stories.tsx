@@ -32,7 +32,7 @@ const MenuExample: React.FC = () => {
   );
 };
 
-export const menuStory: StoryFn = {
+export const menuStory: Story = {
   render: () => (
     <>
       <MenuExample />

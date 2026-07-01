@@ -10,7 +10,7 @@ const meta: Meta<typeof TabBar> = {
 
 type Story = StoryObj<typeof TabBar>;
 
-export const tabBarStory: StoryFn = {
+export const tabBarStory: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <TabBar>

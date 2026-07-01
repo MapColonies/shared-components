@@ -10,7 +10,7 @@ const meta: Meta<typeof IconButton> = {
 
 type Story = StoryObj<typeof IconButton>;
 
-export const iconButtonStory: StoryFn = {
+export const iconButtonStory: Story = {
   render: () => (
     <>
       <IconButton icon="favorite_border" onIcon="favorite" />

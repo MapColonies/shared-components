@@ -10,7 +10,7 @@ const meta: Meta<typeof Checkbox> = {
 
 type Story = StoryObj<typeof Checkbox>;
 
-export const checkboxStory: StoryFn = {
+export const checkboxStory: Story = {
   render: () => (
     <>
       <Checkbox label="un-controlled" />

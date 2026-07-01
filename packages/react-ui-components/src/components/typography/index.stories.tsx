@@ -10,7 +10,7 @@ const meta: Meta<typeof Typography> = {
 
 type Story = StoryObj<typeof Typography>;
 
-export const typographyStory: StoryFn = {
+export const typographyStory: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <>

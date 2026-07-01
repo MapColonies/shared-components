@@ -10,7 +10,7 @@ const meta: Meta<typeof LinearProgress> = {
 
 type Story = StoryObj<typeof LinearProgress>;
 
-export const linearProgressStory: StoryFn = {
+export const linearProgressStory: Story = {
   render: () => (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
