@@ -143,12 +143,12 @@ export const MapWithGeojsonLayer: StoryFn = (args: Record<string, unknown>) => (
   </div>
 );
 
+MapWithGeojsonLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+};
 MapWithGeojsonLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,

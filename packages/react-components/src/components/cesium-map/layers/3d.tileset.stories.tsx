@@ -59,12 +59,12 @@ export const Cesium3DTilesetLayer: StoryFn = (args: Record<string, unknown>) => 
   </div>
 );
 
+Cesium3DTilesetLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 3,
+};
 Cesium3DTilesetLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
@@ -97,20 +97,18 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: StoryFn = (args: Record<s
   </div>
 );
 
+Cesium3DTilesetWithHeightCorrectionLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  center: [-75.61208, 40.04227],
+};
 Cesium3DTilesetWithHeightCorrectionLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  center: {
-    defaultValue: [-75.61208, 40.04227],
   },
 };
 
@@ -127,15 +125,13 @@ export const CesiumSolar3DTilesetLayer: StoryFn = (args: Record<string, unknown>
   );
 };
 
+CesiumSolar3DTilesetLayer.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.811, 31.908],
+  zoom: 14,
+};
 CesiumSolar3DTilesetLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.811, 31.908],
-  },
   zoom: {
-    defaultValue: 14,
     control: {
       type: 'range',
       min: 0,

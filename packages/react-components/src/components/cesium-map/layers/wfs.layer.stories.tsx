@@ -95,20 +95,18 @@ export const MapWithPPWFSLayer: StoryFn = (args: Record<string, unknown>) => {
   );
 };
 
+MapWithPPWFSLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  showDebuggerTool: SHOW_DEBUGGER_TOOL,
+};
 MapWithPPWFSLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  showDebuggerTool: {
-    defaultValue: SHOW_DEBUGGER_TOOL,
   },
 };
 
@@ -145,20 +143,18 @@ export const MapWithWFSLayer: StoryFn = (args: Record<string, unknown>) => {
   );
 };
 
+MapWithWFSLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  showDebuggerTool: SHOW_DEBUGGER_TOOL,
+};
 MapWithWFSLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  showDebuggerTool: {
-    defaultValue: SHOW_DEBUGGER_TOOL,
   },
 };
 
@@ -213,20 +209,18 @@ export const MapWithWFSLayerAPPScenario: StoryFn = (args: Record<string, unknown
   );
 };
 
+MapWithWFSLayerAPPScenario.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  showDebuggerTool: SHOW_DEBUGGER_TOOL,
+};
 MapWithWFSLayerAPPScenario.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  showDebuggerTool: {
-    defaultValue: SHOW_DEBUGGER_TOOL,
   },
 };
 
@@ -256,20 +250,18 @@ export const MapWithWFSLayerWithVisualizer: StoryFn = (args: Record<string, unkn
   );
 };
 
+MapWithWFSLayerWithVisualizer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  showDebuggerTool: SHOW_DEBUGGER_TOOL,
+};
 MapWithWFSLayerWithVisualizer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  showDebuggerTool: {
-    defaultValue: SHOW_DEBUGGER_TOOL,
   },
 };
 
