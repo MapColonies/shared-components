@@ -6,3 +6,5 @@ export * from './data-sources';
 export * from './proxied.types';
 export * from './layers-manager';
 export * from './tools';
+export * from './legend';
+export * from './geocoder';
