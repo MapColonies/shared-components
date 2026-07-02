@@ -4,7 +4,7 @@ import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
-import { CesiumMap, CesiumMapProps, IBaseMaps } from '../map';
+import { CesiumMap, CesiumMapProps } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
 export default {
@@ -31,8 +31,8 @@ const layerManagerMetaMapping = {
 const mapViewProps: CesiumMapProps = {
   center: [-117.30644008676421, 33.117098433617564],
   zoom: 14,
-  imageryProvider: false,
-  baseMaps: BASE_MAPS as IBaseMaps,
+  baseMaps: BASE_MAPS,
+  layerManagerMetaMapping,
 };
 
 const LayersContainer: React.FC = () => {

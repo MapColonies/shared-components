@@ -31,8 +31,8 @@ const layerManagerMetaMapping = {
 const mapViewProps: CesiumMapProps = {
   center: [34.811, 31.908],
   zoom: 14,
-  imageryProvider: false,
   baseMaps: BASE_MAPS,
+  layerManagerMetaMapping,
 };
 
 const optionsRectXYZ = {
