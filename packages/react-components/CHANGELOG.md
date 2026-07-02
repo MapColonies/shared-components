@@ -3,6 +3,94 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.14.1...@map-colonies/react-components@4.15.0) (2026-07-02)
+
+
+### Bug Fixes
+
+* 3d model name ([836241e](https://github.com/MapColonies/shared-components/commit/836241e0a32e3eec90e519178d0b62defcaed372))
+* 3d model properties name ([b672133](https://github.com/MapColonies/shared-components/commit/b672133d259911af6e48c4131f3b3be4a684b9c4))
+* 3d model url ([fd889c4](https://github.com/MapColonies/shared-components/commit/fd889c4d1a1cae0251feec8a1cc9ae06f2f383ab))
+* 3d model url ([e523203](https://github.com/MapColonies/shared-components/commit/e5232030883a7e96748a354b624d8610acdb558e))
+* 3d model url ([cb8d2dd](https://github.com/MapColonies/shared-components/commit/cb8d2ddf162bf4068b3eb3f3a6f381fc08450f73))
+* 3d model use product name ([2f107ca](https://github.com/MapColonies/shared-components/commit/2f107caf21fb7a7ee5884a29cc6b5181ebcdfce4))
+* acdebugger optimization section layers order ([07a359c](https://github.com/MapColonies/shared-components/commit/07a359c09a887bb1b56a792ae7589c54a7e28f6b))
+* active layers fly to icon ([9af2424](https://github.com/MapColonies/shared-components/commit/9af24243c6df60969c67d8287168a97e70897d96))
+* active layers update when reordering layers on the map ([6de6786](https://github.com/MapColonies/shared-components/commit/6de678662e77c5df497cfee535d51a0ffc62838c))
+* base map internal ([9d60f09](https://github.com/MapColonies/shared-components/commit/9d60f09a45e777f857660e37fd4e035d8c255a8d))
+* baseLayer already initialized to false on CesiumMap and no such prop ([65dc4f4](https://github.com/MapColonies/shared-components/commit/65dc4f48e6a58b25b80ec601dac15ef1d6c557f4))
+* bdi with ellipsis ([16c9c63](https://github.com/MapColonies/shared-components/commit/16c9c63f995a90eaddee37e58fc36aaea555f558))
+* cesium inspector tile coordinates if checked should be always on top ([6c491ad](https://github.com/MapColonies/shared-components/commit/6c491add68975f4dadd40395b26ddbf53dc797fb))
+* clean resium and cesium  upgrade ([ad2616d](https://github.com/MapColonies/shared-components/commit/ad2616dabea2f91102baabd6bd5bbe162a5f58cd))
+* code review ([e397e89](https://github.com/MapColonies/shared-components/commit/e397e89bccc65e200410ff8b2396b17641b1982d))
+* data layer layerRecord ([c5e3419](https://github.com/MapColonies/shared-components/commit/c5e3419f1706a68702920e02f32357c022c2735b))
+* debugger ([f3d6493](https://github.com/MapColonies/shared-components/commit/f3d6493497216b0b9bf462df01d4479ec539da3f))
+* debugger layers ([2dd7399](https://github.com/MapColonies/shared-components/commit/2dd7399a348582829fb12bbb1c6d7f534a90c355))
+* debugger layers arrow ([24f926f](https://github.com/MapColonies/shared-components/commit/24f926f31822c7cc9dbd4781c1c892dc4458c8aa))
+* details renamed to layerRecord ([98f2cfd](https://github.com/MapColonies/shared-components/commit/98f2cfd3391185091cdee313fc8d4d093c6715b9))
+* encapsulate catalog data ([0846cc4](https://github.com/MapColonies/shared-components/commit/0846cc4697b719b8437574ef0ada3436151c051c))
+* encapsulate cesium internals ([067d3de](https://github.com/MapColonies/shared-components/commit/067d3de3d01e5de523ce901cb710b48401c2dd87))
+* featureStructure ([5276838](https://github.com/MapColonies/shared-components/commit/52768380f127ebb41d7b3c79fab032f851133634))
+* fix ([c0a860c](https://github.com/MapColonies/shared-components/commit/c0a860ce27056d083d408bad5a3f2d7c74b36dbd))
+* for 3d models when scene doesn't support event listeners ([89e3322](https://github.com/MapColonies/shared-components/commit/89e33221444b304e082ebff37b816318df0655ac))
+* for cesium upgrade ([fbbfbb7](https://github.com/MapColonies/shared-components/commit/fbbfbb7b434d1c87bd02bdeff81321b829df4261))
+* for cesium upgrade ([e8253d1](https://github.com/MapColonies/shared-components/commit/e8253d1da4a976418d3501e83a6bfcfde7ba3c5c))
+* get layerRecord props from app ([7231baa](https://github.com/MapColonies/shared-components/commit/7231baa6561a7626e45a7f990bb85763dfcb4cdc))
+* guard on http error ([eccf6e9](https://github.com/MapColonies/shared-components/commit/eccf6e9bd3c3fdcccca7cb31384b21a989d37a64))
+* hide arrow in case of an empty optimized layers list ([1d936d7](https://github.com/MapColonies/shared-components/commit/1d936d7a1f388895901bc01d13601706a94c7746))
+* hide arrow in case of an empty optimized layers list ([2782b05](https://github.com/MapColonies/shared-components/commit/2782b05ac382e7e3be9ff64eba31702e07a437be))
+* input controls ([36d2f00](https://github.com/MapColonies/shared-components/commit/36d2f009f35323d44284bc00cbc86117bbe0f287))
+* inspector tool moved to debugger panel ([fbafacf](https://github.com/MapColonies/shared-components/commit/fbafacfe77a0f34bdfb138b48bc4cfe71edbbec6))
+* key missing warning ([6df5f9b](https://github.com/MapColonies/shared-components/commit/6df5f9b05d2cb3281d6aff9edfddc176943b360b))
+* layer manager meta mapping ([ec71502](https://github.com/MapColonies/shared-components/commit/ec715028b2c560e3ff6f646c6770c3b8d9832e9c))
+* mandatory layerManagerMetaMapping ([0b39977](https://github.com/MapColonies/shared-components/commit/0b39977e4f04b6a191f61f26fa6d55cf4d39d13e))
+* mandatory mapping layer ([79ea824](https://github.com/MapColonies/shared-components/commit/79ea824cd81421da70bdb4b8b9b2a60a677c4832))
+* mandatory searchLayerPredicate ([56fa6bf](https://github.com/MapColonies/shared-components/commit/56fa6bf5e199c99de2888452511d93b1bb984d8d))
+* mapping mandatory fields ([254e2b9](https://github.com/MapColonies/shared-components/commit/254e2b950f478c6c77543cbae2882eab401a93f8))
+* migrate argTypes defaultValue to args in Cesium stories ([e2a49fd](https://github.com/MapColonies/shared-components/commit/e2a49fdafeec51e8e3c8707410f178322784997b))
+* missing searchLayerPredicate ([ed544f2](https://github.com/MapColonies/shared-components/commit/ed544f26016d8d102059136fd065a330ccdb3b09))
+* naming convention ([465bdea](https://github.com/MapColonies/shared-components/commit/465bdea26f158691968e0bc0fcf39d57ba31d328))
+* new cesium map props ([eed776d](https://github.com/MapColonies/shared-components/commit/eed776da145e443c06134af2e3821e5b14127c96))
+* new checkboxes layout and active layers transparent service layers ([1b7ac75](https://github.com/MapColonies/shared-components/commit/1b7ac75d8163fe5ce9ebdd2c3c8c4a0ce26ef4c2))
+* ol map stories ([bb3ad18](https://github.com/MapColonies/shared-components/commit/bb3ad187c4b648273941ed210ba93640dce00af8))
+* ol map stories ([c9d2692](https://github.com/MapColonies/shared-components/commit/c9d26920883f90340189241b3545183507207024))
+* pp story ([08476f9](https://github.com/MapColonies/shared-components/commit/08476f91a02db2966358cb7b05636115d76bf9c1))
+* reexport types ([023d17b](https://github.com/MapColonies/shared-components/commit/023d17b5254110f91bd3ef6bed285e5090b0055d))
+* remove inageryprovider  not in interface a anymore ([bd9fd9b](https://github.com/MapColonies/shared-components/commit/bd9fd9b410ee0e82bf8ffb8f9817e1ab49c6ee02))
+* required fields ([eaacf23](https://github.com/MapColonies/shared-components/commit/eaacf230bb82c402469fad70b9a0b481d21f2a31))
+* rerun optimization when layer order changes ([21d1a5d](https://github.com/MapColonies/shared-components/commit/21d1a5d900c9f27e9f8e81953afb30af9c3e5bca))
+* reuse ([cddbe4d](https://github.com/MapColonies/shared-components/commit/cddbe4d8ac66924b0138bb780894c680f73b45e7))
+* reuse ([78abd0f](https://github.com/MapColonies/shared-components/commit/78abd0f56fbb8b41dd81d75389af796204d1a8e9))
+* revert ([af04efc](https://github.com/MapColonies/shared-components/commit/af04efcdaec7fb848f61336c130a7cea0b8196e3))
+* revert  NODE_OPTIONS ([504a53e](https://github.com/MapColonies/shared-components/commit/504a53e773398aadd0c1dc54780427bb0ed97bdd))
+* revert tileset.imageryLayers.addImageryProvider ([2669a6c](https://github.com/MapColonies/shared-components/commit/2669a6ca6f931c0d21d79b2b036310bf040cce8c))
+* silence ESLint warnings in story files ([fc0e7ca](https://github.com/MapColonies/shared-components/commit/fc0e7cad8b82860b952ff6b0529c87d259d6e764))
+* stories changes ([fbe3171](https://github.com/MapColonies/shared-components/commit/fbe3171c4f75402a9478a128055b4a06c8350d78))
+* stories with 3D model meta ([24ae456](https://github.com/MapColonies/shared-components/commit/24ae45667ef261fbbe1572b0d475ae2ca9fb65bf))
+* story style ([8518588](https://github.com/MapColonies/shared-components/commit/8518588157b103a0b5c1c321de52572b94188976))
+* sync stories ([1051874](https://github.com/MapColonies/shared-components/commit/1051874e706285c6b572e06d4595d516b652bade))
+* sync stories with new props ([663a3a5](https://github.com/MapColonies/shared-components/commit/663a3a540f4b5be67df802cfd4171afdd01f8e31))
+* terrain stories ([d89b933](https://github.com/MapColonies/shared-components/commit/d89b933098d517ce44d7bce3b0df7932809a96f2))
+* use layersManager instead of cesium mapViewer.imageryLayers directly ([67e53c5](https://github.com/MapColonies/shared-components/commit/67e53c5cf963e2392bbe494178f297f5e0f0727e))
+* use meta ([1fc1207](https://github.com/MapColonies/shared-components/commit/1fc120754bb54b1b2770e037da8326ea2db8eb46))
+* wfs ([2c6c4d3](https://github.com/MapColonies/shared-components/commit/2c6c4d3433f116639ad636ec1c9e7f0fc1e661ee))
+* when predicate fails meta.id is never attached so managed raster treated as service layer ([d23d34a](https://github.com/MapColonies/shared-components/commit/d23d34a06dc403935064cf6f9a24a1ea67482edd))
+* working ([057f497](https://github.com/MapColonies/shared-components/commit/057f49719e1051999beaf4b8ab86b6cbc2087fb6))
+* yarn storybook with node 24 ([3b734b1](https://github.com/MapColonies/shared-components/commit/3b734b1c95c1c92a059fd59442271173d147261a))
+* zoomLevel ([f816496](https://github.com/MapColonies/shared-components/commit/f8164960ad77940e92a557b7c9a2ba66d8c27312))
+
+
+### Features
+
+* add 3d models to active layers panel ([aecbbdd](https://github.com/MapColonies/shared-components/commit/aecbbddb8af4d54456602b749cc3d1cfcc2da2b5))
+* add 3D models to layersManager ([0d759c8](https://github.com/MapColonies/shared-components/commit/0d759c8396734ba7336dcde7433725e1bba6532c))
+* tileset.imageryLayers.addImageryProvider ([e46e4cc](https://github.com/MapColonies/shared-components/commit/e46e4cc9ef93148c09f5e9c834ce5f137852c80b))
+* update resium and cesium ([f4e2ffe](https://github.com/MapColonies/shared-components/commit/f4e2ffee97c11b7b04441829911f45a023409359))
+
+
+
+
+
 ## [4.14.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.14.0...@map-colonies/react-components@4.14.1) (2026-06-07)
 
 

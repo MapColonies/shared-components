@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-core@4.2.0...@map-colonies/react-core@4.2.1) (2026-07-02)
+
+
+### Bug Fixes
+
+* restore typed Story annotation in react-ui-components stories ([8259d70](https://github.com/MapColonies/shared-components/commit/8259d70311ba99f056fb3802f7bd2a87683a1fcb))
+* stories changes ([fbe3171](https://github.com/MapColonies/shared-components/commit/fbe3171c4f75402a9478a128055b4a06c8350d78))
+
+
+
+
+
 # [4.2.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-core@4.1.1...@map-colonies/react-core@4.2.0) (2023-09-21)
 
 

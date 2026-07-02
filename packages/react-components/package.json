@@ -1,6 +1,6 @@
 {
   "name": "@map-colonies/react-components",
-  "version": "4.14.1",
+  "version": "4.15.0",
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
@@ -27,7 +27,7 @@
     "@cmcleese/cesium-navigation": "^4.0.7",
     "@date-io/date-fns": "^1.3.13",
     "@here/quantized-mesh-decoder": "^1.2.8",
-    "@map-colonies/react-core": "^4.2.0",
+    "@map-colonies/react-core": "^4.2.1",
     "@material-ui/core": "^4.11.0",
     "@material-ui/pickers": "^3.2.10",
     "@turf/area": "^6.5.0",
