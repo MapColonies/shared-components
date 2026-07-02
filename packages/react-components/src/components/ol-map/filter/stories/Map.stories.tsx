@@ -1,4 +1,4 @@
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { Button, Typography } from '@map-colonies/react-core';
 import { MapFilterContainer } from '../map-filter-container';
 import { CSFStory } from '../../../utils/story';

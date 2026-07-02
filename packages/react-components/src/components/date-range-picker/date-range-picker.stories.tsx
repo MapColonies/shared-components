@@ -1,5 +1,5 @@
-import { action } from '@storybook/addon-actions';
-import { Story } from '@storybook/react/types-6-0';
+import { action } from 'storybook/actions';
+import type { StoryFn } from '@storybook/react';
 import { CSFStory } from '../utils/story';
 import { SupportedLocales } from '../models/enums';
 import { DateTimeRangePicker } from './date-range-picker';
@@ -18,9 +18,7 @@ DateTime.story = {
   name: 'Date time range',
 };
 
-export const DateOnly: CSFStory<JSX.Element> = () => (
-  <DateTimeRangePicker showTime={false} onChange={action('date changed')} />
-);
+export const DateOnly: CSFStory<JSX.Element> = () => <DateTimeRangePicker showTime={false} onChange={action('date changed')} />;
 
 DateOnly.story = {
   name: 'Date range (date only)',
@@ -45,7 +43,7 @@ DateMinMaxLimitTime.story = {
   name: 'Date time range with minDate & maxDate ',
 };
 
-export const DateTimeFormControl: Story = (args: Record<string, unknown>) => {
+export const DateTimeFormControl: StoryFn = (args: Record<string, unknown>) => {
   return <DateTimeRangePickerFormControl {...args} onChange={action('date changed')} />;
 };
 
@@ -72,7 +70,7 @@ DateTimeFormControl.argTypes = {
   },
 };
 
-export const DateTimeLocalizedFormControl: Story = (args: Record<string, unknown>) => {
+export const DateTimeLocalizedFormControl: StoryFn = (args: Record<string, unknown>) => {
   const local = {
     setText: 'MySet',
     startPlaceHolderText: 'MyStart',
@@ -113,7 +111,7 @@ DateTimeLocalizedFormControl.argTypes = {
   },
 };
 
-export const DateTimeLocalizedAsFormControl: Story = (args: Record<string, unknown>) => {
+export const DateTimeLocalizedAsFormControl: StoryFn = (args: Record<string, unknown>) => {
   const local = {
     setText: 'MySet',
     startPlaceHolderText: 'MyStart',
@@ -145,7 +143,7 @@ DateTimeLocalizedAsFormControl.argTypes = {
   },
 };
 
-export const DateTimeHebrewLocalizedAsFormControl: Story = (args: Record<string, unknown>) => {
+export const DateTimeHebrewLocalizedAsFormControl: StoryFn = (args: Record<string, unknown>) => {
   const local = {
     setText: 'אישור',
     startPlaceHolderText: 'זמן התחלה',

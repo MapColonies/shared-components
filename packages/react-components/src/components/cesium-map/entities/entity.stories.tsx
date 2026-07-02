@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Cartesian3, Color } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumEntity, RCesiumEntityProps } from './entity';
@@ -70,12 +70,9 @@ const CanvasEntity: React.FC<RCesiumEntityProps> = (props) => {
   return <CesiumEntity {...props} billboard={{ image }} />;
 };
 
-export const Basic: Story = (args) => (
+export const Basic: StoryFn = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity
         {...args}
         name="test"
@@ -88,13 +85,10 @@ export const Basic: Story = (args) => (
 );
 Basic.storyName = 'Basic Entity';
 
-export const WithDescription: Story<RCesiumEntityProps> = (args) => {
+export const WithDescription: StoryFn<RCesiumEntityProps> = (args) => {
   const [count, setCount] = useState(0);
   return (
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity
         {...args}
         name="test1"
@@ -124,11 +118,8 @@ export const WithDescription: Story<RCesiumEntityProps> = (args) => {
   );
 };
 
-export const AnimatedCanvas: Story<RCesiumEntityProps> = () => (
-  <CesiumMap
-    baseMaps={BASE_MAPS}
-    layerManagerMetaMapping={layerManagerMetaMapping}
-  >
+export const AnimatedCanvas: StoryFn<RCesiumEntityProps> = () => (
+  <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
     <CanvasEntity name="test" description="test" position={Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100)} />
   </CesiumMap>
 );

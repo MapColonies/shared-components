@@ -1,18 +1,16 @@
 import React from 'react';
 
-import { themes } from '@storybook/theming';
+import { themes } from 'storybook/theming';
 import { ThemeProvider, Themes } from '../src/components/theme';
 import { useDarkMode } from 'storybook-dark-mode';
 import { Preview } from '@storybook/react';
 
 export default {
-  parameters: [
-    {
-      docs: {
-        theme: themes.dark,
-      },
+  parameters: {
+    docs: {
+      theme: themes.dark,
     },
-  ],
+  },
   decorators: [
     (story) => {
       const prefersDarkMode = useDarkMode();

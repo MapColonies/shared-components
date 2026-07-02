@@ -6,7 +6,7 @@ import {
   TerrainProvider,
 } from 'cesium';
 import React, { useState } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { Cesium3DTileset } from '../layers';
@@ -103,17 +103,11 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
   );
 };
 
-export const QuantizedMeshHeightsTool: Story = () => {
+export const QuantizedMeshHeightsTool: StoryFn = () => {
   const [center] = useState<[number, number]>([34.817, 31.911]);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        center={center}
-        zoom={5}
-        baseMaps={BASE_MAPS}
-        showDebuggerTool={true}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
+      <CesiumMap center={center} zoom={5} baseMaps={BASE_MAPS} showDebuggerTool={true} layerManagerMetaMapping={layerManagerMetaMapping}>
         <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }} isZoomTo={true} />
         <div style={terrainControlsStyle}>
           <TerrainianHeightTool />

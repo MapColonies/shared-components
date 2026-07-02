@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
-import { Story, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 import { Box } from '../box';
 import { BASE_MAPS } from './helpers/constants';
 import { getLayerId, ICesiumImageryLayer, IRasterLayer } from './layers-manager';
-import { CesiumMap, IBaseMaps, IContextMenuData, useCesiumMap } from './map';
+import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
 import { CesiumCartesian2, CesiumSceneMode } from './proxied.types';
 
-export default {
+const meta: Meta = {
   title: 'Cesium Map',
   component: CesiumMap,
   parameters: {
     layout: 'fullscreen',
   },
-} as Meta;
+};
+export default meta;
 
 interface ILayersMozaikProps {
   layers: IRasterLayer[];
@@ -125,10 +126,12 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
     top: `${position.y}px`,
   };
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     setPickedLayers(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
     console.log(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
   }, [position]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <>
@@ -355,7 +358,7 @@ const LayersMozaik: React.FC<ILayersMozaikProps> = (props) => {
   );
 };
 
-export const MapWithLayersManagerAndContextMenu: Story = () => {
+export const MapWithLayersManagerAndContextMenu: StoryFn = () => {
   const [center] = useState<[number, number]>([34.811, 31.908]);
 
   return (

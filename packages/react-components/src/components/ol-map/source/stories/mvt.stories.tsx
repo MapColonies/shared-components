@@ -6,7 +6,7 @@ import { TileLayer } from '../../layers';
 import { MVTSource, getMVTOptions } from '../mvt';
 import { TileOsm } from '..';
 
-export default {
+const meta = {
   title: 'OL Map/Tiles/MVT',
   component: VectorTileLayer,
   subcomponents: MVTSource,
@@ -14,6 +14,7 @@ export default {
     layout: 'fullscreen',
   },
 };
+export default meta;
 
 const mapDivStyle = {
   height: '100%',

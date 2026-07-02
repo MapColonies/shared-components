@@ -1,6 +1,6 @@
 import { Feature } from 'geojson';
 import React, { useState, useEffect } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
@@ -281,7 +281,7 @@ const LOCALIZED_GEOCODER_OPTIONS = [
   },
 ] satisfies GeocoderOptions[];
 
-export const BaseMap: Story = (args: CesiumMapProps) => {
+export const BaseMap: StoryFn = (args: CesiumMapProps) => {
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
@@ -290,27 +290,23 @@ export const BaseMap: Story = (args: CesiumMapProps) => {
   );
 };
 
-BaseMap.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
+BaseMap.args = {
+  baseMaps: BASE_MAPS,
 };
 
-export const ZoomedMap: Story = (args: CesiumMapProps) => (
+export const ZoomedMap: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
+ZoomedMap.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.9578094, 32.8178637],
+  zoom: 3,
+};
 ZoomedMap.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.9578094, 32.8178637],
-  },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
@@ -326,7 +322,7 @@ const cesiumTheme = {
   '--mdc-theme-gc-warning-high': '#FFA032',
 };
 
-export const GeocoderPanel: Story = (args: CesiumMapProps) => (
+export const GeocoderPanel: StoryFn = (args: CesiumMapProps) => (
   <ThemeProvider options={cesiumTheme}>
     <div style={mapDivStyle}>
       <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
@@ -334,56 +330,50 @@ export const GeocoderPanel: Story = (args: CesiumMapProps) => (
   </ThemeProvider>
 );
 
+GeocoderPanel.args = {
+  baseMaps: BASE_MAPS,
+  sceneMode: CesiumSceneMode.SCENE2D,
+  projection: Proj.WGS84,
+  zoom: 3,
+  geocoderPanel: GEOCODER_OPTIONS,
+};
 GeocoderPanel.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  sceneMode: {
-    defaultValue: CesiumSceneMode.SCENE2D,
-  },
   projection: {
-    defaultValue: Proj.WGS84,
     control: {
       type: 'radio',
       options: [Proj.WEB_MERCATOR, Proj.WGS84],
     },
   },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  geocoderPanel: {
-    defaultValue: GEOCODER_OPTIONS,
   },
 };
 GeocoderPanel.storyName = 'Geocoder';
 
-export const MapWithProjection: Story = (args: CesiumMapProps) => (
+export const MapWithProjection: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
+MapWithProjection.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.9578094, 32.8178637],
+  projection: Proj.WGS84,
+  zoom: 3,
+};
 MapWithProjection.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.9578094, 32.8178637],
-  },
   projection: {
-    defaultValue: Proj.WGS84,
     control: {
       type: 'radio',
       options: [Proj.WEB_MERCATOR, Proj.WGS84],
     },
   },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
@@ -392,31 +382,27 @@ MapWithProjection.argTypes = {
   },
 };
 
-export const Map2DWithProjection: Story = (args: CesiumMapProps) => (
+export const Map2DWithProjection: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
+Map2DWithProjection.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.9578094, 32.8178637],
+  sceneMode: CesiumSceneMode.SCENE2D,
+  projection: Proj.WGS84,
+  zoom: 8,
+};
 Map2DWithProjection.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.9578094, 32.8178637],
-  },
-  sceneMode: {
-    defaultValue: CesiumSceneMode.SCENE2D,
-  },
   projection: {
-    defaultValue: Proj.WGS84,
     control: {
       type: 'radio',
       options: [Proj.WEB_MERCATOR, Proj.WGS84],
     },
   },
   zoom: {
-    defaultValue: 8,
     control: {
       type: 'range',
       min: 0,
@@ -426,72 +412,64 @@ Map2DWithProjection.argTypes = {
 };
 Map2DWithProjection.storyName = '2D Map With Projection';
 
-export const LocalizedMap: Story = (args: CesiumMapProps) => (
+export const LocalizedMap: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
   </div>
 );
 
-LocalizedMap.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.9578094, 32.8178637],
-  },
+LocalizedMap.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.9578094, 32.8178637],
+  /* eslint-disable @typescript-eslint/naming-convention */
   locale: {
-    /* eslint-disable @typescript-eslint/naming-convention */
-    defaultValue: {
-      METERS_UNIT: "מ'",
-      KILOMETERS_UNIT: "קמ'",
-      ZOOM_LABEL: 'זום',
-      DEBUG_SECTION_DATA: 'מידע',
-      DEBUG_SECTION_LAYERS: 'שכבות',
-      DEBUG_SECTION_TOOLS: 'כלים',
-      TILE_REQUESTS_OPTIMIZATION_CHECKBOX: 'אופטימיזצית בקשות אריחים',
-      CESIUM_INSPECTOR_CHECKBOX: 'כלי בדיקה של סזיום',
-      WITH_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים עם שקיפות',
-      WITHOUT_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים ללא שקיפות',
-      SHOW_FEATURE_ON_MAP: 'הראה על המפה',
-      IN_MAP_EXTENT: 'חיפוש בתיחום נוכחי',
-      SEARCH_PLACEHOLDER: 'חיפוש...',
-      NO_RESULTS: 'אין תוצאות',
-      WFS_TITLE: 'שכבות מידע',
-      WFS_CACHE: 'בזכרון',
-      WFS_EXTENT: 'בתצוגה',
-      NO_DATA_LAYERS: 'לא נמצאו שכבות מידע בתצוגה',
-      ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
-      IMAGERY: 'ראסטר',
-      SERVICE: 'שירות',
-      DATA: 'מידע',
-      '3D': 'תלת-מימד',
-      FLY_TO: 'הצג מיקום',
-      REMOVE: 'הסר',
-      BASE_MAP_TITLE: 'מפות בסיס',
-      TERRAIN_TITLE: 'פני השטח',
-    },
-    /* eslint-enable @typescript-eslint/naming-convention */
+    METERS_UNIT: "מ'",
+    KILOMETERS_UNIT: "קמ'",
+    ZOOM_LABEL: 'זום',
+    DEBUG_SECTION_DATA: 'מידע',
+    DEBUG_SECTION_LAYERS: 'שכבות',
+    DEBUG_SECTION_TOOLS: 'כלים',
+    TILE_REQUESTS_OPTIMIZATION_CHECKBOX: 'אופטימיזצית בקשות אריחים',
+    CESIUM_INSPECTOR_CHECKBOX: 'כלי בדיקה של סזיום',
+    WITH_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים עם שקיפות',
+    WITHOUT_TRANSPARENCY_TOOLTIP: 'שכבה זו מכילה אריחים ללא שקיפות',
+    SHOW_FEATURE_ON_MAP: 'הראה על המפה',
+    IN_MAP_EXTENT: 'חיפוש בתיחום נוכחי',
+    SEARCH_PLACEHOLDER: 'חיפוש...',
+    NO_RESULTS: 'אין תוצאות',
+    WFS_TITLE: 'שכבות מידע',
+    WFS_CACHE: 'בזכרון',
+    WFS_EXTENT: 'בתצוגה',
+    NO_DATA_LAYERS: 'לא נמצאו שכבות מידע בתצוגה',
+    ACTIVE_LAYERS_TITLE: 'שכבות פעילות',
+    IMAGERY: 'ראסטר',
+    SERVICE: 'שירות',
+    DATA: 'מידע',
+    '3D': 'תלת-מימד',
+    FLY_TO: 'הצג מיקום',
+    REMOVE: 'הסר',
+    BASE_MAP_TITLE: 'מפות בסיס',
+    TERRAIN_TITLE: 'פני השטח',
   },
+  /* eslint-enable @typescript-eslint/naming-convention */
+  projection: Proj.WGS84,
+  zoom: 3,
+  geocoderPanel: LOCALIZED_GEOCODER_OPTIONS,
+  showDebuggerTool: true,
+};
+LocalizedMap.argTypes = {
   projection: {
-    defaultValue: Proj.WGS84,
     control: {
       type: 'radio',
       options: [Proj.WEB_MERCATOR, Proj.WGS84],
     },
   },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
-  },
-  geocoderPanel: {
-    defaultValue: LOCALIZED_GEOCODER_OPTIONS,
-  },
-  showDebuggerTool: {
-    defaultValue: true,
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';

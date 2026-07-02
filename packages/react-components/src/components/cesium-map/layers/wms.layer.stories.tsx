@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { ImageryLayer } from 'cesium';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProvider } from '../layers-manager';
@@ -60,12 +60,9 @@ const wmsLayerMeta2 = {
   },
 };
 
-export const MapWithWMSLayers: Story = () => (
+export const MapWithWMSLayers: StoryFn = () => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumWMSLayer options={optionsWMS} meta={wmsLayerMeta} />
       <CesiumWMSLayer options={optionsWMS2} alpha={0.3} meta={wmsLayerMeta2} />
     </CesiumMap>

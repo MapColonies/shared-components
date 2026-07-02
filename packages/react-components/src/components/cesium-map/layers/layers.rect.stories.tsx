@@ -1,6 +1,6 @@
 import { ImageryLayer, Rectangle } from 'cesium';
-import React, { useLayoutEffect } from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import React, { useLayoutEffect, useMemo } from 'react';
+import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl, IRasterLayer, LayerType } from '../layers-manager';
@@ -31,8 +31,8 @@ const layerManagerMetaMapping = {
 const mapViewProps: CesiumMapProps = {
   center: [34.811, 31.908],
   zoom: 14,
-  imageryProvider: false,
   baseMaps: BASE_MAPS,
+  layerManagerMetaMapping,
 };
 
 const optionsRectXYZ = {
@@ -64,12 +64,9 @@ const layerMetaRectXYZ = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsRectXYZ.url,
 };
 
-export const MapWithXYZLayersAndRect: Story = () => (
+export const MapWithXYZLayersAndRect: StoryFn = () => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      {...mapViewProps}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumXYZLayer rectangle={childLayerRect} options={optionsRectXYZ} meta={layerMetaRectXYZ} />
     </CesiumMap>
   </div>
@@ -77,7 +74,7 @@ export const MapWithXYZLayersAndRect: Story = () => (
 
 MapWithXYZLayersAndRect.storyName = 'XYZ child layer with rect';
 
-export const MapWithSettings: Story = () => {
+export const MapWithSettings: StoryFn = () => {
   const layer = {
     id: '2_raster_ext',
     type: 'XYZ_LAYER' as LayerType,
@@ -91,10 +88,7 @@ export const MapWithSettings: Story = () => {
 
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...mapViewProps}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-      >
+      <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
         <LayerViewer layer={layer} />
       </CesiumMap>
     </div>
@@ -116,18 +110,21 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
   }, 2000);
 
   // Mockin footprint data on layer meta
-  const layerFootprint = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [34.8099445223518, 31.9061345394902],
-        [34.8200994167574, 31.9061345394902],
-        [34.8200994167574, 31.9106311613979],
-        [34.8099445223518, 31.9106311613979],
-        [34.8099445223518, 31.9061345394902],
+  const layerFootprint = useMemo(
+    () => ({
+      type: 'Polygon',
+      coordinates: [
+        [
+          [34.8099445223518, 31.9061345394902],
+          [34.8200994167574, 31.9061345394902],
+          [34.8200994167574, 31.9106311613979],
+          [34.8099445223518, 31.9106311613979],
+          [34.8099445223518, 31.9061345394902],
+        ],
       ],
-    ],
-  };
+    }),
+    []
+  );
 
   useLayoutEffect(() => {
     const layerManagerRect = Rectangle.fromDegrees(...bbox(layerFootprint));

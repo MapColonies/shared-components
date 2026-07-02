@@ -9,7 +9,7 @@ import { GeoJSONFeature } from '../feature';
 import { TileOsm } from '../source';
 import { VectorSource } from '../source/vector-source';
 
-export default {
+const meta = {
   title: 'OL Map/Map',
   component: Legend,
   subcomponents: GeoJSONFeature,
@@ -17,6 +17,7 @@ export default {
     layout: 'fullscreen',
   },
 };
+export default meta;
 
 const geometries: Geometries[] = [
   {

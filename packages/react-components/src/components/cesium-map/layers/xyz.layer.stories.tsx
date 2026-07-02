@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { ImageryLayer } from 'cesium';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
@@ -52,12 +52,9 @@ const xyzLayerMeta2 = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ2.url,
 };
 
-export const MapWithXYZLayers: Story = () => (
+export const MapWithXYZLayers: StoryFn = () => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumXYZLayer options={optionsXYZ} meta={xyzLayerMeta} />
       <CesiumXYZLayer options={optionsXYZ2} alpha={0.5} meta={xyzLayerMeta2} />
     </CesiumMap>

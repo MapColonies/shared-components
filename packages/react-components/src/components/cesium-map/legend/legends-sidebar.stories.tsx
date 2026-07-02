@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageryLayer } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumXYZLayer } from '../layers/xyz.layer';
@@ -40,7 +40,7 @@ const layerMetaSanDiego = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZSanDiego.url,
 };
 
-export const MapWithLegends: Story = () => {
+export const MapWithLegends: StoryFn = () => {
   const [center] = useState<[number, number]>([-117.30644008676421, 33.117098433617564]); //Sandiego Poinsettia Park
   return (
     <div style={mapDivStyle}>

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
-import { Story } from '@storybook/react/types-6-0';
+import type { StoryFn } from '@storybook/react';
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core';
 import { Box } from '../box';
 import { SupportedLocales } from '../models';
@@ -207,7 +207,7 @@ const useFileActionHandler = (
   );
 };
 
-export const ReadOnlyMode: Story = () => {
+export const ReadOnlyMode: StoryFn = () => {
   const {
     fileMap,
     currentFolderId,
@@ -227,7 +227,7 @@ export const ReadOnlyMode: Story = () => {
   );
 };
 
-export const DarkTheme: Story = () => {
+export const DarkTheme: StoryFn = () => {
   const {
     fileMap,
     currentFolderId,
@@ -258,7 +258,7 @@ export const DarkTheme: Story = () => {
   );
 };
 
-export const Localized: Story = () => {
+export const Localized: StoryFn = () => {
   const {
     fileMap,
     currentFolderId,
@@ -291,7 +291,7 @@ export const Localized: Story = () => {
   );
 };
 
-export const FilesSelection: Story = () => {
+export const FilesSelection: StoryFn = () => {
   const {
     fileMap,
     currentFolderId,

@@ -73,10 +73,11 @@ const customStyles = {
   },
 };
 
-export default {
+const meta = {
   title: 'Multi Selection',
   component: MultiSelection,
 };
+export default meta;
 
 export const MultiSelectionArea: CSFStory<JSX.Element> = () => {
   const [selectedOptions, setSelectedOptions] = useState([{ value: 'blue', label: 'Blue', color: '#0052CC', disabled: true }]);

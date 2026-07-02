@@ -1,5 +1,5 @@
 import { Cartesian3, Color } from 'cesium';
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
 import { CesiumEntity } from './entity';
@@ -27,12 +27,9 @@ const layerManagerMetaMapping = {
   },
 };
 
-export const Polygon: Story = (args) => (
+export const Polygon: StoryFn = (args) => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumEntity {...args} name="test">
         <CesiumEntityStaticDescription>
           <h1>Hello!</h1>

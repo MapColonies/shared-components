@@ -21,11 +21,11 @@ import {
   Rectangle,
   PerspectiveFrustum,
 } from 'cesium';
-import { BBox, Feature, Point, Polygon } from 'geojson';
+import { BBox, Feature, GeoJsonProperties, Geometry, Point, Polygon } from 'geojson';
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import centroid from '@turf/centroid';
-import { point, Properties } from '@turf/helpers';
+import { point } from '@turf/helpers';
 import * as turf from '@turf/helpers';
 import intersect from '@turf/intersect';
 import pointToPolygonDistance from '@turf/point-to-polygon-distance';
@@ -469,7 +469,7 @@ export const defaultVisualizationHandler = (
     };
   };
 
-  const calcIntersectionRation = (polygon1: turf.Geometry, polygon2: turf.Geometry) => {
+  const calcIntersectionRation = (polygon1: Geometry, polygon2: Geometry) => {
     return area(polygon1) / area(polygon2);
   };
 
@@ -477,13 +477,13 @@ export const defaultVisualizationHandler = (
     return;
   }
 
-  const labelPos = [] as turf.Feature<turf.Point>[];
+  const labelPos = [] as Feature<Point>[];
 
   dataSource?.entities.values.forEach((entity: Entity) => {
     if (extent && labeling && is2D) {
       try {
         const extentPolygon = bboxPolygon(extent);
-        const featureClippedPolygon = intersect(getGeoJsonFromEntity(entity) as Polygon, extentPolygon) as Feature<Polygon, Properties>;
+        const featureClippedPolygon = intersect(getGeoJsonFromEntity(entity) as Polygon, extentPolygon) as Feature<Polygon, GeoJsonProperties>;
         if (featureClippedPolygon) {
           const labelValue = entity.properties?.label.getValue(JulianDate.now());
           const featureClippedPolygonCenter = centroid(featureClippedPolygon as unknown as Polygon, {
@@ -505,7 +505,7 @@ export const defaultVisualizationHandler = (
               properties: {},
               geometry: labelRect,
             });
-            const intersectionRatio = calcIntersectionRation(labelIntersection?.geometry as turf.Geometry, labelRect);
+            const intersectionRatio = calcIntersectionRation(labelIntersection?.geometry as Geometry, labelRect);
             if (intersectionRatio > 0.7) {
               labelPos.push(featureClippedPolygonCenter);
             }

@@ -1,7 +1,7 @@
 import { ArcGISTiledElevationTerrainProvider, TerrainProvider } from 'cesium';
 import React, { useState, useEffect } from 'react';
-import { Story, Meta } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import type { StoryFn, Meta } from '@storybook/react';
+import { action } from 'storybook/actions';
 import { getValue } from '../../utils/config';
 import { BASE_MAPS } from '../helpers/constants';
 import { CesiumMap } from '../map';
@@ -38,7 +38,7 @@ const useArcGisTerrainProvider = (): TerrainProvider | undefined => {
   return provider;
 };
 
-export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
+export const Cesium3DTilesetLayer: StoryFn = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
       <Cesium3DTileset
@@ -59,12 +59,12 @@ export const Cesium3DTilesetLayer: Story = (args: Record<string, unknown>) => (
   </div>
 );
 
+Cesium3DTilesetLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 3,
+};
 Cesium3DTilesetLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 3,
     control: {
       type: 'range',
       min: 0,
@@ -75,7 +75,7 @@ Cesium3DTilesetLayer.argTypes = {
 
 Cesium3DTilesetLayer.storyName = '3D Layer';
 
-export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<string, unknown>) => (
+export const Cesium3DTilesetWithHeightCorrectionLayer: StoryFn = (args: Record<string, unknown>) => (
   <div style={mapDivStyle}>
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
       <Cesium3DTileset
@@ -97,26 +97,24 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: Story = (args: Record<str
   </div>
 );
 
+Cesium3DTilesetWithHeightCorrectionLayer.args = {
+  baseMaps: BASE_MAPS,
+  zoom: 17,
+  center: [-75.61208, 40.04227],
+};
 Cesium3DTilesetWithHeightCorrectionLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
   zoom: {
-    defaultValue: 17,
     control: {
       type: 'range',
       min: 0,
       max: 20,
     },
   },
-  center: {
-    defaultValue: [-75.61208, 40.04227],
-  },
 };
 
 Cesium3DTilesetWithHeightCorrectionLayer.storyName = '3D with Height Correction Layer';
 
-export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) => {
+export const CesiumSolar3DTilesetLayer: StoryFn = (args: Record<string, unknown>) => {
   const terrainProvider = useArcGisTerrainProvider();
   return (
     <div style={mapDivStyle}>
@@ -127,15 +125,13 @@ export const CesiumSolar3DTilesetLayer: Story = (args: Record<string, unknown>) 
   );
 };
 
+CesiumSolar3DTilesetLayer.args = {
+  baseMaps: BASE_MAPS,
+  center: [34.811, 31.908],
+  zoom: 14,
+};
 CesiumSolar3DTilesetLayer.argTypes = {
-  baseMaps: {
-    defaultValue: BASE_MAPS,
-  },
-  center: {
-    defaultValue: [34.811, 31.908],
-  },
   zoom: {
-    defaultValue: 14,
     control: {
       type: 'range',
       min: 0,

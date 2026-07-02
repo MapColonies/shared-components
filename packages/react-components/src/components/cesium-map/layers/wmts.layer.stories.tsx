@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0';
+import type { StoryFn, Meta } from '@storybook/react';
 import { Credit } from 'cesium';
 import { ImageryLayer } from 'cesium';
 import { BASE_MAPS } from '../helpers/constants';
@@ -67,12 +67,9 @@ const wmtsLayerMeta2 = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsWMTS2.url,
 };
 
-export const MapWithWMTSLayers: Story = () => (
+export const MapWithWMTSLayers: StoryFn = () => (
   <div style={mapDivStyle}>
-    <CesiumMap
-      baseMaps={BASE_MAPS}
-      layerManagerMetaMapping={layerManagerMetaMapping}
-    >
+    <CesiumMap baseMaps={BASE_MAPS} layerManagerMetaMapping={layerManagerMetaMapping}>
       <CesiumWMTSLayer options={optionsWMTS} meta={wmtsLayerMeta} />
       <CesiumWMTSLayer options={optionsWMTS2} alpha={0.5} meta={wmtsLayerMeta2} />
     </CesiumMap>
