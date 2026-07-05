@@ -29,9 +29,13 @@ const config: StorybookConfig = {
 
     const base = await (commonConfig.viteFinal as NonNullable<StorybookConfig['viteFinal']>)(config);
 
+    const cesiumBuildRoot = path.resolve(__dirname, '../../../node_modules/cesium/Build');
     return mergeConfig(base, {
       base: '',
-      plugins: [cesium()],
+      plugins: [cesium({
+        cesiumBuildRootPath: cesiumBuildRoot,
+        cesiumBuildPath: path.join(cesiumBuildRoot, 'Cesium', path.sep),
+      })],
       optimizeDeps: {
         // Exclude cesium packages — they are too large to pre-bundle (Vite 8 dev
         // server fails to parse the resulting file). They are served raw instead.
