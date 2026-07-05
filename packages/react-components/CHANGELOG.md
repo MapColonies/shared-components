@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.15.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.15.0...@map-colonies/react-components@4.15.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* cesium draw helper material cached ([bb35158](https://github.com/MapColonies/shared-components/commit/bb35158001ac85d8ed1dd47785f940826796a0e1))
+
+
+
+
+
 # [4.15.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.14.1...@map-colonies/react-components@4.15.0) (2026-07-02)
 
 
