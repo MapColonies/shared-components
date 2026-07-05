@@ -8,14 +8,23 @@ var DrawHelper = (function () {
   // static variables
   var ellipsoid = Cesium.Ellipsoid.WGS84;
   var drawingVertexColor;
-  var material = Cesium.Material.fromType(Cesium.Material.ColorType);
+  var material;
+  // MC_CHANGE lazy: Material.fromType touches browser image-type globals
+  // (ImageBitmap/OffscreenCanvas) that don't exist outside a real browser, so this
+  // must not run at module-import time — only once a DrawHelper is actually built.
+  function getDefaultMaterial() {
+    if (!material) {
+      material = Cesium.Material.fromType(Cesium.Material.ColorType);
+    }
+    return material;
+  }
 
   // constructor
   function _(cesiumWidget, materialClr = new Cesium.Color(1.0, 1.0, 0.0, 0.5), drawingVertexClr = new Cesium.Color(1.0, 1.0, 1.0, 1.0)) {
     this._scene = cesiumWidget.scene;
 
     // UPDATE scoped varibles
-    material.uniforms.color = materialClr;
+    getDefaultMaterial().uniforms.color = materialClr;
     drawingVertexColor = drawingVertexClr;
 
     //MC_CHANGE disable/override tooltip
@@ -158,30 +167,52 @@ var DrawHelper = (function () {
     debugShowBoundingVolume: false,
   };
 
-  var defaultSurfaceOptions = copyOptions(defaultShapeOptions, {
-    appearance: new Cesium.EllipsoidSurfaceAppearance({
-      aboveGround: false,
-    }),
-    material: material,
-    granularity: Math.PI / 180.0,
-  });
+  // MC_CHANGE lazy: these embed a real Cesium Material/Appearance, so — same as
+  // getDefaultMaterial above — they must only be built on first real use, not at
+  // module-import time. Memoized so every caller still shares the same instance.
+  var defaultSurfaceOptions;
+  function getDefaultSurfaceOptions() {
+    if (!defaultSurfaceOptions) {
+      defaultSurfaceOptions = copyOptions(defaultShapeOptions, {
+        appearance: new Cesium.EllipsoidSurfaceAppearance({
+          aboveGround: false,
+        }),
+        material: getDefaultMaterial(),
+        granularity: Math.PI / 180.0,
+      });
+    }
+    return defaultSurfaceOptions;
+  }
 
   var defaultPolygonOptions = copyOptions(defaultShapeOptions, {});
   var defaultExtentOptions = copyOptions(defaultShapeOptions, {});
   var defaultCircleOptions = copyOptions(defaultShapeOptions, {});
-  var defaultEllipseOptions = copyOptions(defaultSurfaceOptions, {
-    rotation: 0,
-  });
 
-  var defaultPolylineOptions = copyOptions(defaultShapeOptions, {
-    width: 5,
-    geodesic: true,
-    granularity: 10000,
-    appearance: new Cesium.PolylineMaterialAppearance({
-      aboveGround: false,
-    }),
-    material: material,
-  });
+  var defaultEllipseOptions;
+  function getDefaultEllipseOptions() {
+    if (!defaultEllipseOptions) {
+      defaultEllipseOptions = copyOptions(getDefaultSurfaceOptions(), {
+        rotation: 0,
+      });
+    }
+    return defaultEllipseOptions;
+  }
+
+  var defaultPolylineOptions;
+  function getDefaultPolylineOptions() {
+    if (!defaultPolylineOptions) {
+      defaultPolylineOptions = copyOptions(defaultShapeOptions, {
+        width: 5,
+        geodesic: true,
+        granularity: 10000,
+        appearance: new Cesium.PolylineMaterialAppearance({
+          aboveGround: false,
+        }),
+        material: getDefaultMaterial(),
+      });
+    }
+    return defaultPolylineOptions;
+  }
 
   //    Cesium.Polygon.prototype.setStrokeStyle = setStrokeStyle;
   //
@@ -332,7 +363,7 @@ var DrawHelper = (function () {
         throw new Cesium.DeveloperError('Extent is required');
       }
 
-      options = copyOptions(options, defaultSurfaceOptions);
+      options = copyOptions(options, getDefaultSurfaceOptions());
 
       this.initialiseOptions(options);
 
@@ -375,7 +406,7 @@ var DrawHelper = (function () {
 
   _.PolygonPrimitive = (function () {
     function _(options) {
-      options = copyOptions(options, defaultSurfaceOptions);
+      options = copyOptions(options, getDefaultSurfaceOptions());
 
       this.initialiseOptions(options);
 
@@ -422,7 +453,7 @@ var DrawHelper = (function () {
         throw new Cesium.DeveloperError('Center and radius are required');
       }
 
-      options = copyOptions(options, defaultSurfaceOptions);
+      options = copyOptions(options, getDefaultSurfaceOptions());
 
       this.initialiseOptions(options);
 
@@ -479,7 +510,7 @@ var DrawHelper = (function () {
         throw new Cesium.DeveloperError('Center and semi major and semi minor axis are required');
       }
 
-      options = copyOptions(options, defaultEllipseOptions);
+      options = copyOptions(options, getDefaultEllipseOptions());
 
       this.initialiseOptions(options);
     }
@@ -552,7 +583,7 @@ var DrawHelper = (function () {
 
   _.PolylinePrimitive = (function () {
     function _(options) {
-      options = copyOptions(options, defaultPolylineOptions);
+      options = copyOptions(options, getDefaultPolylineOptions());
 
       this.initialiseOptions(options);
     }
@@ -814,12 +845,12 @@ var DrawHelper = (function () {
   };
 
   _.prototype.startDrawingPolygon = function (options) {
-    var options = copyOptions(options, defaultSurfaceOptions);
+    var options = copyOptions(options, getDefaultSurfaceOptions());
     this.startDrawingPolyshape(true, options);
   };
 
   _.prototype.startDrawingPolyline = function (options) {
-    var options = copyOptions(options, defaultPolylineOptions);
+    var options = copyOptions(options, getDefaultPolylineOptions());
     this.startDrawingPolyshape(false, options);
   };
 
@@ -952,7 +983,7 @@ var DrawHelper = (function () {
   }
 
   _.prototype.startDrawingExtent = function (options) {
-    var options = copyOptions(options, defaultSurfaceOptions);
+    var options = copyOptions(options, getDefaultSurfaceOptions());
 
     this.startDrawing(function () {
       if (extent != null) {
@@ -1040,7 +1071,7 @@ var DrawHelper = (function () {
   };
 
   _.prototype.startDrawingCircle = function (options) {
-    var options = copyOptions(options, defaultSurfaceOptions);
+    var options = copyOptions(options, getDefaultSurfaceOptions());
 
     this.startDrawing(function cleanUp() {
       if (circle != null) {
@@ -1664,7 +1695,7 @@ var DrawHelper = (function () {
         circleIcon: './assets/img/glyphicons_095_vector_path_circle.png',
         extentIcon: './assets/img/glyphicons_094_vector_path_square.png',
         clearIcon: './assets/img/glyphicons_067_cleaning.png',
-        polylineDrawingOptions: defaultPolylineOptions,
+        polylineDrawingOptions: getDefaultPolylineOptions(),
         polygonDrawingOptions: defaultPolygonOptions,
         extentDrawingOptions: defaultExtentOptions,
         circleDrawingOptions: defaultCircleOptions,
