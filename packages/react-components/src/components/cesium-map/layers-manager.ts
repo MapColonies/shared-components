@@ -225,16 +225,24 @@ class LayerManager {
     this.dataLayerUpdated.raiseEvent(this.dataLayers);
   }
 
-  // A general place to extend layer's data. Should be done when all providers (different types) are initialized
   public addMetaToLayer(meta: any, layerPredicate: (layer: ImageryLayer, idx: number) => boolean): void {
-    Promise.resolve().then(() => {
+    const apply = (): boolean => {
       const layer = this.layers.find(layerPredicate);
       if (layer) {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
         this.setLegends();
         this.layerUpdated.raiseEvent(meta);
+        return true;
       }
-    });
+      return false;
+    };
+    if (!apply()) {
+      const removeListener = this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
+        if (apply()) {
+          removeListener();
+        }
+      });
+    }
   }
 
   public addMetaToDataLayer(meta: any): void {
