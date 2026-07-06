@@ -176,7 +176,7 @@ class LayerManager {
   private shouldOptimizedTileRequests?: boolean;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
-  private readonly layerToOverlays: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
+  private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
   private readonly drapingLayerPredicate?: DrapingLayerPredicate;
 
   public constructor(
@@ -200,7 +200,7 @@ class LayerManager {
     this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
-    this.layerToOverlays = new Map();
+    this.layerToOverlaysMapping = new Map();
     this.drapingLayerPredicate = drapingLayerPredicate;
 
     configureLayerManagerMetaMapping(layerManagerMetaMapping);
@@ -244,7 +244,7 @@ class LayerManager {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
         this.setLegends();
         this.layerUpdated.raiseEvent(meta);
-        if (this.drapingLayerPredicate && !this.layerToOverlays.has(layer)) {
+        if (this.drapingLayerPredicate && !this.layerToOverlaysMapping.has(layer)) {
           if (this.drapingLayerPredicate(layer.meta as ICesiumImageryLayerMeta)) {
             this.addDrapingOverlaysByLayer(layer);
           }
@@ -615,13 +615,13 @@ class LayerManager {
         this.models.splice(index, 1);
       }
       if (this.drapingLayerPredicate) {
-        for (const [layer, overlays] of this.layerToOverlays.entries()) {
+        for (const [layer, overlays] of this.layerToOverlaysMapping.entries()) {
           const filtered = overlays.filter(({ tileset }) => tileset !== model.tileset);
           if (filtered.length !== overlays.length) {
             if (filtered.length === 0) {
-              this.layerToOverlays.delete(layer);
+              this.layerToOverlaysMapping.delete(layer);
             } else {
-              this.layerToOverlays.set(layer, filtered);
+              this.layerToOverlaysMapping.set(layer, filtered);
             }
           }
         }
@@ -641,9 +641,9 @@ class LayerManager {
       const provider = layer.imageryProvider;
       const overlayLayer = new ImageryLayer(provider);
       model.tileset.imageryLayers.add(overlayLayer);
-      const existing = this.layerToOverlays.get(layer) ?? [];
+      const existing = this.layerToOverlaysMapping.get(layer) ?? [];
       existing.push({ tileset: model.tileset, overlay: overlayLayer });
-      this.layerToOverlays.set(layer, existing);
+      this.layerToOverlaysMapping.set(layer, existing);
     }
   }
 
@@ -656,18 +656,18 @@ class LayerManager {
       model.tileset.imageryLayers.add(overlayLayer);
       overlays.push({ tileset: model.tileset, overlay: overlayLayer });
     }
-    this.layerToOverlays.set(layer, overlays);
+    this.layerToOverlaysMapping.set(layer, overlays);
   }
 
   private removeDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
-    const overlays = this.layerToOverlays.get(layer);
+    const overlays = this.layerToOverlaysMapping.get(layer);
     if (!overlays) { return; }
     for (const { tileset, overlay } of overlays) {
       if (!tileset.isDestroyed()) {
         tileset.imageryLayers.remove(overlay, true);
       }
     }
-    this.layerToOverlays.delete(layer);
+    this.layerToOverlaysMapping.delete(layer);
   }
 
   private setLegends(): void {
