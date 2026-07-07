@@ -68,6 +68,7 @@ export interface ICesiumImageryLayerMeta {
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
   examinedTiles?: Array<{ x?: number; y?: number; level?: number }>;
+  shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;
 }
 
@@ -84,6 +85,7 @@ export interface IRasterLayer {
   zIndex: number;
   options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
   show?: boolean;
+  shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;
 }
 
@@ -345,6 +347,11 @@ class LayerManager {
       };
       if (layer.show !== undefined) {
         cesiumLayer.show = layer.show;
+      }
+      if (this.drapingLayerPredicate && !this.layerToOverlaysMapping.has(cesiumLayer)) {
+        if (this.drapingLayerPredicate(cesiumLayer.meta as ICesiumImageryLayerMeta)) {
+          this.addDrapingOverlaysByLayer(cesiumLayer);
+        }
       }
     }
   }

@@ -118,6 +118,7 @@ export const BASE_MAPS: IBaseMaps = {
           type: 'XYZ_LAYER',
           opacity: 0.6,
           zIndex: 2,
+          shouldBeUsedInModelDraping: true,
           options: {
             url: getValue('GLOBAL', 'BM-TRANSPARENT_LABELS_OVERLAY-XYZ_LAYER'),
             layers: '',
