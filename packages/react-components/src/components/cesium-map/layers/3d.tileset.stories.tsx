@@ -172,7 +172,7 @@ export const Cesium3DTilesetWithDrapingLayer: StoryFn = (args: Record<string, un
       {...args}
       layerManagerMetaMapping={layerManagerMetaMapping}
       drapingLayerPredicate={(layerMeta: ICesiumImageryLayerMeta): boolean =>
-        layerMeta.id === 'TRANSPARENT_LABELS_OVERLAY'
+        layerMeta.id === 'TRANSPARENT_LABELS_OVERLAY' || layerMeta.shouldBeUsedInModelDraping === true
       }
     >
       <Cesium3DTileset
