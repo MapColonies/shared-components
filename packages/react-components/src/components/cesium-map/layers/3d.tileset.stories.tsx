@@ -50,7 +50,7 @@ export const Cesium3DTilesetLayer: StoryFn = (args: Record<string, unknown>) => 
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}
-        meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem A' } }}
+        meta={{ id: '1111111', layerRecord: { productName: 'Model A' } }}
         isZoomTo={true}
         onAllTilesLoad={action('onAllTilesLoad')}
         onInitialTilesLoad={action('onInitialTilesLoad')}
@@ -87,7 +87,7 @@ export const Cesium3DTilesetWithHeightCorrectionLayer: StoryFn = (args: Record<s
     <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}
-        meta={{ id: '2222222', layerRecord: { productName: 'Jerusalem B' } }}
+        meta={{ id: '2222222', layerRecord: { productName: 'Model B' } }}
         isZoomTo={false}
         heightFromGround={-10}
         onAllTilesLoad={action('onAllTilesLoad')}
@@ -132,7 +132,7 @@ export const CesiumSolar3DTilesetLayer: StoryFn = (args: Record<string, unknown>
       >
         <Cesium3DTileset
           url={getValue('GLOBAL', '3D_MODEL')}
-          meta={{ id: '3333333', layerRecord: { productName: 'Jerusalem C' } }}
+          meta={{ id: '3333333', layerRecord: { productName: 'Model C' } }}
           isZoomTo={true}
         />
       </CesiumMap>
@@ -177,7 +177,7 @@ export const Cesium3DTilesetWithDrapingLayer: StoryFn = (args: Record<string, un
     >
       <Cesium3DTileset
         url={getValue('GLOBAL', '3D_MODEL')}
-        meta={{ id: '4444444', layerRecord: { productName: 'Jerusalem with Draping' } }}
+        meta={{ id: '4444444', layerRecord: { productName: 'Model with Draping' } }}
         isZoomTo={true}
       />
       <CesiumImageryLayer

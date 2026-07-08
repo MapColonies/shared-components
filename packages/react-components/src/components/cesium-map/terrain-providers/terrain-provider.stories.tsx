@@ -168,7 +168,7 @@ export const QuantizedMeshProviders: StoryFn = () => {
         showDebuggerTool={true}
         layerManagerMetaMapping={layerManagerMetaMapping}
       >
-        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Jerusalem' } }} isZoomTo={true} />
+        <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Model' } }} isZoomTo={true} />
         <TerrainProviderSelector terrainProviderList={terrainProviderList} />
       </CesiumMap>
     </div>
