@@ -647,6 +647,7 @@ class LayerManager {
       if (!this.drapingLayerPredicate!(layer.meta as ICesiumImageryLayerMeta)) { continue; }
       const provider = layer.imageryProvider;
       const overlayLayer = new ImageryLayer(provider);
+      this.applyDrapingOverlayConfig(overlayLayer, layer);
       model.tileset.imageryLayers.add(overlayLayer);
       const existing = this.layerToOverlaysMapping.get(layer) ?? [];
       existing.push({ tileset: model.tileset, overlay: overlayLayer });
@@ -660,10 +661,17 @@ class LayerManager {
     const overlays: { tileset: CesiumTileset; overlay: ImageryLayer }[] = [];
     for (const model of this.models) {
       const overlayLayer = new ImageryLayer(provider);
+      this.applyDrapingOverlayConfig(overlayLayer, layer);
       model.tileset.imageryLayers.add(overlayLayer);
       overlays.push({ tileset: model.tileset, overlay: overlayLayer });
     }
     this.layerToOverlaysMapping.set(layer, overlays);
+  }
+
+  private applyDrapingOverlayConfig(overlayLayer: ImageryLayer, sourceLayer: ICesiumImageryLayer): void {
+    if (isBaseMapLayer(sourceLayer.meta)) {
+      overlayLayer.alpha = sourceLayer.alpha;
+    }
   }
 
   private removeDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
