@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.16.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.15.1...@map-colonies/react-components@4.16.0) (2026-07-08)
+
+
+### Bug Fixes
+
+* add basemaps draping ([ee4de52](https://github.com/MapColonies/shared-components/commit/ee4de52b1b1af45b7ac5623971bcd635f0e617de))
+* code review ([da0c802](https://github.com/MapColonies/shared-components/commit/da0c8025e75f15891a537113acb88e8aeee5431c))
+* keep configured alpha ([048230a](https://github.com/MapColonies/shared-components/commit/048230af5a04480d2ddba44569267553bef35477))
+* new story ([c72bfee](https://github.com/MapColonies/shared-components/commit/c72bfeeec4ce0dd6a3b79b975ea1e02021124fb0))
+* rename ([8227507](https://github.com/MapColonies/shared-components/commit/8227507d201364513a2aea8ad0c78c4aa9153f81))
+* sync raster meta ([4ff1598](https://github.com/MapColonies/shared-components/commit/4ff1598aa4901aa0652cd637ea883cb663aa19ff))
+* warning ([f44b971](https://github.com/MapColonies/shared-components/commit/f44b9719deeaedb5297a8de2821578343643efad))
+
+
+### Features
+
+* draping 3d models with raster vector overlays ([a44fc2a](https://github.com/MapColonies/shared-components/commit/a44fc2a6b83dd1ceda58efabf176de7010f3db25))
+
+
+
+
+
 ## [4.15.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.15.0...@map-colonies/react-components@4.15.1) (2026-07-05)
 
 
