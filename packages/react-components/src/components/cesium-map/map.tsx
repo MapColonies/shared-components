@@ -290,7 +290,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [mapViewRef, props.imageryContextMenu, contextMenuHandler]);
 
   const contextValue = useMemo(() => {
-    if (!mapViewRef) return null;
+    if (!mapViewRef) { return null; }
 
     if (!mapViewRef.layersManager) {
       Object.assign(mapViewRef, {
@@ -312,7 +312,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       viewState,
       setViewState,
     };
-  }, [props.legends, props.layerManagerMetaMapping, mapViewRef, viewState]);
+  }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
