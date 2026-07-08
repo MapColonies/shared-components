@@ -68,6 +68,7 @@ export interface ICesiumImageryLayerMeta {
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
   examinedTiles?: Array<{ x?: number; y?: number; level?: number }>;
+  shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;
 }
 
@@ -84,6 +85,7 @@ export interface IRasterLayer {
   zIndex: number;
   options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
   show?: boolean;
+  shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;
 }
 
@@ -104,6 +106,8 @@ export interface ICesiumDataLayerField {
 }
 
 export type LegendExtractor = (layers: (any & { meta: any })[]) => IMapLegend[];
+
+export type DrapingLayerPredicate = (layerMeta: ICesiumImageryLayerMeta) => boolean;
 
 export const TRANSPARENT_LAYER_ID = 'TRANSPARENT_BASE_LAYER';
 
@@ -174,13 +178,16 @@ class LayerManager {
   private shouldOptimizedTileRequests?: boolean;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
+  private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
+  private readonly drapingLayerPredicate?: DrapingLayerPredicate;
 
   public constructor(
     mapViewer: CesiumViewer,
     layerManagerMetaMapping: ILayerManagerMetaMapping,
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
-    shouldOptimizedTileRequests?: boolean
+    shouldOptimizedTileRequests?: boolean,
+    drapingLayerPredicate?: DrapingLayerPredicate
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
@@ -195,6 +202,8 @@ class LayerManager {
     this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
     this.shouldOptimizedTileRequests = shouldOptimizedTileRequests ?? false;
     this.relevancyListenersCleanup = [];
+    this.layerToOverlaysMapping = new Map();
+    this.drapingLayerPredicate = drapingLayerPredicate;
 
     configureLayerManagerMetaMapping(layerManagerMetaMapping);
 
@@ -202,9 +211,14 @@ class LayerManager {
       this.addLayerUpdatedListener(onLayersUpdate);
     }
 
-    // Binding layer's relevancy check to Cesium lifecycle if optimized tile requests enabled
     if (this.shouldOptimizedTileRequests) {
       this.bindRelevancyListeners();
+    }
+
+    if (drapingLayerPredicate) {
+      this.mapViewer.imageryLayers.layerRemoved.addEventListener((removedLayer: ImageryLayer) => {
+        this.removeDrapingOverlaysByLayer(removedLayer as ICesiumImageryLayer);
+      });
     }
   }
 
@@ -232,6 +246,11 @@ class LayerManager {
         layer.meta = { ...(layer.meta ?? {}), ...meta };
         this.setLegends();
         this.layerUpdated.raiseEvent(meta);
+        if (this.drapingLayerPredicate && !this.layerToOverlaysMapping.has(layer)) {
+          if (this.drapingLayerPredicate(layer.meta as ICesiumImageryLayerMeta)) {
+            this.addDrapingOverlaysByLayer(layer);
+          }
+        }
         return true;
       }
       return false;
@@ -328,6 +347,11 @@ class LayerManager {
       };
       if (layer.show !== undefined) {
         cesiumLayer.show = layer.show;
+      }
+      if (this.drapingLayerPredicate && !this.layerToOverlaysMapping.has(cesiumLayer)) {
+        if (this.drapingLayerPredicate(cesiumLayer.meta as ICesiumImageryLayerMeta)) {
+          this.addDrapingOverlaysByLayer(cesiumLayer);
+        }
       }
     }
   }
@@ -584,6 +608,9 @@ class LayerManager {
 
   public addModel(model: ICesium3DModel): void {
     this.models.push({ ...model });
+    if (this.drapingLayerPredicate) {
+      this.addDrapingOverlaysForModel(model);
+    }
     this.modelUpdated.raiseEvent(this.models);
   }
 
@@ -594,12 +621,68 @@ class LayerManager {
       if (index > -1) {
         this.models.splice(index, 1);
       }
+      if (this.drapingLayerPredicate) {
+        for (const [layer, overlays] of this.layerToOverlaysMapping.entries()) {
+          const filtered = overlays.filter(({ tileset }) => tileset !== model.tileset);
+          if (filtered.length !== overlays.length) {
+            if (filtered.length === 0) {
+              this.layerToOverlaysMapping.delete(layer);
+            } else {
+              this.layerToOverlaysMapping.set(layer, filtered);
+            }
+          }
+        }
+      }
       this.modelUpdated.raiseEvent(this.models);
     }
   }
 
   public findModelById(modelId: string): ICesium3DModel | undefined {
     return this.models.find((model) => getLayerId(model) === modelId);
+  }
+
+  private addDrapingOverlaysForModel(model: ICesium3DModel): void {
+    for (const layer of this.layers) {
+      if (!layer.meta) { continue; }
+      if (!this.drapingLayerPredicate!(layer.meta as ICesiumImageryLayerMeta)) { continue; }
+      const provider = layer.imageryProvider;
+      const overlayLayer = new ImageryLayer(provider);
+      this.applyDrapingOverlayConfig(overlayLayer, layer);
+      model.tileset.imageryLayers.add(overlayLayer);
+      const existing = this.layerToOverlaysMapping.get(layer) ?? [];
+      existing.push({ tileset: model.tileset, overlay: overlayLayer });
+      this.layerToOverlaysMapping.set(layer, existing);
+    }
+  }
+
+  private addDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
+    if (this.models.length === 0) { return; }
+    const provider = layer.imageryProvider;
+    const overlays: { tileset: CesiumTileset; overlay: ImageryLayer }[] = [];
+    for (const model of this.models) {
+      const overlayLayer = new ImageryLayer(provider);
+      this.applyDrapingOverlayConfig(overlayLayer, layer);
+      model.tileset.imageryLayers.add(overlayLayer);
+      overlays.push({ tileset: model.tileset, overlay: overlayLayer });
+    }
+    this.layerToOverlaysMapping.set(layer, overlays);
+  }
+
+  private applyDrapingOverlayConfig(overlayLayer: ImageryLayer, sourceLayer: ICesiumImageryLayer): void {
+    if (isBaseMapLayer(sourceLayer.meta)) {
+      overlayLayer.alpha = sourceLayer.alpha;
+    }
+  }
+
+  private removeDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
+    const overlays = this.layerToOverlaysMapping.get(layer);
+    if (!overlays) { return; }
+    for (const { tileset, overlay } of overlays) {
+      if (!tileset.isDestroyed()) {
+        tileset.imageryLayers.remove(overlay, true);
+      }
+    }
+    this.layerToOverlaysMapping.delete(layer);
   }
 
   private setLegends(): void {

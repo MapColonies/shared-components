@@ -77,6 +77,7 @@ export const BASE_MAPS: IBaseMaps = {
           type: 'XYZ_LAYER',
           opacity: 1,
           zIndex: 2,
+          shouldBeUsedInModelDraping: true,
           options: {
             url: getValue('GLOBAL', 'BM-VECTOR_TILES_GPS-XYZ_LAYER'),
             layers: '',
@@ -118,6 +119,7 @@ export const BASE_MAPS: IBaseMaps = {
           type: 'XYZ_LAYER',
           opacity: 0.6,
           zIndex: 2,
+          shouldBeUsedInModelDraping: true,
           options: {
             url: getValue('GLOBAL', 'BM-TRANSPARENT_LABELS_OVERLAY-XYZ_LAYER'),
             layers: '',

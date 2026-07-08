@@ -26,7 +26,7 @@ import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
-import LayerManager, { IRasterLayer, LegendExtractor, type ILayerManagerMetaMapping } from './layers-manager';
+import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -158,6 +158,7 @@ export interface CesiumMapProps extends ViewerProps {
   };
   legends?: ILegends;
   geocoderPanel?: GeocoderOptions[];
+  drapingLayerPredicate?: DrapingLayerPredicate;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -289,7 +290,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [mapViewRef, props.imageryContextMenu, contextMenuHandler]);
 
   const contextValue = useMemo(() => {
-    if (!mapViewRef) return null;
+    if (!mapViewRef) { return null; }
 
     if (!mapViewRef.layersManager) {
       Object.assign(mapViewRef, {
@@ -300,7 +301,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           () => {
             setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
           },
-          viewState?.shouldOptimizedTileRequests
+          viewState?.shouldOptimizedTileRequests,
+          props.drapingLayerPredicate
         ),
       });
     }
@@ -310,7 +312,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       viewState,
       setViewState,
     };
-  }, [props.legends, props.layerManagerMetaMapping, mapViewRef, viewState]);
+  }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
 
   useEffect(() => {
     setBaseMaps(props.baseMaps);
