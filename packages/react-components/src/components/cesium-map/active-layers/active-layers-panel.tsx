@@ -174,6 +174,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       [DATA]: true,
       [THREE_D]: true,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -193,6 +194,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         mapViewer.imageryLayers.layerMoved.removeEventListener(handleLayerEvent);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
@@ -213,6 +215,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerEvent);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager?.dataLayerList]);
 
   useEffect(() => {
@@ -233,6 +236,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return () => {
       mapViewer.layersManager?.removeModelUpdatedListener(handle3DModelEvent);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager?.modelList]);
 
   const toggleSection = (id: string) => {

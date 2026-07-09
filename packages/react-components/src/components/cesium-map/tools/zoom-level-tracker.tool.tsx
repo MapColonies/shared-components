@@ -111,6 +111,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
         mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: closestZoom.level }));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer, zoomLevelHeights]);
 
   const extractMaxZoomLevelFromRenderedTiles = useCallback(() => {
@@ -125,6 +126,7 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
     if (mapViewState.setViewState) {
       mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: maxZoom }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer]);
 
   const extractZoomMethods = useMemo<Record<ValueBy, () => void>>(

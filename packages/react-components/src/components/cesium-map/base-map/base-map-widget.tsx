@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { get } from 'lodash';
 import { IBaseMap, IBaseMaps, ITerrain } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';

@@ -48,6 +48,7 @@ export const AnimatedValuesProvider: React.FC<AnimatedValuesProviderProps> = ({
 
       return () => clearInterval(intervalRef.current);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values, valueEnd, duration, interval, repeat, valuesIndex]);
 
   return isAnimated ? (

@@ -598,6 +598,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
             const queryName = payload.query.split('(')[0].replace('query ', ''); //strip queryName
             await handleWfsResponse((wfsResponse as any)?.data[queryName], extent, offset, position);
           } else {
+            // eslint-disable-next-line no-throw-literal
             throw 'API as alternative service still not supported';
           }
         } else {
@@ -616,6 +617,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         updateMetadata(-1, -1);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const waitForTilesLoaded = () => {
@@ -648,6 +650,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     if (dataSource) {
       applyVisualization(mapViewer, dataSource, [], undefined);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer?.scene?.mode]);
 
   useEffect(() => {
@@ -660,11 +663,13 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     ) {
       mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metadata]);
 
   useEffect(() => {
     // Happens when layersManager is initialized by parent map component
     mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata }, visualizationHandler });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
@@ -690,11 +695,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       hasRunFetchRef.current = true;
     }
 
+    const wfsCacheRef = wfsCache.current;
+    const fetchMetadataRef = fetchMetadata.current;
+
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        wfsCache.current.clear();
-        fetchMetadata.current.clear();
+        wfsCacheRef.clear();
+        fetchMetadataRef.clear();
         mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
         mapViewer.dataSources.remove(wfsDataSource, true);
         if (dataLayerId !== undefined) {
@@ -704,6 +712,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

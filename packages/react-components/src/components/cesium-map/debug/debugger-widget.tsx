@@ -117,6 +117,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
       removeLayerRemoved();
       mapViewer.layersManager?.removeLayerUpdatedListener(updateLayersMeta);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer, updateLayersMeta]);
 
   useEffect(() => {
@@ -157,6 +158,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager?.dataLayerList]);
 
   return (

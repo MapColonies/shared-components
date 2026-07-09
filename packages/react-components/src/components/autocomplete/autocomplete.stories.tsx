@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention, @typescript-eslint/prefer-regexp-exec, @typescript-eslint/no-magic-numbers*/
-import React from 'react';
 import type { StoryFn } from '@storybook/react';
 import { TextField } from '@map-colonies/react-core';
 import { CSFStory } from '../utils/story';
@@ -12,9 +10,9 @@ const meta = {
 };
 export default meta;
 
-export const AutocpmleteTextArea: CSFStory<JSX.Element> = () => (
+export const AutocompleteTextArea: CSFStory<JSX.Element> = () => (
   <>
-    <h1>Autocpmlete with native HTML TEXTAREA</h1>
+    <h1>Autocomplete with native HTML TEXTAREA</h1>
     <Autocomplete
       {...{
         options: ['apple', 'apricot', 'banana', 'bounty'],
@@ -22,14 +20,14 @@ export const AutocpmleteTextArea: CSFStory<JSX.Element> = () => (
     />
   </>
 );
-AutocpmleteTextArea.story = {
-  name: 'Autocpmlete with TEXTAREA HTML',
+AutocompleteTextArea.story = {
+  name: 'Autocomplete with TEXTAREA HTML',
 };
 
-export const AutocpmleteTextField: StoryFn = (args: Record<string, unknown>) => {
+export const AutocompleteTextField: StoryFn = (args: Record<string, unknown>) => {
   return (
     <>
-      <h1>Autocpmlete with TEXTFIELD react-core component</h1>
+      <h1>Autocomplete with TEXTFIELD react-core component</h1>
       <Autocomplete
         {...{
           Component: <TextField />,
@@ -43,8 +41,8 @@ export const AutocpmleteTextField: StoryFn = (args: Record<string, unknown>) => 
     </>
   );
 };
-AutocpmleteTextField.storyName = 'Autocpmlete with TEXTFIELD component';
-AutocpmleteTextField.argTypes = {
+AutocompleteTextField.storyName = 'Autocomplete with TEXTFIELD component';
+AutocompleteTextField.argTypes = {
   disabled: {
     defaultValue: false,
     control: {
@@ -65,10 +63,10 @@ AutocpmleteTextField.argTypes = {
   },
 };
 
-export const AutocpmleteInComplitionModeEN: StoryFn = (args: Record<string, unknown>) => {
+export const AutocompleteInCompletionModeEN: StoryFn = (args: Record<string, unknown>) => {
   return (
     <>
-      <h1>Autocpmlete with TEXTFIELD in AUTOCOMPLETE mode in English (LTR)</h1>
+      <h1>Autocomplete with TEXTFIELD in AUTOCOMPLETE mode in English (LTR)</h1>
       <Autocomplete
         {...{
           Component: <TextField />,
@@ -80,12 +78,12 @@ export const AutocpmleteInComplitionModeEN: StoryFn = (args: Record<string, unkn
     </>
   );
 };
-AutocpmleteInComplitionModeEN.storyName = 'Autocpmlete in autocomplete MODE RTL';
+AutocompleteInCompletionModeEN.storyName = 'Autocomplete in autocomplete MODE RTL';
 
-export const AutocpmleteInComplitionModeHEB: StoryFn = (args: Record<string, unknown>) => {
+export const AutocompleteInCompletionModeHEB: StoryFn = (args: Record<string, unknown>) => {
   return (
     <div style={{ direction: 'rtl' }}>
-      <h1>Autocpmlete with TEXTFIELD in AUTOCOMPLETE mode in Hebrew (RTL)</h1>
+      <h1>Autocomplete with TEXTFIELD in AUTOCOMPLETE mode in Hebrew (RTL)</h1>
       <Autocomplete
         {...{
           Component: <TextField />,
@@ -97,4 +95,4 @@ export const AutocpmleteInComplitionModeHEB: StoryFn = (args: Record<string, unk
     </div>
   );
 };
-AutocpmleteInComplitionModeHEB.storyName = 'Autocpmlete in autocomplete MODE LTR';
+AutocompleteInCompletionModeHEB.storyName = 'Autocomplete in autocomplete MODE LTR';

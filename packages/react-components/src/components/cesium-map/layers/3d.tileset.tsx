@@ -23,6 +23,7 @@ export const Cesium3DTileset: React.FC<ICesium3DTileset> = ({ meta, ...props }) 
         mapViewer.layersManager?.removeModel(modelId);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

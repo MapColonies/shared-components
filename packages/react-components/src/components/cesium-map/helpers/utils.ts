@@ -26,7 +26,6 @@ import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import centroid from '@turf/centroid';
 import { point } from '@turf/helpers';
-import * as turf from '@turf/helpers';
 import intersect from '@turf/intersect';
 import pointToPolygonDistance from '@turf/point-to-polygon-distance';
 import { ICesiumWFSLayerLabelingOptions } from '../layers';
@@ -404,7 +403,6 @@ export const defaultVisualizationHandler = (
         return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
       });
 
-      // return turf.polygon(positions);
       return {
         type: 'Polygon',
         coordinates: [positions],

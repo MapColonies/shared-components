@@ -428,7 +428,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     };
 
     if (mapViewRef) {
-      mapViewRef.camera.moveEnd.addEventListener(() => {
+      const moveEndHandler = () => {
         if (mapViewRef.scene.mode !== SceneMode.MORPHING) {
           const camera = mapViewRef.camera;
 
@@ -442,16 +442,23 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           };
           cameraStateRef.current = store;
         }
-      });
+      };
+
+      const removeMoveEndListener = mapViewRef.camera.moveEnd.addEventListener(moveEndHandler);
+      let removeTileLoadProgressListener: (() => void) | undefined;
+      let dataLayerUpdatedHandler: ((meta: any) => void) | undefined;
+
       if (showLoadingProgress) {
-        mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
+        const tileLoadProgressHandler = () => {
           if (mapViewRef.scene.globe.tilesLoaded) {
             setIsLoadingTiles(false);
           } else {
             setIsLoadingTiles(true);
           }
-        });
-        mapViewRef.layersManager?.addDataLayerUpdatedListener(() => {
+        };
+        removeTileLoadProgressListener = mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(tileLoadProgressHandler);
+
+        dataLayerUpdatedHandler = () => {
           let loading = false;
           mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
             if (
@@ -465,9 +472,23 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             }
           });
           setIsLoadingDataLayer(loading);
-        });
+        };
+        mapViewRef.layersManager?.addDataLayerUpdatedListener(dataLayerUpdatedHandler);
       }
+
+      return () => {
+        try {
+          removeMoveEndListener();
+          removeTileLoadProgressListener?.();
+          if (dataLayerUpdatedHandler) {
+            mapViewRef.layersManager?.removeDataLayerUpdatedListener(dataLayerUpdatedHandler);
+          }
+        } catch (e) {
+          console.error('Cesium map listeners cleanup failed:', e);
+        }
+      };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewRef]);
 
   useEffect(() => {
@@ -548,7 +569,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer') as Element
       )
     );
-  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress]);
+  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
     return (
@@ -563,7 +584,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-viewer-toolbar') as Element
       )
     );
-  }, [mapViewRef, locale, baseMaps, terrains]);
+  }, [mapViewRef, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     return (
@@ -576,7 +597,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         document.querySelector('.cesium-widget') as Element
       )
     );
-  }, [mapViewRef, locale, viewState?.showCesiumInspector]);
+  }, [mapViewRef, locale, viewState?.showCesiumInspector, showActiveLayersTool]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>

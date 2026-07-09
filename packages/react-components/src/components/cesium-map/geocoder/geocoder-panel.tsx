@@ -210,6 +210,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
 
       return url;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [mapViewer]
   );
 
@@ -274,6 +275,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
 
   useEffect(() => {
     fetchData(searchTextValue, isInMapExtent);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInMapExtent]);
 
   const getIconByFeatureType = (geometry: any) => {

@@ -118,6 +118,7 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
     return (): void => {
       try {
         /* eslint-disable @typescript-eslint/no-unnecessary-condition*/
+        // eslint-disable-next-line eqeqeq
         if (get(mapViewer, '_cesiumWidget') != undefined) {
           mapViewer.camera.moveEnd.removeEventListener(setFromEvent);
         }
