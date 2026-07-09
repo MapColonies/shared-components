@@ -353,6 +353,7 @@ class LayerManager {
           this.addDrapingOverlaysByLayer(cesiumLayer);
         }
       }
+      this.layerUpdated.raiseEvent(cesiumLayer.meta);
     }
   }
 
@@ -538,9 +539,7 @@ class LayerManager {
   public addTransparentImageryProvider(): void {
     // Worldwide transparent layer
     const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
-    const rectangle = new Rectangle(-3.141592653589793, -1.5707963267948966, 3.141592653589793, 1.5707963267948966);
-    /* eslint-enable @typescript-eslint/no-magic-numbers */
+    const rectangle = new Rectangle(-Math.PI, -Math.PI / 2, Math.PI, Math.PI / 2);
 
     void SingleTileImageryProvider.fromUrl(transparentTileUrl, { rectangle }).then((provider) => {
       const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(provider, 0);
@@ -551,6 +550,7 @@ class LayerManager {
       };
       set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
       (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+      this.layerUpdated.raiseEvent(transparentLayerMeta);
     });
   }
 
