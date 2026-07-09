@@ -353,6 +353,7 @@ class LayerManager {
           this.addDrapingOverlaysByLayer(cesiumLayer);
         }
       }
+      this.layerUpdated.raiseEvent(cesiumLayer.meta);
     }
   }
 
@@ -551,6 +552,7 @@ class LayerManager {
       };
       set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
       (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+      this.layerUpdated.raiseEvent(transparentLayerMeta);
     });
   }
 
