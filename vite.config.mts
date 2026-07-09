@@ -7,6 +7,11 @@ import dts from 'vite-plugin-dts';
 
 const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
+const getGlobalName = (id: string): string => {
+  const normalizedId = id.replace(/^@/, '').replace(/[^A-Za-z0-9_$]+/g, '_');
+  return id.startsWith('@') ? `_${normalizedId}` : normalizedId;
+};
+
 export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalConfig = {} as UserConfig }) => {
   return defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -23,7 +28,7 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
           include: ['src'],
           tsconfigPath: 'tsconfig-build.json',
           rollupTypes: true,
-        }),
+        } as any),
         cssInjectedByJsPlugin(),
         ...plugins,
       ],
@@ -32,16 +37,12 @@ export const getBaseConfig = ({ plugins = [] as PluginOption[], lib, additionalC
         rollupOptions: {
           external: isExternal,
           output: {
-            globals: {
-              cesium: 'Cesium',
-              react: 'React',
-              'react-dom': 'ReactDOM',
-            },
+            globals: getGlobalName,
           },
         },
       },
       define: {
-        'process.env': env,
+        'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development'),
         CESIUM_BASE_URL: JSON.stringify(env.CESIUM_BASE_URL),
       },
       ...additionalConfig,
