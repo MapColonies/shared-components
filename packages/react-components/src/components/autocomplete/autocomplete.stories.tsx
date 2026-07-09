@@ -5,7 +5,7 @@ import { CSFStory } from '../utils/story';
 import Autocomplete from './autocomplete';
 
 const meta = {
-  title: 'Autocomplete',
+  title: 'Components/Autocomplete',
   component: Autocomplete,
 };
 export default meta;

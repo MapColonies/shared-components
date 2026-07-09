@@ -74,7 +74,7 @@ const customStyles = {
 };
 
 const meta = {
-  title: 'Multi Selection',
+  title: 'Components/Multi Selection',
   component: MultiSelection,
 };
 export default meta;

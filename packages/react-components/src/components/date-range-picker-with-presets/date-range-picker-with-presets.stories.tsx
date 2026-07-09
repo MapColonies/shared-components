@@ -4,7 +4,7 @@ import './styles';
 import { endOfWeek, startOfMonth, startOfWeek, startOfYear, subWeeks } from 'date-fns';
 
 const meta: Meta<typeof DateRangePickerWithPresets> = {
-  title: 'Date Range Picker With Presets',
+  title: 'Components/Date Range Picker With Presets',
   component: DateRangePickerWithPresets,
 };
 

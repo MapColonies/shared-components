@@ -11,7 +11,7 @@ import { FileActionData, FilePicker, FileArray, FileData, FileHelper, FilePicker
 import FsMap from './fs-map.json';
 
 const story = {
-  title: 'File Picker',
+  title: 'Components/File Picker',
   component: FilePicker,
 };
 

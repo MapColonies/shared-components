@@ -8,7 +8,7 @@ import { DateTimePicker } from './date-picker';
 const TODAY = new Date();
 
 const meta = {
-  title: 'Date Picker',
+  title: 'Components/Date Picker',
   component: DateTimePicker,
 };
 export default meta;

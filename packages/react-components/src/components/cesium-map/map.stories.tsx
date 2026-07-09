@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
