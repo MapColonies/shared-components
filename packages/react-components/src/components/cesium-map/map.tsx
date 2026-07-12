@@ -227,16 +227,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setMapViewRef(viewer as CesiumViewer);
   }, []);
 
-  // Cesium's Scene/Context destroy() never explicitly forces WebGL context loss (no
-  // WEBGL_lose_context.loseContext() call anywhere in its renderer) - it just drops references and
-  // waits for garbage collection to eventually reclaim the context. That's non-deterministic: under
-  // fast story-to-story navigation (e.g. in Storybook), old contexts can pile up faster than GC
-  // reclaims them, hitting the browser's WebGL context limit (visible as "Too many active WebGL
-  // contexts" + a black/frozen preview). Destroying the viewer ourselves here (idempotent - resium's
-  // own async destroy checks isDestroyed() before destroying again) and forcing context loss makes
-  // release immediate and deterministic instead of GC-dependent. This runs after all child tool
-  // components (scale tracker, zoom tracker, active layers panel, etc.) have already removed their
-  // own listeners from the still-live viewer, since child effects clean up before parent effects.
   useEffect(() => {
     return () => {
       if (mapViewRef && !mapViewRef.isDestroyed()) {
