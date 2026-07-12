@@ -283,6 +283,7 @@ const optionsPolygonParts = {
   labeling: {
     dataSourcePrefix: 'labels_',
     text: {
+      // eslint-disable-next-line no-template-curly-in-string
       pattern: '${imagingTimeEndUTC}\n v${productVersion} (${resolutionDegree})',
       fields: [
         {
