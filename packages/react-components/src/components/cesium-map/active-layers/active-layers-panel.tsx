@@ -1,6 +1,6 @@
 import { Cesium3DTileset, Rectangle } from 'cesium';
 import { get } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
 import { Box } from '../../box';
@@ -145,7 +145,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     });
   };
 
-  const refreshSections = (): void => {
+  const refreshSections = useCallback((): void => {
     setSections([
       {
         id: IMAGERY,
@@ -164,7 +164,8 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         values: get3DModels(),
       },
     ]);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     refreshSections();
@@ -174,8 +175,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       [DATA]: true,
       [THREE_D]: true,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshSections]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) { return; }
