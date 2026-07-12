@@ -174,7 +174,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       [DATA]: true,
       [THREE_D]: true,
     });
-  }, [refreshSections]);
+  }, []);
 
   useEffect(() => {
     if (!mapViewer.layersManager) { return; }
