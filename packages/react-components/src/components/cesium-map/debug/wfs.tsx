@@ -58,7 +58,6 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
         )}
       </>
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featureTypes]);
 
   return (

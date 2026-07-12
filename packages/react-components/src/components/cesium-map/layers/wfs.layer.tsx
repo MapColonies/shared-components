@@ -617,7 +617,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         updateMetadata(-1, -1);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const waitForTilesLoaded = () => {
@@ -650,7 +649,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     if (dataSource) {
       applyVisualization(mapViewer, dataSource, [], undefined);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer?.scene?.mode]);
 
   useEffect(() => {
@@ -663,13 +661,11 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
     ) {
       mapViewer.layersManager.addMetaToDataLayer(metadata);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metadata]);
 
   useEffect(() => {
     // Happens when layersManager is initialized by parent map component
     mapViewer.layersManager?.addDataLayer({ options, meta: { ...metadata }, visualizationHandler });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
@@ -712,7 +708,6 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
         handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

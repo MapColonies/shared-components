@@ -36,7 +36,6 @@ export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, f
     return (): void => {
       source.removeFeature(feature);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geometry, source, fit]);
 
   return null;

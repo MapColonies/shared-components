@@ -55,7 +55,6 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
       // eslint-disable-next-line
       new (DrawHelper as any)(mapViewer, drawingMaterial, drawingVertexColor)
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -128,7 +127,6 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
         mapViewer.scene.globe.depthTestAgainstTerrain = true;
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawState, drawHelper]);
 
   const renderGraphicsComponent = (drawEntity: IDrawing): React.ReactElement => {

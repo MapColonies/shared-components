@@ -19,7 +19,6 @@ export const CesiumXYZLayer: React.FC<RCesiumXYZLayerProps> = (props) => {
     return viewState.shouldOptimizedTileRequests
       ? new CustomUrlTemplateImageryProvider(options, mapViewer)
       : new UrlTemplateImageryProvider(options);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewState.shouldOptimizedTileRequests]);
 
   return <CesiumImageryLayer key={`xyz-${String(viewState.shouldOptimizedTileRequests)}`} {...restProps} imageryProvider={providerInstance} />;

@@ -126,12 +126,10 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
     top: `${position.y}px`,
   };
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     setPickedLayers(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
     console.log(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
   }, [position]);
-  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <>

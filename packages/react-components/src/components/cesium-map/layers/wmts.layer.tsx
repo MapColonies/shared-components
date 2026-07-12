@@ -19,7 +19,6 @@ export const CesiumWMTSLayer: React.FC<RCesiumWMTSLayerProps> = (props) => {
     return viewState.shouldOptimizedTileRequests
       ? new CustomWebMapTileServiceImageryProvider(options, mapViewer)
       : new WebMapTileServiceImageryProvider(options);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewState.shouldOptimizedTileRequests]);
 
   return <CesiumImageryLayer key={`wmts-${String(viewState.shouldOptimizedTileRequests)}`} {...restProps} imageryProvider={providerInstance} />;

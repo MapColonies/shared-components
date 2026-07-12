@@ -20,7 +20,6 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ title, baseMaps, s
       setSelectedBaseMap(defaultMap);
       setCurrent(defaultMap);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseMaps]);
 
   const handleItemSelection = (id: string): void => {
