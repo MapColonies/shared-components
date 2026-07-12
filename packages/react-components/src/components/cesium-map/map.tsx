@@ -573,7 +573,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   };
 
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
-    const viewerContainer = mapViewRef?.container;
+    const viewerContainer = mapViewRef?.container?.querySelector('.cesium-viewer');
     if (!viewerContainer) {
       return undefined;
     }
