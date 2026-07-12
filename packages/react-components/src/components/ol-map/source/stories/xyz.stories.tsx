@@ -5,7 +5,7 @@ import { TileLayer } from '../../layers/tile-layer';
 import { getXYZOptions, TileXYZ } from '../xyz';
 
 const xyzOptions = getXYZOptions({
-  url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' + '?apikey=0e6fc415256d4fbb9b5166a718591d71',
+  url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=0e6fc415256d4fbb9b5166a718591d71',
 });
 
 const mapDivStyle = {

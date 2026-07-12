@@ -106,7 +106,9 @@ const LayersContainer: React.FC = () => {
                 meta={{
                   id: 'Opaque Layer',
                   options: { ...optionsXYZOpaque },
-                  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZOpaque.url,
+                  searchLayerPredicate: (layer: ImageryLayer): boolean => {
+                    return getImageryProviderUrl(layer) === optionsXYZOpaque.url;
+                  },
                 }}
                 rectangle={Rectangle.fromDegrees(...bbox(optionsXYZOpaque.footprint))}
                 options={optionsXYZOpaque}
