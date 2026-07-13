@@ -830,9 +830,6 @@ class LayerManager {
   }
 
   private markRelevantLayersForExtent(): void {
-    if (this.mapViewer.isDestroyed()) {
-      return;
-    }
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
       if (isEmpty(extent)) {
