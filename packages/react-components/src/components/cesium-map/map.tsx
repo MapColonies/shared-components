@@ -227,17 +227,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setMapViewRef(viewer as CesiumViewer);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (mapViewRef && !mapViewRef.isDestroyed()) {
-        const canvas = mapViewRef.canvas;
-        mapViewRef.destroy();
-        const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
-        gl?.getExtension('WEBGL_lose_context')?.loseContext();
-      }
-    };
-  }, [mapViewRef]);
-
   const userExtend = (props as ViewerProps).extend;
   const mergedExtend = userExtend ? (Array.isArray(userExtend) ? [...userExtend, onViewerReady] : [userExtend, onViewerReady]) : onViewerReady;
 
