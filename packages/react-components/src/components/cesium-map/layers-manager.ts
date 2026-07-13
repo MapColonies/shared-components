@@ -123,6 +123,17 @@ export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICes
   return get(layer.meta, mapping.layer.name) as string | undefined;
 };
 
+export const getServiceLayerId = (layer: ICesiumImageryLayer, i: number): string => {
+  return getLayerId(layer) ?? `SERVICE_LAYER_${String(i + 1)}`;
+};
+
+export const getServiceLayerName = (layer: ICesiumImageryLayer, i: number): string => {
+  const layerId = getServiceLayerId(layer, i);
+  const isTransparentLayer = layerId === TRANSPARENT_LAYER_ID;
+  const providerName = getImageryProviderName(getImageryProvider(layer)) ?? layerId;
+  return isTransparentLayer ? layerId : providerName;
+};
+
 export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
   return get(meta, mapping.layer.footprint ?? '');
 };
@@ -819,6 +830,9 @@ class LayerManager {
   }
 
   private markRelevantLayersForExtent(): void {
+    if (this.mapViewer.isDestroyed()) {
+      return;
+    }
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
       if (isEmpty(extent)) {

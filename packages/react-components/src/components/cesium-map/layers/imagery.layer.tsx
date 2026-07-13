@@ -13,10 +13,13 @@ export interface RCesiumImageryLayerProps extends ComponentProps<typeof ResiumIm
 export const CesiumImageryLayer: React.FC<RCesiumImageryLayerProps> = (props) => {
   const { meta, ...restProps } = props;
   const mapViewer: CesiumViewer = useCesiumMap();
+  const { imageryProvider } = restProps;
 
   useEffect(() => {
-    mapViewer.layersManager?.addMetaToLayer(meta, meta.searchLayerPredicate);
-  }, [meta, mapViewer]);
+    const identifiesThisLayer = (layer: ImageryLayer, idx: number): boolean =>
+      layer.imageryProvider === imageryProvider && meta.searchLayerPredicate(layer, idx);
+    mapViewer.layersManager?.addMetaToLayer(meta, identifiesThisLayer);
+  }, [meta, mapViewer, imageryProvider]);
 
   return <ResiumImageryLayer {...restProps} />;
 };

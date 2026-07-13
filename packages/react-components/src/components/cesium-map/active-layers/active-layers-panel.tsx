@@ -5,8 +5,6 @@ import { Tooltip, Typography } from '@map-colonies/react-core';
 import bbox from '@turf/bbox';
 import { Box } from '../../box';
 import {
-  getImageryProvider,
-  getImageryProviderName,
   getDataLayerName,
   getLayerFootprint,
   getLayerId,
@@ -15,7 +13,8 @@ import {
   isBaseMapLayer,
   isManagedImageryLayer,
   isServiceLayer,
-  TRANSPARENT_LAYER_ID,
+  getServiceLayerId,
+  getServiceLayerName,
 } from '../layers-manager';
 import { useCesiumMap } from '../map';
 
@@ -25,8 +24,6 @@ const IMAGERY = 'Imagery';
 const SERVICE = 'Service';
 const DATA = 'Data';
 const THREE_D = '3D';
-const TRANSPARENT_LAYER = 'TRANSPARENT_LAYER_FOR_OPTIMIZATION';
-const SERVICE_LAYER = 'LAYER_WITH_NO_ID #';
 
 interface IActiveLayer {
   id: string;
@@ -102,19 +99,12 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     const layerList = getLayerList();
     return layerList.length > 0
       ? layerList.map((layer, i): IActiveLayer | undefined => {
-          const layerId = getLayerId(layer);
-          if (!isServiceLayer(layerId)) {
+          if (!isServiceLayer(getLayerId(layer))) {
             return undefined;
           }
-          const isTransparentLayer = layerId === TRANSPARENT_LAYER_ID;
-          const providerName = getImageryProviderName(getImageryProvider(layer));
-          const name = isTransparentLayer
-            ? TRANSPARENT_LAYER
-            : `${SERVICE_LAYER} ${String(i + 1)}`;
-
           return {
-            id: `SERVICE_LAYER_${String(i)}`,
-            name: isTransparentLayer ? name : providerName ?? name,
+            id: getServiceLayerId(layer, i),
+            name: getServiceLayerName(layer, i),
             rect: layer.rectangle,
             isDisabled: true
           };
