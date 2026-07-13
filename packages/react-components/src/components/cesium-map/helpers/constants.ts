@@ -51,6 +51,7 @@ export const BASE_MAPS: IBaseMaps = {
           type: 'WMS_LAYER',
           opacity: 0.6,
           zIndex: 1,
+          shouldBeUsedInModelDraping: true,
           options: {
             url: getValue('GLOBAL', 'BM-RADAR_RASTER-WMS_LAYER'),
             layers: 'nexrad-n0r',

@@ -673,10 +673,28 @@ class LayerManager {
     for (const model of this.models) {
       const overlayLayer = new ImageryLayer(provider);
       this.applyDrapingOverlayConfig(overlayLayer, layer);
-      model.tileset.imageryLayers.add(overlayLayer);
+      const insertionIndex = this.getBaseMapDrapingInsertionIndex(model, layer);
+      model.tileset.imageryLayers.add(overlayLayer, insertionIndex);
       overlays.push({ tileset: model.tileset, overlay: overlayLayer });
     }
     this.layerToOverlaysMapping.set(layer, overlays);
+  }
+
+  private getBaseMapDrapingInsertionIndex(model: ICesium3DModel, layer: ICesiumImageryLayer): number | undefined {
+    if (!isBaseMapLayer(layer.meta)) {
+      return undefined;
+    }
+    const newZIndex = (layer.meta?.zIndex as number | undefined) ?? 0;
+    let index = 0;
+    for (const [existingLayer, existingOverlays] of this.layerToOverlaysMapping.entries()) {
+      if (!isBaseMapLayer(existingLayer.meta)) { continue; }
+      if (!existingOverlays.some(({ tileset }) => tileset === model.tileset)) { continue; }
+      const existingZIndex = (existingLayer.meta?.zIndex as number | undefined) ?? 0;
+      if (existingZIndex < newZIndex) {
+        index++;
+      }
+    }
+    return index;
   }
 
   private applyDrapingOverlayConfig(overlayLayer: ImageryLayer, sourceLayer: ICesiumImageryLayer): void {
