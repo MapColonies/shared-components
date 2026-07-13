@@ -277,22 +277,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   );
 
   useEffect(() => {
-    if (mapViewRef && !mapViewRef.isDestroyed() && props.imageryContextMenu) {
+    if (mapViewRef && props.imageryContextMenu) {
       // Previews implementation with cesium's events wont expose the native 'contextmenu' event in its callback.
       // We need the native event for the new context menu component.
       // This is a workaround.
       mapViewRef.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
       mapViewRef.scene.canvas.addEventListener('contextmenu', contextMenuHandler);
       return () => {
-        if (!mapViewRef.isDestroyed()) {
-          mapViewRef.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
-        }
+        mapViewRef.scene.canvas.removeEventListener('contextmenu', contextMenuHandler);
       };
     }
   }, [mapViewRef, props.imageryContextMenu, contextMenuHandler]);
 
   const contextValue = useMemo(() => {
-    if (!mapViewRef || mapViewRef.isDestroyed()) { return null; }
+    if (!mapViewRef) { return null; }
 
     if (!mapViewRef.layersManager) {
       Object.assign(mapViewRef, {
@@ -319,13 +317,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     setBaseMaps(props.baseMaps);
     const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
-    if (currentMap && mapViewRef && !mapViewRef.isDestroyed()) {
+    if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
   }, [props.baseMaps, mapViewRef]);
 
   useEffect(() => {
-    if (mapViewRef?.layersManager && !mapViewRef.isDestroyed()) {
+    if (mapViewRef?.layersManager) {
       mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
     }
   }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
@@ -333,7 +331,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     const newTerrains =
       props.terrains ||
-      (mapViewRef && !mapViewRef.isDestroyed() && mapViewRef.terrainProvider
+      (mapViewRef && mapViewRef.terrainProvider
         ? [
             {
               id: '1',
@@ -429,9 +427,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       }
     };
 
-    if (mapViewRef && !mapViewRef.isDestroyed()) {
+    if (mapViewRef) {
       const moveEndHandler = () => {
-        if (mapViewRef.isDestroyed()) { return; }
         if (mapViewRef.scene.mode !== SceneMode.MORPHING) {
           const camera = mapViewRef.camera;
 
@@ -453,7 +450,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
       if (showLoadingProgress) {
         const tileLoadProgressHandler = () => {
-          if (mapViewRef.isDestroyed()) { return; }
           if (mapViewRef.scene.globe.tilesLoaded) {
             setIsLoadingTiles(false);
           } else {
@@ -496,7 +492,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
 
   useEffect(() => {
     const morphCompleteHandler = (): void => {
-      if (mapViewRef && !mapViewRef.isDestroyed() && cameraStateRef.current) {
+      if (mapViewRef && cameraStateRef.current) {
         const cameraState = cameraStateRef.current;
         void mapViewRef.camera.flyTo({
           destination: Cartesian3.fromDegrees(cameraState.position.longitude, cameraState.position.latitude, cameraState.position.height),
@@ -519,7 +515,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   useEffect(() => {
     const zoom = props.zoom;
     const center = props.center;
-    if (mapViewRef && !mapViewRef.isDestroyed() && isNumber(zoom) && isArray(center)) {
+    if (mapViewRef && isNumber(zoom) && isArray(center)) {
       const longitude = center[0];
       const latitude = center[1];
       const height = getAltitude(zoom);
@@ -529,7 +525,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       });
       const homeButtonCommand = mapViewRef.homeButton.viewModel.command;
       const customHomeButtonHandler = function (event: any) {
-        if (mapViewRef.isDestroyed()) { return; }
         void mapViewRef.camera.flyTo({
           destination: Cartesian3.fromDegrees(longitude, latitude, height),
           duration: 1,
