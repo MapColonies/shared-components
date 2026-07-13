@@ -40,8 +40,5 @@ XyzTiles.argTypes = {
         detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_XYZ-XYZ.html"',
       },
     },
-    control: {
-      type: null,
-    },
   },
 };

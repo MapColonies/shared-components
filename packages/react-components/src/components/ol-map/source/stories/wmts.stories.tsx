@@ -63,8 +63,5 @@ WmtsTiles.argTypes = {
         detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_WMTS-WMTS.html"',
       },
     },
-    control: {
-      type: null,
-    },
   },
 };
