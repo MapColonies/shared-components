@@ -11,7 +11,8 @@
     {
       "files": ["packages/react-components/**/*.{ts,tsx,js,jsx}"],
       "rules": {
-        "react-hooks/exhaustive-deps": "off"
+        "react-hooks/exhaustive-deps": "off",
+        "no-template-curly-in-string": "off"
       }
     }
   ]
