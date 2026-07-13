@@ -16,8 +16,7 @@ export const CesiumImageryLayer: React.FC<RCesiumImageryLayerProps> = (props) =>
   const { imageryProvider } = restProps;
 
   useEffect(() => {
-    const identifiesThisLayer = (layer: ImageryLayer, idx: number): boolean =>
-      layer.imageryProvider === imageryProvider && meta.searchLayerPredicate(layer, idx);
+    const identifiesThisLayer = (layer: ImageryLayer): boolean => layer.imageryProvider === imageryProvider;
     mapViewer.layersManager?.addMetaToLayer(meta, identifiesThisLayer);
   }, [meta, mapViewer, imageryProvider]);
 
