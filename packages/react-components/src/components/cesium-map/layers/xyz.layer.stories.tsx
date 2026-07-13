@@ -40,7 +40,9 @@ const xyzLayerMeta = {
     productName: 'XYZ Layer',
   },
   options: { ...optionsXYZ },
-  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ.url,
+  searchLayerPredicate: (layer: ImageryLayer): boolean => {
+    return getImageryProviderUrl(layer) === optionsXYZ.url;
+  },
 };
 
 const xyzLayerMeta2 = {
@@ -49,7 +51,9 @@ const xyzLayerMeta2 = {
     productName: 'XYZ Layer 2',
   },
   options: { ...optionsXYZ2 },
-  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ2.url,
+  searchLayerPredicate: (layer: ImageryLayer): boolean => {
+    return layer.imageryProvider.url === optionsXYZ2.url;
+  },
 };
 
 export const MapWithXYZLayers: StoryFn = () => (
