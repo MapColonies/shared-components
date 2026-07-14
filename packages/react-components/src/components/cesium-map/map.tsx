@@ -551,8 +551,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setIsLegendsSidebarOpen((prev) => !prev);
   };
 
+  const getViewerPortalTarget = useCallback((selector: string): Element | null | undefined => {
+    return mapViewRef?.container?.querySelector(selector);
+  }, [mapViewRef]);
+
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
-    const viewerContainer = mapViewRef?.container?.querySelector('.cesium-viewer');
+    const viewerContainer = getViewerPortalTarget('.cesium-viewer');
     if (!viewerContainer) {
       return undefined;
     }
@@ -572,10 +576,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         viewerContainer
       )
     );
-  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel]);
+  }, [getViewerPortalTarget, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
-    const toolbarContainer = mapViewRef?.container?.querySelector('.cesium-viewer-toolbar');
+    const toolbarContainer = getViewerPortalTarget('.cesium-viewer-toolbar');
     if (!toolbarContainer) {
       return undefined;
     }
@@ -591,10 +595,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         toolbarContainer
       )
     );
-  }, [mapViewRef, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool]);
+  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
-    const widgetContainer = mapViewRef?.container?.querySelector('.cesium-widget');
+    const widgetContainer = getViewerPortalTarget('.cesium-widget');
     if (!widgetContainer) {
       return undefined;
     }
@@ -608,7 +612,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         widgetContainer
       )
     );
-  }, [mapViewRef, locale, viewState?.showCesiumInspector, showActiveLayersTool]);
+  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>
