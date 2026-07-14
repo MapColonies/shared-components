@@ -600,8 +600,7 @@ class LayerManager {
       this.bindRelevancyListeners();
       this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
       return;
     }
 
@@ -793,8 +792,7 @@ class LayerManager {
       const newMetaKeys = Object.keys(meta);
       const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
       if (shouldTriggerRelevancyCheck) {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
+        this.refreshRelevancyState();
       }
     };
 
@@ -807,26 +805,22 @@ class LayerManager {
 
     const removeLayerRemovedListener = this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
       this.setLegends();
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerRemovedListener);
 
     const removeLayerMovedListener = this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerMovedListener);
 
     const removeLayerAddedListener = this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerAddedListener);
 
     const removeMoveEndListener = this.mapViewer.camera.moveEnd.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeMoveEndListener);
   }
@@ -843,11 +837,29 @@ class LayerManager {
     if (!this.shouldOptimizedTileRequests) {
       return;
     }
+    this.refreshRelevancyState();
+  }
+
+  private isViewerAvailable(): boolean {
+    try {
+      return !this.mapViewer.isDestroyed() && this.mapViewer.scene !== undefined;
+    } catch {
+      return false;
+    }
+  }
+
+  private refreshRelevancyState(): void {
+    if (!this.isViewerAvailable()) {
+      return;
+    }
     this.markRelevantLayersForExtent();
     this.hideNonRelevantLayers();
   }
 
   private markRelevantLayersForExtent(): void {
+    if (!this.isViewerAvailable()) {
+      return;
+    }
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
       if (isEmpty(extent)) {
