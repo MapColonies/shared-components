@@ -596,7 +596,10 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
               },
             });
             const queryName = payload.query.split('(')[0].replace('query ', ''); //strip queryName
-            await handleWfsResponse((wfsResponse as any)?.data[queryName], extent, offset, position);
+            if ((wfsResponse as any)?.errors) {
+              throw new Error(JSON.stringify((wfsResponse as any).errors));
+            }
+            await handleWfsResponse((wfsResponse as any)?.data?.[queryName], extent, offset, position);
           } else {
             // eslint-disable-next-line no-throw-literal
             throw 'API as alternative service still not supported';
