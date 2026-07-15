@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-core@4.2.1...@map-colonies/react-core@4.2.2) (2026-07-15)
+
+**Note:** Version bump only for package @map-colonies/react-core
+
+
+
+
+
 ## [4.2.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-core@4.2.0...@map-colonies/react-core@4.2.1) (2026-07-02)
 
 

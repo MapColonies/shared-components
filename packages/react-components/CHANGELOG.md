@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.16.0...@map-colonies/react-components@4.16.1) (2026-07-15)
+
+
+### Bug Fixes
+
+* ActiveLayersPanel Service/Imagery misclassification of last basemap layer ([1bf22a9](https://github.com/MapColonies/shared-components/commit/1bf22a9e1154734cd9f46985e05a1c26c66fdc7e))
+* casting ([6b79d58](https://github.com/MapColonies/shared-components/commit/6b79d58ef3742e92b587ca00b544472143b34434))
+* code review ([66343b7](https://github.com/MapColonies/shared-components/commit/66343b7426ddeb71164f7e8208ad378f035a9673))
+* code review ([1df93d6](https://github.com/MapColonies/shared-components/commit/1df93d694030a879ce4bf19dde15e6be98694dc1))
+* code review - use helper ([0a67b5e](https://github.com/MapColonies/shared-components/commit/0a67b5e0a02af036bdbb3b858ae06636148663bf))
+* disabled react-hooks/exhaustive-deps for the whole react-components package ([a0f4cf6](https://github.com/MapColonies/shared-components/commit/a0f4cf6bcfa968f9a6d8efc95e13d34f631fa5f9))
+* draping layers on the model should keep the same order as on the map ([52a98d9](https://github.com/MapColonies/shared-components/commit/52a98d9a90f93a5fc8062976508567c0ed1139aa))
+* empty dependency array ([d0aa4bd](https://github.com/MapColonies/shared-components/commit/d0aa4bd9fde74fa3013e5be670cda26092121e6a))
+* Error fetching WFS data: TypeError: Cannot read properties of null ([e94429b](https://github.com/MapColonies/shared-components/commit/e94429bf252e67d6ede360ba21e11c83271bd926))
+* eslint ([fced146](https://github.com/MapColonies/shared-components/commit/fced1466b9b53b5616e6fd592470bce246028ca5))
+* misclassification when toggling on optimization ([ee17f3f](https://github.com/MapColonies/shared-components/commit/ee17f3f9867578d6f4a0fbe7131350807fb8b005))
+* no template curly in string ([e9ae019](https://github.com/MapColonies/shared-components/commit/e9ae019708a7d5b5fb6cbd75cc927334d1871c5d))
+* old and new instances coexisting in new resium version and context leak ([11d9fdf](https://github.com/MapColonies/shared-components/commit/11d9fdf21cc66f80fe95abd83769a0a0f7567e61))
+* race between cesium teardown and the optimization listeners - cannot read property scene of undefined ([7a939fa](https://github.com/MapColonies/shared-components/commit/7a939fae1b8dfec12b1c94aa78235d19b4badeb7))
+* redundent for XYZ 2 layers ([211b699](https://github.com/MapColonies/shared-components/commit/211b699f19f0e6372c31e22c0eb3dfa8d114b004))
+* remove context leak fix ([e5963ba](https://github.com/MapColonies/shared-components/commit/e5963bafcd86b023f83e07c07faf7bbaed6022a2))
+* replace PI ([be9c37d](https://github.com/MapColonies/shared-components/commit/be9c37d652baf8066f8dad74acdb9b82f71ee798))
+* revert mapViewRef.isDestroyed() ([851ee53](https://github.com/MapColonies/shared-components/commit/851ee53073978cc9c4e2e322ca05216ff4a8395f))
+* story args ([d9d7f72](https://github.com/MapColonies/shared-components/commit/d9d7f723ebbddcd82e8ff6dd5c05121ecf93aac5))
+* storybook navigation ([2363e45](https://github.com/MapColonies/shared-components/commit/2363e4538779d2f5b678fd140cdfe7292750cbb2))
+* throw new error ([e6ef9ee](https://github.com/MapColonies/shared-components/commit/e6ef9ee40346cebc26672861cb78222a95d18b8d))
+* toggling layers ([f79a20b](https://github.com/MapColonies/shared-components/commit/f79a20bc35957ca1bafead20009095c7fed3b7d3))
+* unnecessary ([d410ed9](https://github.com/MapColonies/shared-components/commit/d410ed9f3a49af9eb43723329b8adcf4f0c474ea))
+* viewer custom tools ([1a491f8](https://github.com/MapColonies/shared-components/commit/1a491f8d39ac4a404a3f59ef969b5b1f67fdd4ee))
+* xyz 2 layers ([ddb5d06](https://github.com/MapColonies/shared-components/commit/ddb5d066a9c2603d68221d43b5f4a00d97302cdd))
+* yarn storybook errors ([7b8ee25](https://github.com/MapColonies/shared-components/commit/7b8ee25423518400e269e13cc655693ebbf595ed))
+
+
+
+
+
 # [4.16.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.15.1...@map-colonies/react-components@4.16.0) (2026-07-08)
 
 
