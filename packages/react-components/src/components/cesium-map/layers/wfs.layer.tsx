@@ -601,8 +601,7 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
             }
             await handleWfsResponse((wfsResponse as any)?.data?.[queryName], extent, offset, position);
           } else {
-            // eslint-disable-next-line no-throw-literal
-            throw 'API as alternative service still not supported';
+            throw new Error('API as alternative service still not supported');
           }
         } else {
           const urlSeparator = url.includes('?') ? '&' : '?';
