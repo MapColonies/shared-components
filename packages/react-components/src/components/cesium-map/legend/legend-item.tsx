@@ -23,11 +23,6 @@ export const LegendItem: React.FC<LegendItemProps> = ({ legend: { legendImg, leg
     window.open(legendImg, '_blank');
   }, [legendImg]);
 
-  const handleLegendDocOpen = useCallback(() => {
-    // Open doc in a new tab.
-    window.open(legendDoc, '_blank');
-  }, [legendDoc]);
-
   const renderLayerName = useCallback(() => {
     const MAX_LAYER_NAME_LENGTH = 15;
 

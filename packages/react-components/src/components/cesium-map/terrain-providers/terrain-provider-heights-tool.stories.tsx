@@ -72,13 +72,6 @@ const TerrainProviderSelector: React.FC<ITerrainProviderSelectorProps> = ({ terr
   return (
     <div>
       <select
-        style={{
-          display: 'block',
-          marginTop: '8px',
-          height: '32px',
-          maxHeight: '32px',
-          width: 'auto',
-        }}
         defaultValue={terrainProviderList[0].id}
         onChange={(evt): void => {
           const selected = terrainProviderList.find((item) => item.id === evt.target.value);

@@ -43,8 +43,5 @@ WmsTiles.argTypes = {
         detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_TileWMS-TileWMS.html"',
       },
     },
-    control: {
-      type: null,
-    },
   },
 };

@@ -1,5 +1,5 @@
 import { ImageryLayer, Rectangle } from 'cesium';
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
 import { BASE_MAPS } from '../helpers/constants';
@@ -64,6 +64,17 @@ const layerMetaRectXYZ = {
   searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsRectXYZ.url,
 };
 
+const layerRaster = {
+  id: '2_raster_ext',
+  type: 'XYZ_LAYER' as LayerType,
+  opacity: 1,
+  zIndex: 0,
+  show: true,
+  options: {
+    url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
+  },
+};
+
 export const MapWithXYZLayersAndRect: StoryFn = () => (
   <div style={mapDivStyle}>
     <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
@@ -75,21 +86,10 @@ export const MapWithXYZLayersAndRect: StoryFn = () => (
 MapWithXYZLayersAndRect.storyName = 'XYZ child layer with rect';
 
 export const MapWithSettings: StoryFn = () => {
-  const layer = {
-    id: '2_raster_ext',
-    type: 'XYZ_LAYER' as LayerType,
-    opacity: 1,
-    zIndex: 0,
-    show: true,
-    options: {
-      url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
-    },
-  };
-
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...mapViewProps} layerManagerMetaMapping={layerManagerMetaMapping}>
-        <LayerViewer layer={layer} />
+        <LayerViewer layer={layerRaster} />
       </CesiumMap>
     </div>
   );
@@ -105,9 +105,12 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
   const { layer } = props;
 
   // For testing the exposure of current zoom level on map viewer
-  setInterval(() => {
-    console.log('######################### Zoom level: ', (mapViewer as { currentZoomLevel?: number }).currentZoomLevel);
-  }, 2000);
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      console.log('######################### Zoom level: ', (mapViewer as { currentZoomLevel?: number }).currentZoomLevel);
+    }, 2000);
+    return () => window.clearInterval(interval);
+  }, [mapViewer]);
 
   // Mockin footprint data on layer meta
   const layerFootprint = useMemo(
@@ -132,6 +135,10 @@ const LayerViewer: React.FC<ILayerViewerProps> = (props) => {
     layer.options.rectangle = layerManagerRect;
 
     mapViewer.layersManager?.addRasterLayer(layer, 0, '');
+
+    return () => {
+      mapViewer.layersManager?.removeLayer(layer.id);
+    };
   }, [mapViewer, layerFootprint, layer]);
 
   return <></>;

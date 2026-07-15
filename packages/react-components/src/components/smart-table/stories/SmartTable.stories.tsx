@@ -4,7 +4,7 @@ import { SmartTable, CellMetadata } from '..';
 import { CSFStory } from '../../utils/story';
 
 const meta = {
-  title: 'Smart Table',
+  title: 'Components/Smart Table',
   component: SmartTable,
 };
 export default meta;

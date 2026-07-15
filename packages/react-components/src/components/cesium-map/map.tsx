@@ -428,7 +428,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     };
 
     if (mapViewRef) {
-      mapViewRef.camera.moveEnd.addEventListener(() => {
+      const moveEndHandler = () => {
         if (mapViewRef.scene.mode !== SceneMode.MORPHING) {
           const camera = mapViewRef.camera;
 
@@ -442,16 +442,23 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           };
           cameraStateRef.current = store;
         }
-      });
+      };
+
+      const removeMoveEndListener = mapViewRef.camera.moveEnd.addEventListener(moveEndHandler);
+      let removeTileLoadProgressListener: (() => void) | undefined;
+      let dataLayerUpdatedHandler: ((meta: any) => void) | undefined;
+
       if (showLoadingProgress) {
-        mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(function () {
+        const tileLoadProgressHandler = () => {
           if (mapViewRef.scene.globe.tilesLoaded) {
             setIsLoadingTiles(false);
           } else {
             setIsLoadingTiles(true);
           }
-        });
-        mapViewRef.layersManager?.addDataLayerUpdatedListener(() => {
+        };
+        removeTileLoadProgressListener = mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(tileLoadProgressHandler);
+
+        dataLayerUpdatedHandler = () => {
           let loading = false;
           mapViewRef.layersManager?.dataLayerList.forEach((dataLayer) => {
             if (
@@ -465,8 +472,21 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             }
           });
           setIsLoadingDataLayer(loading);
-        });
+        };
+        mapViewRef.layersManager?.addDataLayerUpdatedListener(dataLayerUpdatedHandler);
       }
+
+      return () => {
+        try {
+          removeMoveEndListener();
+          removeTileLoadProgressListener?.();
+          if (dataLayerUpdatedHandler) {
+            mapViewRef.layersManager?.removeDataLayerUpdatedListener(dataLayerUpdatedHandler);
+          }
+        } catch (e) {
+          console.error('Cesium map listeners cleanup failed:', e);
+        }
+      };
     }
   }, [mapViewRef]);
 
@@ -531,7 +551,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     setIsLegendsSidebarOpen((prev) => !prev);
   };
 
+  const getViewerPortalTarget = useCallback((selector: string): Element | null | undefined => {
+    return mapViewRef?.container?.querySelector(selector);
+  }, [mapViewRef]);
+
   const bindCustomToolsToViewer = useCallback((): JSX.Element | undefined => {
+    const viewerContainer = getViewerPortalTarget('.cesium-viewer');
+    if (!viewerContainer) {
+      return undefined;
+    }
     return (
       mapViewRef &&
       createPortal(
@@ -545,12 +573,16 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           </Box>
           {showZoomButtons && <ZoomButtons />}
         </>,
-        document.querySelector('.cesium-viewer') as Element
+        viewerContainer
       )
     );
-  }, [mapViewRef, locale, projection, showMousePosition, showScale, isLoadingProgress]);
+  }, [getViewerPortalTarget, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
+    const toolbarContainer = getViewerPortalTarget('.cesium-viewer-toolbar');
+    if (!toolbarContainer) {
+      return undefined;
+    }
     return (
       mapViewRef &&
       createPortal(
@@ -560,12 +592,16 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {props.showDebuggerTool && <DebuggerWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
-        document.querySelector('.cesium-viewer-toolbar') as Element
+        toolbarContainer
       )
     );
-  }, [mapViewRef, locale, baseMaps, terrains]);
+  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
+    const widgetContainer = getViewerPortalTarget('.cesium-widget');
+    if (!widgetContainer) {
+      return undefined;
+    }
     return (
       mapViewRef &&
       createPortal(
@@ -573,10 +609,10 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
           {viewState?.showCesiumInspector && <InspectorTool />}
         </Box>,
-        document.querySelector('.cesium-widget') as Element
+        widgetContainer
       )
     );
-  }, [mapViewRef, locale, viewState?.showCesiumInspector]);
+  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>

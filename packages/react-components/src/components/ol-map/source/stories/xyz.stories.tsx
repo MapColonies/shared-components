@@ -5,7 +5,7 @@ import { TileLayer } from '../../layers/tile-layer';
 import { getXYZOptions, TileXYZ } from '../xyz';
 
 const xyzOptions = getXYZOptions({
-  url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' + '?apikey=0e6fc415256d4fbb9b5166a718591d71',
+  url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=0e6fc415256d4fbb9b5166a718591d71',
 });
 
 const mapDivStyle = {
@@ -39,9 +39,6 @@ XyzTiles.argTypes = {
         summary: 'OpenLayers type',
         detail: 'Go to "https://openlayers.org/en/latest/apidoc/module-ol_source_XYZ-XYZ.html"',
       },
-    },
-    control: {
-      type: null,
     },
   },
 };

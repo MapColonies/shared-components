@@ -37,7 +37,6 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
   useEffect(() => {

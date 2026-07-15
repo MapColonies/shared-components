@@ -6,7 +6,7 @@ import { Box } from '../box';
 import { CircularProgressBar } from './circular-progress-bar';
 
 const story = {
-  title: 'Circular Progress Bar',
+  title: 'Components/Circular Progress Bar',
   component: CircularProgressBar,
 };
 

@@ -1,10 +1,19 @@
 {
-    "parserOptions": { "project": ["./tsconfig.json"] },
-    "extends": ["react-app"],
-    "ignorePatterns": ["vite.config.*", "commitlint.config.js"],
-    "plugins": ["react"],
-    "rules": {
-        "import/exports-last": 0,
-        "no-lonely-if": 0
+  "parserOptions": { "project": ["./tsconfig.json"] },
+  "extends": ["react-app"],
+  "ignorePatterns": ["vite.config.*", "commitlint.config.js"],
+  "plugins": ["react"],
+  "rules": {
+    "import/exports-last": 0,
+    "no-lonely-if": 0
+  },
+  "overrides": [
+    {
+      "files": ["packages/react-components/**/*.{ts,tsx,js,jsx}"],
+      "rules": {
+        "react-hooks/exhaustive-deps": "off",
+        "no-template-curly-in-string": "off"
+      }
     }
+  ]
 }

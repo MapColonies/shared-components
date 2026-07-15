@@ -15,7 +15,9 @@ export const CesiumImageryLayer: React.FC<RCesiumImageryLayerProps> = (props) =>
   const mapViewer: CesiumViewer = useCesiumMap();
 
   useEffect(() => {
-    mapViewer.layersManager?.addMetaToLayer(meta, meta.searchLayerPredicate);
+    window.requestAnimationFrame(() => {
+      mapViewer.layersManager?.addMetaToLayer(meta, meta.searchLayerPredicate);
+    });
   }, [meta, mapViewer]);
 
   return <ResiumImageryLayer {...restProps} />;

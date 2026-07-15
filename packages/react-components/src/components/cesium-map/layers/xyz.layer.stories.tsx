@@ -1,5 +1,6 @@
 import type { StoryFn, Meta } from '@storybook/react';
 import { ImageryLayer } from 'cesium';
+import { get } from 'lodash';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumMap } from '../map';
@@ -40,7 +41,9 @@ const xyzLayerMeta = {
     productName: 'XYZ Layer',
   },
   options: { ...optionsXYZ },
-  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ.url,
+  searchLayerPredicate: (layer: ImageryLayer): boolean => {
+    return getImageryProviderUrl(layer) === optionsXYZ.url;
+  },
 };
 
 const xyzLayerMeta2 = {
@@ -49,7 +52,9 @@ const xyzLayerMeta2 = {
     productName: 'XYZ Layer 2',
   },
   options: { ...optionsXYZ2 },
-  searchLayerPredicate: (layer: ImageryLayer): boolean => getImageryProviderUrl(layer) === optionsXYZ2.url,
+  searchLayerPredicate: (layer: ImageryLayer): boolean => {
+    return get(layer, 'imageryProvider.url') === optionsXYZ2.url;
+  },
 };
 
 export const MapWithXYZLayers: StoryFn = () => (

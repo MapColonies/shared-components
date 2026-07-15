@@ -596,9 +596,12 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
               },
             });
             const queryName = payload.query.split('(')[0].replace('query ', ''); //strip queryName
-            await handleWfsResponse((wfsResponse as any)?.data[queryName], extent, offset, position);
+            if ((wfsResponse as any)?.errors) {
+              throw new Error(JSON.stringify((wfsResponse as any).errors));
+            }
+            await handleWfsResponse((wfsResponse as any)?.data?.[queryName], extent, offset, position);
           } else {
-            throw 'API as alternative service still not supported';
+            throw new Error('API as alternative service still not supported');
           }
         } else {
           const urlSeparator = url.includes('?') ? '&' : '?';
@@ -690,11 +693,14 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
       hasRunFetchRef.current = true;
     }
 
+    const wfsCacheRef = wfsCache.current;
+    const fetchMetadataRef = fetchMetadata.current;
+
     // Cleanup
     return () => {
       if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        wfsCache.current.clear();
-        fetchMetadata.current.clear();
+        wfsCacheRef.clear();
+        fetchMetadataRef.clear();
         mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
         mapViewer.dataSources.remove(wfsDataSource, true);
         if (dataLayerId !== undefined) {

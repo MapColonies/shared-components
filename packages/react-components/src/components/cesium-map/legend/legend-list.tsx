@@ -26,7 +26,6 @@ export const LegendList: React.FC<LegendListProps> = ({ legends, actionsTexts: {
     if (!legends.length) {
       return handleNoLegends();
     }
-
     return legends.map((legend, i) => {
       return <LegendItem key={`${legend.layer as string}_${i}`} legend={legend} docText={docText} imgText={imgText} />;
     });

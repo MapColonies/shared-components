@@ -6,7 +6,7 @@ import { DateTimeRangePicker } from './date-range-picker';
 import { DateTimeRangePickerFormControl } from './date-range-picker.form-control';
 
 const story = {
-  title: 'Date Range Picker',
+  title: 'Components/Date Range Picker',
   component: DateTimeRangePicker,
 };
 

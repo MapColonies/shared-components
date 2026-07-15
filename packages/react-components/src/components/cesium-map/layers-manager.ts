@@ -123,6 +123,17 @@ export const getLayerName = (layer: ICesiumImageryLayer | ICesiumWFSLayer | ICes
   return get(layer.meta, mapping.layer.name) as string | undefined;
 };
 
+export const getServiceLayerId = (layer: ICesiumImageryLayer, i: number): string => {
+  return getLayerId(layer) ?? `SERVICE_LAYER_${String(i + 1)}`;
+};
+
+export const getServiceLayerName = (layer: ICesiumImageryLayer, i: number): string => {
+  const layerId = getServiceLayerId(layer, i);
+  const isTransparentLayer = layerId === TRANSPARENT_LAYER_ID;
+  const providerName = getImageryProviderName(getImageryProvider(layer)) ?? layerId;
+  return isTransparentLayer ? layerId : providerName;
+};
+
 export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
   return get(meta, mapping.layer.footprint ?? '');
 };
@@ -589,8 +600,7 @@ class LayerManager {
       this.bindRelevancyListeners();
       this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
       return;
     }
 
@@ -662,10 +672,28 @@ class LayerManager {
     for (const model of this.models) {
       const overlayLayer = new ImageryLayer(provider);
       this.applyDrapingOverlayConfig(overlayLayer, layer);
-      model.tileset.imageryLayers.add(overlayLayer);
+      const insertionIndex = this.getBaseMapDrapingInsertionIndex(model, layer);
+      model.tileset.imageryLayers.add(overlayLayer, insertionIndex);
       overlays.push({ tileset: model.tileset, overlay: overlayLayer });
     }
     this.layerToOverlaysMapping.set(layer, overlays);
+  }
+
+  private getBaseMapDrapingInsertionIndex(model: ICesium3DModel, layer: ICesiumImageryLayer): number | undefined {
+    if (!isBaseMapLayer(layer.meta)) {
+      return undefined;
+    }
+    const newZIndex = (layer.meta?.zIndex as number | undefined) ?? 0;
+    let index = 0;
+    for (const [existingLayer, existingOverlays] of this.layerToOverlaysMapping.entries()) {
+      if (!isBaseMapLayer(existingLayer.meta)) { continue; }
+      if (!existingOverlays.some(({ tileset }) => tileset === model.tileset)) { continue; }
+      const existingZIndex = (existingLayer.meta?.zIndex as number | undefined) ?? 0;
+      if (existingZIndex < newZIndex) {
+        index++;
+      }
+    }
+    return index;
   }
 
   private applyDrapingOverlayConfig(overlayLayer: ImageryLayer, sourceLayer: ICesiumImageryLayer): void {
@@ -764,8 +792,7 @@ class LayerManager {
       const newMetaKeys = Object.keys(meta);
       const shouldTriggerRelevancyCheck = newMetaKeys.length === 1 && newMetaKeys[0] === HAS_TRANSPARENCY_META_PROP;
       if (shouldTriggerRelevancyCheck) {
-        this.markRelevantLayersForExtent();
-        this.hideNonRelevantLayers();
+        this.refreshRelevancyState();
       }
     };
 
@@ -778,26 +805,22 @@ class LayerManager {
 
     const removeLayerRemovedListener = this.mapViewer.imageryLayers.layerRemoved.addEventListener(() => {
       this.setLegends();
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerRemovedListener);
 
     const removeLayerMovedListener = this.mapViewer.imageryLayers.layerMoved.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerMovedListener);
 
     const removeLayerAddedListener = this.mapViewer.imageryLayers.layerAdded.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeLayerAddedListener);
 
     const removeMoveEndListener = this.mapViewer.camera.moveEnd.addEventListener(() => {
-      this.markRelevantLayersForExtent();
-      this.hideNonRelevantLayers();
+      this.refreshRelevancyState();
     });
     this.relevancyListenersCleanup.push(removeMoveEndListener);
   }
@@ -814,11 +837,29 @@ class LayerManager {
     if (!this.shouldOptimizedTileRequests) {
       return;
     }
+    this.refreshRelevancyState();
+  }
+
+  private isViewerAvailable(): boolean {
+    try {
+      return !this.mapViewer.isDestroyed() && this.mapViewer.scene !== undefined;
+    } catch {
+      return false;
+    }
+  }
+
+  private refreshRelevancyState(): void {
+    if (!this.isViewerAvailable()) {
+      return;
+    }
     this.markRelevantLayersForExtent();
     this.hideNonRelevantLayers();
   }
 
   private markRelevantLayersForExtent(): void {
+    if (!this.isViewerAvailable()) {
+      return;
+    }
     try {
       const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
       if (isEmpty(extent)) {
