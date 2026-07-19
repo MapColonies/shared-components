@@ -194,41 +194,25 @@ export const rectangle2Feature = (rect: Rectangle): Feature<Polygon> => {
   };
 };
 
-export const customComputeViewRectangle = (mapViewer: CesiumViewer) => {
-  const scene = mapViewer.scene;
-  const camera = mapViewer.camera;
-
-  let viewRect = camera.computeViewRectangle(scene.globe.ellipsoid);
-
-  if (!defined(viewRect) || !viewRect) {
-    console.error('cesium native computeViewRectangle returned invalid rectangle, fallback to custom calculation ');
-    const cl2 = new Cartesian2(0, 0);
-    const leftTop = scene.camera.pickEllipsoid(cl2, scene.globe.ellipsoid);
-
-    const cr2 = new Cartesian2(scene.canvas.width, scene.canvas.height);
-    const rightDown = scene.camera.pickEllipsoid(cr2, scene.globe.ellipsoid);
-
-    const cartoLeftTop = scene.globe.ellipsoid.cartesianToCartographic(leftTop as Cartesian3);
-    const cartoRightDown = scene.globe.ellipsoid.cartesianToCartographic(rightDown as Cartesian3);
-    viewRect = new Rectangle(cartoLeftTop.longitude, cartoRightDown.latitude, cartoRightDown.longitude, cartoLeftTop.latitude);
-  }
-
-  return viewRect;
-};
-
 // camera.computeViewRectangle() ray-casts only the 4 screen corners against the ellipsoid. At
 // high camera altitude combined with a wide field of view, those corner rays can point past the
 // horizon into space even though most of the screen still shows the globe - this happens after
 // flying to a layer whose footprint spans a wide area (e.g. a footprint with far-apart parts,
-// which needs a much higher altitude to fit in view than a compact one). Sampling a grid of
-// points across the screen and keeping whichever ones actually hit the ellipsoid is robust to
-// that failure mode, since interior points are far less likely to miss than the corners.
+// which needs a much higher altitude to fit in view than a compact one). When that happens, fall
+// back to sampling a grid of points across the screen and keeping whichever ones actually hit the
+// ellipsoid, since interior points are far less likely to miss than the corners.
 export const computeViewRectangleFromGrid = (
   mapViewer: CesiumViewer,
   gridSize = FALLBACK_GRID_SIZE
 ): Rectangle | undefined => {
   const { scene, camera } = mapViewer;
   const ellipsoid = scene.globe.ellipsoid;
+
+  const nativeRect = camera.computeViewRectangle(ellipsoid);
+  if (defined(nativeRect) && nativeRect) {
+    return nativeRect;
+  }
+
   const width = scene.canvas.clientWidth;
   const height = scene.canvas.clientHeight;
 
@@ -294,11 +278,11 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const mode = scene.mode;
 
   // Get the full rectangle in 2D or 3D mode
-  const fullRect = customComputeViewRectangle(mapViewer);
+  const fullRect = computeViewRectangleFromGrid(mapViewer);
 
   // Check if fullRect is valid before proceeding
   if (!defined(fullRect) || !fullRect) {
-    console.error('customComputeViewRectangle returned invalid rectangle.');
+    console.error('computeViewRectangleFromGrid returned invalid rectangle.');
     return undefined;
   }
 

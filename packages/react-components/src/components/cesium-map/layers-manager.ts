@@ -874,10 +874,7 @@ class LayerManager {
       return;
     }
     try {
-      let extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
-      if (isEmpty(extent)) {
-        extent = computeViewRectangleFromGrid(this.mapViewer) as Rectangle;
-      }
+      const extent = computeViewRectangleFromGrid(this.mapViewer) as Rectangle;
       if (isEmpty(extent)) {
         for (const layer of this.layers) {
           layer.meta = { ...(layer.meta ?? {}), isRelevantToExtent: true };

@@ -7,7 +7,7 @@ import { getType } from '@turf/invariant';
 import { TextField, Typography, Checkbox, List, ListItem, ListItemSecondaryText, Tooltip } from '@map-colonies/react-core';
 import { Box } from '../../box';
 import { useCesiumMap } from '../map';
-import { applyFactor, customComputeViewRectangle, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
+import { applyFactor, computeViewRectangleFromGrid, defaultVisualizationHandler, rectangle2bbox } from '../helpers/utils';
 import { CesiumRectangle } from '../proxied.types';
 
 import '@map-colonies/react-core/dist/list/styles';
@@ -181,7 +181,7 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
         }
 
         if (isInMapExtent) {
-          const rectangle = customComputeViewRectangle(mapViewer);
+          const rectangle = computeViewRectangleFromGrid(mapViewer);
 
           const geoContext = params.dynamic.geoContext;
           const geoContextName = typeof geoContext === 'string' ? geoContext : geoContext?.name;
