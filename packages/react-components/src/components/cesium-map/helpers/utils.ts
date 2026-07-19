@@ -30,11 +30,12 @@ import intersect from '@turf/intersect';
 import pointToPolygonDistance from '@turf/point-to-polygon-distance';
 import { ICesiumWFSLayerLabelingOptions } from '../layers';
 import { CesiumViewer } from '../map';
-import { CesiumMath, CesiumRectangle } from '../proxied.types';
+import { CesiumCartesian2, CesiumCartographic, CesiumMath, CesiumRectangle } from '../proxied.types';
 import { CustomImageryProvider } from './customImageryProviders';
 
 const canvasElem = document.createElement('canvas');
 const canvasCtx = canvasElem.getContext('2d');
+const FALLBACK_GRID_SIZE = 5;
 
 /**
  * Checks if image data has at least one transparent pixel.
@@ -213,6 +214,72 @@ export const customComputeViewRectangle = (mapViewer: CesiumViewer) => {
   }
 
   return viewRect;
+};
+
+// camera.computeViewRectangle() ray-casts only the 4 screen corners against the ellipsoid. At
+// high camera altitude combined with a wide field of view, those corner rays can point past the
+// horizon into space even though most of the screen still shows the globe - this happens after
+// flying to a layer whose footprint spans a wide area (e.g. a footprint with far-apart parts,
+// which needs a much higher altitude to fit in view than a compact one). Sampling a grid of
+// points across the screen and keeping whichever ones actually hit the ellipsoid is robust to
+// that failure mode, since interior points are far less likely to miss than the corners.
+export const computeViewRectangleFromGrid = (
+  mapViewer: CesiumViewer,
+  gridSize = FALLBACK_GRID_SIZE
+): Rectangle | undefined => {
+  const { scene, camera } = mapViewer;
+  const ellipsoid = scene.globe.ellipsoid;
+  const width = scene.canvas.clientWidth;
+  const height = scene.canvas.clientHeight;
+
+  const samples: CesiumCartographic[] = [];
+  for (let y = 0; y < gridSize; y++) {
+    const sy = (y / (gridSize - 1)) * height;
+    for (let x = 0; x < gridSize; x++) {
+      const sx = (x / (gridSize - 1)) * width;
+      const windowPosition = new CesiumCartesian2(sx, sy);
+      const ray = camera.getPickRay(windowPosition);
+      if (!ray) {
+        continue;
+      }
+      const cartesian = scene.globe.pick(ray, scene) ?? camera.pickEllipsoid(windowPosition, ellipsoid);
+      if (!cartesian) {
+        continue;
+      }
+      samples.push(CesiumCartographic.fromCartesian(cartesian, ellipsoid));
+    }
+  }
+
+  if (samples.length === 0) {
+    return undefined;
+  }
+
+  let west = Number.POSITIVE_INFINITY;
+  let east = Number.NEGATIVE_INFINITY;
+  let south = Number.POSITIVE_INFINITY;
+  let north = Number.NEGATIVE_INFINITY;
+  for (const { longitude, latitude } of samples) {
+    west = Math.min(west, longitude);
+    east = Math.max(east, longitude);
+    south = Math.min(south, latitude);
+    north = Math.max(north, latitude);
+  }
+
+  // Handle views crossing the antimeridian: re-derive west/east in a longitude space shifted so
+  // the true (contiguous) cluster of samples isn't split across the +-Pi wrap point.
+  if (east - west > Math.PI) {
+    west = Number.POSITIVE_INFINITY;
+    east = Number.NEGATIVE_INFINITY;
+    for (const { longitude } of samples) {
+      const shiftedLongitude = longitude < 0 ? longitude + CesiumMath.TWO_PI : longitude;
+      west = Math.min(west, shiftedLongitude);
+      east = Math.max(east, shiftedLongitude);
+    }
+    west = CesiumMath.negativePiToPi(west);
+    east = CesiumMath.negativePiToPi(east);
+  }
+
+  return new Rectangle(west, south, east, north);
 };
 
 /**

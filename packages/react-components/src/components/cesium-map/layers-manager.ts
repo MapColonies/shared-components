@@ -8,6 +8,8 @@ import {
   Event,
   Rectangle,
   SingleTileImageryProvider,
+  TileCoordinatesImageryProvider,
+  OpenStreetMapImageryProvider,
 } from 'cesium';
 import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
@@ -19,7 +21,7 @@ import {
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
-import { cesiumRectangleContained } from './helpers/utils';
+import { cesiumRectangleContained, computeViewRectangleFromGrid } from './helpers/utils';
 import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
@@ -170,8 +172,19 @@ export const getImageryProviderUrl = (layer: ICesiumImageryLayer): string | unde
   return get(layer, '_imageryProvider._resource._url');
 };
 
+type ImageryProviderConstructor = new (...args: never[]) => CesiumImageryProvider;
+const KNOWN_IMAGERY_PROVIDER_TYPES: Array<{ ctor: ImageryProviderConstructor; name: string }> = [
+  { ctor: TileCoordinatesImageryProvider, name: 'TileCoordinatesImageryProvider' },
+  { ctor: UrlTemplateImageryProvider, name: 'UrlTemplateImageryProvider' },
+  { ctor: WebMapServiceImageryProvider, name: 'WebMapServiceImageryProvider' },
+  { ctor: WebMapTileServiceImageryProvider, name: 'WebMapTileServiceImageryProvider' },
+  { ctor: SingleTileImageryProvider, name: 'SingleTileImageryProvider' },
+  { ctor: OpenStreetMapImageryProvider, name: 'OpenStreetMapImageryProvider' },
+];
+
 export const getImageryProviderName = (provider: CesiumImageryProvider): string => {
-  return provider.constructor.name;
+  const knownType = KNOWN_IMAGERY_PROVIDER_TYPES.find(({ ctor }) => provider instanceof ctor);
+  return knownType?.name ?? provider.constructor.name;
 };
 
 class LayerManager {
@@ -861,8 +874,14 @@ class LayerManager {
       return;
     }
     try {
-      const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
+      let extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
       if (isEmpty(extent)) {
+        extent = computeViewRectangleFromGrid(this.mapViewer) as Rectangle;
+      }
+      if (isEmpty(extent)) {
+        for (const layer of this.layers) {
+          layer.meta = { ...(layer.meta ?? {}), isRelevantToExtent: true };
+        }
         return;
       }
       // Iterating in reverse order so that top layer is first
