@@ -98,14 +98,14 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
   });
 
   useEffect(() => {
-    const setFromEvent = (e: MouseEvent): void => {
+    const setFromEvent = (): void => {
       updateDistanceLegendCesium(mapViewer, scaleData, setScaleData, props.locale);
     };
 
     const helper = new EventHelper();
-    const tileLoadHandler = (event: number): void => {
+    const tileLoadHandler = (): void => {
       if (mapViewer.scene.globe.tilesLoaded) {
-        setFromEvent(new MouseEvent('mouse'));
+        setFromEvent();
         helper.removeAll();
       }
     };
@@ -117,9 +117,8 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
 
     return (): void => {
       try {
-        if (get(mapViewer, '_cesiumWidget') !== undefined) {
-          mapViewer.camera.moveEnd.removeEventListener(setFromEvent);
-        }
+        helper.removeAll();
+        mapViewer.camera.moveEnd.removeEventListener(setFromEvent);
       } catch (e) {
         console.log('CESIUM camera "moveEnd" remove listener failed', e);
       }
