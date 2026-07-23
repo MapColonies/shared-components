@@ -698,17 +698,15 @@ export const CesiumWFSLayer: React.FC<ICesiumWFSLayer> = (props) => {
 
     // Cleanup
     return () => {
-      if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        wfsCacheRef.clear();
-        fetchMetadataRef.clear();
-        mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
-        mapViewer.dataSources.remove(wfsDataSource, true);
-        if (dataLayerId !== undefined) {
-          mapViewer.layersManager?.removeDataLayer(dataLayerId);
-        }
-        mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
-        handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+      wfsCacheRef.clear();
+      fetchMetadataRef.clear();
+      mapViewer.dataSources.remove(mapViewer.dataSources.getByName(`${labeling?.dataSourcePrefix}${wfsDataSource.name}`)[0]);
+      mapViewer.dataSources.remove(wfsDataSource, true);
+      if (dataLayerId !== undefined) {
+        mapViewer.layersManager?.removeDataLayer(dataLayerId);
       }
+      mapViewer.scene.camera.moveEnd.removeEventListener(fetchHandler);
+      handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
     };
   }, []);
 

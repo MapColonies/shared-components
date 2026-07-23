@@ -149,11 +149,8 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
 
     return (): void => {
       try {
-        /* eslint-disable @typescript-eslint/no-unnecessary-condition*/
-        if (typeof get(mapViewer, '_cesiumWidget') !== 'undefined') {
-          mapViewer.camera.moveEnd.removeEventListener(zoomExtractionMethod);
-          removeTilesLoadedListener();
-        }
+        mapViewer.camera.moveEnd.removeEventListener(zoomExtractionMethod);
+        removeTilesLoadedListener();
       } catch (e) {
         console.log('CESIUM camera "moveEnd"(from zoom tracker) remove listener failed', e);
       }

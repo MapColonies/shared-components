@@ -64,7 +64,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     { id: IMAGERY, values: [] },
     { id: SERVICE, values: [] },
     { id: DATA, values: [] },
-    { id: THREE_D, values: [] }
+    { id: THREE_D, values: [] },
   ]);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
@@ -79,47 +79,54 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   const getImageryLayers = (): IActiveLayer[] => {
     const layerList = getLayerList();
     return layerList.length > 0
-      ? layerList.map((layer): IActiveLayer | undefined => {
-          const meta = get(layer, 'meta');
-          const layerId = getLayerId(layer);
-          if (!isManagedImageryLayer(layerId)) {
-            return undefined;
-          }
-          return {
-            id: layerId as string,
-            name: (getLayerName(layer) ?? layerId) as string,
-            rect: layer.rectangle,
-            isDisabled: isBaseMapLayer(meta as Record<string, unknown>)
-          };
-        }).filter((item): item is IActiveLayer => item !== undefined)
+      ? layerList
+          .map((layer): IActiveLayer | undefined => {
+            const meta = get(layer, 'meta');
+            const layerId = getLayerId(layer);
+            if (!isManagedImageryLayer(layerId)) {
+              return undefined;
+            }
+            return {
+              id: layerId as string,
+              name: (getLayerName(layer) ?? layerId) as string,
+              rect: layer.rectangle,
+              isDisabled: isBaseMapLayer(meta as Record<string, unknown>),
+            };
+          })
+          .filter((item): item is IActiveLayer => item !== undefined)
       : [];
   };
 
   const getServiceLayers = (): IActiveLayer[] => {
     const layerList = getLayerList();
     return layerList.length > 0
-      ? layerList.map((layer, i): IActiveLayer | undefined => {
-          if (!isServiceLayer(getLayerId(layer))) {
-            return undefined;
-          }
-          return {
-            id: getServiceLayerId(layer, i),
-            name: getServiceLayerName(layer, i),
-            rect: layer.rectangle,
-            isDisabled: true
-          };
-        }).filter((item): item is IActiveLayer => item !== undefined)
+      ? layerList
+          .map((layer, i): IActiveLayer | undefined => {
+            if (!isServiceLayer(getLayerId(layer))) {
+              return undefined;
+            }
+            return {
+              id: getServiceLayerId(layer, i),
+              name: getServiceLayerName(layer, i),
+              rect: layer.rectangle,
+              isDisabled: true,
+            };
+          })
+          .filter((item): item is IActiveLayer => item !== undefined)
       : [];
   };
 
   const getDataLayers = (): IActiveLayer[] => {
-    return mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
-      return {
-        id: getLayerId(dataLayer) as string,
-        name: (getDataLayerName(dataLayer.meta) ?? getLayerName(dataLayer)) as string,
-        rect: Rectangle.fromDegrees(...bbox(getLayerFootprint(dataLayer.meta))),
-        isDisabled: false
-      }; }) || [];
+    return (
+      mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
+        return {
+          id: getLayerId(dataLayer) as string,
+          name: (getDataLayerName(dataLayer.meta) ?? getLayerName(dataLayer)) as string,
+          rect: Rectangle.fromDegrees(...bbox(getLayerFootprint(dataLayer.meta))),
+          isDisabled: false,
+        };
+      }) || []
+    );
   };
 
   const get3DModels = (): IActiveLayer[] => {
@@ -167,7 +174,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   }, []);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) { return; }
+    if (!mapViewer.layersManager) {
+      return;
+    }
     const handleLayerEvent = (): void => {
       refreshSections();
     };
@@ -176,24 +185,24 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     mapViewer.imageryLayers.layerRemoved.addEventListener(handleLayerEvent);
     mapViewer.imageryLayers.layerMoved.addEventListener(handleLayerEvent);
     return () => {
-      if (get(mapViewer, '_cesiumWidget') !== undefined) {
-        mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerEvent);
-        mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
-        mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
-        mapViewer.imageryLayers.layerMoved.removeEventListener(handleLayerEvent);
-      }
+      mapViewer.layersManager?.removeLayerUpdatedListener(handleLayerEvent);
+      mapViewer.imageryLayers.layerAdded.removeEventListener(handleLayerEvent);
+      mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
+      mapViewer.imageryLayers.layerMoved.removeEventListener(handleLayerEvent);
     };
   }, [mapViewer.layersManager]);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) { return; }
+    if (!mapViewer.layersManager) {
+      return;
+    }
     const handleDataLayerEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === DATA
             ? {
                 ...item,
-                values: getDataLayers()
+                values: getDataLayers(),
               }
             : item
         )
@@ -206,14 +215,16 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
   }, [mapViewer.layersManager?.dataLayerList]);
 
   useEffect(() => {
-    if (!mapViewer.layersManager) { return; }
+    if (!mapViewer.layersManager) {
+      return;
+    }
     const handle3DModelEvent = (): void => {
       setSections((prev) =>
         prev.map((item) =>
           item.id === THREE_D
             ? {
                 ...item,
-                values: get3DModels()
+                values: get3DModels(),
               }
             : item
         )
@@ -241,8 +252,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
 
   return (
     <Box className="activeLayersPanel">
-      {
-        sections.filter(item => item.values.length > 0).map((section) => (
+      {sections
+        .filter((item) => item.values.length > 0)
+        .map((section) => (
           <Box
             key={section.id}
             className={`cesium-cesiumInspector-section ${collapsedSections[section.id] ? 'cesium-cesiumInspector-section-collapsed' : ''}`}
@@ -252,36 +264,41 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
               {getLabel(section.id)}
             </Typography>
             <Box className="cesium-cesiumInspector-sectionContent">
-              {
-                section.values.map((activeLayer: IActiveLayer) => (
-                  <Box key={activeLayer.id} className="layer">
-                    <Tooltip content={activeLayer.name}>
-                      <Box className={`name ${activeLayer.isDisabled ? 'disabled' : ''}`}><bdi>{activeLayer.name}</bdi></Box>
+              {section.values.map((activeLayer: IActiveLayer) => (
+                <Box key={activeLayer.id} className="layer">
+                  <Tooltip content={activeLayer.name}>
+                    <Box className={`name ${activeLayer.isDisabled ? 'disabled' : ''}`}>
+                      <bdi>{activeLayer.name}</bdi>
+                    </Box>
+                  </Tooltip>
+                  <Box className="icons">
+                    <Tooltip content={get(locale, 'FLY_TO') ?? 'Fly To'}>
+                      <Box
+                        className="icon"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleFlyTo(activeLayer);
+                        }}
+                      >
+                        <svg fill="var(--mdc-theme-cesium-color)" width="100%" height="100%" viewBox="0 0 256 256">
+                          <path d="M236,120H223.66406A96.15352,96.15352,0,0,0,136,32.33618V20a8,8,0,0,0-16,0V32.33618A96.15352,96.15352,0,0,0,32.33594,120H20a8,8,0,0,0,0,16H32.33594A96.15352,96.15352,0,0,0,120,223.66382V236a8,8,0,0,0,16,0V223.66382A96.15352,96.15352,0,0,0,223.66406,136H236a8,8,0,0,0,0-16Zm-40,16h11.59912A80.14164,80.14164,0,0,1,136,207.59912V196a8,8,0,0,0-16,0v11.59912A80.14164,80.14164,0,0,1,48.40088,136H60a8,8,0,0,0,0-16H48.40088A80.14164,80.14164,0,0,1,120,48.40088V60a8,8,0,0,0,16,0V48.40088A80.14164,80.14164,0,0,1,207.59912,120H196a8,8,0,0,0,0,16Z" />
+                          <polygon points="128,80 80,170 128,150 176,170" fill="var(--mdc-theme-cesium-color)" />
+                        </svg>
+                      </Box>
                     </Tooltip>
-                    <Box className="icons">
-                      <Tooltip content={get(locale, 'FLY_TO') ?? 'Fly To'}>
-                        <Box className="icon" onClick={(event) => { event.stopPropagation(); handleFlyTo(activeLayer); }}>
-                          <svg fill="var(--mdc-theme-cesium-color)" width="100%" height="100%" viewBox="0 0 256 256">
-                            <path d="M236,120H223.66406A96.15352,96.15352,0,0,0,136,32.33618V20a8,8,0,0,0-16,0V32.33618A96.15352,96.15352,0,0,0,32.33594,120H20a8,8,0,0,0,0,16H32.33594A96.15352,96.15352,0,0,0,120,223.66382V236a8,8,0,0,0,16,0V223.66382A96.15352,96.15352,0,0,0,223.66406,136H236a8,8,0,0,0,0-16Zm-40,16h11.59912A80.14164,80.14164,0,0,1,136,207.59912V196a8,8,0,0,0-16,0v11.59912A80.14164,80.14164,0,0,1,48.40088,136H60a8,8,0,0,0,0-16H48.40088A80.14164,80.14164,0,0,1,120,48.40088V60a8,8,0,0,0,16,0V48.40088A80.14164,80.14164,0,0,1,207.59912,120H196a8,8,0,0,0,0,16Z"/>
-                            <polygon points="128,80 80,170 128,150 176,170" fill="var(--mdc-theme-cesium-color)"/>
-                          </svg>
-                        </Box>
-                      </Tooltip>
-                      {/* <Tooltip content={get(locale, 'REMOVE') ?? 'Remove'}>
+                    {/* <Tooltip content={get(locale, 'REMOVE') ?? 'Remove'}>
                         <Box className={`icon ${activeLayer.isDisabled ? 'disabled' : ''}`} onClick={(event) => { event.stopPropagation(); }}>
                           <svg width="100%" height="100%" viewBox="0 0 16 16" fill="var(--mdc-theme-cesium-color)">
                             <path fillRule="evenodd" clipRule="evenodd" d="M10 3h3v1h-1v9l-1 1H4l-1-1V4H2V3h3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1zM9 2H6v1h3V2zM4 13h7V4H4v9zm2-8H5v7h1V5zm1 0h1v7H7V5zm2 0h1v7H9V5z"/>
                           </svg>
                         </Box>
                       </Tooltip> */}
-                    </Box>
                   </Box>
-                ))
-              }
+                </Box>
+              ))}
             </Box>
           </Box>
-        ))
-      }
+        ))}
     </Box>
   );
 };
