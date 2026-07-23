@@ -279,7 +279,7 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
 
   // Check if fullRect is valid before proceeding
   if (!defined(fullRect) || !fullRect) {
-    console.error('computeViewRectangleFromGrid returned invalid rectangle.');
+    console.error('customComputeViewRectangle returned invalid rectangle.');
     return undefined;
   }
 
