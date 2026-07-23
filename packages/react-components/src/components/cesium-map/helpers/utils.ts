@@ -201,10 +201,7 @@ export const rectangle2Feature = (rect: Rectangle): Feature<Polygon> => {
 // which needs a much higher altitude to fit in view than a compact one). When that happens, fall
 // back to sampling a grid of points across the screen and keeping whichever ones actually hit the
 // ellipsoid, since interior points are far less likely to miss than the corners.
-export const computeViewRectangleFromGrid = (
-  mapViewer: CesiumViewer,
-  gridSize = FALLBACK_GRID_SIZE
-): Rectangle | undefined => {
+export const customComputeViewRectangle = (mapViewer: CesiumViewer, gridSize = FALLBACK_GRID_SIZE): Rectangle | undefined => {
   const { scene, camera } = mapViewer;
   const ellipsoid = scene.globe.ellipsoid;
 
@@ -278,11 +275,11 @@ export const computeLimitedViewRectangle = (mapViewer: CesiumViewer, maxDistance
   const mode = scene.mode;
 
   // Get the full rectangle in 2D or 3D mode
-  const fullRect = computeViewRectangleFromGrid(mapViewer);
+  const fullRect = customComputeViewRectangle(mapViewer);
 
   // Check if fullRect is valid before proceeding
   if (!defined(fullRect) || !fullRect) {
-    console.error('computeViewRectangleFromGrid returned invalid rectangle.');
+    console.error('customComputeViewRectangle returned invalid rectangle.');
     return undefined;
   }
 
