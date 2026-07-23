@@ -59,15 +59,17 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
     const normal = scene.globe.ellipsoid.geodeticSurfaceNormal(center, new Cartesian3());
     const offset = Cartesian3.multiplyByScalar(normal, height, new Cartesian3());
     const carto = Cartographic.fromCartesian(center);
-    void sampleTerrainMostDetailed(scene.terrainProvider, [carto]).then((results) => {
-      const result = results[0];
-      return defined(result) ? result : carto;
-    }).then((result) => {
-      const resultCartesian = Cartographic.toCartesian(result as Cartographic);
-      const position = Cartesian3.subtract(resultCartesian, offset, new Cartesian3());
-      // @ts-ignore
-      model._rtcCenter = Cartesian3.clone(position, model._rtcCenter);
-    });
+    void sampleTerrainMostDetailed(scene.terrainProvider, [carto])
+      .then((results) => {
+        const result = results[0];
+        return defined(result) ? result : carto;
+      })
+      .then((result) => {
+        const resultCartesian = Cartographic.toCartesian(result as Cartographic);
+        const position = Cartesian3.subtract(resultCartesian, offset, new Cartesian3());
+        // @ts-ignore
+        model._rtcCenter = Cartesian3.clone(position, model._rtcCenter);
+      });
   };
 
   const updateTile = (ts: Cesium3DTileset, tile: Cesium3DTile): void => {

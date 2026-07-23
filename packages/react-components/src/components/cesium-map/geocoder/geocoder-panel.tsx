@@ -49,7 +49,7 @@ type RequestResult = {
   status: number;
   url: string;
   headers: Record<string, string>;
-}
+};
 
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, locale }) => {
   const mapViewer = useCesiumMap();
@@ -213,55 +213,61 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
     [mapViewer]
   );
 
-  const fetchData = useCallback(async (text: string, isInMapExtent: boolean) => {
-    if (!text) {
-      setSearchResults([]);
-      return;
-    }
-    const queryPromises = options.map(async (option) => {
-      if (option.url) {
-        const url = buildQueryParams(option.url, option.params, text, isInMapExtent);
-        return fetch(url, {
-          method: 'GET',
-        });
-      } else {
-        return Promise.reject({
-          message: "No URL provided. Please provide one",
-        });
+  const fetchData = useCallback(
+    async (text: string, isInMapExtent: boolean) => {
+      if (!text) {
+        setSearchResults([]);
+        return;
       }
-    });
-    const rawResponses = await Promise.all(queryPromises);
-    const parsedResponses = await Promise.all(
-      rawResponses
-        .filter((res): res is Response => res !== undefined)
-        .map(async (res) => {
-          const body = await res.json();
-          body.features = body.features?.map((feat: Feature) => {
-            return {
-              ...feat,
-              properties: {
-                ...feat.properties,
-                headers: res.headers
-              }
-            } as Feature;
+      const queryPromises = options.map(async (option) => {
+        if (option.url) {
+          const url = buildQueryParams(option.url, option.params, text, isInMapExtent);
+          return fetch(url, {
+            method: 'GET',
           });
+        } else {
+          return Promise.reject({
+            message: 'No URL provided. Please provide one',
+          });
+        }
+      });
+      const rawResponses = await Promise.all(queryPromises);
+      const parsedResponses = await Promise.all(
+        rawResponses
+          .filter((res): res is Response => res !== undefined)
+          .map(async (res) => {
+            const body = await res.json();
+            body.features = body.features?.map((feat: Feature) => {
+              return {
+                ...feat,
+                properties: {
+                  ...feat.properties,
+                  headers: res.headers,
+                },
+              } as Feature;
+            });
 
-          return {
-            body,
-            status: res.status,
-            url: res.url,
-            headers: Object.fromEntries(res.headers.entries()),
-          };
-        })
-    );
+            return {
+              body,
+              status: res.status,
+              url: res.url,
+              headers: Object.fromEntries(res.headers.entries()),
+            };
+          })
+      );
 
-    setSearchResults(parsedResponses);
-  }, [buildQueryParams, options]);
+      setSearchResults(parsedResponses);
+    },
+    [buildQueryParams, options]
+  );
 
-  const debouncedSearch = useMemo(() =>
-    debounce((value: string, isInMapExtent: boolean) => {
-      fetchData(value, isInMapExtent);
-    }, DEFAULT_DEBOUNCE), [fetchData]);
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string, isInMapExtent: boolean) => {
+        fetchData(value, isInMapExtent);
+      }, DEFAULT_DEBOUNCE),
+    [fetchData]
+  );
 
   useEffect(() => {
     return () => debouncedSearch.cancel();
@@ -290,14 +296,28 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
       case 'LineString':
         typedIcon = (
           <svg width="18px" height="18px" viewBox="0 0 24 24">
-            <path fill="var(--mdc-theme-cesium-color)" stroke="var(--mdc-theme-cesium-color)" strokeWidth={0.5} d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z" />
+            <path
+              fill="var(--mdc-theme-cesium-color)"
+              stroke="var(--mdc-theme-cesium-color)"
+              strokeWidth={0.5}
+              d="M21 6h.046l-5.25 9h-.944L10 9.455V7H7v2.926L1.862 18H0v3h3v-2.926L8.138 10h1.01L14 15.545V18h3v-3h-.046l5.25-9H24V3h-3zM8 8h1v1H8zM2 20H1v-1h1zm14-3h-1v-1h1zm7-13v1h-1V4z"
+            />
             <path fill="none" d="M0 0h24v24H0z" />
           </svg>
         );
         break;
       default:
         typedIcon = (
-          <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="var(--mdc-theme-cesium-color)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18px"
+            height="18px"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--mdc-theme-cesium-color)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M11 4 L20 14 L20 20 L4 20 L4 10 Z" />
           </svg>
         );
@@ -384,7 +404,11 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
                     } else if (featuresLength === 0) {
                       return <ListItemSecondaryText className="generalListItem queryNoResults">{noResults}</ListItemSecondaryText>;
                     } else if (message) {
-                      return <ListItemSecondaryText className={`generalListItem ${status === 400 ? 'queryWarning' : 'queryError'}`}>{message}</ListItemSecondaryText>;
+                      return (
+                        <ListItemSecondaryText className={`generalListItem ${status === 400 ? 'queryWarning' : 'queryError'}`}>
+                          {message}
+                        </ListItemSecondaryText>
+                      );
                     } else {
                       return <ListItemSecondaryText className="generalListItem"></ListItemSecondaryText>;
                     }

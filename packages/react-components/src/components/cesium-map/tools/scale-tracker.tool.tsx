@@ -133,8 +133,7 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
 
   return (
     <div className="scaleTracker">
-      {
-        isNumber(scaleData.barWidth) &&
+      {isNumber(scaleData.barWidth) && (
         <>
           <div className="scaleTrackerLabel">
             <bdi>{scaleData.distanceLabel}</bdi>
@@ -148,7 +147,7 @@ export const ScaleTrackerTool: React.FC<RScaleTrackerToolProps> = (props) => {
             }}
           />
         </>
-      }
+      )}
     </div>
   );
 };

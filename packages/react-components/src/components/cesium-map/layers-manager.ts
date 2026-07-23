@@ -8,6 +8,8 @@ import {
   Event,
   Rectangle,
   SingleTileImageryProvider,
+  TileCoordinatesImageryProvider,
+  OpenStreetMapImageryProvider,
 } from 'cesium';
 import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
@@ -19,7 +21,7 @@ import {
   HAS_TRANSPARENCY_META_PROP,
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
-import { cesiumRectangleContained } from './helpers/utils';
+import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
 import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
@@ -170,8 +172,19 @@ export const getImageryProviderUrl = (layer: ICesiumImageryLayer): string | unde
   return get(layer, '_imageryProvider._resource._url');
 };
 
+type ImageryProviderConstructor = new (...args: never[]) => CesiumImageryProvider;
+const KNOWN_IMAGERY_PROVIDER_TYPES: Array<{ ctor: ImageryProviderConstructor; name: string }> = [
+  { ctor: TileCoordinatesImageryProvider, name: 'TileCoordinatesImageryProvider' },
+  { ctor: UrlTemplateImageryProvider, name: 'UrlTemplateImageryProvider' },
+  { ctor: WebMapServiceImageryProvider, name: 'WebMapServiceImageryProvider' },
+  { ctor: WebMapTileServiceImageryProvider, name: 'WebMapTileServiceImageryProvider' },
+  { ctor: SingleTileImageryProvider, name: 'SingleTileImageryProvider' },
+  { ctor: OpenStreetMapImageryProvider, name: 'OpenStreetMapImageryProvider' },
+];
+
 export const getImageryProviderName = (provider: CesiumImageryProvider): string => {
-  return provider.constructor.name;
+  const knownType = KNOWN_IMAGERY_PROVIDER_TYPES.find(({ ctor }) => provider instanceof ctor);
+  return knownType?.name ?? provider.constructor.name;
 };
 
 class LayerManager {
@@ -653,8 +666,12 @@ class LayerManager {
 
   private addDrapingOverlaysForModel(model: ICesium3DModel): void {
     for (const layer of this.layers) {
-      if (!layer.meta) { continue; }
-      if (!this.drapingLayerPredicate!(layer.meta as ICesiumImageryLayerMeta)) { continue; }
+      if (!layer.meta) {
+        continue;
+      }
+      if (!this.drapingLayerPredicate!(layer.meta as ICesiumImageryLayerMeta)) {
+        continue;
+      }
       const provider = layer.imageryProvider;
       const overlayLayer = new ImageryLayer(provider);
       this.applyDrapingOverlayConfig(overlayLayer, layer);
@@ -666,7 +683,9 @@ class LayerManager {
   }
 
   private addDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
-    if (this.models.length === 0) { return; }
+    if (this.models.length === 0) {
+      return;
+    }
     const provider = layer.imageryProvider;
     const overlays: { tileset: CesiumTileset; overlay: ImageryLayer }[] = [];
     for (const model of this.models) {
@@ -686,8 +705,12 @@ class LayerManager {
     const newZIndex = (layer.meta?.zIndex as number | undefined) ?? 0;
     let index = 0;
     for (const [existingLayer, existingOverlays] of this.layerToOverlaysMapping.entries()) {
-      if (!isBaseMapLayer(existingLayer.meta)) { continue; }
-      if (!existingOverlays.some(({ tileset }) => tileset === model.tileset)) { continue; }
+      if (!isBaseMapLayer(existingLayer.meta)) {
+        continue;
+      }
+      if (!existingOverlays.some(({ tileset }) => tileset === model.tileset)) {
+        continue;
+      }
       const existingZIndex = (existingLayer.meta?.zIndex as number | undefined) ?? 0;
       if (existingZIndex < newZIndex) {
         index++;
@@ -704,7 +727,9 @@ class LayerManager {
 
   private removeDrapingOverlaysByLayer(layer: ICesiumImageryLayer): void {
     const overlays = this.layerToOverlaysMapping.get(layer);
-    if (!overlays) { return; }
+    if (!overlays) {
+      return;
+    }
     for (const { tileset, overlay } of overlays) {
       if (!tileset.isDestroyed()) {
         tileset.imageryLayers.remove(overlay, true);
@@ -861,8 +886,11 @@ class LayerManager {
       return;
     }
     try {
-      const extent = this.mapViewer.camera.computeViewRectangle() as Rectangle;
+      const extent = customComputeViewRectangle(this.mapViewer) as Rectangle;
       if (isEmpty(extent)) {
+        for (const layer of this.layers) {
+          layer.meta = { ...(layer.meta ?? {}), isRelevantToExtent: true };
+        }
         return;
       }
       // Iterating in reverse order so that top layer is first
