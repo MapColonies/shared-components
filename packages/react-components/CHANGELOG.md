@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.17.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.16.1...@map-colonies/react-components@4.17.0) (2026-07-23)
+
+
+### Bug Fixes
+
+* optimization ([e5c3019](https://github.com/MapColonies/shared-components/commit/e5c30197ed95ed53f0d461f789a460190084827e))
+* reuse ([fd6d71a](https://github.com/MapColonies/shared-components/commit/fd6d71a26bca7269ae68dce56acc4bd624766336))
+* yarn test ([fe85d2c](https://github.com/MapColonies/shared-components/commit/fe85d2c1405003c35b7bd3c5a0c639f743240461))
+
+
+### Features
+
+* cesium event listener cleanup work ([9dcb50d](https://github.com/MapColonies/shared-components/commit/9dcb50dd139622267a76b3bab5f50752491f76c6))
+
+
+
+
+
 ## [4.16.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.16.0...@map-colonies/react-components@4.16.1) (2026-07-15)
 
 
