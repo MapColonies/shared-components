@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.17.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.0...@map-colonies/react-components@4.17.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* add featureStyle dependency ([58c1df6](https://github.com/MapColonies/shared-components/commit/58c1df6a590f6818f58a6d7b2ad2b507112f756c))
+
+
+
+
+
 # [4.17.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.16.1...@map-colonies/react-components@4.17.0) (2026-07-23)
 
 
