@@ -36,7 +36,7 @@ export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, f
     return (): void => {
       source.removeFeature(feature);
     };
-  }, [geometry, source, fit]);
+  }, [geometry, source, fit, featureStyle]);
 
   return null;
 };
