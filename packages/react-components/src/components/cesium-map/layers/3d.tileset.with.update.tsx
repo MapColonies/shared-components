@@ -22,6 +22,11 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
   const scene = mapViewer.scene;
   const [tileset, setTileset] = useState<Cesium3DTileset | undefined>(undefined);
   const tileLoadListenerRemoversRef = useRef<Array<() => void>>([]);
+  // withUpdate/updateTileset are read at load-completion time only; tracking them as
+  // reactive deps would refetch and re-add the tileset whenever they change identity.
+  const withUpdateRef = useRef(withUpdate);
+  withUpdateRef.current = withUpdate;
+  const updateTilesetRef = useRef<(ts: Cesium3DTileset) => void>();
 
   const clearTileLoadListeners = (): void => {
     tileLoadListenerRemoversRef.current.forEach((removeListener) => {
@@ -38,15 +43,15 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
       setTileset(added);
       scene.globe.depthTestAgainstTerrain = true;
       void mapViewer.zoomTo(added);
-      if (withUpdate === true) {
-        updateTileset(added);
+      if (withUpdateRef.current === true) {
+        updateTilesetRef.current?.(added);
       }
     });
     return () => {
       cancelled = true;
       clearTileLoadListeners();
     };
-  }, [url]);
+  }, [url, mapViewer, scene.globe, scene.primitives]);
 
   useEffect(() => {
     if (meta === undefined || tileset === undefined) {
@@ -59,7 +64,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
         mapViewer.layersManager?.removeModel(modelId);
       }
     };
-  }, [mapViewer.layersManager]);
+  }, [mapViewer.layersManager, meta, tileset]);
 
   const updateContent = (model: Cesium3DTileContent, boundingVolume: any): void => {
     const height = boundingVolume.minimumHeight ? boundingVolume.minimumHeight : boundingVolume.center.z - boundingVolume.radius;
@@ -100,6 +105,7 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
   const updateTileset = (ts: Cesium3DTileset): void => {
     updateTile(ts, ts.root);
   };
+  updateTilesetRef.current = updateTileset;
 
   return <></>;
 };

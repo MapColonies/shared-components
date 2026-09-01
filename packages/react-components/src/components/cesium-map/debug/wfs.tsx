@@ -58,7 +58,7 @@ export const WFS: React.FC<IWFSProps> = ({ featureTypes, locale }) => {
         )}
       </>
     );
-  }, [featureTypes]);
+  }, [featureTypes, cacheLabel, extentLabel, noDataLayers]);
 
   return (
     <Box className="wfsContainer">

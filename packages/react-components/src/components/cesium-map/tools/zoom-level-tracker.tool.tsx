@@ -1,6 +1,6 @@
 import { PerspectiveOffCenterFrustum } from 'cesium';
 import { get } from 'lodash';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CesiumViewer, useCesiumMap, useCesiumMapViewstate } from '../map';
 import { CesiumSceneMode } from '../proxied.types';
 
@@ -76,6 +76,8 @@ const getZoomLevelHeights = (precision: number, viewer: CesiumViewer) => {
 export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ locale = undefined, valueBy = 'RENDERED_TILES' }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const mapViewState = useCesiumMapViewstate();
+  const setViewStateRef = useRef(mapViewState.setViewState);
+  setViewStateRef.current = mapViewState.setViewState;
   const [zoomLevel, setZoomLevel] = useState(1);
   const zoomLevelHeights = getZoomLevelHeights(1, mapViewer);
 
@@ -107,8 +109,8 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
       });
 
       setZoomLevel(closestZoom.level);
-      if (mapViewState.setViewState) {
-        mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: closestZoom.level }));
+      if (setViewStateRef.current) {
+        setViewStateRef.current((prev) => ({ ...prev, currentZoomLevel: closestZoom.level }));
       }
     }
   }, [mapViewer, zoomLevelHeights]);
@@ -122,8 +124,8 @@ export const ZoomLevelTrackerTool: React.FC<RZoomLevelTrackerToolProps> = ({ loc
     });
 
     setZoomLevel(maxZoom);
-    if (mapViewState.setViewState) {
-      mapViewState.setViewState((prev) => ({ ...prev, currentZoomLevel: maxZoom }));
+    if (setViewStateRef.current) {
+      setViewStateRef.current((prev) => ({ ...prev, currentZoomLevel: maxZoom }));
     }
   }, [mapViewer]);
 
