@@ -488,6 +488,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         }
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewRef]);
 
   useEffect(() => {
