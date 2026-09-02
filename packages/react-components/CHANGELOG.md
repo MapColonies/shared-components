@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.17.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.1...@map-colonies/react-components@4.17.2) (2026-09-02)
+
+
+### Bug Fixes
+
+* exhaustive-deps ([7815da8](https://github.com/MapColonies/shared-components/commit/7815da80010dd7f6302c4fd4a908eb07fbb59571))
+* with inline ignore ([c48536a](https://github.com/MapColonies/shared-components/commit/c48536ac2bd3bae76b0b7d7c2e2ae5b19692ccd0))
+
+
+
+
+
 ## [4.17.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.0...@map-colonies/react-components@4.17.1) (2026-08-19)
 
 
