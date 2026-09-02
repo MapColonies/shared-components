@@ -22,8 +22,6 @@ export const Cesium3DTilesetWithUpdate: React.FC<ICesium3DTilesetWithUpdate> = (
   const scene = mapViewer.scene;
   const [tileset, setTileset] = useState<Cesium3DTileset | undefined>(undefined);
   const tileLoadListenerRemoversRef = useRef<Array<() => void>>([]);
-  // withUpdate/updateTileset are read at load-completion time only; tracking them as
-  // reactive deps would refetch and re-add the tileset whenever they change identity.
   const withUpdateRef = useRef(withUpdate);
   withUpdateRef.current = withUpdate;
   const updateTilesetRef = useRef<(ts: Cesium3DTileset) => void>();
