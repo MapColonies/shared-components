@@ -48,14 +48,11 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
   const { drawState, drawingMaterial, drawingVertexColor, material, hollow, outlineWidth } = props;
   const mapViewer: CesiumViewer = useCesiumMap();
 
-  const [drawHelper, setDrawHelper] = useState<typeof DrawHelper>();
-
-  useEffect(() => {
-    setDrawHelper(
+  const [drawHelper] = useState<typeof DrawHelper>(
+    () =>
       // eslint-disable-next-line
       new (DrawHelper as any)(mapViewer, drawingMaterial, drawingVertexColor)
-    );
-  }, []);
+  );
 
   useEffect(() => {
     if (drawHelper) {
@@ -127,7 +124,7 @@ export const CesiumDrawingsDataSource: React.FC<RCesiumDrawingDataSourceProps> =
         mapViewer.scene.globe.depthTestAgainstTerrain = true;
       }
     }
-  }, [drawState, drawHelper]);
+  }, [drawState, drawHelper, mapViewer.scene.globe]);
 
   const renderGraphicsComponent = (drawEntity: IDrawing): React.ReactElement => {
     try {

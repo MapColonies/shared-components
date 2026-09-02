@@ -51,11 +51,48 @@ type RequestResult = {
   headers: Record<string, string>;
 };
 
+const valueToString = (value: unknown): string | undefined => {
+  switch (typeof value) {
+    case 'object':
+      if (Array.isArray(value)) {
+        return `[${value.map((item: string) => `'${item}'`).join(', ')}]`;
+      } else {
+        return JSON.stringify(value);
+      }
+    case 'boolean':
+    case 'number':
+    case 'string':
+      return value.toString();
+    case 'undefined':
+      return undefined;
+  }
+};
+
+const appendUrlParam = (url: string, key: string, value: any) => {
+  const stringValue = valueToString(value);
+  if (stringValue) {
+    const separator = url.includes('?') ? (url.endsWith('?') || url.endsWith('&') ? '' : '&') : '?';
+    return `${url}${separator}${encodeURIComponent(key)}=${encodeURIComponent(stringValue)}`;
+  }
+  return url;
+};
+
+const appendUrlParams = (params: [string, any][] | undefined, url: string) => {
+  if (params) {
+    params.forEach((tuple) => {
+      url = appendUrlParam(url, tuple[0], tuple[1]);
+    });
+  }
+  return url;
+};
+
 export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, locale }) => {
   const mapViewer = useCesiumMap();
   const dataSourceRef = useRef<GeoJsonDataSource | undefined>(undefined);
   const geocoderInputRef = useRef<HTMLInputElement | null>(null);
   const [searchTextValue, setSearchTextValue] = useState('');
+  const searchTextValueRef = useRef(searchTextValue);
+  searchTextValueRef.current = searchTextValue;
   const [isInMapExtent, setIsInMapExtent] = useState(false);
   const [showFeatureOnMap, setShowFeatureOnMap] = useState(true);
   const [searchResults, setSearchResults] = useState<RequestResult[]>();
@@ -129,41 +166,6 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
       dataSource.entities.removeAll();
     }
   }, [mapViewer, showFeatureOnMap, featureToShow]);
-
-  const valueToString = (value: unknown): string | undefined => {
-    switch (typeof value) {
-      case 'object':
-        if (Array.isArray(value)) {
-          return `[${value.map((item: string) => `'${item}'`).join(', ')}]`;
-        } else {
-          return JSON.stringify(value);
-        }
-      case 'boolean':
-      case 'number':
-      case 'string':
-        return value.toString();
-      case 'undefined':
-        return undefined;
-    }
-  };
-
-  const appendUrlParam = (url: string, key: string, value: any) => {
-    const stringValue = valueToString(value);
-    if (stringValue) {
-      const separator = url.includes('?') ? (url.endsWith('?') || url.endsWith('&') ? '' : '&') : '?';
-      return `${url}${separator}${encodeURIComponent(key)}=${encodeURIComponent(stringValue)}`;
-    }
-    return url;
-  };
-
-  const appendUrlParams = (params: [string, any][] | undefined, url: string) => {
-    if (params) {
-      params.forEach((tuple) => {
-        url = appendUrlParam(url, tuple[0], tuple[1]);
-      });
-    }
-    return url;
-  };
 
   const buildQueryParams = useCallback(
     (url: string, params: GeocoderOptions['params'], text: string, isInMapExtent: boolean) => {
@@ -279,8 +281,8 @@ export const GeocoderPanel: React.FC<GeocoderPanelProps> = ({ options, isOpen, l
   };
 
   useEffect(() => {
-    fetchData(searchTextValue, isInMapExtent);
-  }, [isInMapExtent]);
+    fetchData(searchTextValueRef.current, isInMapExtent);
+  }, [isInMapExtent, fetchData]);
 
   const getIconByFeatureType = (geometry: any) => {
     const geometryType = getType(geometry);

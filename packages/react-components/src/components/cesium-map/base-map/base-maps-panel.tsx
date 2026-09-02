@@ -20,7 +20,7 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ title, baseMaps, s
       setSelectedBaseMap(defaultMap);
       setCurrent(defaultMap);
     }
-  }, [baseMaps]);
+  }, [baseMaps, setCurrent]);
 
   const handleItemSelection = (id: string): void => {
     mapViewer.layersManager?.removeBaseMapLayers();

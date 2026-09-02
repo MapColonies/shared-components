@@ -15,15 +15,17 @@ export interface ICesium3DTileset extends ComponentProps<typeof Resium3DTileset>
 export const Cesium3DTileset: React.FC<ICesium3DTileset> = ({ meta, ...props }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const tilesetRef = useRef<CesiumTileset | null>(null);
+  const metaRef = useRef(meta);
+  metaRef.current = meta;
 
   useEffect(() => {
     return () => {
-      const modelId = getLayerIdFromMeta(meta);
+      const modelId = getLayerIdFromMeta(metaRef.current);
       if (tilesetRef.current !== null && modelId !== undefined) {
         mapViewer.layersManager?.removeModel(modelId);
       }
     };
-  }, []);
+  }, [mapViewer.layersManager]);
 
   return (
     <Resium3DTileset

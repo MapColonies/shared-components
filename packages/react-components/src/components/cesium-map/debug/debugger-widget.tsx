@@ -157,7 +157,7 @@ const DebuggerComponent: React.FC<IDebuggerWidgetProps> = ({ locale, isOpen, set
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerUpdated);
     };
-  }, [mapViewer.layersManager?.dataLayerList]);
+  }, [mapViewer.layersManager, mapViewer.layersManager?.dataLayerList]);
 
   return (
     <>

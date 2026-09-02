@@ -72,11 +72,11 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return get(locale, key.toUpperCase()) ?? key;
   };
 
-  const getLayerList = (): ICesiumImageryLayer[] => {
+  const getLayerList = useCallback((): ICesiumImageryLayer[] => {
     return mapViewer.layersManager?.layerList ?? [];
-  };
+  }, [mapViewer]);
 
-  const getImageryLayers = (): IActiveLayer[] => {
+  const getImageryLayers = useCallback((): IActiveLayer[] => {
     const layerList = getLayerList();
     return layerList.length > 0
       ? layerList
@@ -95,9 +95,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           })
           .filter((item): item is IActiveLayer => item !== undefined)
       : [];
-  };
+  }, [getLayerList]);
 
-  const getServiceLayers = (): IActiveLayer[] => {
+  const getServiceLayers = useCallback((): IActiveLayer[] => {
     const layerList = getLayerList();
     return layerList.length > 0
       ? layerList
@@ -114,9 +114,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
           })
           .filter((item): item is IActiveLayer => item !== undefined)
       : [];
-  };
+  }, [getLayerList]);
 
-  const getDataLayers = (): IActiveLayer[] => {
+  const getDataLayers = useCallback((): IActiveLayer[] => {
     return (
       mapViewer.layersManager?.dataLayerList.map((dataLayer) => {
         return {
@@ -127,9 +127,9 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         };
       }) || []
     );
-  };
+  }, [mapViewer]);
 
-  const get3DModels = (): IActiveLayer[] => {
+  const get3DModels = useCallback((): IActiveLayer[] => {
     return (mapViewer.layersManager?.modelList ?? []).map((model, index): IActiveLayer => {
       const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
       const modelName = getLayerName(model) ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
@@ -140,7 +140,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         isDisabled: false,
       };
     });
-  };
+  }, [mapViewer]);
 
   const refreshSections = useCallback((): void => {
     setSections([
@@ -161,7 +161,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
         values: get3DModels(),
       },
     ]);
-  }, []);
+  }, [getImageryLayers, getServiceLayers, getDataLayers, get3DModels]);
 
   useEffect(() => {
     refreshSections();
@@ -171,7 +171,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       [DATA]: true,
       [THREE_D]: true,
     });
-  }, []);
+  }, [refreshSections]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) {
@@ -190,7 +190,13 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
       mapViewer.imageryLayers.layerRemoved.removeEventListener(handleLayerEvent);
       mapViewer.imageryLayers.layerMoved.removeEventListener(handleLayerEvent);
     };
-  }, [mapViewer.layersManager]);
+  }, [
+    mapViewer.layersManager,
+    mapViewer.imageryLayers.layerAdded,
+    mapViewer.imageryLayers.layerRemoved,
+    mapViewer.imageryLayers.layerMoved,
+    refreshSections,
+  ]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) {
@@ -212,7 +218,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return () => {
       mapViewer.layersManager?.removeDataLayerUpdatedListener(handleDataLayerEvent);
     };
-  }, [mapViewer.layersManager?.dataLayerList]);
+  }, [mapViewer.layersManager, mapViewer.layersManager?.dataLayerList, getDataLayers]);
 
   useEffect(() => {
     if (!mapViewer.layersManager) {
@@ -234,7 +240,7 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return () => {
       mapViewer.layersManager?.removeModelUpdatedListener(handle3DModelEvent);
     };
-  }, [mapViewer.layersManager?.modelList]);
+  }, [mapViewer.layersManager, mapViewer.layersManager?.modelList, get3DModels]);
 
   const toggleSection = (id: string) => {
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));

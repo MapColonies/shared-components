@@ -129,7 +129,7 @@ const ContextMenu: React.FC<IContextMenuData> = ({ data, position, style, handle
   useEffect(() => {
     setPickedLayers(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
     console.log(mapViewer.layersManager?.pickImageryLayers(position as CesiumCartesian2));
-  }, [position]);
+  }, [position, mapViewer.layersManager]);
 
   return (
     <>

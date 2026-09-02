@@ -48,7 +48,7 @@ export const AnimatedValuesProvider: React.FC<AnimatedValuesProviderProps> = ({
 
       return () => clearInterval(intervalRef.current);
     }
-  }, [values, valueEnd, duration, interval, repeat, valuesIndex]);
+  }, [values, valueEnd, duration, interval, repeat, valuesIndex, isAnimated, valueStart]);
 
   return isAnimated ? (
     <Animate

@@ -488,6 +488,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         }
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapViewRef]);
 
   useEffect(() => {
@@ -576,7 +577,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         viewerContainer
       )
     );
-  }, [getViewerPortalTarget, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel]);
+  }, [getViewerPortalTarget, locale, projection, showMousePosition, showScale, isLoadingProgress, showCompass, showLoadingProgress, showZoomButtons, showZoomLevel, mapViewRef]);
 
   const bindToolsToToolbar = useCallback((): JSX.Element | undefined => {
     const toolbarContainer = getViewerPortalTarget('.cesium-viewer-toolbar');
@@ -595,7 +596,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         toolbarContainer
       )
     );
-  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool]);
+  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool, mapViewRef]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     const widgetContainer = getViewerPortalTarget('.cesium-widget');
@@ -612,7 +613,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         widgetContainer
       )
     );
-  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool]);
+  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool, mapViewRef]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>

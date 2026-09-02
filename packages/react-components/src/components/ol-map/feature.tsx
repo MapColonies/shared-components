@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { Feature, Geometry } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import { FitOptions } from 'ol/View';
@@ -16,6 +16,8 @@ export interface FeatureProps {
 export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, fit, featureStyle }) => {
   const source = useVectorSource();
   const map = useMap();
+  const fitOptionsRef = useRef(fitOptions);
+  fitOptionsRef.current = fitOptions;
 
   useLayoutEffect(() => {
     const geoJSON = new GeoJSON();
@@ -23,7 +25,7 @@ export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, f
 
     if (fit) {
       source.on('addfeature', function () {
-        map.getView().fit(source.getExtent(), fitOptions);
+        map.getView().fit(source.getExtent(), fitOptionsRef.current);
       });
     }
 
@@ -36,7 +38,7 @@ export const GeoJSONFeature: React.FC<FeatureProps> = ({ geometry, fitOptions, f
     return (): void => {
       source.removeFeature(feature);
     };
-  }, [geometry, source, fit, featureStyle]);
+  }, [geometry, source, fit, featureStyle, map]);
 
   return null;
 };

@@ -29,7 +29,7 @@ export const LegendList: React.FC<LegendListProps> = ({ legends, actionsTexts: {
     return legends.map((legend, i) => {
       return <LegendItem key={`${legend.layer as string}_${i}`} legend={legend} docText={docText} imgText={imgText} />;
     });
-  }, [legends]);
+  }, [legends, docText, imgText, handleNoLegends]);
 
   return <Box className="mapLegendsList">{renderList()}</Box>;
 };
