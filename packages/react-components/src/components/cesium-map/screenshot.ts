@@ -20,7 +20,7 @@ export interface ICesiumScreenshotDimensions {
 export const CESIUM_SCREENSHOT_SIZES: Readonly<Record<CesiumScreenshotSize, ICesiumScreenshotDimensions>> = {
   [CesiumScreenshotSize.SMALL]: { width: 128, height: 128 },
   [CesiumScreenshotSize.MEDIUM]: { width: 256, height: 256 },
-  [CesiumScreenshotSize.LARGE]: { width: 512, height: 512 },
+  [CesiumScreenshotSize.LARGE]: { width: 1024, height: 1024 },
 };
 
 export interface ICaptureCesiumScreenshotOptions {
