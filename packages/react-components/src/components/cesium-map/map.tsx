@@ -240,6 +240,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     baseLayer: false,
+    contextOptions: { webgl: { preserveDrawingBuffer: true } },
     ...(props as ViewerProps),
     extend: mergedExtend,
   };
