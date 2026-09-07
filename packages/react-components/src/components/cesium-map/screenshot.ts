@@ -100,7 +100,13 @@ export const captureCesiumScreenshot = (
   }
 
   try {
-    targetContext.drawImage(sourceCanvas, sx, sy, sWidth, sHeight, 0, 0, dimensions.width, dimensions.height);
+    targetContext.drawImage(
+      sourceCanvas,       // source image
+      sx, sy,             // starting position in SOURCE
+      sWidth, sHeight,    // SIZE TO COPY from source
+      0, 0,               // starting position in TARGET
+      dimensions.width,   // SIZE TO PAINT to in target
+      dimensions.height);
   } catch (err) {
     return Promise.reject(
       new Error(`captureCesiumScreenshot: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`)
