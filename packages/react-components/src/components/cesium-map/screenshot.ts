@@ -1,10 +1,11 @@
 import { CesiumViewer } from './map';
 
 /**
- * Named output sizes for {@link captureCesiumScreenshot}. No prior convention existed in this
- * repo for thumbnail/preview/detail image dimensions, so these are new: a small list-row-scale
- * thumbnail, a medium preview-card size, and a larger detail size. All share a 4:3 aspect ratio
- * so the same "cover" crop logic applies uniformly regardless of the source canvas's own ratio.
+ * Named output sizes for {@link captureCesiumScreenshot}.
+ * Thumbnail/preview/detail image dimensions: a small list-row-scale
+ * thumbnail, a medium preview-card size, and a larger detail size.
+ * All share a 1:1 (square) aspect ratio so the same "cover" crop logic 
+ * applies uniformly regardless of the source canvas's own ratio.
  */
 export enum CesiumScreenshotSize {
   SMALL = 'SMALL',
