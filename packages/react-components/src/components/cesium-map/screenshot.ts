@@ -39,8 +39,8 @@ const DEFAULT_FORMAT = 'image/png';
  * Captures exactly what is currently rendered on screen right now — it does not wait for
  * in-flight imagery/terrain tiles to finish loading. Callers that need a "settled" view should
  * wait for their own readiness signal (e.g. `scene.globe.tileLoadProgressEvent` /
- * `scene.globe.tilesLoaded`, the pattern already used elsewhere in this package) before calling
- * this function; an unbounded internal wait is deliberately not built in here.
+ * `scene.globe.tilesLoaded`) before calling this function; an unbounded internal wait is 
+ * deliberately not built in here.
  *
  * Only the Cesium canvas itself is captured — Cesium/DOM widgets rendered alongside it
  * (compass, base-layer picker, credits, etc.) are separate DOM elements outside the canvas and
@@ -52,8 +52,7 @@ const DEFAULT_FORMAT = 'image/png';
  *
  * @returns a Blob in the requested format. Rejects with a descriptive Error if the viewer/canvas
  * is unavailable, the size is invalid, or the browser refuses to encode the canvas (e.g. a
- * cross-origin imagery response tainted the canvas — see the CORS caveat in this module's design
- * notes; this project does not currently set `crossOrigin` on Cesium imagery requests).
+ * cross-origin imagery response tainted the canvas).
  */
 export const captureCesiumScreenshot = (
   viewer: CesiumViewer | undefined,
