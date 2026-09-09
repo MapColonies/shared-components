@@ -28,6 +28,7 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
+import { capture, type ICaptureOptions } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { InspectorTool } from './tools/inspector.tool';
@@ -46,6 +47,12 @@ const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
 const DEFAULT_DYNAMIC_HEIGHT_INCREMENT = 0;
 
+// `contextOptions` is one of resium's read-only (construction-time-only) Viewer props: resium
+// destroys and recreates the whole Cesium Viewer whenever its reference changes between renders.
+// This default must therefore have a stable identity — an inline object literal here would
+// recreate the viewer on every single render of CesiumMap.
+const DEFAULT_CONTEXT_OPTIONS = { webgl: { preserveDrawingBuffer: true } };
+
 interface ICameraPosition {
   longitude: number;
   latitude: number;
@@ -63,6 +70,7 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
+  public capture?: (options: ICaptureOptions) => Promise<Blob>;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
@@ -240,6 +248,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     baseLayer: false,
+    contextOptions: DEFAULT_CONTEXT_OPTIONS,
     ...(props as ViewerProps),
     extend: mergedExtend,
   };
@@ -304,6 +313,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           viewState?.shouldOptimizedTileRequests,
           props.drapingLayerPredicate
         ),
+      });
+    }
+
+    if (!mapViewRef.capture) {
+      Object.assign(mapViewRef, {
+        capture: (options: ICaptureOptions) => capture(mapViewRef, options),
       });
     }
 
