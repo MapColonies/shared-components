@@ -1,7 +1,7 @@
-import { CesiumViewer } from './map';
+import type { CesiumViewer } from './map';
 
 /**
- * Named output sizes for {@link captureCesiumScreenshot}.
+ * Named output sizes for {@link capture}.
  * Thumbnail/preview/detail image dimensions: a small list-row-scale
  * thumbnail, a medium preview-card size, and a larger detail size.
  * All share a 1:1 (square) aspect ratio so the same "cover" crop logic 
@@ -24,7 +24,7 @@ export const CESIUM_SCREENSHOT_SIZES: Readonly<Record<CesiumScreenshotSize, ICes
   [CesiumScreenshotSize.LARGE]: { width: 1024, height: 1024 },
 };
 
-export interface ICaptureCesiumScreenshotOptions {
+export interface ICaptureOptions {
   size: CesiumScreenshotSize;
   format?: 'image/png' | 'image/jpeg';
   quality?: number;
@@ -54,22 +54,22 @@ const DEFAULT_FORMAT = 'image/png';
  * is unavailable, the size is invalid, or the browser refuses to encode the canvas (e.g. a
  * cross-origin imagery response tainted the canvas).
  */
-export const captureCesiumScreenshot = (
+export const capture = (
   viewer: CesiumViewer | undefined,
-  options: ICaptureCesiumScreenshotOptions
+  options: ICaptureOptions
 ): Promise<Blob> => {
   if (!viewer || viewer.isDestroyed()) {
-    return Promise.reject(new Error('captureCesiumScreenshot: Cesium viewer is not available'));
+    return Promise.reject(new Error('capture: Cesium viewer is not available'));
   }
 
   const sourceCanvas = viewer.scene?.canvas;
   if (!sourceCanvas) {
-    return Promise.reject(new Error('captureCesiumScreenshot: Cesium scene canvas is not available'));
+    return Promise.reject(new Error('capture: Cesium scene canvas is not available'));
   }
 
   const dimensions = CESIUM_SCREENSHOT_SIZES[options.size];
   if (!dimensions) {
-    return Promise.reject(new Error(`captureCesiumScreenshot: unknown size "${String(options.size)}"`));
+    return Promise.reject(new Error(`capture: unknown size "${String(options.size)}"`));
   }
 
   // Flush the current camera/scene state to the (preserveDrawingBuffer-enabled) WebGL buffer
@@ -81,7 +81,7 @@ export const captureCesiumScreenshot = (
   targetCanvas.height = dimensions.height;
   const targetContext = targetCanvas.getContext('2d');
   if (!targetContext) {
-    return Promise.reject(new Error('captureCesiumScreenshot: could not create 2D context for the target canvas'));
+    return Promise.reject(new Error('capture: could not create 2D context for the target canvas'));
   }
 
   // "Cover" crop: preserve aspect ratio, fill the entire target, crop overflow — never stretch.
@@ -109,7 +109,7 @@ export const captureCesiumScreenshot = (
       dimensions.height);
   } catch (err) {
     return Promise.reject(
-      new Error(`captureCesiumScreenshot: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`)
+      new Error(`capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`)
     );
   }
 
@@ -117,7 +117,7 @@ export const captureCesiumScreenshot = (
     targetCanvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error('captureCesiumScreenshot: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
+          reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
           return;
         }
         resolve(blob);
