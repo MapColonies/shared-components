@@ -47,6 +47,12 @@ const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
 const DEFAULT_DYNAMIC_HEIGHT_INCREMENT = 0;
 
+// `contextOptions` is one of resium's read-only (construction-time-only) Viewer props: resium
+// destroys and recreates the whole Cesium Viewer whenever its reference changes between renders.
+// This default must therefore have a stable identity — an inline object literal here would
+// recreate the viewer on every single render of CesiumMap.
+const DEFAULT_CONTEXT_OPTIONS = { webgl: { preserveDrawingBuffer: true } };
+
 interface ICameraPosition {
   longitude: number;
   latitude: number;
@@ -242,7 +248,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     baseLayer: false,
-    contextOptions: { webgl: { preserveDrawingBuffer: true } },
+    contextOptions: DEFAULT_CONTEXT_OPTIONS,
     ...(props as ViewerProps),
     extend: mergedExtend,
   };
