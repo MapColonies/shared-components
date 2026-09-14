@@ -450,6 +450,7 @@ LocalizedMap.args = {
     REMOVE: 'הסר',
     BASE_MAP_TITLE: 'מפות בסיס',
     TERRAIN_TITLE: 'פני השטח',
+    NONE: 'ללא',
   },
   /* eslint-enable @typescript-eslint/naming-convention */
   projection: Proj.WGS84,

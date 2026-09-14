@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box } from '../../box';
 import { IBaseMap, ITerrain } from '../map';
+import { BaseMapThumbnail } from './base-map-thumbnail';
 
 interface CesiumItemProps {
   item: IBaseMap | ITerrain;
@@ -15,7 +16,7 @@ export const CesiumItem: React.FC<CesiumItemProps> = ({ item, isSelected, onClic
       title={item.title}
       onClick={onClick}
     >
-      <img className="cesium-baseLayerPicker-itemIcon" src={item.thumbnail} alt={item.title} />
+      <BaseMapThumbnail className="cesium-baseLayerPicker-itemIcon" src={item.thumbnail} alt={item.title ?? ''} />
       <Box className="cesium-baseLayerPicker-itemLabel">{item.title}</Box>
     </Box>
   );
