@@ -630,6 +630,10 @@ class LayerManager {
   }
 
   public addModel(model: ICesium3DModel): void {
+    const modelId = getLayerIdFromMeta(model.meta);
+    if (modelId !== undefined && this.findModelById(modelId) !== undefined) {
+      this.removeModel(modelId);
+    }
     this.models.push({ ...model });
     if (this.drapingLayerPredicate) {
       this.addDrapingOverlaysForModel(model);

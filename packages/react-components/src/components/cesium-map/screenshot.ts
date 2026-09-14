@@ -1,129 +1,182 @@
 import type { CesiumViewer } from './map';
 
-/**
- * Named output sizes for {@link capture}.
- * Thumbnail/preview/detail image dimensions: a small list-row-scale
- * thumbnail, a medium preview-card size, and a larger detail size.
- * All share a 1:1 (square) aspect ratio so the same "cover" crop logic 
- * applies uniformly regardless of the source canvas's own ratio.
- */
-export enum CesiumScreenshotSize {
-  SMALL = 'SMALL',
-  MEDIUM = 'MEDIUM',
-  LARGE = 'LARGE',
-}
-
-export interface ICesiumScreenshotDimensions {
+export interface ICaptureDimensions {
   width: number;
   height: number;
 }
 
-export const CESIUM_SCREENSHOT_SIZES: Readonly<Record<CesiumScreenshotSize, ICesiumScreenshotDimensions>> = {
-  [CesiumScreenshotSize.SMALL]: { width: 128, height: 128 },
-  [CesiumScreenshotSize.MEDIUM]: { width: 256, height: 256 },
-  [CesiumScreenshotSize.LARGE]: { width: 1024, height: 1024 },
-};
-
-export interface ICaptureOptions {
-  size: CesiumScreenshotSize;
+export interface ICaptureOptions extends ICaptureDimensions {
+  pixelRatio?: number;
   format?: 'image/png' | 'image/jpeg';
   quality?: number;
+  waitForTiles?: boolean;
+}
+
+export interface ICropRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface ICesiumScreenshotApi {
+  capture(options: ICaptureOptions): Promise<Blob>;
+  captureViewport(options?: Omit<ICaptureOptions, 'width' | 'height'>): Promise<Blob>;
 }
 
 const DEFAULT_FORMAT = 'image/png';
+const MAX_RESOLUTION_SCALE = 4;
+const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
 
-/**
- * Captures the Cesium viewer's canvas as an image, resized to one of the predefined
- * {@link CesiumScreenshotSize} dimensions.
- *
- * Captures exactly what is currently rendered on screen right now — it does not wait for
- * in-flight imagery/terrain tiles to finish loading. Callers that need a "settled" view should
- * wait for their own readiness signal (e.g. `scene.globe.tileLoadProgressEvent` /
- * `scene.globe.tilesLoaded`) before calling this function; an unbounded internal wait is 
- * deliberately not built in here.
- *
- * Only the Cesium canvas itself is captured — Cesium/DOM widgets rendered alongside it
- * (compass, base-layer picker, credits, etc.) are separate DOM elements outside the canvas and
- * are therefore never included, with no special-casing required.
- *
- * Requires the viewer to have been constructed with `contextOptions.webgl.preserveDrawingBuffer`
- * enabled (set by default in `CesiumMap`) — without it, the WebGL drawing buffer is not
- * guaranteed to still hold the last-rendered frame by the time this function reads it.
- *
- * @returns a Blob in the requested format. Rejects with a descriptive Error if the viewer/canvas
- * is unavailable, the size is invalid, or the browser refuses to encode the canvas (e.g. a
- * cross-origin imagery response tainted the canvas).
- */
-export const capture = (
-  viewer: CesiumViewer | undefined,
-  options: ICaptureOptions
-): Promise<Blob> => {
-  if (!viewer || viewer.isDestroyed()) {
-    return Promise.reject(new Error('capture: Cesium viewer is not available'));
+export const calculateCoverCropRegion = (sourceAspect: number, targetAspect: number): ICropRegion => {
+  if (sourceAspect > targetAspect) {
+    // Source is relatively wider than the target: crop its width, keep full height.
+    const width = targetAspect / sourceAspect;
+    return { x: (1 - width) / 2, y: 0, width, height: 1 };
   }
+  if (sourceAspect < targetAspect) {
+    // Source is relatively taller than the target: crop its height, keep full width.
+    const height = sourceAspect / targetAspect;
+    return { x: 0, y: (1 - height) / 2, width: 1, height };
+  }
+  return { x: 0, y: 0, width: 1, height: 1 };
+};
 
+const waitForTilesToSettle = (viewer: CesiumViewer, timeoutMs: number): Promise<void> => {
+  return new Promise((resolve) => {
+    if (viewer.scene.globe.tilesLoaded) {
+      resolve();
+      return;
+    }
+    let settled = false;
+    const finish = (): void => {
+      if (settled) return;
+      settled = true;
+      removeListener();
+      clearTimeout(timer);
+      resolve();
+    };
+    const removeListener = viewer.scene.globe.tileLoadProgressEvent.addEventListener(
+      (pendingRequests: number) => {
+        if (pendingRequests === 0) finish();
+      }
+    );
+    const timer = setTimeout(finish, timeoutMs);
+  });
+};
+
+const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Promise<Blob> => {
+  if (viewer.isDestroyed()) {
+    throw new Error('capture: Cesium viewer is not available');
+  }
   const sourceCanvas = viewer.scene?.canvas;
   if (!sourceCanvas) {
-    return Promise.reject(new Error('capture: Cesium scene canvas is not available'));
+    throw new Error('capture: Cesium scene canvas is not available');
+  }
+  if (options.width <= 0 || options.height <= 0) {
+    throw new Error(`capture: invalid dimensions ${options.width}x${options.height}`);
   }
 
-  const dimensions = CESIUM_SCREENSHOT_SIZES[options.size];
-  if (!dimensions) {
-    return Promise.reject(new Error(`capture: unknown size "${String(options.size)}"`));
+  if (options.waitForTiles) {
+    await waitForTilesToSettle(viewer, WAIT_FOR_TILES_TIMEOUT_MS);
   }
 
-  // Flush the current camera/scene state to the (preserveDrawingBuffer-enabled) WebGL buffer
-  // immediately before reading it, without altering camera position or recreating the viewer.
-  viewer.scene.render();
-
-  const targetCanvas = document.createElement('canvas');
-  targetCanvas.width = dimensions.width;
-  targetCanvas.height = dimensions.height;
-  const targetContext = targetCanvas.getContext('2d');
-  if (!targetContext) {
-    return Promise.reject(new Error('capture: could not create 2D context for the target canvas'));
-  }
-
-  // "Cover" crop: preserve aspect ratio, fill the entire target, crop overflow — never stretch.
-  const sourceRatio = sourceCanvas.width / sourceCanvas.height;
-  const targetRatio = dimensions.width / dimensions.height;
-  let sx = 0;
-  let sy = 0;
-  let sWidth = sourceCanvas.width;
-  let sHeight = sourceCanvas.height;
-  if (sourceRatio > targetRatio) {
-    sWidth = sourceCanvas.height * targetRatio;
-    sx = (sourceCanvas.width - sWidth) / 2;
-  } else if (sourceRatio < targetRatio) {
-    sHeight = sourceCanvas.width / targetRatio;
-    sy = (sourceCanvas.height - sHeight) / 2;
-  }
+  const targetAspect = options.width / options.height;
+  const originalResolutionScale = viewer.resolutionScale;
 
   try {
-    targetContext.drawImage(
-      sourceCanvas,       // source image
-      sx, sy,             // starting position in SOURCE
-      sWidth, sHeight,    // SIZE TO COPY from source
-      0, 0,               // starting position in TARGET
-      dimensions.width,   // SIZE TO PAINT to in target
-      dimensions.height);
-  } catch (err) {
-    return Promise.reject(
-      new Error(`capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`)
-    );
+    const baseCrop = calculateCoverCropRegion(sourceCanvas.width / sourceCanvas.height, targetAspect);
+    const baseCropWidthPx = baseCrop.width * sourceCanvas.width;
+    const baseCropHeightPx = baseCrop.height * sourceCanvas.height;
+    const requiredMultiplier = Math.max(
+      options.width / baseCropWidthPx,
+      options.height / baseCropHeightPx,
+      1
+    ) * (options.pixelRatio ?? 1);
+    const newResolutionScale = Math.min(originalResolutionScale * requiredMultiplier, MAX_RESOLUTION_SCALE);
+
+    if (newResolutionScale !== originalResolutionScale) {
+      viewer.resolutionScale = newResolutionScale;
+      viewer.resize();
+    }
+
+    viewer.scene.render();
+
+    const crop = calculateCoverCropRegion(sourceCanvas.width / sourceCanvas.height, targetAspect);
+    const sx = crop.x * sourceCanvas.width;
+    const sy = crop.y * sourceCanvas.height;
+    const sWidth = crop.width * sourceCanvas.width;
+    const sHeight = crop.height * sourceCanvas.height;
+
+    const targetCanvas = document.createElement('canvas');
+    targetCanvas.width = options.width;
+    targetCanvas.height = options.height;
+    const targetContext = targetCanvas.getContext('2d');
+    if (!targetContext) {
+      throw new Error('capture: could not create 2D context for the target canvas');
+    }
+
+    try {
+      targetContext.drawImage(
+        sourceCanvas,       // source image
+        sx, sy,             // starting position in SOURCE
+        sWidth, sHeight,    // SIZE TO COPY from source
+        0, 0,               // starting position in TARGET
+        options.width,      // SIZE TO PAINT to in target
+        options.height);
+    } catch (err) {
+      throw new Error(
+        `capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`
+      );
+    }
+
+    return await new Promise<Blob>((resolve, reject) => {
+      targetCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
+            return;
+          }
+          resolve(blob);
+        },
+        options.format ?? DEFAULT_FORMAT,
+        options.quality
+      );
+    });
+  } finally {
+    if (viewer.resolutionScale !== originalResolutionScale) {
+      viewer.resolutionScale = originalResolutionScale;
+      viewer.resize();
+    }
+  }
+};
+
+export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
+  if (Object.prototype.hasOwnProperty.call(viewer, 'screenshot')) {
+    throw new Error('screenshot is already defined by another mixin.');
   }
 
-  return new Promise<Blob>((resolve, reject) => {
-    targetCanvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
-          return;
-        }
-        resolve(blob);
-      },
-      options.format ?? DEFAULT_FORMAT,
-      options.quality
+  let queue: Promise<unknown> = Promise.resolve();
+  const enqueue = <T,>(task: () => Promise<T>): Promise<T> => {
+    const result = queue.then(task, task);
+    queue = result.then(
+      () => undefined,
+      () => undefined
     );
-  });
+    return result;
+  };
+
+  const api: ICesiumScreenshotApi = {
+    capture: (options) => enqueue(() => renderAndCrop(viewer, options)),
+    captureViewport: (options) =>
+      enqueue(() =>
+        renderAndCrop(viewer, {
+          ...options,
+          width: viewer.scene.canvas.width,
+          height: viewer.scene.canvas.height,
+        })
+      ),
+  };
+
+  Object.defineProperty(viewer, 'screenshot', { value: api, writable: false, configurable: false });
 };
