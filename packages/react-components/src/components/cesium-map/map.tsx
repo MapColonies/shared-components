@@ -28,7 +28,7 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
-import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './screenshot';
+import type { ICesiumScreenshotApi } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { InspectorTool } from './tools/inspector.tool';
@@ -314,10 +314,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
           props.drapingLayerPredicate
         ),
       });
-    }
-
-    if (!mapViewRef.screenshot) {
-      mapViewRef.extend(CesiumScreenshotMixin);
     }
 
     return {
