@@ -12,11 +12,12 @@ export interface ICaptureOptions extends ICaptureDimensions {
   waitForTiles?: boolean;
 }
 
-export interface ICropRegion {
+export interface ICenteredCropRegion {
   x: number;
   y: number;
   width: number;
   height: number;
+  fits: boolean;
 }
 
 export interface ICesiumScreenshotApi {
@@ -25,21 +26,23 @@ export interface ICesiumScreenshotApi {
 }
 
 const DEFAULT_FORMAT = 'image/png';
-const MAX_RESOLUTION_SCALE = 4;
 const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
 
-export const calculateCoverCropRegion = (sourceAspect: number, targetAspect: number): ICropRegion => {
-  if (sourceAspect > targetAspect) {
-    // Source is relatively wider than the target: crop its width, keep full height.
-    const width = targetAspect / sourceAspect;
-    return { x: (1 - width) / 2, y: 0, width, height: 1 };
-  }
-  if (sourceAspect < targetAspect) {
-    // Source is relatively taller than the target: crop its height, keep full width.
-    const height = sourceAspect / targetAspect;
-    return { x: 0, y: (1 - height) / 2, width: 1, height };
-  }
-  return { x: 0, y: 0, width: 1, height: 1 };
+export const calculateCenteredCropRegion = (
+  sourceWidth: number,
+  sourceHeight: number,
+  targetWidth: number,
+  targetHeight: number
+): ICenteredCropRegion => {
+  const width = Math.min(targetWidth, sourceWidth);
+  const height = Math.min(targetHeight, sourceHeight);
+  return {
+    x: (sourceWidth - width) / 2,
+    y: (sourceHeight - height) / 2,
+    width,
+    height,
+    fits: targetWidth <= sourceWidth && targetHeight <= sourceHeight,
+  };
 };
 
 const waitForTilesToSettle = (viewer: CesiumViewer, timeoutMs: number): Promise<void> => {
@@ -81,74 +84,55 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
     await waitForTilesToSettle(viewer, WAIT_FOR_TILES_TIMEOUT_MS);
   }
 
-  const targetAspect = options.width / options.height;
-  const originalResolutionScale = viewer.resolutionScale;
+  viewer.scene.render();
+
+  const crop = calculateCenteredCropRegion(
+    sourceCanvas.width,
+    sourceCanvas.height,
+    options.width,
+    options.height
+  );
+  if (!crop.fits) {
+    throw new Error(
+      `capture: requested capture size ${options.width}x${options.height} exceeds the current viewport ${sourceCanvas.width}x${sourceCanvas.height}`
+    );
+  }
+
+  const targetCanvas = document.createElement('canvas');
+  targetCanvas.width = options.width;
+  targetCanvas.height = options.height;
+  const targetContext = targetCanvas.getContext('2d');
+  if (!targetContext) {
+    throw new Error('capture: could not create 2D context for the target canvas');
+  }
 
   try {
-    const baseCrop = calculateCoverCropRegion(sourceCanvas.width / sourceCanvas.height, targetAspect);
-    const baseCropWidthPx = baseCrop.width * sourceCanvas.width;
-    const baseCropHeightPx = baseCrop.height * sourceCanvas.height;
-    const requiredMultiplier = Math.max(
-      options.width / baseCropWidthPx,
-      options.height / baseCropHeightPx,
-      1
-    ) * (options.pixelRatio ?? 1);
-    const newResolutionScale = Math.min(originalResolutionScale * requiredMultiplier, MAX_RESOLUTION_SCALE);
-
-    if (newResolutionScale !== originalResolutionScale) {
-      viewer.resolutionScale = newResolutionScale;
-      viewer.resize();
-    }
-
-    viewer.scene.render();
-
-    const crop = calculateCoverCropRegion(sourceCanvas.width / sourceCanvas.height, targetAspect);
-    const sx = crop.x * sourceCanvas.width;
-    const sy = crop.y * sourceCanvas.height;
-    const sWidth = crop.width * sourceCanvas.width;
-    const sHeight = crop.height * sourceCanvas.height;
-
-    const targetCanvas = document.createElement('canvas');
-    targetCanvas.width = options.width;
-    targetCanvas.height = options.height;
-    const targetContext = targetCanvas.getContext('2d');
-    if (!targetContext) {
-      throw new Error('capture: could not create 2D context for the target canvas');
-    }
-
-    try {
-      targetContext.drawImage(
-        sourceCanvas,       // source image
-        sx, sy,             // starting position in SOURCE
-        sWidth, sHeight,    // SIZE TO COPY from source
-        0, 0,               // starting position in TARGET
-        options.width,      // SIZE TO PAINT to in target
-        options.height);
-    } catch (err) {
-      throw new Error(
-        `capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`
-      );
-    }
-
-    return await new Promise<Blob>((resolve, reject) => {
-      targetCanvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
-            return;
-          }
-          resolve(blob);
-        },
-        options.format ?? DEFAULT_FORMAT,
-        options.quality
-      );
-    });
-  } finally {
-    if (viewer.resolutionScale !== originalResolutionScale) {
-      viewer.resolutionScale = originalResolutionScale;
-      viewer.resize();
-    }
+    targetContext.drawImage(
+      sourceCanvas,               // source image
+      crop.x, crop.y,             // starting position in SOURCE
+      crop.width, crop.height,    // SIZE TO COPY from source — equals options.width/height when it fits
+      0, 0,                       // starting position in TARGET
+      options.width,              // SIZE TO PAINT to in target
+      options.height);
+  } catch (err) {
+    throw new Error(
+      `capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`
+    );
   }
+
+  return await new Promise<Blob>((resolve, reject) => {
+    targetCanvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
+          return;
+        }
+        resolve(blob);
+      },
+      options.format ?? DEFAULT_FORMAT,
+      options.quality
+    );
+  });
 };
 
 export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
