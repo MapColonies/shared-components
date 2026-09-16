@@ -18,6 +18,65 @@ import {
   type Scene,
 } from 'cesium';
 import buildVectorGltfFromMVTWGS84 from './buildVectorGltfFromMVTWGS84';
+import PlaceLabelsWGS84 from './placeLabelsWGS84';
+
+export interface MVTDataProviderWGS84ConstructorOptions {
+  /** Minimum zoom level represented in the generated tileset. */
+  minZoom?: number;
+  /** Maximum zoom level represented in the generated tileset. */
+  maxZoom?: number;
+  /** Optional geographic extent in radians to constrain the generated tile tree. */
+  extent?: Rectangle;
+  /** MVT property name to use as feature ID. */
+  featureIdProperty?: string;
+  /** Drapes the decoded points, lines and polygons onto terrain and/or 3D Tiles. Requires `scene`. */
+  heightReference?: HeightReference;
+  /** The scene the generated tileset is rendered in, required when `heightReference` is a clamping value. */
+  scene?: Scene;
+  /**
+   * 3D Tiles refinement strategy for the generated tileset. Defaults to `'REPLACE'` (matching Cesium's
+   * own `MVTDataProvider`): exactly one zoom level renders per area, swapped out for its children once
+   * they're all loaded. Set to `'ADD'` only if the tile server can return a tile failure Cesium is
+   * unable to treat as "merely empty" (see the `refine` comment in `buildTileNode` for why that matters)
+   * - `'ADD'` renders every loaded zoom level of an area simultaneously instead, trading visible overdraw
+   * (each zoom's own, differently-simplified geometry can visibly not quite line up) for immunity to
+   * that failure mode.
+   */
+  refine?: 'REPLACE' | 'ADD';
+  /**
+   * Drops polygon rings smaller than this many "pixels" at a nominal 256px-tile reference resolution
+   * (see `BuildVectorGltfOptions.minPolygonAreaPixels` in buildVectorGltfFromMVTWGS84.ts). Real-world
+   * landuse/administrative data is often a multipolygon of many disjoint parts, some tiny enough to
+   * read as visual noise rather than real shapes - this filters those out per-tile before triangulating.
+   * Opt-in: undefined/0 renders every ring regardless of size, same as if this option didn't exist.
+   */
+  minPolygonAreaPixels?: number;
+  /**
+   * Douglas-Peucker simplification tolerance, in this many "pixels" at a nominal 256px-tile reference
+   * resolution (see `BuildVectorGltfOptions.simplifyTolerancePixels` in buildVectorGltfFromMVTWGS84.ts).
+   * Reduces excess vertex density in polygon rings before triangulating. Opt-in: undefined/0 disables
+   * it, same as if this option didn't exist.
+   */
+  simplifyTolerancePixels?: number;
+  /**
+   * Chaikin corner-cutting passes applied to every line feature's vertices before triangulating (see
+   * `BuildVectorGltfOptions.lineSmoothingIterations` in buildVectorGltfFromMVTWGS84.ts). Mitigates a
+   * visible "spiking" at sharp vertices - most noticeable on administrative boundaries at low zoom,
+   * where the source geometry is simplified the most aggressively - caused by Cesium's polyline
+   * widening having no miter limit. Opt-in: undefined/0 renders every line with its original vertices,
+   * same as if this option didn't exist.
+   */
+  lineSmoothingIterations?: number;
+  /**
+   * Renders text labels for named point features decoded from the `place_labels` MVT source-layer
+   * (city/town/village/... names, per Shortbread's schema) as a `LabelCollection` kept in sync with
+   * this provider's own tile load/unload. `Cesium3DTileStyle` has no equivalent hook: the vector glTF
+   * content this provider produces only evaluates `show`/`color`/`pointSize`/`lineWidth` from a style,
+   * never `labelText`/`labelColor`/`font` (see PlaceLabelsWGS84 for why). Requires `scene` - silently
+   * does nothing without it, same as `heightReference` clamping.
+   */
+  placeLabels?: boolean;
+}
 
 /**
  * WGS84 (EPSG:4326) counterpart of Cesium's `MVTDataProvider`
@@ -41,26 +100,37 @@ import buildVectorGltfFromMVTWGS84 from './buildVectorGltfFromMVTWGS84';
  * when the estimate is too large (see `MAX_ESTIMATED_TILE_COUNT`) - pass a tighter `extent` and/or a
  * lower `maxZoom` to stay under it.
  *
+ * `options.refine` (default `'REPLACE'`, matching `MVTDataProvider`) controls the generated tileset's
+ * 3D Tiles refinement strategy - see the `refine` comment in `buildTileNode` below for the tradeoff
+ * `'ADD'` exists for: tolerating a server that can return a tile request Cesium can never recognize as
+ * merely "empty" (a genuinely failed/errored tile, or one whose failure response breaks HTTP semantics
+ * that Cesium depends on to detect it), at the cost of visibly overlapping multiple zoom levels.
+ *
  * @experimental Mirrors the @experimental status of Cesium's own MVTDataProvider.
  */
 class MVTDataProviderWGS84 extends UrlTemplate3DTilesDataProvider {
+  private readonly _mvtRefine: 'REPLACE' | 'ADD';
+  private readonly _mvtMinPolygonAreaPixels: number | undefined;
+  private readonly _mvtSimplifyTolerancePixels: number | undefined;
+  private readonly _mvtLineSmoothingIterations: number | undefined;
+  private readonly _placeLabels: PlaceLabelsWGS84 | undefined;
+
+  public constructor(urlTemplate: Resource | string, options?: MVTDataProviderWGS84ConstructorOptions) {
+    super(urlTemplate, options);
+    this._mvtRefine = options?.refine ?? 'REPLACE';
+    this._mvtMinPolygonAreaPixels = options?.minPolygonAreaPixels;
+    this._mvtSimplifyTolerancePixels = options?.simplifyTolerancePixels;
+    this._mvtLineSmoothingIterations = options?.lineSmoothingIterations;
+    this._placeLabels = options?.placeLabels === true && options.scene !== undefined ? new PlaceLabelsWGS84(options.scene) : undefined;
+  }
+
   /**
    * Creates an MVTDataProviderWGS84 from the specified URL template and options.
    *
    * @param url URL template, containing {z}, {x}, and {y} placeholders.
    * @param options Provider options.
    */
-  public static async fromUrl(
-    url: Resource | string,
-    options?: {
-      minZoom?: number;
-      maxZoom?: number;
-      extent?: Rectangle;
-      featureIdProperty?: string;
-      heightReference?: HeightReference;
-      scene?: Scene;
-    }
-  ): Promise<MVTDataProviderWGS84> {
+  public static async fromUrl(url: Resource | string, options?: MVTDataProviderWGS84ConstructorOptions): Promise<MVTDataProviderWGS84> {
     return super.fromUrl(url, options) as unknown as Promise<MVTDataProviderWGS84>;
   }
 
@@ -101,14 +171,21 @@ class MVTDataProviderWGS84 extends UrlTemplate3DTilesDataProvider {
       // only `onload` constructs a `RequestErrorEvent` carrying `statusCode`). A server whose error
       // response itself fails at the network level - e.g. a `Content-Encoding` header that doesn't
       // match the actual (uncompressed) error body, surfacing as the browser's own
-      // `net::ERR_CONTENT_DECODING_FAILED` - never gives Cesium a status to match against, so
-      // `refine: 'ADD'` below is what actually keeps this provider working against such a server.
+      // `net::ERR_CONTENT_DECODING_FAILED` - never gives Cesium a status to match against; against such
+      // a server, only `options.refine: 'ADD'` (see MVTDataProviderWGS84ConstructorOptions) keeps this
+      // provider working, since this policy alone can't help it.
       missingTilePolicy: { statusCodes: [404, 204, 500, 502, 503, 504] },
       createContent: async (tileset: Cesium3DTileset, tile: Cesium3DTile, resource: Resource, arrayBuffer: ArrayBuffer) => {
         const decodedTile = decodeMVT(arrayBuffer);
         const resolvedUri = resource.getUrlComponent(true);
         const tileCoordinates = uriCoordinates?.get(resolvedUri) ?? parseTileCoordinates(resolvedUri);
-        const glb = buildVectorGltfFromMVTWGS84(decodedTile, tileCoordinates, { featureIdProperty });
+        this._placeLabels?.addTileLabels(tile, decodedTile, tileCoordinates);
+        const glb = buildVectorGltfFromMVTWGS84(decodedTile, tileCoordinates, {
+          featureIdProperty,
+          minPolygonAreaPixels: this._mvtMinPolygonAreaPixels,
+          simplifyTolerancePixels: this._mvtSimplifyTolerancePixels,
+          lineSmoothingIterations: this._mvtLineSmoothingIterations,
+        });
         if (glb === undefined) {
           if (!hasAnyDecodedFeatures(decodedTile)) {
             return new Empty3DTileContent(tileset, tile);
@@ -131,6 +208,7 @@ class MVTDataProviderWGS84 extends UrlTemplate3DTilesDataProvider {
     const tilesetJson = buildRuntimeTilesetJsonWGS84(
       this.resource,
       this._createRuntimeTilesetOptions() as unknown as RuntimeTilesetOptions,
+      this._mvtRefine,
       tileUriCoordinates
     );
     const tilesetBlob = new Blob([JSON.stringify(tilesetJson)], { type: 'application/json' });
@@ -156,6 +234,19 @@ class MVTDataProviderWGS84 extends UrlTemplate3DTilesDataProvider {
     this._configureTileset(tileset);
     (tileset as any)._runtimeContentCodec = this._createCodec();
     tileset.show = self._show;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+
+    this._placeLabels?.attachToTileset(tileset);
+  }
+
+  /**
+   * `UrlTemplate3DTilesDataProvider#destroy` (see the type-augmentation comment below) has no notion of
+   * `_placeLabels`'s own `LabelCollection`, so it must be torn down here first.
+   */
+  public destroy(): void {
+    this._placeLabels?.destroy();
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    (UrlTemplate3DTilesDataProvider.prototype as any).destroy.call(this);
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 }
@@ -228,6 +319,7 @@ function estimateMaxTileCount(rootTileCount: number, levels: number): number {
 function buildRuntimeTilesetJsonWGS84(
   resource: Resource,
   options: RuntimeTilesetOptions,
+  refine: 'REPLACE' | 'ADD',
   uriCoordinates: Map<string, TileCoordinates>
 ): Record<string, unknown> {
   const tilingScheme = new GeographicTilingScheme();
@@ -255,12 +347,12 @@ function buildRuntimeTilesetJsonWGS84(
     // Root has no renderable content, so keep a coarse error to ensure
     // refinement reaches the first renderable zoom even when minZoom is high.
     geometricError: computeGeometricError(tilingScheme, 0),
-    refine: 'ADD',
+    refine: refine,
     children: [],
   };
   for (let y = minLevelRange.minY; y <= minLevelRange.maxY; y++) {
     for (let x = minLevelRange.minX; x <= minLevelRange.maxX; x++) {
-      const child = buildTileNode(tilingScheme, resource, extent, options.minZoom, options.maxZoom, x, y, uriCoordinates);
+      const child = buildTileNode(tilingScheme, resource, extent, options.minZoom, options.maxZoom, refine, x, y, uriCoordinates);
       if (child !== undefined) {
         root.children?.push(child);
       }
@@ -284,6 +376,7 @@ function buildTileNode(
   extent: Rectangle,
   level: number,
   maxZoom: number,
+  refine: 'REPLACE' | 'ADD',
   x: number,
   y: number,
   uriCoordinates: Map<string, TileCoordinates>
@@ -298,19 +391,18 @@ function buildTileNode(
       region: rectangleToRegion(tileRectangle),
     },
     geometricError: level < maxZoom ? computeGeometricError(tilingScheme, level) : 0.0,
-    // ADD (not REPLACE): each tile is loaded/selected independently of its siblings and children.
-    // REPLACE would be visually preferable (exactly one LOD renders per area, instead of every loaded
-    // ancestor/descendant of that area simultaneously - which visibly stacks each zoom level's own,
-    // differently-simplified geometry, e.g. a small island's coastline landing in a slightly different
-    // place at each zoom). But REPLACE only tolerates a permanently-failing tile (blocking every
-    // descendant beneath it - see Cesium3DTilesetBaseTraversal#updateAndPushChildren's
-    // `checkRefines`/`refines` chain) via `missingTilePolicy.statusCodes` above, and that in turn only
-    // works when Cesium actually receives an HTTP status for the failed request. Some servers' error
-    // responses fail at the network level instead (e.g. a `Content-Encoding` header that doesn't match
-    // the actual error body, surfacing as the browser's own `net::ERR_CONTENT_DECODING_FAILED`), in
-    // which case Cesium never gets a status to match against and REPLACE refinement stays stuck
-    // forever. ADD tolerates that too, at the cost of the overdraw described above.
-    refine: 'ADD',
+    // With REPLACE (the default - see MVTDataProviderWGS84ConstructorOptions.refine), exactly one LOD
+    // renders per area. With ADD, every loaded ancestor/descendant of a given area renders simultaneously
+    // instead - which visibly stacks each zoom level's own, differently-simplified geometry (e.g. a small
+    // island's coastline landing in a slightly different place at each zoom) - accepted only because ADD
+    // tolerates a server that REPLACE can't: REPLACE only advances past a tile once ALL of its children
+    // have successfully loaded content (see Cesium3DTilesetBaseTraversal#updateAndPushChildren's
+    // `checkRefines`/`refines` chain), so a *permanently* failing tile - one `missingTilePolicy.statusCodes`
+    // above can't recognize as merely empty, e.g. because its error response breaks the HTTP semantics
+    // Cesium relies on to detect it (surfacing as the browser's own `net::ERR_CONTENT_DECODING_FAILED`
+    // instead of a readable status) - would otherwise block every descendant of that tile from ever being
+    // selected, however successfully the rest of the subtree loads.
+    refine: refine,
     content: {
       uri: resolveTileUrl(resource, level, x, y, uriCoordinates),
     },
@@ -322,7 +414,7 @@ function buildTileNode(
   const children: TilesetJsonRoot[] = [];
   for (let childY = y * 2; childY <= y * 2 + 1; childY++) {
     for (let childX = x * 2; childX <= x * 2 + 1; childX++) {
-      const child = buildTileNode(tilingScheme, resource, extent, childLevel, maxZoom, childX, childY, uriCoordinates);
+      const child = buildTileNode(tilingScheme, resource, extent, childLevel, maxZoom, refine, childX, childY, uriCoordinates);
       if (child !== undefined) {
         children.push(child);
       }

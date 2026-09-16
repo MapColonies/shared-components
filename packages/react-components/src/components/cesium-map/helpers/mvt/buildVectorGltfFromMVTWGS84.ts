@@ -19,8 +19,9 @@ import {
  * `WebMercatorTilingScheme` to place tile-local MVT coordinates on the globe, which only produces
  * correct results for EPSG:3857 tile sources. This is a straight port with the tiling scheme and
  * the tile-local-to-lon/lat conversion swapped for the equirectangular (Plate Carree) math used by
- * the WGS84 tile matrix set - everything else (triangulation, feature IDs, glTF/GLB assembly) is
- * unchanged.
+ * the WGS84 tile matrix set - everything else (triangulation, glTF/GLB assembly) is unchanged, except
+ * feature IDs and EXT_structural_metadata property tables are scoped per MVT layer instead of pooled
+ * across the whole tile (see the comment on `schemaClasses`/`propertyTables` below for why).
  */
 
 const DEFAULT_HEIGHT = 0;
@@ -32,7 +33,50 @@ const tilingRectangle = tilingScheme.rectangle;
 
 export interface BuildVectorGltfOptions {
   featureIdProperty?: string;
+  /**
+   * Drops polygon rings smaller than this, in "pixels" at a nominal 256px-tile reference resolution
+   * (independent of the MVT layer's own `extent`, which is commonly 4096 but not guaranteed to be).
+   * Real-world landuse/administrative polygon data (forests especially) is frequently a multipolygon
+   * of many disjoint parts, including plenty that are only a handful of tile units across - each one
+   * still renders as its own small, correctly-shaped patch, but at typical zoom levels they're too
+   * small to read as anything but visual noise (a "jagged"/"fragmented" look). Opt-in: defaults to 0
+   * (disabled - every ring renders, exactly as if this option didn't exist) so existing callers that
+   * don't pass it see no change in behavior.
+   */
+  minPolygonAreaPixels?: number;
+  /**
+   * Douglas-Peucker simplification tolerance for polygon rings, in "pixels" at the same nominal 256px
+   * reference tile as `minPolygonAreaPixels`. Reduces point density/detail on rings that have far more
+   * vertices than are visually meaningful at typical render scale (administrative and landuse polygons
+   * are frequently over-detailed for this). Opt-in: defaults to 0 (disabled - rings render with their
+   * original vertices, exactly as if this option didn't exist) so existing callers that don't pass it
+   * see no change in behavior.
+   */
+  simplifyTolerancePixels?: number;
+  /**
+   * Chaikin corner-cutting passes applied to every `LineString` feature's tile-local vertices before
+   * they're triangulated into line quads. Cesium's polyline widening (the same miter-join math every
+   * Cesium polyline uses, in BufferPolylineMaterialVS.glsl's `getPolylineWindowCoordinatesEC`) has no
+   * miter limit: a sharp vertex angle makes the join overshoot into a visible spike, and that spike gets
+   * worse the more aggressively a line's source geometry was simplified for its zoom (administrative
+   * boundaries especially - a country border can simplify to a handful of long, sharply-angled segments
+   * at low zoom). Each pass replaces every interior vertex with two points 1/4 and 3/4 along its
+   * neighboring edges (the endpoints are kept as-is, so the line doesn't visibly shrink back from where
+   * it should start/end), which is a no-op on an already-straight run and only meaningfully rounds off
+   * actually-sharp corners. Opt-in: defaults to 0 (disabled - lines render with their original vertices,
+   * exactly as if this option didn't exist) so existing callers that don't pass it see no change.
+   */
+  lineSmoothingIterations?: number;
 }
+
+/** @see BuildVectorGltfOptions.minPolygonAreaPixels */
+const DEFAULT_MIN_POLYGON_AREA_PIXELS = 0;
+/** @see BuildVectorGltfOptions.simplifyTolerancePixels */
+const DEFAULT_SIMPLIFY_TOLERANCE_PIXELS = 0;
+/** @see BuildVectorGltfOptions.lineSmoothingIterations */
+const DEFAULT_LINE_SMOOTHING_ITERATIONS = 0;
+/** Reference tile pixel size `minPolygonAreaPixels`/`simplifyTolerancePixels` are expressed against. */
+const REFERENCE_TILE_PIXELS = 256;
 
 interface PolygonRingGroup {
   outerRing: DecodedMVTPoint[];
@@ -53,6 +97,9 @@ function buildVectorGltfFromMVTWGS84(
   const tileY = tileCoordinates.tileY;
   const tileZ = tileCoordinates.tileZ;
   const featureIdProperty = options?.featureIdProperty;
+  const minPolygonAreaPixels = options?.minPolygonAreaPixels ?? DEFAULT_MIN_POLYGON_AREA_PIXELS;
+  const simplifyTolerancePixels = options?.simplifyTolerancePixels ?? DEFAULT_SIMPLIFY_TOLERANCE_PIXELS;
+  const lineSmoothingIterations = options?.lineSmoothingIterations ?? DEFAULT_LINE_SMOOTHING_ITERATIONS;
 
   const tileRect = tilingScheme.tileXYToRectangle(tileX, tileY, tileZ);
   const tileCenter = Rectangle.center(tileRect);
@@ -61,16 +108,22 @@ function buildVectorGltfFromMVTWGS84(
   const MAX_INT_U32 = 0xffffffff;
   const nullFeatureId = MAX_INT_U32;
   const primitiveRestartIndex = MAX_INT_U32;
-  // Maps a property value (or auto-increment key) to a compact integer feature ID.
-  const featureIdLookup = new Map<string | DecodedMVTFeature, number>();
-
-  // Maps featureId -> properties object (first-seen wins for ID collisions).
-  const featureProperties = new Map<number, Record<string, unknown>>();
 
   const bufferViews: Record<string, unknown>[] = [];
   const accessors: Record<string, unknown>[] = [];
   const chunks: Uint8Array[] = [];
   let byteLength = 0;
+  let hasAnyFeatureIds = false;
+
+  // One schema class + property table per MVT layer that has properties, populated as layers are
+  // processed below - deliberately NOT one combined table for the whole tile. A single MVT tile
+  // commonly holds several unrelated layers (e.g. "boundaries", "ocean", "buildings", "places"), each
+  // with its own property set. Pooling them into one table means every feature gets the *union* of
+  // every layer's properties: a "boundaries" feature would pick up an empty "" for a "places" layer's
+  // `name`/`name_en` and a NaN for a "buildings" layer's `way_area`, since it has neither - exactly the
+  // "looks bad" symptom of unrelated, blank/NaN properties showing up on a feature that never had them.
+  const schemaClasses: Record<string, unknown> = {};
+  const propertyTables: Record<string, unknown>[] = [];
 
   function addPadding(): void {
     const padding = (4 - (byteLength % 4)) % 4;
@@ -157,10 +210,17 @@ function buildVectorGltfFromMVTWGS84(
     };
   }
 
-  function addFeatureIdsToPrimitive(attributes: Record<string, unknown>, extensions: Record<string, unknown>, featureIdValues: number[]): void {
+  function addFeatureIdsToPrimitive(
+    attributes: Record<string, unknown>,
+    extensions: Record<string, unknown>,
+    featureIdValues: number[],
+    featureCount: number,
+    propertyTableIndex: number | undefined
+  ): void {
     if (featureIdValues.length === 0) {
       return;
     }
+    hasAnyFeatureIds = true;
     const featureIds = new Uint32Array(featureIdValues);
     const featureAccessor = addAccessor(featureIds, {
       type: 'SCALAR',
@@ -169,12 +229,12 @@ function buildVectorGltfFromMVTWGS84(
     });
     attributes._FEATURE_ID_0 = featureAccessor;
     const featureIdDef: Record<string, unknown> = {
-      featureCount: featureIdLookup.size,
+      featureCount: featureCount,
       nullFeatureId: nullFeatureId,
       attribute: 0,
     };
-    if (featureProperties.size > 0) {
-      featureIdDef.propertyTable = 0;
+    if (propertyTableIndex !== undefined) {
+      featureIdDef.propertyTable = propertyTableIndex;
     }
     extensions.EXT_mesh_features = {
       featureIds: [featureIdDef],
@@ -203,15 +263,42 @@ function buildVectorGltfFromMVTWGS84(
   }
 
   /**
-   * Builds the EXT_structural_metadata extension object with schema and
-   * property table from the collected feature properties.
+   * Coerces a raw MVT property value to a finite number for a SCALAR metadata property. Real numbers
+   * pass through as-is; numeric strings and bigints (MVT int64/sint64 values can decode as either,
+   * depending on magnitude) are converted rather than discarded, so a genuinely numeric property like
+   * `way_area` doesn't collapse to NaN just because of which JS type it happened to decode as.
    */
-  function buildStructuralMetadata(): Record<string, unknown> | undefined {
+  function coerceToFiniteNumber(raw: unknown): number {
+    if (typeof raw === 'number') {
+      return Number.isFinite(raw) ? raw : NaN;
+    }
+    if (typeof raw === 'bigint') {
+      return Number(raw);
+    }
+    if (typeof raw === 'string' && raw.trim() !== '') {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+    return NaN;
+  }
+
+  /**
+   * Builds one MVT layer's EXT_structural_metadata schema class + property table (scoped to just that
+   * layer's own features), appends them to the tile-wide `schemaClasses`/`propertyTables`, and returns
+   * the new table's index for `addFeatureIdsToPrimitive` to reference - or `undefined` if this layer's
+   * features carry no properties worth describing.
+   */
+  function buildStructuralMetadataForLayer(
+    layerName: string,
+    layerIndex: number,
+    featureProperties: Map<number, Record<string, unknown>>,
+    featureCount: number
+  ): number | undefined {
     if (featureProperties.size === 0) {
       return undefined;
     }
 
-    // 1. Determine union of all property names and infer types.
+    // 1. Determine union of this layer's property names and infer types.
     const propertyTypes = new Map<string, string>();
 
     for (const props of featureProperties.values()) {
@@ -223,7 +310,7 @@ function buildVectorGltfFromMVTWGS84(
         let metaType: string;
         if (jsType === 'string') {
           metaType = 'STRING';
-        } else if (jsType === 'number') {
+        } else if (jsType === 'number' || jsType === 'bigint') {
           metaType = 'SCALAR';
         } else if (jsType === 'boolean') {
           metaType = 'BOOLEAN';
@@ -267,15 +354,14 @@ function buildVectorGltfFromMVTWGS84(
 
     // 3. Encode property values into binary buffers.
     const tableProperties: Record<string, unknown> = {};
-    const count = featureIdLookup.size;
+    const count = featureCount;
 
     for (const [name, type] of propertyTypes) {
       if (type === 'SCALAR') {
         const values = new Float64Array(count);
         for (let i = 0; i < count; i++) {
           const props = featureProperties.get(i);
-          const raw = props?.[name];
-          values[i] = typeof raw === 'number' && Number.isFinite(raw) ? raw : NaN;
+          values[i] = coerceToFiniteNumber(props?.[name]);
         }
         const bvIndex = addMetadataBufferView(new Uint8Array(values.buffer, values.byteOffset, values.byteLength), 8);
         tableProperties[name] = { values: bvIndex };
@@ -334,30 +420,38 @@ function buildVectorGltfFromMVTWGS84(
       }
     }
 
-    return {
-      schema: {
-        classes: {
-          mvt_feature: {
-            properties: classProperties,
-          },
-        },
-      },
-      propertyTables: [
-        {
-          class: 'mvt_feature',
-          count: count,
-          properties: tableProperties,
-        },
-      ],
-    };
+    // Class names must be unique tile-wide; layer names are usually already unique and identifier-safe,
+    // but the index guarantees uniqueness and the character replacement guards against exotic names.
+    const className = `mvt_layer_${layerIndex}_${(layerName || 'layer').replace(/[^A-Za-z0-9_]/g, '_')}`;
+    schemaClasses[className] = { properties: classProperties };
+    const tableIndex = propertyTables.length;
+    propertyTables.push({
+      class: className,
+      count: count,
+      properties: tableProperties,
+    });
+    return tableIndex;
   }
 
   const meshes: Record<string, unknown>[] = [];
   const nodes: Record<string, unknown>[] = [];
   const translation = [origin.x, origin.y, origin.z];
 
+  let layerIndex = 0;
   for (const layer of decoded.layers) {
+    const currentLayerIndex = layerIndex++;
     const extent = layer.extent;
+    // See BuildVectorGltfOptions.minPolygonAreaPixels/simplifyTolerancePixels - both expressed per a
+    // 256px reference tile, then scaled by this layer's own extent (tile-local units per pixel =
+    // extent / 256); minRingArea scales as pixels squared (it's an area), simplifyTolerance linearly
+    // (it's a distance).
+    const minRingArea = minPolygonAreaPixels * (extent / REFERENCE_TILE_PIXELS) ** 2;
+    const simplifyTolerance = simplifyTolerancePixels * (extent / REFERENCE_TILE_PIXELS);
+
+    // Scoped per layer (not shared tile-wide) so feature IDs and their properties never mix across
+    // unrelated layers - see the comment on `schemaClasses`/`propertyTables` above.
+    const featureIdLookup = new Map<string | DecodedMVTFeature, number>();
+    const featureProperties = new Map<number, Record<string, unknown>>();
 
     const pointPositions: number[] = [];
     const pointFeatureIds: number[] = [];
@@ -381,7 +475,7 @@ function buildVectorGltfFromMVTWGS84(
         ? mapFeatureIdFromProperty(feature, featureIdProperty, featureIdLookup as unknown as Map<string, number>) ?? nullFeatureId
         : getOrAssignAutoFeatureId(feature, featureIdLookup as unknown as Map<DecodedMVTFeature, number>);
 
-      // Collect properties for the property table (first-seen wins).
+      // Collect properties for the property table (first-seen wins for ID collisions).
       if (currentFeatureId !== nullFeatureId && !featureProperties.has(currentFeatureId)) {
         const props: Record<string, unknown> = Object.assign({}, feature.properties);
         props._layer = layer.name ?? '';
@@ -399,7 +493,8 @@ function buildVectorGltfFromMVTWGS84(
 
       if (feature.type === 'LineString') {
         const lines = feature.geometry as DecodedMVTPoint[][];
-        for (const line of lines) {
+        for (const rawLine of lines) {
+          const line = lineSmoothingIterations > 0 ? chaikinSmoothLine(rawLine, lineSmoothingIterations) : rawLine;
           const lineStart = linePositions.length / 3;
           for (const point of line) {
             appendTilePointAsLocalPosition(point, tileX, tileY, tileZ, extent, DEFAULT_HEIGHT, origin, linePositions);
@@ -417,7 +512,7 @@ function buildVectorGltfFromMVTWGS84(
 
       if (feature.type === 'Polygon') {
         const rawRings = feature.geometry as DecodedMVTPoint[][];
-        const groups = groupPolygonRings(rawRings);
+        const groups = groupPolygonRings(rawRings, minRingArea, simplifyTolerance);
 
         for (const group of groups) {
           const rings = [group.outerRing, ...group.holes];
@@ -482,6 +577,9 @@ function buildVectorGltfFromMVTWGS84(
       lineIndices.pop();
     }
 
+    const layerFeatureCount = featureIdLookup.size;
+    const layerPropertyTableIndex = buildStructuralMetadataForLayer(layer.name ?? '', currentLayerIndex, featureProperties, layerFeatureCount);
+
     const primitives: Record<string, unknown>[] = [];
 
     if (pointPositions.length > 0) {
@@ -504,7 +602,7 @@ function buildVectorGltfFromMVTWGS84(
           count: positions.length / 3,
         },
       };
-      addFeatureIdsToPrimitive(attributes, extensions, pointFeatureIds);
+      addFeatureIdsToPrimitive(attributes, extensions, pointFeatureIds, layerFeatureCount, layerPropertyTableIndex);
 
       primitives.push({
         mode: PrimitiveType.POINTS,
@@ -539,7 +637,7 @@ function buildVectorGltfFromMVTWGS84(
           count: lineCount,
         },
       };
-      addFeatureIdsToPrimitive(attributes, extensions, lineFeatureIds);
+      addFeatureIdsToPrimitive(attributes, extensions, lineFeatureIds, layerFeatureCount, layerPropertyTableIndex);
 
       primitives.push({
         mode: PrimitiveType.LINE_STRIP,
@@ -612,7 +710,7 @@ function buildVectorGltfFromMVTWGS84(
         extensions.CESIUM_mesh_vector.polygonHoleCounts = holeCountsAccessor;
         extensions.CESIUM_mesh_vector.polygonHoleOffsets = holeOffsetsAccessor;
       }
-      addFeatureIdsToPrimitive(attributes, extensions, polygonFeatureIds);
+      addFeatureIdsToPrimitive(attributes, extensions, polygonFeatureIds, layerFeatureCount, layerPropertyTableIndex);
 
       primitives.push({
         mode: PrimitiveType.TRIANGLES,
@@ -639,15 +737,12 @@ function buildVectorGltfFromMVTWGS84(
     return undefined;
   }
 
-  // Build property table AFTER primitives (adds metadata buffer views).
-  const structuralMetadata = buildStructuralMetadata();
-
   const binaryChunk = concatChunks(chunks, byteLength);
   const extensionsUsed = ['CESIUM_mesh_vector'];
-  if (featureIdLookup.size > 0) {
+  if (hasAnyFeatureIds) {
     extensionsUsed.push('EXT_mesh_features');
   }
-  if (structuralMetadata !== undefined) {
+  if (propertyTables.length > 0) {
     extensionsUsed.push('EXT_structural_metadata');
   }
 
@@ -675,9 +770,14 @@ function buildVectorGltfFromMVTWGS84(
     ],
   };
 
-  if (structuralMetadata !== undefined) {
+  if (propertyTables.length > 0) {
     gltfJson.extensions = {
-      EXT_structural_metadata: structuralMetadata,
+      EXT_structural_metadata: {
+        schema: {
+          classes: schemaClasses,
+        },
+        propertyTables: propertyTables,
+      },
     };
   }
 
@@ -719,21 +819,157 @@ function mapFeatureIdFromProperty(feature: DecodedMVTFeature, featureIdProperty:
   return mappedFeatureId;
 }
 
-function groupPolygonRings(rawRings: DecodedMVTPoint[][]): PolygonRingGroup[] {
+/**
+ * Groups a polygon feature's flat ring list into (outer ring + its holes) groups. Each ring is first
+ * tested against its OWN (pre-simplification) area, dropped entirely - outer *or* hole - if smaller
+ * than `minRingArea` (see BuildVectorGltfOptions.minPolygonAreaPixels), and only then, if it survives,
+ * Douglas-Peucker simplified (see BuildVectorGltfOptions.simplifyTolerancePixels) to reduce excess
+ * vertex density. Both options default to disabled (0) - see their doc comments - so a caller that
+ * doesn't opt in gets every ring exactly as decoded. Dropping tiny outer rings also drops any holes
+ * that would have belonged to them, so they don't get misattached to an unrelated, previously-seen
+ * group instead. Dropping tiny holes matters on its own: a hole ring that's degenerate (near-zero
+ * area, often just 3-4 nearly-collinear points) is exactly the kind of input earcut has no obligation
+ * to handle gracefully - punching a practically-zero-size hole into a large, detailed outer ring is a
+ * real, observed way to get long, wrong-looking "spike" triangles, not just harmless visual noise.
+ */
+function groupPolygonRings(rawRings: DecodedMVTPoint[][], minRingArea: number, simplifyTolerance: number): PolygonRingGroup[] {
   const groups: PolygonRingGroup[] = [];
+  let lastOuterRingDropped = false;
   for (const rawRing of rawRings) {
-    const ring = stripClosingVertex(rawRing);
-    if (ring.length < 3) {
+    const stripped = stripClosingVertex(rawRing);
+    if (stripped.length < 3) {
       continue;
     }
-    const area = ringSignedArea(ring);
+    // The area test runs against the ORIGINAL ring, not the simplified one: simplification can shrink
+    // a small-but-legitimate ring's area well below its true size (e.g. a small building reduced to a
+    // near-degenerate sliver), which would otherwise make `minRingArea` drop real shapes it was never
+    // meant to touch once `simplifyTolerance` is also in use. Simplification itself is applied only to
+    // rings that already passed on their own merits, purely to reduce vertex count.
+    const area = ringSignedArea(stripped);
+    if (Math.abs(area) < minRingArea) {
+      if (area <= 0) {
+        lastOuterRingDropped = true;
+      }
+      continue;
+    }
+    const ring = simplifyRingDouglasPeucker(stripped, simplifyTolerance);
     if (area <= 0) {
+      lastOuterRingDropped = false;
       groups.push({ outerRing: ring, holes: [] });
-    } else if (groups.length > 0) {
+    } else if (!lastOuterRingDropped && groups.length > 0) {
       groups[groups.length - 1].holes.push(ring);
     }
   }
   return groups;
+}
+
+/**
+ * Douglas-Peucker simplification for a CLOSED ring. Standard DP needs two anchor points that are far
+ * apart to work well; naively anchoring on `points[0]`/`points[last]` is wrong here because those are
+ * *adjacent* ring vertices (the ring's own closing edge, stripped earlier) sitting right next to each
+ * other; the "farthest point from the anchor" search below finds a point roughly on the opposite side
+ * of the shape instead. Using two adjacent points as anchors is worse than merely suboptimal: perpendicular
+ * distance is measured against the INFINITE line through the anchors (not the segment between them), so
+ * a real, large lobe of the ring on the far side can end up nearly collinear with that line's extension
+ * and get judged as within tolerance - even though it is nowhere near the two adjacent anchor points -
+ * causing whole concave sections to be silently dropped (observed as boundaries "ballooning" outward/
+ * covering more area than they should, worst at high zoom where a ring carries the most vertices).
+ * Splitting on a proper far-apart pair avoids that degenerate case. Never simplifies below a valid
+ * triangle (3 points); returns the input unchanged if that would happen or if `tolerance` is 0.
+ */
+function simplifyRingDouglasPeucker(points: DecodedMVTPoint[], tolerance: number): DecodedMVTPoint[] {
+  const n = points.length;
+  if (n <= 3 || tolerance <= 0) {
+    return points;
+  }
+  const toleranceSq = tolerance * tolerance;
+  const anchorB = farthestPointIndex(points, 0);
+
+  // Two independent open chains sharing the anchors as their shared endpoints: 0→anchorB directly, and
+  // anchorB→(end of array)→0 the "long way" around. Slicing into plain arrays sidesteps circular-index
+  // arithmetic entirely - each chain is simplified with the same, ordinary open-polyline DP.
+  const chainA = points.slice(0, anchorB + 1);
+  const chainB = points.slice(anchorB).concat([points[0]]);
+
+  const keptA = simplifyOpenChain(chainA, toleranceSq);
+  const keptB = simplifyOpenChain(chainB, toleranceSq);
+
+  // keptB's first/last points duplicate keptA's last/first (the shared anchors) - drop them here.
+  const result = keptA.concat(keptB.slice(1, keptB.length - 1));
+  return result.length >= 3 ? result : points;
+}
+
+/** Index of the point in `points` farthest (by squared distance) from `points[fromIndex]`. */
+function farthestPointIndex(points: DecodedMVTPoint[], fromIndex: number): number {
+  const from = points[fromIndex];
+  let maxDistSq = -1;
+  let index = fromIndex;
+  for (let i = 0; i < points.length; i++) {
+    if (i === fromIndex) {
+      continue;
+    }
+    const dx = points[i].x - from.x;
+    const dy = points[i].y - from.y;
+    const distSq = dx * dx + dy * dy;
+    if (distSq > maxDistSq) {
+      maxDistSq = distSq;
+      index = i;
+    }
+  }
+  return index;
+}
+
+function simplifyOpenChain(chain: DecodedMVTPoint[], toleranceSq: number): DecodedMVTPoint[] {
+  const keep = new Uint8Array(chain.length);
+  keep[0] = 1;
+  keep[chain.length - 1] = 1;
+  simplifyDouglasPeuckerSection(chain, 0, chain.length - 1, toleranceSq, keep);
+  const result: DecodedMVTPoint[] = [];
+  for (let i = 0; i < chain.length; i++) {
+    if (keep[i]) {
+      result.push(chain[i]);
+    }
+  }
+  return result;
+}
+
+function simplifyDouglasPeuckerSection(points: DecodedMVTPoint[], first: number, last: number, toleranceSq: number, keep: Uint8Array): void {
+  if (last <= first + 1) {
+    return;
+  }
+  const a = points[first];
+  const b = points[last];
+  let maxDistSq = 0;
+  let splitIndex = -1;
+  for (let i = first + 1; i < last; i++) {
+    const distSq = perpendicularDistanceSquared(points[i], a, b);
+    if (distSq > maxDistSq) {
+      maxDistSq = distSq;
+      splitIndex = i;
+    }
+  }
+  if (maxDistSq > toleranceSq && splitIndex !== -1) {
+    keep[splitIndex] = 1;
+    simplifyDouglasPeuckerSection(points, first, splitIndex, toleranceSq, keep);
+    simplifyDouglasPeuckerSection(points, splitIndex, last, toleranceSq, keep);
+  }
+}
+
+/** Squared distance from point `p` to the line through `a`/`b` (not the segment - matches standard DP). */
+function perpendicularDistanceSquared(p: DecodedMVTPoint, a: DecodedMVTPoint, b: DecodedMVTPoint): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (dx === 0 && dy === 0) {
+    const ddx = p.x - a.x;
+    const ddy = p.y - a.y;
+    return ddx * ddx + ddy * ddy;
+  }
+  const t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy);
+  const projX = a.x + t * dx;
+  const projY = a.y + t * dy;
+  const ddx = p.x - projX;
+  const ddy = p.y - projY;
+  return ddx * ddx + ddy * ddy;
 }
 
 function ringSignedArea(ring: DecodedMVTPoint[]): number {
@@ -749,6 +985,33 @@ function stripClosingVertex(ring: DecodedMVTPoint[]): DecodedMVTPoint[] {
     return ring.slice(0, ring.length - 1);
   }
   return ring;
+}
+
+/**
+ * @see BuildVectorGltfOptions.lineSmoothingIterations
+ *
+ * Chaikin corner-cutting, treating `line` as an open polyline: each pass keeps the first/last vertex
+ * as-is and replaces every edge with two points 1/4 and 3/4 along it, so a straight run of vertices is
+ * unchanged (both new points still lie exactly on the original line) while a sharp corner gets pulled
+ * into two shallower ones - after a couple of passes, effectively a rounded corner.
+ */
+function chaikinSmoothLine(line: DecodedMVTPoint[], iterations: number): DecodedMVTPoint[] {
+  let current = line;
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    if (current.length < 3) {
+      break;
+    }
+    const next: DecodedMVTPoint[] = [current[0]];
+    for (let i = 0; i < current.length - 1; i++) {
+      const p0 = current[i];
+      const p1 = current[i + 1];
+      next.push({ x: 0.75 * p0.x + 0.25 * p1.x, y: 0.75 * p0.y + 0.25 * p1.y });
+      next.push({ x: 0.25 * p0.x + 0.75 * p1.x, y: 0.25 * p0.y + 0.75 * p1.y });
+    }
+    next.push(current[current.length - 1]);
+    current = next;
+  }
+  return current;
 }
 
 /**
