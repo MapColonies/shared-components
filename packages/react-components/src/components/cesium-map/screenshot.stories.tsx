@@ -33,7 +33,7 @@ const mapViewProps: CesiumMapProps = {
 const DEMO_SIZES = {
   SMALL: { width: 150, height: 150 },
   MEDIUM: { width: 320, height: 200 },
-  LARGE: { width: 480, height: 300 },
+  LARGE: { width: 300, height: 480 },
 } as const;
 type DemoSize = keyof typeof DEMO_SIZES;
 const SIZE_KEYS = Object.keys(DEMO_SIZES) as DemoSize[];
