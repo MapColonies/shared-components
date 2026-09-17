@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { get } from 'lodash';
-import { IBaseMap, IBaseMaps, ITerrain } from '../map';
+import { IBaseMap, IBaseMaps, ITerrain, useCesiumMap } from '../map';
 import { CesiumIcon } from '../widget/cesium-icon';
 import { CesiumTool } from '../widget/cesium-tool';
 import { IWidgetProps, WidgetWrapper } from '../widget/widget-wrapper';
@@ -15,10 +15,12 @@ interface IBaseMapWidgetProps extends IWidgetProps {
 }
 
 const BaseMapComponent: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, locale, isOpen, setIsOpen }) => {
+  const mapViewer = useCesiumMap();
   const [selected, setSelected] = useState<IBaseMap>();
   const baseMapsTitle = useMemo(() => get(locale, 'BASE_MAP_TITLE') ?? 'Base Map', [locale]);
   const terrainsTitle = useMemo(() => get(locale, 'TERRAIN_TITLE') ?? 'Terrain', [locale]);
   const none = useMemo(() => get(locale, 'NONE') ?? 'None', [locale]);
+  const fallbackColor = mapViewer.scene.globe.baseColor.toCssColorString();
 
   return (
     <>
@@ -28,6 +30,7 @@ const BaseMapComponent: React.FC<IBaseMapWidgetProps> = ({ baseMaps, terrains, l
           src={selected?.thumbnail}
           title={selected?.title ?? none}
           alt="Current Map"
+          fallbackColor={fallbackColor}
         />
       </CesiumIcon>
       <CesiumTool isVisible={isOpen}>

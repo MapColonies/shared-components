@@ -281,17 +281,46 @@ const LOCALIZED_GEOCODER_OPTIONS = [
   },
 ] satisfies GeocoderOptions[];
 
-export const BaseMap: StoryFn = (args: CesiumMapProps) => {
+interface BaseMapArgs extends CesiumMapProps {
+  useWhiteSmokeGlobe?: boolean;
+}
+
+const FlyToGlobe: React.FC = () => {
+  const mapViewer = useCesiumMap();
+  useEffect(() => {
+    mapViewer.camera.setView({
+      destination: CesiumCartesian3.fromDegrees(34.9578094, 32.8178637, 3000000),
+    });
+  }, [mapViewer]);
+  return null;
+};
+
+export const BaseMap: StoryFn = (args: BaseMapArgs) => {
+  const { useWhiteSmokeGlobe, ...rest } = args;
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} terrains={terrains} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
+      <CesiumMap
+        {...rest}
+        terrains={terrains}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+        globeBaseColor={useWhiteSmokeGlobe ? CesiumColor.WHITESMOKE : undefined}
+      >
+        <FlyToGlobe />
+      </CesiumMap>
     </div>
   );
 };
 
 BaseMap.args = {
   baseMaps: BASE_MAPS,
+  useWhiteSmokeGlobe: false,
+};
+BaseMap.argTypes = {
+  useWhiteSmokeGlobe: {
+    name: 'globeBaseColor: WhiteSmoke (off = Cesium default)',
+    control: 'boolean',
+  },
 };
 
 export const ZoomedMap: StoryFn = (args: CesiumMapProps) => (
@@ -474,43 +503,3 @@ LocalizedMap.argTypes = {
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';
-
-interface GlobeBaseColorArgs extends CesiumMapProps {
-  useWhiteSmoke?: boolean;
-}
-
-const FlyToGlobe: React.FC = () => {
-  const mapViewer = useCesiumMap();
-  useEffect(() => {
-    mapViewer.camera.setView({
-      destination: CesiumCartesian3.fromDegrees(34.9578094, 32.8178637, 3000000),
-    });
-  }, [mapViewer]);
-  return null;
-};
-
-export const GlobeBaseColor: StoryFn = (args: GlobeBaseColorArgs) => {
-  const { useWhiteSmoke, ...rest } = args;
-  return (
-    <div style={mapDivStyle}>
-      <CesiumMap
-        {...rest}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-        globeBaseColor={useWhiteSmoke ? CesiumColor.WHITESMOKE : undefined}
-      >
-        <FlyToGlobe />
-      </CesiumMap>
-    </div>
-  );
-};
-
-GlobeBaseColor.args = {
-  useWhiteSmoke: false,
-};
-GlobeBaseColor.argTypes = {
-  useWhiteSmoke: {
-    name: 'globeBaseColor: WhiteSmoke (off = Cesium default)',
-    control: 'boolean',
-  },
-};
-GlobeBaseColor.storyName = 'Globe Base Color (No Basemap)';

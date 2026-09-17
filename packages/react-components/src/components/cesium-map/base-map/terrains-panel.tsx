@@ -13,6 +13,7 @@ interface TerrainsPanelProps {
 export const TerrainsPanel: React.FC<TerrainsPanelProps> = ({ title, terrains }) => {
   const [selected, setSelected] = useState<ITerrain | undefined>();
   const mapViewer = useCesiumMap();
+  const fallbackColor = mapViewer.scene.globe.baseColor.toCssColorString();
 
   useEffect(() => {
     const defaultTerrain = terrains.find((terrain: ITerrain) => terrain.isCurrent);
@@ -43,6 +44,7 @@ export const TerrainsPanel: React.FC<TerrainsPanelProps> = ({ title, terrains })
               item={terrain}
               isSelected={selected === terrain}
               onClick={() => handleItemSelection(terrain.id)}
+              fallbackColor={fallbackColor}
             />
           ))
         }

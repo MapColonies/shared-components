@@ -13,7 +13,7 @@ import {
   TerrainProvider,
   Ray,
 } from 'cesium';
-import { isNumber, isArray } from 'lodash';
+import { get, isNumber, isArray } from 'lodash';
 import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
@@ -29,6 +29,7 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
+import { withNoBasemapOption } from './no-basemap';
 import type { CesiumColor } from './proxied.types';
 import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
@@ -331,12 +332,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
 
   useEffect(() => {
-    setBaseMaps(props.baseMaps);
-    const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
+    const augmentedBaseMaps = props.baseMaps
+      ? withNoBasemapOption(props.baseMaps, get(props.locale, 'NONE') ?? 'None')
+      : undefined;
+    setBaseMaps(augmentedBaseMaps);
+    const currentMap = augmentedBaseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
-  }, [props.baseMaps, mapViewRef]);
+  }, [props.baseMaps, props.locale, mapViewRef]);
 
   useEffect(() => {
     if (mapViewRef?.layersManager) {

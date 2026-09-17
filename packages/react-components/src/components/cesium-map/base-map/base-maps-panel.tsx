@@ -13,6 +13,7 @@ interface BaseMapsPanelProps {
 export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ title, baseMaps, setCurrent }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const [selectedBaseMap, setSelectedBaseMap] = useState<IBaseMap | undefined>();
+  const fallbackColor = mapViewer.scene.globe.baseColor.toCssColorString();
 
   useEffect(() => {
     const defaultMap = baseMaps.maps.find((map: IBaseMap) => map.isCurrent);
@@ -46,6 +47,7 @@ export const BaseMapsPanel: React.FC<BaseMapsPanelProps> = ({ title, baseMaps, s
               item={map}
               isSelected={selectedBaseMap === map}
               onClick={() => handleItemSelection(map.id)}
+              fallbackColor={fallbackColor}
             />
           ))
         }
