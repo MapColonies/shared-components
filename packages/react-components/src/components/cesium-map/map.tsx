@@ -13,7 +13,7 @@ import {
   TerrainProvider,
   Ray,
 } from 'cesium';
-import { isNumber, isArray } from 'lodash';
+import { get, isNumber, isArray } from 'lodash';
 import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
@@ -24,10 +24,14 @@ import { BaseMapWidget } from './base-map/base-map-widget';
 import { DebuggerWidget } from './debug/debugger-widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
+import { resolveGlobeBaseColor } from './globe-base-color';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
+import { withNoBasemapOption } from './no-basemap';
+import type { CesiumColor } from './proxied.types';
+import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { InspectorTool } from './tools/inspector.tool';
@@ -45,6 +49,8 @@ const TWO = 2;
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
 const DEFAULT_DYNAMIC_HEIGHT_INCREMENT = 0;
+const DEFAULT_CONTEXT_OPTIONS = { webgl: {} };
+const SCREENSHOT_CONTEXT_OPTIONS = { webgl: { preserveDrawingBuffer: true } };
 
 interface ICameraPosition {
   longitude: number;
@@ -63,11 +69,14 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
+  public screenshot?: ICesiumScreenshotApi;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
   }
 }
+
+const defaultGlobeBaseColors = new WeakMap<CesiumViewer, CesiumColor>();
 
 export type MapViewState = {
   currentZoomLevel: number;
@@ -159,6 +168,8 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   geocoderPanel?: GeocoderOptions[];
   drapingLayerPredicate?: DrapingLayerPredicate;
+  screenshotEnabled?: boolean;
+  globeBaseColor?: CesiumColor;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -228,7 +239,12 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, []);
 
   const userExtend = (props as ViewerProps).extend;
-  const mergedExtend = userExtend ? (Array.isArray(userExtend) ? [...userExtend, onViewerReady] : [userExtend, onViewerReady]) : onViewerReady;
+  const userExtendList = userExtend ? (Array.isArray(userExtend) ? userExtend : [userExtend]) : [];
+  const mergedExtend = [
+    ...userExtendList,
+    ...(props.screenshotEnabled ? [CesiumScreenshotMixin] : []),
+    onViewerReady,
+  ];
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -240,6 +256,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     baseLayer: false,
+    contextOptions: props.screenshotEnabled ? SCREENSHOT_CONTEXT_OPTIONS : DEFAULT_CONTEXT_OPTIONS,
     ...(props as ViewerProps),
     extend: mergedExtend,
   };
@@ -315,18 +332,33 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
 
   useEffect(() => {
-    setBaseMaps(props.baseMaps);
-    const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
+    const augmentedBaseMaps = props.baseMaps
+      ? withNoBasemapOption(props.baseMaps, get(props.locale, 'NONE') ?? 'None')
+      : undefined;
+    setBaseMaps(augmentedBaseMaps);
+    const currentMap = augmentedBaseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
-  }, [props.baseMaps, mapViewRef]);
+  }, [props.baseMaps, props.locale, mapViewRef]);
 
   useEffect(() => {
     if (mapViewRef?.layersManager) {
       mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
     }
   }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
+
+  useEffect(() => {
+    if (!mapViewRef) return;
+    const globe = mapViewRef.scene.globe;
+    const { colorToApply, defaultToStore } = resolveGlobeBaseColor(
+      props.globeBaseColor,
+      globe.baseColor,
+      defaultGlobeBaseColors.get(mapViewRef)
+    );
+    defaultGlobeBaseColors.set(mapViewRef, defaultToStore);
+    globe.baseColor = colorToApply;
+  }, [props.globeBaseColor, mapViewRef]);
 
   useEffect(() => {
     const newTerrains =

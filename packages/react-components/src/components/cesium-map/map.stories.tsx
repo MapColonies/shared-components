@@ -1,13 +1,13 @@
 import { Feature } from 'geojson';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
-import { CesiumMap, CesiumMapProps, ITerrain } from './map';
-import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
+import { CesiumMap, CesiumMapProps, ITerrain, useCesiumMap } from './map';
+import { CesiumCartesian3, CesiumCesiumTerrainProvider, CesiumColor, CesiumSceneMode } from './proxied.types';
 
 const useTerrains = (): ITerrain[] | undefined => {
   const [terrains, setTerrains] = useState<ITerrain[] | undefined>(undefined);
@@ -281,17 +281,46 @@ const LOCALIZED_GEOCODER_OPTIONS = [
   },
 ] satisfies GeocoderOptions[];
 
-export const BaseMap: StoryFn = (args: CesiumMapProps) => {
+interface BaseMapArgs extends CesiumMapProps {
+  useWhiteSmokeGlobe?: boolean;
+}
+
+const FlyToGlobe: React.FC = () => {
+  const mapViewer = useCesiumMap();
+  useEffect(() => {
+    mapViewer.camera.setView({
+      destination: CesiumCartesian3.fromDegrees(34.9578094, 32.8178637, 3000000),
+    });
+  }, [mapViewer]);
+  return null;
+};
+
+export const BaseMap: StoryFn = (args: BaseMapArgs) => {
+  const { useWhiteSmokeGlobe, ...rest } = args;
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...args} terrains={terrains} layerManagerMetaMapping={layerManagerMetaMapping}></CesiumMap>
+      <CesiumMap
+        {...rest}
+        terrains={terrains}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+        globeBaseColor={useWhiteSmokeGlobe ? CesiumColor.WHITESMOKE : undefined}
+      >
+        <FlyToGlobe />
+      </CesiumMap>
     </div>
   );
 };
 
 BaseMap.args = {
   baseMaps: BASE_MAPS,
+  useWhiteSmokeGlobe: false,
+};
+BaseMap.argTypes = {
+  useWhiteSmokeGlobe: {
+    name: 'globeBaseColor: WhiteSmoke (off = Cesium default)',
+    control: 'boolean',
+  },
 };
 
 export const ZoomedMap: StoryFn = (args: CesiumMapProps) => (
@@ -450,6 +479,7 @@ LocalizedMap.args = {
     REMOVE: 'הסר',
     BASE_MAP_TITLE: 'מפות בסיס',
     TERRAIN_TITLE: 'פני השטח',
+    NONE: 'ללא',
   },
   /* eslint-enable @typescript-eslint/naming-convention */
   projection: Proj.WGS84,
