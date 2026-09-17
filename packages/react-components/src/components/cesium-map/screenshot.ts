@@ -140,26 +140,14 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     throw new Error('screenshot is already defined by another mixin.');
   }
 
-  let queue: Promise<unknown> = Promise.resolve();
-  const enqueue = <T,>(task: () => Promise<T>): Promise<T> => {
-    const result = queue.then(task, task);
-    queue = result.then(
-      () => undefined,
-      () => undefined
-    );
-    return result;
-  };
-
   const api: ICesiumScreenshotApi = {
-    capture: (options) => enqueue(() => renderAndCrop(viewer, options)),
+    capture: (options) => renderAndCrop(viewer, options),
     captureViewport: (options) =>
-      enqueue(() =>
-        renderAndCrop(viewer, {
-          ...options,
-          width: viewer.scene.canvas.width,
-          height: viewer.scene.canvas.height,
-        })
-      ),
+      renderAndCrop(viewer, {
+        ...options,
+        width: viewer.scene.canvas.width,
+        height: viewer.scene.canvas.height,
+      }),
   };
 
   Object.defineProperty(viewer, 'screenshot', { value: api, writable: false, configurable: false });
