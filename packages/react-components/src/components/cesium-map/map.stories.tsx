@@ -1,13 +1,13 @@
 import { Feature } from 'geojson';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import { ThemeProvider } from '@map-colonies/react-core';
 import { getValue } from '../utils/config';
 import { Proj } from '../utils/projections';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { BASE_MAPS, DEFAULT_TERRAIN_PROVIDER_URL, TERRAIN_COMBINED, TERRAIN_SRTM100 } from './helpers/constants';
-import { CesiumMap, CesiumMapProps, ITerrain } from './map';
-import { CesiumCesiumTerrainProvider, CesiumSceneMode } from './proxied.types';
+import { CesiumMap, CesiumMapProps, ITerrain, useCesiumMap } from './map';
+import { CesiumCartesian3, CesiumCesiumTerrainProvider, CesiumColor, CesiumSceneMode } from './proxied.types';
 
 const useTerrains = (): ITerrain[] | undefined => {
   const [terrains, setTerrains] = useState<ITerrain[] | undefined>(undefined);
@@ -474,3 +474,43 @@ LocalizedMap.argTypes = {
   },
 };
 LocalizedMap.storyName = 'Localized Map (ctrl+F5)';
+
+interface GlobeBaseColorArgs extends CesiumMapProps {
+  useWhiteSmoke?: boolean;
+}
+
+const FlyToGlobe: React.FC = () => {
+  const mapViewer = useCesiumMap();
+  useEffect(() => {
+    mapViewer.camera.setView({
+      destination: CesiumCartesian3.fromDegrees(34.9578094, 32.8178637, 3000000),
+    });
+  }, [mapViewer]);
+  return null;
+};
+
+export const GlobeBaseColor: StoryFn = (args: GlobeBaseColorArgs) => {
+  const { useWhiteSmoke, ...rest } = args;
+  return (
+    <div style={mapDivStyle}>
+      <CesiumMap
+        {...rest}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+        globeBaseColor={useWhiteSmoke ? CesiumColor.WHITESMOKE : undefined}
+      >
+        <FlyToGlobe />
+      </CesiumMap>
+    </div>
+  );
+};
+
+GlobeBaseColor.args = {
+  useWhiteSmoke: false,
+};
+GlobeBaseColor.argTypes = {
+  useWhiteSmoke: {
+    name: 'globeBaseColor: WhiteSmoke (off = Cesium default)',
+    control: 'boolean',
+  },
+};
+GlobeBaseColor.storyName = 'Globe Base Color (No Basemap)';

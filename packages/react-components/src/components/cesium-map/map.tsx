@@ -24,10 +24,12 @@ import { BaseMapWidget } from './base-map/base-map-widget';
 import { DebuggerWidget } from './debug/debugger-widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
+import { resolveGlobeBaseColor } from './globe-base-color';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
+import type { CesiumColor } from './proxied.types';
 import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
@@ -72,6 +74,8 @@ export class CesiumViewer extends CesiumViewerCls {
     super(container, options);
   }
 }
+
+const defaultGlobeBaseColors = new WeakMap<CesiumViewer, CesiumColor>();
 
 export type MapViewState = {
   currentZoomLevel: number;
@@ -164,6 +168,7 @@ export interface CesiumMapProps extends ViewerProps {
   geocoderPanel?: GeocoderOptions[];
   drapingLayerPredicate?: DrapingLayerPredicate;
   screenshotEnabled?: boolean;
+  globeBaseColor?: CesiumColor;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -338,6 +343,18 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
     }
   }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
+
+  useEffect(() => {
+    if (!mapViewRef) return;
+    const globe = mapViewRef.scene.globe;
+    const { colorToApply, defaultToStore } = resolveGlobeBaseColor(
+      props.globeBaseColor,
+      globe.baseColor,
+      defaultGlobeBaseColors.get(mapViewRef)
+    );
+    defaultGlobeBaseColors.set(mapViewRef, defaultToStore);
+    globe.baseColor = colorToApply;
+  }, [props.globeBaseColor, mapViewRef]);
 
   useEffect(() => {
     const newTerrains =
