@@ -24,7 +24,6 @@ import { BaseMapWidget } from './base-map/base-map-widget';
 import { DebuggerWidget } from './debug/debugger-widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder-widget';
-import { resolveGlobeBaseColor } from './globe-base-color';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
@@ -75,8 +74,6 @@ export class CesiumViewer extends CesiumViewerCls {
     super(container, options);
   }
 }
-
-const defaultGlobeBaseColors = new WeakMap<CesiumViewer, CesiumColor>();
 
 export type MapViewState = {
   currentZoomLevel: number;
@@ -235,7 +232,11 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   // In resium v1.23, cesiumElement is set asynchronously — extend is called by Cesium after the
   // viewer is fully created, making it the reliable "onReady" hook.
   const onViewerReady = useCallback((viewer: CesiumViewerCls) => {
+    if (props.globeBaseColor) {
+      viewer.scene.globe.baseColor = props.globeBaseColor;
+    }
     setMapViewRef(viewer as CesiumViewer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const userExtend = (props as ViewerProps).extend;
@@ -347,18 +348,6 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef.layersManager.setShouldOptimizedTileRequests(viewState?.shouldOptimizedTileRequests ?? false);
     }
   }, [viewState?.shouldOptimizedTileRequests, mapViewRef]);
-
-  useEffect(() => {
-    if (!mapViewRef) return;
-    const globe = mapViewRef.scene.globe;
-    const { colorToApply, defaultToStore } = resolveGlobeBaseColor(
-      props.globeBaseColor,
-      globe.baseColor,
-      defaultGlobeBaseColors.get(mapViewRef)
-    );
-    defaultGlobeBaseColors.set(mapViewRef, defaultToStore);
-    globe.baseColor = colorToApply;
-  }, [props.globeBaseColor, mapViewRef]);
 
   useEffect(() => {
     const newTerrains =

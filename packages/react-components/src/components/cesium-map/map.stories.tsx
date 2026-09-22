@@ -281,10 +281,6 @@ const LOCALIZED_GEOCODER_OPTIONS = [
   },
 ] satisfies GeocoderOptions[];
 
-interface BaseMapArgs extends CesiumMapProps {
-  useWhiteSmokeGlobe?: boolean;
-}
-
 const FlyToGlobe: React.FC = () => {
   const mapViewer = useCesiumMap();
   useEffect(() => {
@@ -295,18 +291,28 @@ const FlyToGlobe: React.FC = () => {
   return null;
 };
 
+interface BaseMapArgs extends CesiumMapProps {
+  applyWhiteSmokeGlobe?: boolean;
+}
+
+const SetGlobeColorDemo: React.FC<{ apply: boolean }> = ({ apply }) => {
+  const mapViewer = useCesiumMap();
+  useEffect(() => {
+    if (apply) {
+      mapViewer.scene.globe.baseColor = CesiumColor.WHITESMOKE;
+    }
+  }, [mapViewer, apply]);
+  return null;
+};
+
 export const BaseMap: StoryFn = (args: BaseMapArgs) => {
-  const { useWhiteSmokeGlobe, ...rest } = args;
+  const { applyWhiteSmokeGlobe, ...rest } = args;
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
-      <CesiumMap
-        {...rest}
-        terrains={terrains}
-        layerManagerMetaMapping={layerManagerMetaMapping}
-        globeBaseColor={useWhiteSmokeGlobe ? CesiumColor.WHITESMOKE : undefined}
-      >
+      <CesiumMap {...rest} terrains={terrains} layerManagerMetaMapping={layerManagerMetaMapping}>
         <FlyToGlobe />
+        <SetGlobeColorDemo apply={applyWhiteSmokeGlobe ?? false} />
       </CesiumMap>
     </div>
   );
@@ -314,11 +320,11 @@ export const BaseMap: StoryFn = (args: BaseMapArgs) => {
 
 BaseMap.args = {
   baseMaps: BASE_MAPS,
-  useWhiteSmokeGlobe: false,
+  applyWhiteSmokeGlobe: false,
 };
 BaseMap.argTypes = {
-  useWhiteSmokeGlobe: {
-    name: 'globeBaseColor: WhiteSmoke (off = Cesium default)',
+  applyWhiteSmokeGlobe: {
+    name: 'Apply WhiteSmoke globe color',
     control: 'boolean',
   },
 };
