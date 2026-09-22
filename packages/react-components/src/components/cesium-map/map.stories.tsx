@@ -291,28 +291,17 @@ const FlyToGlobe: React.FC = () => {
   return null;
 };
 
-interface BaseMapArgs extends CesiumMapProps {
-  applyWhiteSmokeGlobe?: boolean;
-}
-
-const SetGlobeColorDemo: React.FC<{ apply: boolean }> = ({ apply }) => {
-  const mapViewer = useCesiumMap();
-  useEffect(() => {
-    if (apply) {
-      mapViewer.scene.globe.baseColor = CesiumColor.WHITESMOKE;
-    }
-  }, [mapViewer, apply]);
-  return null;
-};
-
-export const BaseMap: StoryFn = (args: BaseMapArgs) => {
-  const { applyWhiteSmokeGlobe, ...rest } = args;
+export const BaseMap: StoryFn = (args: CesiumMapProps) => {
   const terrains = useTerrains();
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...rest} terrains={terrains} layerManagerMetaMapping={layerManagerMetaMapping}>
+      <CesiumMap
+        {...args}
+        terrains={terrains}
+        layerManagerMetaMapping={layerManagerMetaMapping}
+        globeBaseColor={CesiumColor.WHITESMOKE}
+      >
         <FlyToGlobe />
-        <SetGlobeColorDemo apply={applyWhiteSmokeGlobe ?? false} />
       </CesiumMap>
     </div>
   );
@@ -320,13 +309,6 @@ export const BaseMap: StoryFn = (args: BaseMapArgs) => {
 
 BaseMap.args = {
   baseMaps: BASE_MAPS,
-  applyWhiteSmokeGlobe: false,
-};
-BaseMap.argTypes = {
-  applyWhiteSmokeGlobe: {
-    name: 'Apply WhiteSmoke globe color',
-    control: 'boolean',
-  },
 };
 
 export const ZoomedMap: StoryFn = (args: CesiumMapProps) => (
