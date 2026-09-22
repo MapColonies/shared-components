@@ -4,6 +4,8 @@ import { IBaseMaps } from '../map';
 export const DEFAULT_TERRAIN_PROVIDER_URL = getValue('GLOBAL', 'DEFAULT_TERRAIN_PROVIDER_URL');
 export const TERRAIN_SRTM100 = getValue('GLOBAL', 'TERRAIN_SRTM100');
 export const TERRAIN_COMBINED = getValue('GLOBAL', 'TERRAIN_COMBINED');
+export const COPC_SAMPLE_URL_AUTZEN = getValue('GLOBAL', 'COPC_3D_MODEL_AUTZEN');
+export const COPC_SAMPLE_URL_L0026 = getValue('GLOBAL', 'COPC_3D_MODEL_L0026');
 
 export const BASE_MAPS: IBaseMaps = {
   maps: [
