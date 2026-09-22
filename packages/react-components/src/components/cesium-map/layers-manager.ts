@@ -327,15 +327,6 @@ class LayerManager {
      *
      *  A simple workaround would be adding a transparent layer as the very first layer at all times,
      *  so that we ensure the rectangle will always be affective.
-     *
-     *  The same "only active layer" condition also happens whenever the base map has no raster
-     *  layers configured at all (an intentional "no basemap" state) and a consumer then adds its
-     *  own rectangle-bound layer as a `CesiumMap` child — that child becomes Cesium's base layer
-     *  and its rectangle gets ignored the same way, so it needs the same transparent-layer guard.
-     *
-     *  This "no basemap" requirement is independent of the optimization flag — recorded here so
-     *  `setShouldOptimizedTileRequests` knows not to drop the transparent layer on `false` while
-     *  it's still needed for this reason.
      */
     this.needsWorldwideTransparentLayer = requiresWorldwideTransparentLayer(sortedBaseMapLayers.length);
 
