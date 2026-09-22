@@ -12,7 +12,17 @@ export interface ICaptureOptions extends ICaptureDimensions {
   waitForTiles?: boolean;
 }
 
-export interface ICenteredCropRegion {
+export interface ICesiumScreenshotApi {
+  capture(options: ICaptureOptions): Promise<Blob>;
+  captureViewport(options?: Omit<ICaptureOptions, 'width' | 'height'>): Promise<Blob>;
+  showCapturePreview(dimensions: ICaptureDimensions): void;
+  hideCapturePreview(): void;
+}
+
+const DEFAULT_FORMAT = 'image/png';
+const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
+
+interface ICenteredCropRegion {
   x: number;
   y: number;
   width: number;
@@ -20,15 +30,7 @@ export interface ICenteredCropRegion {
   fits: boolean;
 }
 
-export interface ICesiumScreenshotApi {
-  capture(options: ICaptureOptions): Promise<Blob>;
-  captureViewport(options?: Omit<ICaptureOptions, 'width' | 'height'>): Promise<Blob>;
-}
-
-const DEFAULT_FORMAT = 'image/png';
-const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
-
-export const calculateCenteredCropRegion = (
+const calculateCenteredCropRegion = (
   sourceWidth: number,
   sourceHeight: number,
   targetWidth: number,
@@ -135,10 +137,133 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
   });
 };
 
+const OVERLAY_DIM_BACKGROUND = 'rgba(0, 0, 0, 0.45)';
+const OVERLAY_RECT_BORDER = '2px dashed #fff';
+const OVERLAY_RECT_SHADOW = '0 0 0 1px rgba(0, 0, 0, 0.6)';
+const OVERLAY_LABEL_BACKGROUND = 'rgba(0, 0, 0, 0.6)';
+
+interface ICapturePreviewElements {
+  root: HTMLDivElement;
+  dimTop: HTMLDivElement;
+  dimBottom: HTMLDivElement;
+  dimLeft: HTMLDivElement;
+  dimRight: HTMLDivElement;
+  rect: HTMLDivElement;
+  label: HTMLDivElement;
+}
+
+interface ICapturePreview extends ICapturePreviewElements {
+  resizeObserver: ResizeObserver;
+  dimensions: ICaptureDimensions;
+}
+
+const createCapturePreviewElements = (): ICapturePreviewElements => {
+  const root = document.createElement('div');
+  root.style.cssText = 'position:absolute; inset:0; pointer-events:none; overflow:hidden;';
+
+  const createDim = (): HTMLDivElement => {
+    const dim = document.createElement('div');
+    dim.style.position = 'absolute';
+    dim.style.backgroundColor = OVERLAY_DIM_BACKGROUND;
+    root.appendChild(dim);
+    return dim;
+  };
+
+  const rect = document.createElement('div');
+  rect.style.cssText = `position:absolute; box-sizing:border-box; border:${OVERLAY_RECT_BORDER}; box-shadow:${OVERLAY_RECT_SHADOW};`;
+  root.appendChild(rect);
+
+  const label = document.createElement('div');
+  label.style.cssText = `position:absolute; top:4px; left:50%; transform:translateX(-50%); padding:2px 6px; background-color:${OVERLAY_LABEL_BACKGROUND}; color:#fff; font-size:11px; border-radius:2px; white-space:nowrap;`;
+  rect.appendChild(label);
+
+  return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label };
+};
+
 export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
   if (Object.prototype.hasOwnProperty.call(viewer, 'screenshot')) {
     throw new Error('screenshot is already defined by another mixin.');
   }
+
+  let preview: ICapturePreview | null = null;
+
+  const positionCapturePreview = (): void => {
+    if (!preview || viewer.isDestroyed()) {
+      return;
+    }
+    const canvas = viewer.scene?.canvas;
+    if (!canvas) {
+      return;
+    }
+    const pixelRatio = canvas.clientWidth > 0 ? canvas.width / canvas.clientWidth : 1;
+    const region = calculateCenteredCropRegion(
+      canvas.width,
+      canvas.height,
+      preview.dimensions.width,
+      preview.dimensions.height
+    );
+    const left = region.x / pixelRatio;
+    const top = region.y / pixelRatio;
+    const width = region.width / pixelRatio;
+    const height = region.height / pixelRatio;
+
+    preview.rect.style.left = `${left}px`;
+    preview.rect.style.top = `${top}px`;
+    preview.rect.style.width = `${width}px`;
+    preview.rect.style.height = `${height}px`;
+    preview.label.textContent = `${preview.dimensions.width}×${preview.dimensions.height}`;
+
+    preview.dimTop.style.left = '0';
+    preview.dimTop.style.top = '0';
+    preview.dimTop.style.right = '0';
+    preview.dimTop.style.height = `${top}px`;
+
+    preview.dimBottom.style.left = '0';
+    preview.dimBottom.style.top = `${top + height}px`;
+    preview.dimBottom.style.right = '0';
+    preview.dimBottom.style.bottom = '0';
+
+    preview.dimLeft.style.left = '0';
+    preview.dimLeft.style.top = `${top}px`;
+    preview.dimLeft.style.width = `${left}px`;
+    preview.dimLeft.style.height = `${height}px`;
+
+    preview.dimRight.style.left = `${left + width}px`;
+    preview.dimRight.style.top = `${top}px`;
+    preview.dimRight.style.right = '0';
+    preview.dimRight.style.height = `${height}px`;
+  };
+
+  const showCapturePreview = (dimensions: ICaptureDimensions): void => {
+    if (viewer.isDestroyed()) {
+      return;
+    }
+    if (!preview) {
+      const elements = createCapturePreviewElements();
+      viewer.container.appendChild(elements.root);
+      const resizeObserver = new ResizeObserver(() => positionCapturePreview());
+      resizeObserver.observe(viewer.container);
+      preview = { ...elements, resizeObserver, dimensions };
+    } else {
+      preview.dimensions = dimensions;
+    }
+    positionCapturePreview();
+  };
+
+  const hideCapturePreview = (): void => {
+    if (!preview) {
+      return;
+    }
+    preview.resizeObserver.disconnect();
+    preview.root.remove();
+    preview = null;
+  };
+
+  const originalDestroy = viewer.destroy.bind(viewer);
+  viewer.destroy = ((): void => {
+    hideCapturePreview();
+    originalDestroy();
+  }) as typeof viewer.destroy;
 
   const api: ICesiumScreenshotApi = {
     capture: (options) => renderAndCrop(viewer, options),
@@ -148,6 +273,8 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
         width: viewer.scene.canvas.width,
         height: viewer.scene.canvas.height,
       }),
+    showCapturePreview,
+    hideCapturePreview,
   };
 
   Object.defineProperty(viewer, 'screenshot', { value: api, writable: false, configurable: false });

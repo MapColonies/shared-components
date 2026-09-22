@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import { BASE_MAPS } from './helpers/constants';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from './map';
-import { calculateCenteredCropRegion } from './screenshot';
 
 export default {
   title: 'Cesium Map/Screenshot',
@@ -37,61 +36,6 @@ const DEMO_SIZES = {
 } as const;
 type DemoSize = keyof typeof DEMO_SIZES;
 const SIZE_KEYS = Object.keys(DEMO_SIZES) as DemoSize[];
-
-interface Rect {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-const CaptureRectangleOverlay: React.FC<{ dimensions: { width: number; height: number } }> = ({
-  dimensions,
-}) => {
-  const mapViewer = useCesiumMap();
-  const [rect, setRect] = useState<Rect | null>(null);
-
-  useEffect(() => {
-    const canvas = mapViewer.canvas;
-
-    const update = (): void => {
-      const pixelRatio = canvas.clientWidth > 0 ? canvas.width / canvas.clientWidth : 1;
-      const region = calculateCenteredCropRegion(
-        canvas.clientWidth,
-        canvas.clientHeight,
-        dimensions.width / pixelRatio,
-        dimensions.height / pixelRatio
-      );
-      setRect({ left: region.x, top: region.y, width: region.width, height: region.height });
-    };
-
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(canvas);
-    return (): void => observer.disconnect();
-  }, [mapViewer, dimensions.width, dimensions.height]);
-
-  if (!rect) {
-    return null;
-  }
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-        border: '2px dashed #fff',
-        boxShadow: '0 0 0 2000px rgba(0, 0, 0, 0.45)',
-        pointerEvents: 'none',
-        zIndex: 1000,
-        boxSizing: 'border-box',
-      }}
-    />
-  );
-};
 
 const panelStyle: React.CSSProperties = {
   position: 'absolute',
@@ -138,6 +82,17 @@ const ScreenshotDemoPanel: React.FC = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!mapViewer.screenshot) {
+      return;
+    }
+    if (isComposing) {
+      mapViewer.screenshot.showCapturePreview(DEMO_SIZES[selectedSize]);
+    } else {
+      mapViewer.screenshot.hideCapturePreview();
+    }
+  }, [mapViewer, isComposing, selectedSize]);
 
   if (!mapViewer.screenshot) {
     return (
@@ -187,7 +142,6 @@ const ScreenshotDemoPanel: React.FC = () => {
 
   return (
     <>
-      {isComposing && <CaptureRectangleOverlay dimensions={DEMO_SIZES[selectedSize]} />}
       <div style={panelStyle}>
         <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
           {SIZE_KEYS.map((size) => {
