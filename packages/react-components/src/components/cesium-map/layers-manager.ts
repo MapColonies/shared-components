@@ -22,10 +22,19 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
+import {
+  RCesiumOSMLayerOptions,
+  RCesiumWMSLayerOptions,
+  RCesiumWMTSLayerOptions,
+  RCesiumXYZLayerOptions
+} from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
+import {
+  requiresWorldwideTransparentLayer,
+  shouldRemoveTransparentLayerOnOptimizationDisable,
+} from './optimized-tile-requests';
 import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 
 const INC = 1;
@@ -200,6 +209,7 @@ class LayerManager {
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
+  private needsWorldwideTransparentLayer = false;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
   private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
@@ -301,7 +311,7 @@ class LayerManager {
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
-    const sortedBaseMapLayers = baseMap.baseRasterLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
+    const sortedBaseMapLayers = [...baseMap.baseRasterLayers].sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });
@@ -322,10 +332,14 @@ class LayerManager {
      *  layers configured at all (an intentional "no basemap" state) and a consumer then adds its
      *  own rectangle-bound layer as a `CesiumMap` child — that child becomes Cesium's base layer
      *  and its rectangle gets ignored the same way, so it needs the same transparent-layer guard.
+     *
+     *  This "no basemap" requirement is independent of the optimization flag — recorded here so
+     *  `setShouldOptimizedTileRequests` knows not to drop the transparent layer on `false` while
+     *  it's still needed for this reason.
      */
+    this.needsWorldwideTransparentLayer = requiresWorldwideTransparentLayer(sortedBaseMapLayers.length);
 
-    if (this.shouldOptimizedTileRequests || sortedBaseMapLayers.length === 0) {
-      this.removeLayer(TRANSPARENT_LAYER_ID);
+    if (this.shouldOptimizedTileRequests || this.needsWorldwideTransparentLayer) {
       this.addTransparentImageryProvider();
     }
   }
@@ -570,6 +584,8 @@ class LayerManager {
     const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
     const rectangle = new Rectangle(-Math.PI, -Math.PI / 2, Math.PI, Math.PI / 2);
 
+    const staleLayer = this.findLayerById(TRANSPARENT_LAYER_ID);
+
     void SingleTileImageryProvider.fromUrl(transparentTileUrl, { rectangle }).then((provider) => {
       const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(provider, 0);
 
@@ -579,6 +595,10 @@ class LayerManager {
       };
       set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
       (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+
+      if (staleLayer) {
+        this.mapViewer.imageryLayers.remove(staleLayer, true);
+      }
       this.layerUpdated.raiseEvent(transparentLayerMeta);
     });
   }
@@ -616,14 +636,15 @@ class LayerManager {
 
     if (shouldOptimize) {
       this.bindRelevancyListeners();
-      this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
       this.refreshRelevancyState();
       return;
     }
 
     this.unbindRelevancyListeners();
-    this.removeLayer(TRANSPARENT_LAYER_ID);
+    if (shouldRemoveTransparentLayerOnOptimizationDisable(this.needsWorldwideTransparentLayer)) {
+      this.removeLayer(TRANSPARENT_LAYER_ID);
+    }
     this.restoreAllLayersVisibility();
     this.clearLayersRelevancy();
   }
