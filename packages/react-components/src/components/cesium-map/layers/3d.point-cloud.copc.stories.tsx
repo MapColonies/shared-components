@@ -100,12 +100,12 @@ CopcPointCloudColorModes.storyName = 'Color Modes';
 
 export const CopcPointCloudWithPicking: StoryFn = (args: Record<string, unknown>) => {
   const [pickedPoint, setPickedPoint] = useState<CopcPointInspection | undefined>(undefined);
-
+  const hoverPixelSize = args.hoverPixelSize as number | undefined;
   return (
     <div style={mapDivStyle}>
       <CesiumMap {...args} layerManagerMetaMapping={layerManagerMetaMapping}>
         <BacgroundChanger />
-        <CesiumCopcPointCloud url={COPC_SAMPLE_URL} colorMode="classification" onPointPicked={setPickedPoint} />
+        <CesiumCopcPointCloud url={COPC_SAMPLE_URL} colorMode="classification" onPointPicked={setPickedPoint} hoverPixelSize={hoverPixelSize} />
       </CesiumMap>
       <div
         style={{
@@ -123,10 +123,12 @@ export const CopcPointCloudWithPicking: StoryFn = (args: Record<string, unknown>
         }}
       >
         {pickedPoint === undefined ? (
-          <span>Click a point to inspect it</span>
+          <>
+            <div>Move the mouse over a point to enlarge it</div>
+            <div>Click a point to inspect it</div>
+          </>
         ) : (
           <>
-            {console.log('******** pickedPoint *****', pickedPoint)}
             <div>lon: {pickedPoint.longitude.toFixed(6)}</div>
             <div>lat: {pickedPoint.latitude.toFixed(6)}</div>
             <div>height: {pickedPoint.height.toFixed(2)}m</div>
@@ -142,5 +144,10 @@ export const CopcPointCloudWithPicking: StoryFn = (args: Record<string, unknown>
 CopcPointCloudWithPicking.args = {
   baseMaps: BASE_MAPS,
   zoom: 3,
+};
+CopcPointCloudWithPicking.argTypes = {
+  hoverPixelSize: {
+    control: { type: 'range', min: 3, max: 30 },
+  },
 };
 CopcPointCloudWithPicking.storyName = 'Interactive Point Picking';
