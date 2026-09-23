@@ -43,10 +43,11 @@ const copcFootprint = {
     ],
   ],
 };
+
 // const COPC_SAMPLE_URL = 'https://s3.amazonaws.com/hobu-lidar/sofi.copc.laz';
+
 // const COPC_SAMPLE_URL = COPC_SAMPLE_URL_L0026;
 // const copcFootprint = {
-
 //   "type": "Polygon",
 //   "coordinates": [
 //     [
