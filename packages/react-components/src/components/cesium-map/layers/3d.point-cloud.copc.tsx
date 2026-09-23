@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { PointPrimitive, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
 import { CopcCesiumLayer, CopcCesiumLayerOptions, isCopcPointPickId } from '@frillab/copc-adapter/cesium';
+import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
 export interface ICesiumCopcPointCloud extends CopcCesiumLayerOptions {
@@ -8,9 +9,10 @@ export interface ICesiumCopcPointCloud extends CopcCesiumLayerOptions {
   onError?: (error: unknown) => void;
   /** Pixel size applied to the point under the cursor. Defaults to twice its current size. */
   hoverPixelSize?: number;
+  meta?: ICesium3DModelMeta;
 }
 
-export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady, onError, hoverPixelSize, ...options }) => {
+export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady, onError, hoverPixelSize, meta, ...options }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const layerRef = useRef<CopcCesiumLayer | null>(null);
   const onReadyRef = useRef(onReady);
@@ -19,11 +21,14 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
   onErrorRef.current = onError;
   const hoverPixelSizeRef = useRef(hoverPixelSize);
   hoverPixelSizeRef.current = hoverPixelSize;
+  const metaRef = useRef(meta);
+  metaRef.current = meta;
 
   useEffect(() => {
     const layer = new CopcCesiumLayer(options);
     layerRef.current = layer;
     let isCancelled = false;
+    let isModelRegistered = false;
     let hoverHandler: ScreenSpaceEventHandler | undefined;
     let hoveredPrimitive: PointPrimitive | undefined;
     let hoveredOriginalPixelSize: number | undefined;
@@ -47,6 +52,10 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
           return;
         }
         layer.attachTo(mapViewer);
+        if (metaRef.current !== undefined) {
+          mapViewer.layersManager?.addModel({ tileset: layer, meta: metaRef.current });
+          isModelRegistered = true;
+        }
         onReadyRef.current?.(layer);
 
         hoverHandler = new ScreenSpaceEventHandler(mapViewer.scene.canvas);
@@ -81,6 +90,12 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
 
     return () => {
       isCancelled = true;
+      if (isModelRegistered) {
+        const modelId = getLayerIdFromMeta(metaRef.current);
+        if (modelId !== undefined) {
+          mapViewer.layersManager?.removeModel(modelId);
+        }
+      }
       restoreHoveredPoint();
       hoverHandler?.destroy();
       layer.destroy();
