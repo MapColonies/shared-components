@@ -1,4 +1,5 @@
 export * from './3d.tileset';
+export * from './3d.point-cloud.copc';
 export * from './geojson.layer';
 export * from './imagery.layer';
 export * from './wms.layer';
