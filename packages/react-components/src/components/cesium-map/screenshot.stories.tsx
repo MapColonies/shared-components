@@ -162,7 +162,7 @@ const ScreenshotDemoPanel: React.FC = () => {
                     <span style={{ color: '#888' }}>empty</span>
                   )}
                 </div>
-                <div>{`${size} (${dims.width}×${dims.height})`}</div>
+                <div style={{ textAlign: 'center' }}>{`${size} (${dims.width}×${dims.height})`}</div>
                 {previewUrl && (
                   <button
                     type="button"
