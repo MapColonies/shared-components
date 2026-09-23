@@ -2,7 +2,33 @@ import { Cesium3DTileset } from 'cesium';
 import { createDomElement } from '../utils/dom';
 import type { CesiumViewer } from './map';
 
+import '@map-colonies/react-core/dist/circular-progress/styles';
 import './screenshot.css';
+
+const SPINNER_SIZE_PX = 28;
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+const createIndeterminateSpinner = (sizePx: number): HTMLDivElement => {
+  const wrapper = createDomElement('div', 'rmwc-circular-progress rmwc-circular-progress--indeterminate');
+  wrapper.style.fontSize = `${sizePx}px`;
+  wrapper.setAttribute('role', 'progressbar');
+  wrapper.setAttribute('aria-valuemin', '0');
+  wrapper.setAttribute('aria-valuemax', '1');
+
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+  svg.setAttribute('class', 'rmwc-circular-progress__circle');
+  svg.setAttribute('viewBox', `0 0 ${sizePx} ${sizePx}`);
+
+  const circle = document.createElementNS(SVG_NAMESPACE, 'circle');
+  circle.setAttribute('class', 'rmwc-circular-progress__path');
+  circle.setAttribute('cx', String(sizePx / 2));
+  circle.setAttribute('cy', String(sizePx / 2));
+  circle.setAttribute('r', String(sizePx / 2.4));
+
+  svg.appendChild(circle);
+  wrapper.appendChild(svg);
+  return wrapper;
+};
 
 export interface ICaptureDimensions {
   width: number;
@@ -197,6 +223,7 @@ const createCapturePreviewElements = (): ICapturePreviewElements => {
   rect.appendChild(label);
 
   const spinner = createDomElement('div', 'screenshot-capture-spinner');
+  spinner.appendChild(createIndeterminateSpinner(SPINNER_SIZE_PX));
   rect.appendChild(spinner);
 
   return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label, spinner };
