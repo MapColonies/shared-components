@@ -24,6 +24,17 @@ export interface ICesiumScreenshotApi {
 const DEFAULT_FORMAT = 'image/png';
 const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
 
+const createDomElement = <K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  className?: string
+): HTMLElementTagNameMap[K] => {
+  const element = document.createElement(tagName);
+  if (className) {
+    element.className = className;
+  }
+  return element;
+};
+
 interface ICenteredCropRegion {
   x: number;
   y: number;
@@ -102,7 +113,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
     );
   }
 
-  const targetCanvas = document.createElement('canvas');
+  const targetCanvas = createDomElement('canvas');
   targetCanvas.width = options.width;
   targetCanvas.height = options.height;
   const targetContext = targetCanvas.getContext('2d');
@@ -155,22 +166,18 @@ interface ICapturePreview extends ICapturePreviewElements {
 }
 
 const createCapturePreviewElements = (): ICapturePreviewElements => {
-  const root = document.createElement('div');
-  root.className = 'screenshot-capture-overlay';
+  const root = createDomElement('div', 'screenshot-capture-overlay');
 
   const createDim = (): HTMLDivElement => {
-    const dim = document.createElement('div');
-    dim.className = 'screenshot-capture-dim';
+    const dim = createDomElement('div', 'screenshot-capture-dim');
     root.appendChild(dim);
     return dim;
   };
 
-  const rect = document.createElement('div');
-  rect.className = 'screenshot-capture-rect';
+  const rect = createDomElement('div', 'screenshot-capture-rect');
   root.appendChild(rect);
 
-  const label = document.createElement('div');
-  label.className = 'screenshot-capture-label';
+  const label = createDomElement('div', 'screenshot-capture-label');
   rect.appendChild(label);
 
   return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label };
