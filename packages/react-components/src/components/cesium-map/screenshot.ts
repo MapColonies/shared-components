@@ -1,3 +1,4 @@
+import { createDomElement } from '../utils/dom';
 import type { CesiumViewer } from './map';
 
 import './screenshot.css';
@@ -23,17 +24,6 @@ export interface ICesiumScreenshotApi {
 
 const DEFAULT_FORMAT = 'image/png';
 const WAIT_FOR_TILES_TIMEOUT_MS = 5000;
-
-const createDomElement = <K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  className?: string
-): HTMLElementTagNameMap[K] => {
-  const element = document.createElement(tagName);
-  if (className) {
-    element.className = className;
-  }
-  return element;
-};
 
 interface ICenteredCropRegion {
   x: number;
