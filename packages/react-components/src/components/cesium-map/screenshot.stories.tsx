@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
+import { getValue } from '../utils/config';
 import { BASE_MAPS } from './helpers/constants';
+import { Cesium3DTileset } from './layers/3d.tileset';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from './map';
 
 export default {
@@ -230,6 +232,11 @@ const ScreenshotDemoPanel: React.FC = () => {
 export const Screenshot: StoryFn<CesiumMapProps> = (args) => (
   <div style={mapDivStyle}>
     <CesiumMap {...mapViewProps} {...args}>
+      <Cesium3DTileset
+        url={getValue('GLOBAL', '3D_MODEL')}
+        meta={{ id: '1111111', layerRecord: { productName: 'Model A' } }}
+        isZoomTo={true}
+      />
       <ScreenshotDemoPanel />
     </CesiumMap>
   </div>
