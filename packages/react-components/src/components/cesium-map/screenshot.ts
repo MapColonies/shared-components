@@ -72,21 +72,21 @@ const waitForTilesToSettle = (viewer: CesiumViewer, timeoutMs: number): Promise<
 
 const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Promise<Blob> => {
   if (viewer.isDestroyed()) {
-    throw new Error('capture: Cesium viewer is not available');
+    throw new Error('[Shared-Components][CesiumCapture]: Cesium viewer is not available');
   }
   const sourceCanvas = viewer.scene?.canvas;
   if (!sourceCanvas) {
-    throw new Error('capture: Cesium scene canvas is not available');
+    throw new Error('[Shared-Components][CesiumCapture]: Cesium scene canvas is not available');
   }
   if (options.width <= 0 || options.height <= 0) {
-    throw new Error(`capture: invalid dimensions ${options.width}x${options.height}`);
+    throw new Error(`[Shared-Components][CesiumCapture]: invalid dimensions ${options.width}x${options.height}`);
   }
 
   if (options.waitForTiles) {
     await waitForTilesToSettle(viewer, WAIT_FOR_TILES_TIMEOUT_MS);
   }
 
-  viewer.scene.render();
+  viewer.scene.render(); // ALEX: worth to check if this is needed, but it seems to be required to get the latest frame rendered before cropping
 
   const crop = calculateCenteredCropRegion(
     sourceCanvas.width,
@@ -96,7 +96,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
   );
   if (!crop.fits) {
     throw new Error(
-      `capture: requested capture size ${options.width}x${options.height} exceeds the current viewport ${sourceCanvas.width}x${sourceCanvas.height}`
+      `[Shared-Components][CesiumCapture]: requested capture size ${options.width}x${options.height} exceeds the current viewport ${sourceCanvas.width}x${sourceCanvas.height}`
     );
   }
 
@@ -105,7 +105,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
   targetCanvas.height = options.height;
   const targetContext = targetCanvas.getContext('2d');
   if (!targetContext) {
-    throw new Error('capture: could not create 2D context for the target canvas');
+    throw new Error('[Shared-Components][CesiumCapture]: could not create 2D context for the target canvas');
   }
 
   try {
@@ -118,7 +118,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
       options.height);
   } catch (err) {
     throw new Error(
-      `capture: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`
+      `[Shared-Components][CesiumCapture]: failed to draw source canvas (possibly tainted by cross-origin imagery): ${String(err)}`
     );
   }
 
@@ -126,7 +126,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
     targetCanvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error('capture: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
+          reject(new Error('[Shared-Components][CesiumCapture]: canvas.toBlob() returned null — canvas may be tainted by cross-origin imagery'));
           return;
         }
         resolve(blob);
@@ -182,7 +182,7 @@ const createCapturePreviewElements = (): ICapturePreviewElements => {
 
 export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
   if (Object.prototype.hasOwnProperty.call(viewer, 'screenshot')) {
-    throw new Error('screenshot is already defined by another mixin.');
+    throw new Error('[Shared-Components][CesiumCapture]: screenshot is already defined by another mixin');
   }
 
   let preview: ICapturePreview | null = null;
