@@ -76,6 +76,7 @@ const ScreenshotDemoPanel: React.FC = () => {
   const [isComposing, setIsComposing] = useState(false);
   const [selectedSize, setSelectedSize] = useState<DemoSize>('SMALL');
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isContentLoading, setIsContentLoading] = useState(false);
   const [images, setImages] = useState<Partial<Record<DemoSize, string>>>({});
 
   useEffect(() => {
@@ -95,6 +96,13 @@ const ScreenshotDemoPanel: React.FC = () => {
       mapViewer.screenshot.stopCapturePreview();
     }
   }, [mapViewer, isComposing, selectedSize]);
+
+  useEffect(() => {
+    if (!mapViewer.screenshot) {
+      return;
+    }
+    return mapViewer.screenshot.onLoadingChange(setIsContentLoading);
+  }, [mapViewer]);
 
   if (!mapViewer.screenshot) {
     return (
@@ -124,7 +132,7 @@ const ScreenshotDemoPanel: React.FC = () => {
     }
     setIsCapturing(true);
     try {
-      const blob = await mapViewer.screenshot.capture(DEMO_SIZES[selectedSize]);
+      const blob = await mapViewer.screenshot.capture({ ...DEMO_SIZES[selectedSize], waitForTiles: true });
       setImages((prev) => {
         const next = { ...prev };
         const previousUrl = next[selectedSize];
@@ -211,11 +219,19 @@ const ScreenshotDemoPanel: React.FC = () => {
         <div style={{ display: 'flex', gap: 8 }}>
           {isComposing ? (
             <>
-              <button type="button" disabled={isCapturing} onClick={(): void => setIsComposing(false)}>
+              <button
+                type="button"
+                disabled={isCapturing || isContentLoading}
+                onClick={(): void => setIsComposing(false)}
+              >
                 Cancel
               </button>
-              <button type="button" disabled={isCapturing} onClick={(): void => void handleCapture()}>
-                {isCapturing ? 'Capturing…' : 'Capture'}
+              <button
+                type="button"
+                disabled={isCapturing || isContentLoading}
+                onClick={(): void => void handleCapture()}
+              >
+                {isCapturing ? 'Capturing…' : isContentLoading ? 'Loading tiles…' : 'Capture'}
               </button>
             </>
           ) : (

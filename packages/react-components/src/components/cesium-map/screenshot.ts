@@ -1,3 +1,4 @@
+import { Cesium3DTileset } from 'cesium';
 import { createDomElement } from '../utils/dom';
 import type { CesiumViewer } from './map';
 
@@ -15,11 +16,15 @@ export interface ICaptureOptions extends ICaptureDimensions {
   waitForTiles?: boolean;
 }
 
+export type ScreenshotLoadingListener = (isLoading: boolean) => void;
+
 export interface ICesiumScreenshotApi {
   capture(options: ICaptureOptions): Promise<Blob>;
   captureViewport(options?: Omit<ICaptureOptions, 'width' | 'height'>): Promise<Blob>;
   startCapturePreview(dimensions: ICaptureDimensions): void;
   stopCapturePreview(): void;
+  isContentLoading(): boolean;
+  onLoadingChange(listener: ScreenshotLoadingListener): () => void;
 }
 
 const DEFAULT_FORMAT = 'image/png';
@@ -50,9 +55,31 @@ const calculateCenteredCropRegion = (
   };
 };
 
-const waitForTilesToSettle = (viewer: CesiumViewer, timeoutMs: number): Promise<void> => {
+const collectActiveTilesets = (viewer: CesiumViewer): Cesium3DTileset[] => {
+  const tilesets: Cesium3DTileset[] = [];
+  const { primitives } = viewer.scene;
+  for (let i = 0; i < primitives.length; i++) {
+    const primitive: unknown = primitives.get(i);
+    if (primitive instanceof Cesium3DTileset && !primitive.isDestroyed()) {
+      tilesets.push(primitive);
+    }
+  }
+  return tilesets;
+};
+
+const isScreenshotContentLoading = (viewer: CesiumViewer): boolean => {
+  if (viewer.isDestroyed()) {
+    return false;
+  }
+  if (!viewer.scene.globe.tilesLoaded) {
+    return true;
+  }
+  return collectActiveTilesets(viewer).some((tileset) => !tileset.tilesLoaded);
+};
+
+const waitForScreenshotContent = (viewer: CesiumViewer, timeoutMs: number): Promise<void> => {
   return new Promise((resolve) => {
-    if (viewer.scene.globe.tilesLoaded) {
+    if (!isScreenshotContentLoading(viewer)) {
       resolve();
       return;
     }
@@ -64,11 +91,9 @@ const waitForTilesToSettle = (viewer: CesiumViewer, timeoutMs: number): Promise<
       clearTimeout(timer);
       resolve();
     };
-    const removeListener = viewer.scene.globe.tileLoadProgressEvent.addEventListener(
-      (pendingRequests: number) => {
-        if (pendingRequests === 0) finish();
-      }
-    );
+    const removeListener = viewer.scene.postRender.addEventListener(() => {
+      if (!isScreenshotContentLoading(viewer)) finish();
+    });
     const timer = setTimeout(finish, timeoutMs);
   });
 };
@@ -86,7 +111,7 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
   }
 
   if (options.waitForTiles) {
-    await waitForTilesToSettle(viewer, WAIT_FOR_TILES_TIMEOUT_MS);
+    await waitForScreenshotContent(viewer, WAIT_FOR_TILES_TIMEOUT_MS);
   }
 
   viewer.scene.render(); // ALEX: worth to check if this is needed, but it seems to be required to get the latest frame rendered before cropping
@@ -148,6 +173,7 @@ interface ICapturePreviewElements {
   dimRight: HTMLDivElement;
   rect: HTMLDivElement;
   label: HTMLDivElement;
+  spinner: HTMLDivElement;
 }
 
 interface ICapturePreview extends ICapturePreviewElements {
@@ -170,7 +196,10 @@ const createCapturePreviewElements = (): ICapturePreviewElements => {
   const label = createDomElement('div', 'screenshot-capture-label');
   rect.appendChild(label);
 
-  return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label };
+  const spinner = createDomElement('div', 'screenshot-capture-spinner');
+  rect.appendChild(spinner);
+
+  return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label, spinner };
 };
 
 export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
@@ -179,6 +208,51 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
   }
 
   let preview: ICapturePreview | null = null;
+  let isLoadingTracked = false;
+  let removePostRenderListener: (() => void) | null = null;
+  const loadingListeners = new Set<ScreenshotLoadingListener>();
+
+  const updatePreviewSpinner = (isLoading: boolean): void => {
+    preview?.spinner.classList.toggle('screenshot-capture-spinner--visible', isLoading);
+  };
+
+  const checkLoadingChanged = (): void => {
+    const nextIsLoading = isScreenshotContentLoading(viewer);
+    if (nextIsLoading !== isLoadingTracked) {
+      isLoadingTracked = nextIsLoading;
+      loadingListeners.forEach((listener) => listener(isLoadingTracked));
+    }
+    updatePreviewSpinner(isLoadingTracked);
+  };
+
+  const ensureLoadingTracking = (): void => {
+    if (removePostRenderListener || viewer.isDestroyed()) {
+      return;
+    }
+    isLoadingTracked = isScreenshotContentLoading(viewer);
+    updatePreviewSpinner(isLoadingTracked);
+    removePostRenderListener = viewer.scene.postRender.addEventListener(checkLoadingChanged);
+  };
+
+  const stopLoadingTrackingIfIdle = (): void => {
+    if (preview || loadingListeners.size > 0) {
+      return;
+    }
+    if (removePostRenderListener) {
+      removePostRenderListener();
+      removePostRenderListener = null;
+    }
+  };
+
+  const onLoadingChange = (listener: ScreenshotLoadingListener): (() => void) => {
+    loadingListeners.add(listener);
+    ensureLoadingTracking();
+    listener(isLoadingTracked);
+    return (): void => {
+      loadingListeners.delete(listener);
+      stopLoadingTrackingIfIdle();
+    };
+  };
 
   const positionCapturePreview = (): void => {
     if (!preview || viewer.isDestroyed()) {
@@ -240,6 +314,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     } else {
       preview.dimensions = dimensions;
     }
+    ensureLoadingTracking();
     positionCapturePreview();
   };
 
@@ -250,11 +325,17 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     preview.resizeObserver.disconnect();
     preview.root.remove();
     preview = null;
+    stopLoadingTrackingIfIdle();
   };
 
   const originalDestroy = viewer.destroy.bind(viewer);
   viewer.destroy = ((): void => {
     stopCapturePreview();
+    if (removePostRenderListener) {
+      removePostRenderListener();
+      removePostRenderListener = null;
+    }
+    loadingListeners.clear();
     originalDestroy();
   }) as typeof viewer.destroy;
 
@@ -268,6 +349,8 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
       }),
     startCapturePreview,
     stopCapturePreview,
+    isContentLoading: () => isScreenshotContentLoading(viewer),
+    onLoadingChange,
   };
 
   Object.defineProperty(viewer, 'screenshot', { value: api, writable: false, configurable: false });
