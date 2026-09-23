@@ -88,9 +88,9 @@ const ScreenshotDemoPanel: React.FC = () => {
       return;
     }
     if (isComposing) {
-      mapViewer.screenshot.showCapturePreview(DEMO_SIZES[selectedSize]);
+      mapViewer.screenshot.startCapturePreview(DEMO_SIZES[selectedSize]);
     } else {
-      mapViewer.screenshot.hideCapturePreview();
+      mapViewer.screenshot.stopCapturePreview();
     }
   }, [mapViewer, isComposing, selectedSize]);
 
@@ -238,4 +238,3 @@ export const Screenshot: StoryFn<CesiumMapProps> = (args) => (
 Screenshot.args = {
   screenshotEnabled: true,
 };
-Screenshot.storyName = 'Screenshot Capture Playground';

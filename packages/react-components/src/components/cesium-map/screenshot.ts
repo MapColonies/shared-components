@@ -15,8 +15,8 @@ export interface ICaptureOptions extends ICaptureDimensions {
 export interface ICesiumScreenshotApi {
   capture(options: ICaptureOptions): Promise<Blob>;
   captureViewport(options?: Omit<ICaptureOptions, 'width' | 'height'>): Promise<Blob>;
-  showCapturePreview(dimensions: ICaptureDimensions): void;
-  hideCapturePreview(): void;
+  startCapturePreview(dimensions: ICaptureDimensions): void;
+  stopCapturePreview(): void;
 }
 
 const DEFAULT_FORMAT = 'image/png';
@@ -234,7 +234,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     preview.dimRight.style.height = `${height}px`;
   };
 
-  const showCapturePreview = (dimensions: ICaptureDimensions): void => {
+  const startCapturePreview = (dimensions: ICaptureDimensions): void => {
     if (viewer.isDestroyed()) {
       return;
     }
@@ -250,7 +250,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     positionCapturePreview();
   };
 
-  const hideCapturePreview = (): void => {
+  const stopCapturePreview = (): void => {
     if (!preview) {
       return;
     }
@@ -261,7 +261,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
 
   const originalDestroy = viewer.destroy.bind(viewer);
   viewer.destroy = ((): void => {
-    hideCapturePreview();
+    stopCapturePreview();
     originalDestroy();
   }) as typeof viewer.destroy;
 
@@ -273,8 +273,8 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
         width: viewer.scene.canvas.width,
         height: viewer.scene.canvas.height,
       }),
-    showCapturePreview,
-    hideCapturePreview,
+    startCapturePreview,
+    stopCapturePreview,
   };
 
   Object.defineProperty(viewer, 'screenshot', { value: api, writable: false, configurable: false });
