@@ -1,5 +1,7 @@
 import type { CesiumViewer } from './map';
 
+import './screenshot.css';
+
 export interface ICaptureDimensions {
   width: number;
   height: number;
@@ -137,11 +139,6 @@ const renderAndCrop = async (viewer: CesiumViewer, options: ICaptureOptions): Pr
   });
 };
 
-const OVERLAY_DIM_BACKGROUND = 'rgba(0, 0, 0, 0.45)';
-const OVERLAY_RECT_BORDER = '2px dashed #fff';
-const OVERLAY_RECT_SHADOW = '0 0 0 1px rgba(0, 0, 0, 0.6)';
-const OVERLAY_LABEL_BACKGROUND = 'rgba(0, 0, 0, 0.6)';
-
 interface ICapturePreviewElements {
   root: HTMLDivElement;
   dimTop: HTMLDivElement;
@@ -159,22 +156,21 @@ interface ICapturePreview extends ICapturePreviewElements {
 
 const createCapturePreviewElements = (): ICapturePreviewElements => {
   const root = document.createElement('div');
-  root.style.cssText = 'position:absolute; inset:0; pointer-events:none; overflow:hidden;';
+  root.className = 'screenshot-capture-overlay';
 
   const createDim = (): HTMLDivElement => {
     const dim = document.createElement('div');
-    dim.style.position = 'absolute';
-    dim.style.backgroundColor = OVERLAY_DIM_BACKGROUND;
+    dim.className = 'screenshot-capture-dim';
     root.appendChild(dim);
     return dim;
   };
 
   const rect = document.createElement('div');
-  rect.style.cssText = `position:absolute; box-sizing:border-box; border:${OVERLAY_RECT_BORDER}; box-shadow:${OVERLAY_RECT_SHADOW};`;
+  rect.className = 'screenshot-capture-rect';
   root.appendChild(rect);
 
   const label = document.createElement('div');
-  label.style.cssText = `position:absolute; top:4px; left:50%; transform:translateX(-50%); padding:2px 6px; background-color:${OVERLAY_LABEL_BACKGROUND}; color:#fff; font-size:11px; border-radius:2px; white-space:nowrap;`;
+  label.className = 'screenshot-capture-label';
   rect.appendChild(label);
 
   return { root, dimTop: createDim(), dimBottom: createDim(), dimLeft: createDim(), dimRight: createDim(), rect, label };
