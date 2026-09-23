@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.18.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.3...@map-colonies/react-components@4.18.0) (2026-09-23)
+
+
+### Features
+
+* start copc 3d model point cloud ([ab099e3](https://github.com/MapColonies/shared-components/commit/ab099e3d54967f2b0f6b1d263889115d77652fe0))
+
+
+
+
+
 ## [4.17.3](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.2...@map-colonies/react-components@4.17.3) (2026-09-09)
 
 **Note:** Version bump only for package @map-colonies/react-components
