@@ -36,7 +36,7 @@ import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { InspectorTool } from './tools/inspector.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
-import { ZoomButtons } from './tools/zoom-buttons';
+import { ZoomButtonsTool } from './tools/zoom-buttons.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 
 import './map.css';
@@ -596,7 +596,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
             {showScale && <ScaleTrackerTool locale={locale} />}
           </Box>
-          {showZoomButtons && <ZoomButtons />}
+          {showZoomButtons && <ZoomButtonsTool />}
         </>,
         viewerContainer
       )
