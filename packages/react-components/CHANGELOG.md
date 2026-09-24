@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.17.5](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.4...@map-colonies/react-components@4.17.5) (2026-09-24)
+
+
+### Bug Fixes
+
+* layer manager and active layers pannel integration ([7870f4e](https://github.com/MapColonies/shared-components/commit/7870f4e1c300b133dbedd79c357701e246d10336))
+* point selection enhancement ([9f1980d](https://github.com/MapColonies/shared-components/commit/9f1980d63910c05b0ef8a57813d439705fb8a625))
+
+
+
+
+
 ## [4.17.4](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.18.0...@map-colonies/react-components@4.17.4) (2026-09-23)
 
 **Note:** Version bump only for package @map-colonies/react-components
