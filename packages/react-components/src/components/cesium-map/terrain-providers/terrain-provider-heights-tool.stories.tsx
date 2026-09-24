@@ -100,7 +100,7 @@ export const QuantizedMeshHeightsTool: StoryFn = () => {
   const [center] = useState<[number, number]>([34.817, 31.911]);
   return (
     <div style={mapDivStyle}>
-      <CesiumMap center={center} zoom={5} baseMaps={BASE_MAPS} showDebuggerTool={true} layerManagerMetaMapping={layerManagerMetaMapping}>
+      <CesiumMap center={center} zoom={5} baseMaps={BASE_MAPS} showDebugger={true} layerManagerMetaMapping={layerManagerMetaMapping}>
         <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Model' } }} isZoomTo={true} />
         <div style={terrainControlsStyle}>
           <TerrainianHeightTool />

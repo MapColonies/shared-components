@@ -2,9 +2,9 @@ import React from 'react';
 import { Icon } from '@map-colonies/react-core';
 import { useCesiumMap } from '../map';
 
-import './zoom-buttons.css';
+import './zoom-buttons.tool.css';
 
-export const ZoomButtons: React.FC = () => {
+export const ZoomButtonsTool: React.FC = () => {
   const viewer = useCesiumMap();
 
   const buttons: { onClick: () => void; iconPath: string }[] = [

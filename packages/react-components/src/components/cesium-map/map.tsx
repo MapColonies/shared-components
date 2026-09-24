@@ -13,26 +13,30 @@ import {
   TerrainProvider,
   Ray,
 } from 'cesium';
-import { isNumber, isArray } from 'lodash';
+import { get, isNumber, isArray } from 'lodash';
 import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
 import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
+import { withNoBasemapOption } from '../utils/no-basemap';
 import { Proj } from '../utils/projections';
-import { ActiveLayersWidget } from './active-layers/active-layers-widget';
-import { BaseMapWidget } from './base-map/base-map-widget';
-import { DebuggerWidget } from './debug/debugger-widget';
+import { isCesiumSceneLoading } from '../utils/tile-loading';
+import { ActiveLayersWidget } from './active-layers/active-layers.widget';
+import { BaseMapWidget } from './base-map/base-map.widget';
+import { DebuggerWidget } from './debugger/debugger.widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
-import { GeocoderWidget } from './geocoder/geocoder-widget';
+import { GeocoderWidget } from './geocoder/geocoder.widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
+import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './mixins/screenshot.mixin';
+import type { CesiumColor } from './proxied.types';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';
 import { CoordinatesTrackerTool } from './tools/coordinates-tracker.tool';
 import { InspectorTool } from './tools/inspector.tool';
 import { ScaleTrackerTool } from './tools/scale-tracker.tool';
-import { ZoomButtons } from './tools/zoom-buttons';
+import { ZoomButtonsTool } from './tools/zoom-buttons.tool';
 import { ZoomLevelTrackerTool } from './tools/zoom-level-tracker.tool';
 
 import './map.css';
@@ -45,6 +49,8 @@ const TWO = 2;
 const DEFAULT_HEIGHT = 212;
 const DEFAULT_WIDTH = 260;
 const DEFAULT_DYNAMIC_HEIGHT_INCREMENT = 0;
+const DEFAULT_CONTEXT_OPTIONS = { webgl: {} };
+const SCREENSHOT_CONTEXT_OPTIONS = { webgl: { preserveDrawingBuffer: true } };
 
 interface ICameraPosition {
   longitude: number;
@@ -63,6 +69,7 @@ interface ICameraState {
 
 export class CesiumViewer extends CesiumViewerCls {
   public layersManager?: LayerManager;
+  public screenshot?: ICesiumScreenshotApi;
 
   public constructor(container: string | Element, options?: CesiumViewerCls.ConstructorOptions) {
     super(container, options);
@@ -141,8 +148,8 @@ export interface CesiumMapProps extends ViewerProps {
   showLoadingProgress?: boolean;
   showCompass?: boolean;
   showZoomButtons?: boolean;
-  showDebuggerTool?: boolean;
-  showActiveLayersTool?: boolean;
+  showDebugger?: boolean;
+  showActiveLayers?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
@@ -159,6 +166,8 @@ export interface CesiumMapProps extends ViewerProps {
   legends?: ILegends;
   geocoderPanel?: GeocoderOptions[];
   drapingLayerPredicate?: DrapingLayerPredicate;
+  screenshotEnabled?: boolean;
+  globeBaseColor?: CesiumColor;
 }
 
 export const useCesiumMap = (): CesiumViewer => {
@@ -192,7 +201,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
   const [showZoomButtons, setShowZoomButtons] = useState<boolean>();
-  const [showActiveLayersTool, setShowActiveLayersTool] = useState<boolean>();
+  const [showActiveLayers, setShowActiveLayers] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
@@ -224,11 +233,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   // In resium v1.23, cesiumElement is set asynchronously — extend is called by Cesium after the
   // viewer is fully created, making it the reliable "onReady" hook.
   const onViewerReady = useCallback((viewer: CesiumViewerCls) => {
+    if (props.globeBaseColor) {
+      viewer.scene.globe.baseColor = props.globeBaseColor;
+    }
     setMapViewRef(viewer as CesiumViewer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const userExtend = (props as ViewerProps).extend;
-  const mergedExtend = userExtend ? (Array.isArray(userExtend) ? [...userExtend, onViewerReady] : [userExtend, onViewerReady]) : onViewerReady;
+  const userExtendList = userExtend ? (Array.isArray(userExtend) ? userExtend : [userExtend]) : [];
+  const mergedExtend = [
+    ...userExtendList,
+    ...(props.screenshotEnabled ? [CesiumScreenshotMixin] : []),
+    onViewerReady,
+  ];
 
   const viewerProps: ViewerProps = {
     fullscreenButton: true,
@@ -240,6 +258,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     homeButton: isNumber(props.zoom) && isArray(props.center),
     sceneModePicker: true,
     baseLayer: false,
+    contextOptions: props.screenshotEnabled ? SCREENSHOT_CONTEXT_OPTIONS : DEFAULT_CONTEXT_OPTIONS,
     ...(props as ViewerProps),
     extend: mergedExtend,
   };
@@ -315,12 +334,15 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
 
   useEffect(() => {
-    setBaseMaps(props.baseMaps);
-    const currentMap = props.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
+    const augmentedBaseMaps = props.baseMaps
+      ? withNoBasemapOption(props.baseMaps, get(props.locale, 'NONE') ?? 'None')
+      : undefined;
+    setBaseMaps(augmentedBaseMaps);
+    const currentMap = augmentedBaseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     if (currentMap && mapViewRef) {
       mapViewRef.layersManager?.setBaseMapLayers(currentMap);
     }
-  }, [props.baseMaps, mapViewRef]);
+  }, [props.baseMaps, props.locale, mapViewRef]);
 
   useEffect(() => {
     if (mapViewRef?.layersManager) {
@@ -375,8 +397,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showLoadingProgress]);
 
   useEffect(() => {
-    setShowActiveLayersTool(props.showActiveLayersTool ?? true);
-  }, [props.showActiveLayersTool]);
+    setShowActiveLayers(props.showActiveLayers ?? true);
+  }, [props.showActiveLayers]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -445,18 +467,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       };
 
       const removeMoveEndListener = mapViewRef.camera.moveEnd.addEventListener(moveEndHandler);
-      let removeTileLoadProgressListener: (() => void) | undefined;
+      let removeTilesLoadingListener: (() => void) | undefined;
       let dataLayerUpdatedHandler: ((meta: any) => void) | undefined;
 
       if (showLoadingProgress) {
-        const tileLoadProgressHandler = () => {
-          if (mapViewRef.scene.globe.tilesLoaded) {
-            setIsLoadingTiles(false);
-          } else {
-            setIsLoadingTiles(true);
+        let isTilesLoadingTracked = isCesiumSceneLoading(mapViewRef);
+        setIsLoadingTiles(isTilesLoadingTracked);
+        const checkTilesLoadingHandler = () => {
+          const nextIsLoading = isCesiumSceneLoading(mapViewRef);
+          if (nextIsLoading !== isTilesLoadingTracked) {
+            isTilesLoadingTracked = nextIsLoading;
+            setIsLoadingTiles(nextIsLoading);
           }
         };
-        removeTileLoadProgressListener = mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(tileLoadProgressHandler);
+        removeTilesLoadingListener = mapViewRef.scene.postRender.addEventListener(checkTilesLoadingHandler);
 
         dataLayerUpdatedHandler = () => {
           let loading = false;
@@ -479,7 +503,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       return () => {
         try {
           removeMoveEndListener();
-          removeTileLoadProgressListener?.();
+          removeTilesLoadingListener?.();
           if (dataLayerUpdatedHandler) {
             mapViewRef.layersManager?.removeDataLayerUpdatedListener(dataLayerUpdatedHandler);
           }
@@ -572,7 +596,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             {showZoomLevel && <ZoomLevelTrackerTool locale={locale} valueBy="RENDERED_TILES" />}
             {showScale && <ScaleTrackerTool locale={locale} />}
           </Box>
-          {showZoomButtons && <ZoomButtons />}
+          {showZoomButtons && <ZoomButtonsTool />}
         </>,
         viewerContainer
       )
@@ -590,13 +614,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {props.geocoderPanel && <GeocoderWidget options={[...props.geocoderPanel]} locale={locale} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.showDebuggerTool && <DebuggerWidget locale={locale} />}
+          {props.showDebugger && <DebuggerWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         toolbarContainer
       )
     );
-  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool, mapViewRef]);
+  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebugger, mapViewRef]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     const widgetContainer = getViewerPortalTarget('.cesium-widget');
@@ -607,13 +631,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
-          {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
+          {showActiveLayers && <ActiveLayersWidget locale={locale} />}
           {viewState?.showCesiumInspector && <InspectorTool />}
         </Box>,
         widgetContainer
       )
     );
-  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool, mapViewRef]);
+  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayers, mapViewRef]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>

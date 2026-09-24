@@ -16,6 +16,10 @@ import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import type { CopcCesiumLayer } from '@frillab/copc-adapter/cesium';
 import {
+  requiresWorldwideTransparentLayer,
+  shouldRemoveTransparentLayerOnOptimizationDisable,
+} from '../utils/optimized-tile-requests';
+import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
   CustomWebMapTileServiceImageryProvider,
@@ -23,7 +27,12 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
+import {
+  RCesiumOSMLayerOptions,
+  RCesiumWMSLayerOptions,
+  RCesiumWMTSLayerOptions,
+  RCesiumXYZLayerOptions
+} from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
@@ -206,6 +215,7 @@ class LayerManager {
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
+  private needsWorldwideTransparentLayer = false;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
   private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
@@ -307,7 +317,7 @@ class LayerManager {
   }
 
   public setBaseMapLayers(baseMap: IBaseMap): void {
-    const sortedBaseMapLayers = baseMap.baseRasterLayers.sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
+    const sortedBaseMapLayers = [...baseMap.baseRasterLayers].sort((layer1, layer2) => layer1.zIndex - layer2.zIndex);
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });
@@ -324,9 +334,9 @@ class LayerManager {
      *  A simple workaround would be adding a transparent layer as the very first layer at all times,
      *  so that we ensure the rectangle will always be affective.
      */
+    this.needsWorldwideTransparentLayer = requiresWorldwideTransparentLayer(sortedBaseMapLayers.length);
 
-    if (this.shouldOptimizedTileRequests) {
-      this.removeLayer(TRANSPARENT_LAYER_ID);
+    if (this.shouldOptimizedTileRequests || this.needsWorldwideTransparentLayer) {
       this.addTransparentImageryProvider();
     }
   }
@@ -571,6 +581,8 @@ class LayerManager {
     const transparentTileUrl = `${import.meta.env.BASE_URL}assets/img/transparent-tile.png`;
     const rectangle = new Rectangle(-Math.PI, -Math.PI / 2, Math.PI, Math.PI / 2);
 
+    const staleLayer = this.findLayerById(TRANSPARENT_LAYER_ID);
+
     void SingleTileImageryProvider.fromUrl(transparentTileUrl, { rectangle }).then((provider) => {
       const transparentLayer = this.mapViewer.imageryLayers.addImageryProvider(provider, 0);
 
@@ -580,6 +592,10 @@ class LayerManager {
       };
       set(transparentLayerMeta, mapping.layer.id, TRANSPARENT_LAYER_ID);
       (transparentLayer as ICesiumImageryLayer).meta = transparentLayerMeta;
+
+      if (staleLayer) {
+        this.mapViewer.imageryLayers.remove(staleLayer, true);
+      }
       this.layerUpdated.raiseEvent(transparentLayerMeta);
     });
   }
@@ -617,14 +633,15 @@ class LayerManager {
 
     if (shouldOptimize) {
       this.bindRelevancyListeners();
-      this.removeLayer(TRANSPARENT_LAYER_ID);
       this.addTransparentImageryProvider();
       this.refreshRelevancyState();
       return;
     }
 
     this.unbindRelevancyListeners();
-    this.removeLayer(TRANSPARENT_LAYER_ID);
+    if (shouldRemoveTransparentLayerOnOptimizationDisable(this.needsWorldwideTransparentLayer)) {
+      this.removeLayer(TRANSPARENT_LAYER_ID);
+    }
     this.restoreAllLayersVisibility();
     this.clearLayersRelevancy();
   }
@@ -636,6 +653,10 @@ class LayerManager {
   }
 
   public addModel(model: ICesium3DModel): void {
+    const modelId = getLayerIdFromMeta(model.meta);
+    if (modelId !== undefined && this.findModelById(modelId) !== undefined) {
+      this.removeModel(modelId);
+    }
     this.models.push({ ...model });
     if (this.drapingLayerPredicate) {
       this.addDrapingOverlaysForModel(model);

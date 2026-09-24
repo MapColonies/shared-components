@@ -128,7 +128,7 @@ const LayersContainer: React.FC = () => {
 export const OptimizedTileRequestingMap: StoryFn = () => {
   return (
     <div style={mapDivStyle}>
-      <CesiumMap {...mapViewProps} showDebuggerTool={true} layerManagerMetaMapping={layerManagerMetaMapping}>
+      <CesiumMap {...mapViewProps} showDebugger={true} layerManagerMetaMapping={layerManagerMetaMapping}>
         <LayersContainer />
       </CesiumMap>
     </div>
