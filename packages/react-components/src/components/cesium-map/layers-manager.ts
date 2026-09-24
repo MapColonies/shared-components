@@ -14,6 +14,7 @@ import {
 import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import type { CopcCesiumLayer } from '@frillab/copc-adapter/cesium';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
@@ -97,9 +98,14 @@ export interface ICesium3DModelMeta {
 }
 
 export interface ICesium3DModel {
-  tileset: CesiumTileset;
+  tileset: CesiumTileset | CopcCesiumLayer;
   meta: ICesium3DModelMeta;
 }
+
+/** Draping (and other tileset-only APIs) only applies to real 3D Tiles models, not point-cloud layers. */
+export const isDrapableModelTileset = (tileset: CesiumTileset | CopcCesiumLayer): tileset is CesiumTileset => {
+  return tileset instanceof CesiumTileset;
+};
 
 export interface ICesiumDataLayerField {
   fieldName: string;
@@ -136,7 +142,7 @@ export const getServiceLayerName = (layer: ICesiumImageryLayer, i: number): stri
   return isTransparentLayer ? layerId : providerName;
 };
 
-export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | undefined): unknown => {
+export const getLayerFootprint = (meta: ICesiumWFSLayerMeta | ICesium3DModelMeta | undefined): unknown => {
   return get(meta, mapping.layer.footprint ?? '');
 };
 
@@ -665,6 +671,10 @@ class LayerManager {
   }
 
   private addDrapingOverlaysForModel(model: ICesium3DModel): void {
+    if (!isDrapableModelTileset(model.tileset)) {
+      return;
+    }
+    const tileset = model.tileset;
     for (const layer of this.layers) {
       if (!layer.meta) {
         continue;
@@ -675,9 +685,9 @@ class LayerManager {
       const provider = layer.imageryProvider;
       const overlayLayer = new ImageryLayer(provider);
       this.applyDrapingOverlayConfig(overlayLayer, layer);
-      model.tileset.imageryLayers.add(overlayLayer);
+      tileset.imageryLayers.add(overlayLayer);
       const existing = this.layerToOverlaysMapping.get(layer) ?? [];
-      existing.push({ tileset: model.tileset, overlay: overlayLayer });
+      existing.push({ tileset, overlay: overlayLayer });
       this.layerToOverlaysMapping.set(layer, existing);
     }
   }
@@ -689,11 +699,15 @@ class LayerManager {
     const provider = layer.imageryProvider;
     const overlays: { tileset: CesiumTileset; overlay: ImageryLayer }[] = [];
     for (const model of this.models) {
+      if (!isDrapableModelTileset(model.tileset)) {
+        continue;
+      }
+      const tileset = model.tileset;
       const overlayLayer = new ImageryLayer(provider);
       this.applyDrapingOverlayConfig(overlayLayer, layer);
       const insertionIndex = this.getBaseMapDrapingInsertionIndex(model, layer);
-      model.tileset.imageryLayers.add(overlayLayer, insertionIndex);
-      overlays.push({ tileset: model.tileset, overlay: overlayLayer });
+      tileset.imageryLayers.add(overlayLayer, insertionIndex);
+      overlays.push({ tileset, overlay: overlayLayer });
     }
     this.layerToOverlaysMapping.set(layer, overlays);
   }

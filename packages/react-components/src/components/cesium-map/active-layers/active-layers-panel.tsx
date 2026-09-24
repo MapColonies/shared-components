@@ -11,6 +11,7 @@ import {
   getLayerName,
   ICesiumImageryLayer,
   isBaseMapLayer,
+  isDrapableModelTileset,
   isManagedImageryLayer,
   isServiceLayer,
   getServiceLayerId,
@@ -133,10 +134,14 @@ export const ActiveLayersPanel: React.FC<IActiveLayersPanelProps> = ({ locale })
     return (mapViewer.layersManager?.modelList ?? []).map((model, index): IActiveLayer => {
       const modelUrl = get(model.tileset, 'resource.url') as string | undefined;
       const modelName = getLayerName(model) ?? extractModelName(modelUrl ?? `Model #${String(index + 1)}`);
+      // Non-tileset models (e.g. COPC point clouds) have no Cesium.zoomTo-compatible target,
+      // so fly to their footprint from meta instead, same as data layers do.
+      const footprint = isDrapableModelTileset(model.tileset) ? undefined : getLayerFootprint(model.meta);
       return {
         id: (getLayerId(model) as string) ?? `3D_MODEL_${String(index)}`,
         name: modelName,
-        zoomToTarget: model.tileset,
+        zoomToTarget: isDrapableModelTileset(model.tileset) ? model.tileset : undefined,
+        rect: footprint !== undefined ? Rectangle.fromDegrees(...bbox(footprint)) : undefined,
         isDisabled: false,
       };
     });
