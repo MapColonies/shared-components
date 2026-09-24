@@ -19,6 +19,7 @@ import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
 import { Proj } from '../utils/projections';
+import { isCesiumSceneLoading } from '../utils/tile-loading';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
 import { BaseMapWidget } from './base-map/base-map-widget';
 import { DebuggerWidget } from './debug/debugger-widget';
@@ -466,18 +467,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       };
 
       const removeMoveEndListener = mapViewRef.camera.moveEnd.addEventListener(moveEndHandler);
-      let removeTileLoadProgressListener: (() => void) | undefined;
+      let removeTilesLoadingListener: (() => void) | undefined;
       let dataLayerUpdatedHandler: ((meta: any) => void) | undefined;
 
       if (showLoadingProgress) {
-        const tileLoadProgressHandler = () => {
-          if (mapViewRef.scene.globe.tilesLoaded) {
-            setIsLoadingTiles(false);
-          } else {
-            setIsLoadingTiles(true);
+        let isTilesLoadingTracked = isCesiumSceneLoading(mapViewRef);
+        setIsLoadingTiles(isTilesLoadingTracked);
+        const checkTilesLoadingHandler = () => {
+          const nextIsLoading = isCesiumSceneLoading(mapViewRef);
+          if (nextIsLoading !== isTilesLoadingTracked) {
+            isTilesLoadingTracked = nextIsLoading;
+            setIsLoadingTiles(nextIsLoading);
           }
         };
-        removeTileLoadProgressListener = mapViewRef.scene.globe.tileLoadProgressEvent.addEventListener(tileLoadProgressHandler);
+        removeTilesLoadingListener = mapViewRef.scene.postRender.addEventListener(checkTilesLoadingHandler);
 
         dataLayerUpdatedHandler = () => {
           let loading = false;
@@ -500,7 +503,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       return () => {
         try {
           removeMoveEndListener();
-          removeTileLoadProgressListener?.();
+          removeTilesLoadingListener?.();
           if (dataLayerUpdatedHandler) {
             mapViewRef.layersManager?.removeDataLayerUpdatedListener(dataLayerUpdatedHandler);
           }

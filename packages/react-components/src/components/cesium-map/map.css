@@ -2,6 +2,10 @@
   display: none !important;
 }
 
+.cesium-viewer .mdc-linear-progress {
+  direction: ltr;
+}
+
 .cesium-viewer .cesium-viewer-toolbar {
   display: flex;
   flex-direction: column;

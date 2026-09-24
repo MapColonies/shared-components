@@ -1,5 +1,5 @@
-import { Cesium3DTileset } from 'cesium';
 import { createDomElement } from '../utils/dom';
+import { isCesiumSceneLoading } from '../utils/tile-loading';
 import type { CesiumViewer } from './map';
 
 import '@map-colonies/react-core/dist/circular-progress/styles';
@@ -81,31 +81,9 @@ const calculateCenteredCropRegion = (
   };
 };
 
-const collectActiveTilesets = (viewer: CesiumViewer): Cesium3DTileset[] => {
-  const tilesets: Cesium3DTileset[] = [];
-  const { primitives } = viewer.scene;
-  for (let i = 0; i < primitives.length; i++) {
-    const primitive: unknown = primitives.get(i);
-    if (primitive instanceof Cesium3DTileset && !primitive.isDestroyed()) {
-      tilesets.push(primitive);
-    }
-  }
-  return tilesets;
-};
-
-const isScreenshotContentLoading = (viewer: CesiumViewer): boolean => {
-  if (viewer.isDestroyed()) {
-    return false;
-  }
-  if (!viewer.scene.globe.tilesLoaded) {
-    return true;
-  }
-  return collectActiveTilesets(viewer).some((tileset) => !tileset.tilesLoaded);
-};
-
 const waitForScreenshotContent = (viewer: CesiumViewer, timeoutMs: number): Promise<void> => {
   return new Promise((resolve) => {
-    if (!isScreenshotContentLoading(viewer)) {
+    if (!isCesiumSceneLoading(viewer)) {
       resolve();
       return;
     }
@@ -118,7 +96,7 @@ const waitForScreenshotContent = (viewer: CesiumViewer, timeoutMs: number): Prom
       resolve();
     };
     const removeListener = viewer.scene.postRender.addEventListener(() => {
-      if (!isScreenshotContentLoading(viewer)) finish();
+      if (!isCesiumSceneLoading(viewer)) finish();
     });
     const timer = setTimeout(finish, timeoutMs);
   });
@@ -244,7 +222,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
   };
 
   const checkLoadingChanged = (): void => {
-    const nextIsLoading = isScreenshotContentLoading(viewer);
+    const nextIsLoading = isCesiumSceneLoading(viewer);
     if (nextIsLoading !== isLoadingTracked) {
       isLoadingTracked = nextIsLoading;
       loadingListeners.forEach((listener) => listener(isLoadingTracked));
@@ -256,7 +234,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
     if (removePostRenderListener || viewer.isDestroyed()) {
       return;
     }
-    isLoadingTracked = isScreenshotContentLoading(viewer);
+    isLoadingTracked = isCesiumSceneLoading(viewer);
     updatePreviewSpinner(isLoadingTracked);
     removePostRenderListener = viewer.scene.postRender.addEventListener(checkLoadingChanged);
   };
@@ -376,7 +354,7 @@ export const CesiumScreenshotMixin = (viewer: CesiumViewer): void => {
       }),
     startCapturePreview,
     stopCapturePreview,
-    isContentLoading: () => isScreenshotContentLoading(viewer),
+    isContentLoading: () => isCesiumSceneLoading(viewer),
     onLoadingChange,
   };
 
