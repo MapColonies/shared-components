@@ -398,6 +398,7 @@ MapWithProjection.argTypes = {
     },
   },
 };
+MapWithProjection.storyName = 'Map with Projection';
 
 export const Map2DWithProjection: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
@@ -427,7 +428,7 @@ Map2DWithProjection.argTypes = {
     },
   },
 };
-Map2DWithProjection.storyName = '2D Map With Projection';
+Map2DWithProjection.storyName = '2D Map with Projection';
 
 export const LocalizedMap: StoryFn = (args: CesiumMapProps) => (
   <div style={mapDivStyle}>
