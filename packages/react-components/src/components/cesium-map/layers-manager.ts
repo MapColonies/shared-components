@@ -14,11 +14,8 @@ import {
 import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import type { CopcCesiumLayer } from '@frillab/copc-adapter/cesium';
-import {
-  requiresWorldwideTransparentLayer,
-  shouldRemoveTransparentLayerOnOptimizationDisable,
-} from '../utils/optimized-tile-requests';
+import type { CopcCesiumLayer } from '@frillab/copc-adapter';
+import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
@@ -27,12 +24,7 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
-import {
-  RCesiumOSMLayerOptions,
-  RCesiumWMSLayerOptions,
-  RCesiumWMTSLayerOptions,
-  RCesiumXYZLayerOptions
-} from './layers';
+import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
