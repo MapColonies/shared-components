@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.18.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.5...@map-colonies/react-components@4.18.0) (2026-09-24)
+
+
+### Bug Fixes
+
+* add 3D model ([26f5a81](https://github.com/MapColonies/shared-components/commit/26f5a81b95ae793ff4d3638bff0e091b0e35548f))
+* add error prefix ([e34ca88](https://github.com/MapColonies/shared-components/commit/e34ca885c1b939d7ec4ec80f0f2e9967ad4d3621))
+* add story ([2a7d1be](https://github.com/MapColonies/shared-components/commit/2a7d1bec62135aca1f251eaae60378dd6c28a871))
+* alignment ([681f066](https://github.com/MapColonies/shared-components/commit/681f066b74d2c56ad311ef6b674a09cada6d4cc5))
+* app crash ([1e5c42c](https://github.com/MapColonies/shared-components/commit/1e5c42c5e3abc2c0ce4465002021bae50c43f5b4))
+* apply screenshot capability to viewer by demand ([b0f6c35](https://github.com/MapColonies/shared-components/commit/b0f6c35d7105c6b70ee5d5e38c38ec08b18ff4a0))
+* Base Map story ([f22b4a7](https://github.com/MapColonies/shared-components/commit/f22b4a7ce15423639be5254ad0276bc00c2460e0))
+* basemap picker widget in case no basemap is current ([e68c117](https://github.com/MapColonies/shared-components/commit/e68c117276d54d4a42fe32390d1cf27a6c2df523))
+* central no basemap option ([2e92961](https://github.com/MapColonies/shared-components/commit/2e929611a3ed8d37e8825d88b359ded468848ca3))
+* code review ([1b38fad](https://github.com/MapColonies/shared-components/commit/1b38fad7f3a6c18b1bf6f93636c7c82c4d861477))
+* document.createElement(...) helper ([8472ff8](https://github.com/MapColonies/shared-components/commit/8472ff8e0db811e54edc52fa4bfbfad82a93bcff))
+* improve the new helper ([77585c6](https://github.com/MapColonies/shared-components/commit/77585c62e05480cb798c5cb833df3be86902ac92))
+* inner spinner ([525c5fc](https://github.com/MapColonies/shared-components/commit/525c5fc63e1b75da905ec19d960f3801fb590be6))
+* map linear progress ([38e99c6](https://github.com/MapColonies/shared-components/commit/38e99c6ea7e31c091925ae8311116d7b524f08bd))
+* mixin instead of Object.assign ([779e4a6](https://github.com/MapColonies/shared-components/commit/779e4a6375a0a9c8718b09d9047e40570a8cd89c))
+* move globe base color from catalog-app to shared-components ([1725a1d](https://github.com/MapColonies/shared-components/commit/1725a1dd9a308457caed2a738f7a6d22e15c7f95))
+* move the capture-area preview overlay into mixin ([df9ceec](https://github.com/MapColonies/shared-components/commit/df9ceecd5a6d6f6503b409880b37790f396d218a))
+* move to utils ([724d579](https://github.com/MapColonies/shared-components/commit/724d579790fde7ee9e5d685ace45d55450b46bc7))
+* move to utils ([0e393d2](https://github.com/MapColonies/shared-components/commit/0e393d27003a29364cf7b24c2c7161494d58dd3e))
+* move to utils ([6e46241](https://github.com/MapColonies/shared-components/commit/6e46241efaef726e642889207d569d1cc29c8fe9))
+* move viewer.extend(CesiumScreenshotMixin) from catalog-app to shared-components ([344c944](https://github.com/MapColonies/shared-components/commit/344c9441c37cd1fb74f738f3d229e0fcfda7352d))
+* names ([1242843](https://github.com/MapColonies/shared-components/commit/1242843d71d1ef3572e98d7dcb907f8ee1d2c939))
+* no basemap thumbnail ([d9b33b6](https://github.com/MapColonies/shared-components/commit/d9b33b655ef08aed3df023dd208286357f9226d9))
+* remove queue from mixin, can run in parallel ([332b029](https://github.com/MapColonies/shared-components/commit/332b02987fb8bf05adc1c82df3efef480451f1bb))
+* rename APIs ([7af523c](https://github.com/MapColonies/shared-components/commit/7af523c1964dabb75790b56a88cd6d0977360e1e))
+* screenshot cropped area ([01ced4b](https://github.com/MapColonies/shared-components/commit/01ced4be06e7f263210689b841c9a1881dea665e))
+* set map context value for screenshots only on relevant instance ([ced248a](https://github.com/MapColonies/shared-components/commit/ced248a04f1b9a6e9c5fde3e47da5bf9b60512d3))
+* simplify globe base color ([592291b](https://github.com/MapColonies/shared-components/commit/592291b318873223e45fc24ec371e3d2feba5398))
+* smeared layer at boundaries in case no basemap ([b073370](https://github.com/MapColonies/shared-components/commit/b0733702b41971fbb0dd805cd5f4d5cdd02cb8d4))
+* smearing on enable optimization and lost of worldwide transparent layer on disable optimization ([c559899](https://github.com/MapColonies/shared-components/commit/c559899793c46247df60d27b3d5735ae1262644e))
+* stories title ([fec9028](https://github.com/MapColonies/shared-components/commit/fec9028e793dfe0e131f679a40c3d19fc03a2731))
+* tool ([88b518d](https://github.com/MapColonies/shared-components/commit/88b518d9995cf558eb394ae32be720d9f21f7b0a))
+* tool ([4c9fb84](https://github.com/MapColonies/shared-components/commit/4c9fb84a02c3936ae2ad9f2964aef3ea46054db9))
+* use css classes instead of inline style ([4cc78f0](https://github.com/MapColonies/shared-components/commit/4cc78f009f8d3640b0734db56307644f122078f1))
+
+
+### Features
+
+* capture cesium screenshot ([d19b254](https://github.com/MapColonies/shared-components/commit/d19b254664a8e260afce70a2c50c5e74fec8a52a))
+* wait before capture & live loading state ([3afd589](https://github.com/MapColonies/shared-components/commit/3afd589a02f63e0bd8a32152c14ad7afa0190550))
+
+
+
+
+
 ## [4.17.5](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.4...@map-colonies/react-components@4.17.5) (2026-09-24)
 
 
