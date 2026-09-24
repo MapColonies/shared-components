@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.19.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.19.0...@map-colonies/react-components@4.19.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* copc adapter typing ([b838b9c](https://github.com/MapColonies/shared-components/commit/b838b9ca0f3b09f67a10082a0d68bc5134033bcf))
+
+
+
+
+
 # [4.19.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.17.5...@map-colonies/react-components@4.19.0) (2026-09-24)
 
 
