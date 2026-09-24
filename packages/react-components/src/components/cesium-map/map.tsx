@@ -23,7 +23,7 @@ import { Proj } from '../utils/projections';
 import { isCesiumSceneLoading } from '../utils/tile-loading';
 import { ActiveLayersWidget } from './active-layers/active-layers.widget';
 import { BaseMapWidget } from './base-map/base-map.widget';
-import { DebuggerWidget } from './debug/debugger.widget';
+import { DebuggerWidget } from './debugger/debugger.widget';
 import { GeocoderOptions } from './geocoder/geocoder-panel';
 import { GeocoderWidget } from './geocoder/geocoder.widget';
 import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';

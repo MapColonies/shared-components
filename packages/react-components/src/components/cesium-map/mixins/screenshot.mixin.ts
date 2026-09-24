@@ -3,7 +3,7 @@ import { isCesiumSceneLoading } from '../../utils/tile-loading';
 import type { CesiumViewer } from '../map';
 
 import '@map-colonies/react-core/dist/circular-progress/styles';
-import './screenshot.css';
+import './screenshot.mixin.css';
 
 const SPINNER_SIZE_PX = 28;
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
