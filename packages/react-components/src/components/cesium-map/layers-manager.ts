@@ -15,6 +15,10 @@ import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import {
+  requiresWorldwideTransparentLayer,
+  shouldRemoveTransparentLayerOnOptimizationDisable,
+} from '../utils/optimized-tile-requests';
+import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
   CustomWebMapTileServiceImageryProvider,
@@ -31,10 +35,6 @@ import {
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
-import {
-  requiresWorldwideTransparentLayer,
-  shouldRemoveTransparentLayerOnOptimizationDisable,
-} from './optimized-tile-requests';
 import { CesiumCartesian2, CesiumImageryProvider } from './proxied.types';
 
 const INC = 1;
