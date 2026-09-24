@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { PointPrimitive, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
-import { CopcCesiumLayer, CopcCesiumLayerOptions, isCopcPointPickId } from '@frillab/copc-adapter/cesium';
+import { CopcCesiumLayer, isCopcPointPickId } from '@frillab/copc-adapter/cesium';
+import type { CopcCesiumLayerOptions } from '@frillab/copc-adapter';
 import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
 
