@@ -1,5 +1,5 @@
 export * from './map';
-export * from './screenshot';
+export * from './mixins';
 export * from './layers';
 export * from '../utils/projections';
 export * from './entities';

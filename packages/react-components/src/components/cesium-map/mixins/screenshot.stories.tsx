@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
-import { getValue } from '../utils/config';
-import { BASE_MAPS } from './helpers/constants';
-import { Cesium3DTileset } from './layers/3d.tileset';
-import { CesiumMap, CesiumMapProps, useCesiumMap } from './map';
+import { getValue } from '../../utils/config';
+import { BASE_MAPS } from '../helpers/constants';
+import { Cesium3DTileset } from '../layers/3d.tileset';
+import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
 
 export default {
   title: 'Cesium Map/Screenshot',

@@ -1,2 +1,2 @@
 export * from './geocoder-panel';
-export * from './geocoder-widget';
+export * from './geocoder.widget';

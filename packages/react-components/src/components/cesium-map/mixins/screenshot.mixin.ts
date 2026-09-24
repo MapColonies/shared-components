@@ -1,6 +1,6 @@
-import { createDomElement } from '../utils/dom';
-import { isCesiumSceneLoading } from '../utils/tile-loading';
-import type { CesiumViewer } from './map';
+import { createDomElement } from '../../utils/dom';
+import { isCesiumSceneLoading } from '../../utils/tile-loading';
+import type { CesiumViewer } from '../map';
 
 import '@map-colonies/react-core/dist/circular-progress/styles';
 import './screenshot.css';
