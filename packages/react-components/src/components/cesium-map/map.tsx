@@ -18,6 +18,7 @@ import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-cor
 import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
+import { withNoBasemapOption } from '../utils/no-basemap';
 import { Proj } from '../utils/projections';
 import { isCesiumSceneLoading } from '../utils/tile-loading';
 import { ActiveLayersWidget } from './active-layers/active-layers-widget';
@@ -29,7 +30,6 @@ import { DEFAULT_TERRAIN_PROVIDER_URL } from './helpers/constants';
 import { pointToLonLat } from './helpers/geojson/point.geojson';
 import LayerManager, { IRasterLayer, LegendExtractor, DrapingLayerPredicate, type ILayerManagerMetaMapping } from './layers-manager';
 import { LegendWidget, IMapLegend, LegendSidebar } from './legend';
-import { withNoBasemapOption } from './no-basemap';
 import type { CesiumColor } from './proxied.types';
 import { CesiumScreenshotMixin, type ICesiumScreenshotApi } from './screenshot';
 import { CesiumCompassTool } from './tools/cesium-compass.tool';

@@ -1,4 +1,4 @@
-import type { IBaseMap, IBaseMaps } from './map';
+import type { IBaseMap, IBaseMaps } from '../cesium-map/map';
 
 export const NO_BASEMAP_ID = '__cesium-map-no-basemap__';
 
