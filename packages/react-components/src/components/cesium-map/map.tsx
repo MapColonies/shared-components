@@ -148,8 +148,8 @@ export interface CesiumMapProps extends ViewerProps {
   showLoadingProgress?: boolean;
   showCompass?: boolean;
   showZoomButtons?: boolean;
-  showDebuggerTool?: boolean;
-  showActiveLayersTool?: boolean;
+  showDebugger?: boolean;
+  showActiveLayers?: boolean;
   projection?: Proj;
   center?: [number, number];
   zoom?: number;
@@ -201,7 +201,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   const [showScale, setShowScale] = useState<boolean>();
   const [showCompass, setShowCompass] = useState<boolean>();
   const [showZoomButtons, setShowZoomButtons] = useState<boolean>();
-  const [showActiveLayersTool, setShowActiveLayersTool] = useState<boolean>();
+  const [showActiveLayers, setShowActiveLayers] = useState<boolean>();
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>();
   const [isLoadingTiles, setIsLoadingTiles] = useState<boolean>(false);
   const [isLoadingDataLayer, setIsLoadingDataLayer] = useState<boolean>(false);
@@ -397,8 +397,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
   }, [props.showLoadingProgress]);
 
   useEffect(() => {
-    setShowActiveLayersTool(props.showActiveLayersTool ?? true);
-  }, [props.showActiveLayersTool]);
+    setShowActiveLayers(props.showActiveLayers ?? true);
+  }, [props.showActiveLayers]);
 
   useEffect(() => {
     const getCameraPosition = (): ICameraPosition => {
@@ -614,13 +614,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
         <>
           {props.geocoderPanel && <GeocoderWidget options={[...props.geocoderPanel]} locale={locale} />}
           <BaseMapWidget baseMaps={baseMaps} terrains={terrains} locale={locale} />
-          {props.showDebuggerTool && <DebuggerWidget locale={locale} />}
+          {props.showDebugger && <DebuggerWidget locale={locale} />}
           <LegendWidget legendToggle={updateLegendToggle} />
         </>,
         toolbarContainer
       )
     );
-  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebuggerTool, mapViewRef]);
+  }, [getViewerPortalTarget, locale, baseMaps, terrains, props.geocoderPanel, props.showDebugger, mapViewRef]);
 
   const bindInspectorsToWidgets = useCallback((): JSX.Element | undefined => {
     const widgetContainer = getViewerPortalTarget('.cesium-widget');
@@ -631,13 +631,13 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       mapViewRef &&
       createPortal(
         <Box className="cesium-viewer-cesiumInspectorContainer widgetsContainer">
-          {showActiveLayersTool && <ActiveLayersWidget locale={locale} />}
+          {showActiveLayers && <ActiveLayersWidget locale={locale} />}
           {viewState?.showCesiumInspector && <InspectorTool />}
         </Box>,
         widgetContainer
       )
     );
-  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayersTool, mapViewRef]);
+  }, [getViewerPortalTarget, locale, viewState?.showCesiumInspector, showActiveLayers, mapViewRef]);
 
   return (
     <ThemeProvider id="cesiumTheme" options={themeCesium}>

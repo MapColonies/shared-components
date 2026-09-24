@@ -369,7 +369,7 @@ export const MapWithLayersManagerAndContextMenu: StoryFn = () => {
         // @ts-ignore
         imageryContextMenu={<ContextMenu />}
         imageryContextMenuSize={{ height: 340, width: 200 }}
-        showDebuggerTool={true}
+        showDebugger={true}
         layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <LayersMozaik layers={layers} />

@@ -165,7 +165,7 @@ export const QuantizedMeshProviders: StoryFn = () => {
         zoom={5}
         baseMaps={BASE_MAPS}
         mapProjection={new WebMercatorProjection()}
-        showDebuggerTool={true}
+        showDebugger={true}
         layerManagerMetaMapping={layerManagerMetaMapping}
       >
         <Cesium3DTileset url={getValue('GLOBAL', '3D_MODEL')} meta={{ id: '1111111', layerRecord: { productName: 'Model' } }} isZoomTo={true} />
