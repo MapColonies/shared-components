@@ -2,7 +2,11 @@ import { useEffect, useState, FC } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import { action } from 'storybook/actions';
 import type { CopcColorMode, CopcPointInspection } from '@frillab/copc-adapter/cesium';
-import { BASE_MAPS, COPC_SAMPLE_URL_AUTZEN, COPC_SAMPLE_URL_L0026 } from '../helpers/constants';
+import {
+  BASE_MAPS,
+  COPC_SAMPLE_URL_AUTZEN,
+  // COPC_SAMPLE_URL_L0026
+} from '../helpers/constants';
 import { CesiumMap, useCesiumMap } from '../map';
 import { CesiumCopcPointCloud } from './3d.point-cloud.copc';
 import { CesiumColor } from '../proxied.types';
