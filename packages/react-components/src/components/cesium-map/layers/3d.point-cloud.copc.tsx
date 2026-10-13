@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { PointPrimitive, ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
-import { CopcCesiumLayer, isCopcPointPickId } from '@frillab/copc-adapter/cesium';
+import { CopcCesiumLayer, CopcJsBackend, isCopcPointPickId } from '@frillab/copc-adapter/cesium';
 import type { CopcCesiumLayerOptions } from '@frillab/copc-adapter';
 import { getLayerIdFromMeta, ICesium3DModelMeta } from '../layers-manager';
 import { CesiumViewer, useCesiumMap } from '../map';
@@ -11,9 +11,15 @@ export interface ICesiumCopcPointCloud extends CopcCesiumLayerOptions {
   /** Pixel size applied to the point under the cursor. Defaults to twice its current size. */
   hoverPixelSize?: number;
   meta?: ICesium3DModelMeta;
+  /**
+   * Extra schema dimensions (e.g. LAS extra bytes like `leg_id`) to read per point and expose on the
+   * picked point as `dimensions`, or `'*'` for every non-standard dimension. Requires the patched
+   * `@frillab/copc-adapter` (see patches/) and is ignored when a custom `backend` is supplied.
+   */
+  extraDimensions?: string[] | '*';
 }
 
-export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady, onError, hoverPixelSize, meta, ...options }) => {
+export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady, onError, hoverPixelSize, meta, extraDimensions, ...options }) => {
   const mapViewer: CesiumViewer = useCesiumMap();
   const layerRef = useRef<CopcCesiumLayer | null>(null);
   const onReadyRef = useRef(onReady);
@@ -24,9 +30,12 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
   hoverPixelSizeRef.current = hoverPixelSize;
   const metaRef = useRef(meta);
   metaRef.current = meta;
+  const extraDimensionsKey = Array.isArray(extraDimensions) ? extraDimensions.join(',') : extraDimensions;
 
   useEffect(() => {
-    const layer = new CopcCesiumLayer(options);
+    const layer = new CopcCesiumLayer(
+      extraDimensions !== undefined && options.backend === undefined ? { ...options, backend: new CopcJsBackend({ extraDimensions }) } : options
+    );
     layerRef.current = layer;
     let isCancelled = false;
     let isModelRegistered = false;
@@ -112,6 +121,7 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
     options.maxRenderedPoints,
     options.backend,
     options.maxPointCacheBytes,
+    extraDimensionsKey,
   ]);
 
   return null;

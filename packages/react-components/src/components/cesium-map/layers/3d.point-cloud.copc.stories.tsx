@@ -28,21 +28,35 @@ const layerManagerMetaMapping = {
     footprint: 'layerRecord.footprint',
   },
 };
-
-// Publicly hosted COPC sample dataset, commonly used across COPC tooling demos.
-const COPC_SAMPLE_URL = COPC_SAMPLE_URL_AUTZEN; //cls
+//TEST
+const COPC_SAMPLE_URL = '/assets/data/001_small_las_classified_extra_dimensions.copc.laz';
 const copcFootprint = {
   type: 'Polygon',
   coordinates: [
     [
-      [-123.0749505370863, 44.04720492912755],
-      [-123.06337410636391, 44.04720492912755],
-      [-123.06337410636391, 44.062547882173845],
-      [-123.0749505370863, 44.062547882173845],
-      [-123.0749505370863, 44.04720492912755],
+      [-79.441383440903252, 46.285231808734444],
+      [-79.437062253194526, 46.285172807954723],
+      [-79.436998270493504, 46.287421942498504],
+      [-79.441319634925861, 46.28748094788412],
+      [-79.441383440903252, 46.285231808734444],
     ],
   ],
 };
+
+// Publicly hosted COPC sample dataset, commonly used across COPC tooling demos.
+// const COPC_SAMPLE_URL = COPC_SAMPLE_URL_AUTZEN; //cls
+// const copcFootprint = {
+//   type: 'Polygon',
+//   coordinates: [
+//     [
+//       [-123.0749505370863, 44.04720492912755],
+//       [-123.06337410636391, 44.04720492912755],
+//       [-123.06337410636391, 44.062547882173845],
+//       [-123.0749505370863, 44.062547882173845],
+//       [-123.0749505370863, 44.04720492912755],
+//     ],
+//   ],
+// };
 
 // const COPC_SAMPLE_URL = 'https://s3.amazonaws.com/hobu-lidar/sofi.copc.laz';
 
@@ -160,6 +174,7 @@ export const CopcPointCloudWithPicking: StoryFn = (args: Record<string, unknown>
           meta={{ id: '7777777', layerRecord: { productName: 'COPC Point Cloud (Picking)', footprint: copcFootprint } }}
           onPointPicked={setPickedPoint}
           hoverPixelSize={hoverPixelSize}
+          extraDimensions="*"
         />
       </CesiumMap>
       <div
@@ -189,6 +204,11 @@ export const CopcPointCloudWithPicking: StoryFn = (args: Record<string, unknown>
             <div>height: {pickedPoint.height.toFixed(2)}m</div>
             {pickedPoint.classificationLabel !== undefined && <div>class: {pickedPoint.classificationLabel}</div>}
             {pickedPoint.intensity !== undefined && <div>intensity: {pickedPoint.intensity}</div>}
+            {Object.entries(pickedPoint.dimensions ?? {}).map(([name, value]) => (
+              <div key={name}>
+                {name}: {String(value)}
+              </div>
+            ))}
           </>
         )}
       </div>

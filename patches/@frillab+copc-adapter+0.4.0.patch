@@ -1,0 +1,146 @@
+diff --git a/node_modules/@frillab/copc-adapter/dist/copc/backend/copcJsBackend.d.ts b/node_modules/@frillab/copc-adapter/dist/copc/backend/copcJsBackend.d.ts
+index 5755ff9..24050ff 100644
+--- a/node_modules/@frillab/copc-adapter/dist/copc/backend/copcJsBackend.d.ts
++++ b/node_modules/@frillab/copc-adapter/dist/copc/backend/copcJsBackend.d.ts
+@@ -8,7 +8,12 @@ type SourcePointView = {
+ };
+ export declare function toCopcPointView(view: SourcePointView, requestedFields: CopcPointFieldSelection): CopcPointView;
+ /** Opens COPC resources through copc.js. */
++export type CopcJsBackendOptions = {
++    /** Names of extra schema dimensions to read per point, or '*' for every non-standard dimension. */
++    extraDimensions?: string[] | '*';
++};
+ export declare class CopcJsBackend implements CopcBackend {
++    constructor(options?: CopcJsBackendOptions);
+     open(source: string): Promise<CopcSource>;
+ }
+ /** Shared default backend used when callers do not provide one. */
+diff --git a/node_modules/@frillab/copc-adapter/dist/copc/points/pointInspection.d.ts b/node_modules/@frillab/copc-adapter/dist/copc/points/pointInspection.d.ts
+index 2331a1f..4dc70bb 100644
+--- a/node_modules/@frillab/copc-adapter/dist/copc/points/pointInspection.d.ts
++++ b/node_modules/@frillab/copc-adapter/dist/copc/points/pointInspection.d.ts
+@@ -34,6 +34,9 @@ export type CopcPointInspection = {
+         blue: number;
+     };
+     backend: CopcBackendName | 'custom';
++    /** Extra schema dimensions (e.g. LAS extra bytes) requested via `new CopcJsBackend({ extraDimensions })`. */
++    /** 64-bit integer dimensions are returned as `bigint` to stay exact. */
++    dimensions?: Record<string, number | bigint>;
+ };
+ export declare function isCopcPointPickId(value: unknown): value is CopcPointPickId;
+ /**
+diff --git a/node_modules/@frillab/copc-adapter/dist/datasetLocalFrame-6K6HjPxZ.js b/node_modules/@frillab/copc-adapter/dist/datasetLocalFrame-6K6HjPxZ.js
+index bef696d..d8cc344 100644
+--- a/node_modules/@frillab/copc-adapter/dist/datasetLocalFrame-6K6HjPxZ.js
++++ b/node_modules/@frillab/copc-adapter/dist/datasetLocalFrame-6K6HjPxZ.js
+@@ -617,6 +617,7 @@ function je(e, t, n, r) {
+ 		z: n.worldCoordinates[i + 2]
+ 	});
+ 	let { intensity: o, classification: s, red: c, green: l, blue: u } = n.attributes ?? {};
++	for (let [d, v] of Object.entries(n.attributes ?? {})) d.startsWith("dim:") && v && e.pointIndex < v.length && ((a.dimensions ??= {})[d.slice(4)] = v[e.pointIndex]);
+ 	return o && e.pointIndex < o.length && (a.intensity = o[e.pointIndex]), s && e.pointIndex < s.length && (a.classification = s[e.pointIndex], a.classificationLabel = Ae(s[e.pointIndex])), c && l && u && e.pointIndex < c.length && e.pointIndex < l.length && e.pointIndex < u.length && (a.rgb = {
+ 		red: c[e.pointIndex],
+ 		green: l[e.pointIndex],
+@@ -7634,8 +7635,8 @@ async function rl(e, { pointDataRecordFormat: t, pointDataRecordLength: n }, r,
+ 	}, i);
+ }
+ async function il(e, t, n, { lazPerf: r, include: i } = {}) {
+-	let a = await rl(e, t.header, n, r);
+-	return Lc.create(a, t.header, t.eb, i);
++	let a = await rl(e, t.header, n, r), v = Lc.create(a, t.header, t.eb, i);
++	return v.__raw = { data: a, header: t.header, eb: t.eb }, v;
+ }
+ //#endregion
+ //#region src/copc/adapters/hierarchyAdapter.ts
+@@ -7838,6 +7839,11 @@ function Tl(e) {
+ 		green: Cl(e, "rgb", "green"),
+ 		blue: Cl(e, "rgb", "blue")
+ 	};
++	if (e.extraGetters) for (let [n, x] of e.extraGetters) {
++		let r = x.kind === "u64" ? new BigUint64Array(e.pointCount) : x.kind === "i64" ? new BigInt64Array(e.pointCount) : new Float64Array(e.pointCount);
++		for (let i = 0; i < e.pointCount; i += 1) r[i] = x.get(i);
++		t["dim:" + n] = r;
++	}
+ 	return Object.values(t).some((e) => e !== void 0) ? t : void 0;
+ }
+ async function El(e) {
+@@ -7936,8 +7942,34 @@ function Il(e, t, n, r) {
+ 		nodeKey: r
+ 	});
+ }
+-function Ll(e, t) {
++var COPC_STD_DIMS = new Set(["X", "Y", "Z", "Intensity", "ReturnNumber", "NumberOfReturns", "ScanDirectionFlag", "EdgeOfFlightLine", "Classification", "Synthetic", "KeyPoint", "Withheld", "Overlap", "ScanAngle", "ScanAngleRank", "UserData", "PointSourceId", "GpsTime", "Red", "Green", "Blue", "Infrared", "ScannerChannel"]);
++function copcExactInt64Getter({ data: d, header: h, eb: all }, b) {
++	let base = { 0: 20, 1: 28, 2: 26, 3: 34, 6: 30, 7: 36, 8: 38 }[h.pointDataRecordFormat];
++	if (base === void 0) return;
++	let off = base;
++	for (let k of all) {
++		if (k === b) break;
++		off += k.length;
++	}
++	let dv = new DataView(d.buffer, d.byteOffset, d.byteLength), len = h.pointDataRecordLength;
++	return b.type === "unsigned" ? (i) => dv.getBigUint64(i * len + off, !0) : (i) => dv.getBigInt64(i * len + off, !0);
++}
++function Ll(e, t, x) {
+ 	let n = new Set(Object.keys(e.dimensions)), r = /* @__PURE__ */ new Set(), i = /* @__PURE__ */ new Set();
++	let xg = /* @__PURE__ */ new Map();
++	if (x) {
++		let xn = x === "*" ? Object.keys(e.dimensions).filter((d) => !COPC_STD_DIMS.has(d)) : x;
++		for (let d of xn) {
++			if (!n.has(d)) continue;
++			let rw = e.__raw, eb = rw?.eb?.find((b) => b.name === d), g;
++			rw && eb && eb.length === 8 && (eb.type === "unsigned" || eb.type === "signed") && (eb.scale === void 0 || eb.scale === 1) && !eb.offset && (g = copcExactInt64Getter(rw, eb));
++			if (g) xg.set(d, { kind: eb.type === "unsigned" ? "u64" : "i64", get: g });
++			else {
++				let f = e.getter(d);
++				xg.set(d, { kind: "f64", get: (i) => { try { return f(i); } catch { return NaN; } } });
++			}
++		}
++	}
+ 	for (let e of t) {
+ 		let t = Fl[e];
+ 		if (t.every((e) => n.has(Pl[e]))) {
+@@ -7948,6 +7980,7 @@ function Ll(e, t) {
+ 	return {
+ 		pointCount: e.pointCount,
+ 		availableFields: r,
++		extraGetters: xg,
+ 		getter(t) {
+ 			if (!i.has(t)) throw Error(`COPC point component is unavailable: ${t}`);
+ 			return e.getter(Pl[t]);
+@@ -7960,8 +7993,8 @@ var Rl = class {
+ 	getter;
+ 	copc;
+ 	performanceObserver;
+-	constructor(e, t, n) {
+-		this.source = e, this.sourceGetter = t, this.getter = (e, t) => this.readRange(e, t), this.copc = n;
++	constructor(e, t, n, x) {
++		this.source = e, this.sourceGetter = t, this.getter = (e, t) => this.readRange(e, t), this.copc = n, this.extraDimensions = x;
+ 	}
+ 	async readRange(e, t, n, r) {
+ 		let i = l(), a = await this.sourceGetter(e, t);
+@@ -8016,7 +8049,7 @@ var Rl = class {
+ 				durationMs: Math.max(0, l() - r - n),
+ 				nodeKey: e.key,
+ 				blocksMainThread: !0
+-			}), Ll(i, t);
++			}), Ll(i, t, this.extraDimensions);
+ 		} catch (t) {
+ 			throw Il(this.source, t, "point", e.key);
+ 		}
+@@ -8028,10 +8061,14 @@ var Rl = class {
+ 		this.performanceObserver = e;
+ 	}
+ }, zl = class {
++	extraDimensions;
++	constructor(e = {}) {
++		this.extraDimensions = e.extraDimensions;
++	}
+ 	async open(e) {
+ 		try {
+ 			let t = dl(e);
+-			return new Rl(e, t, await $c.create(t));
++			return new Rl(e, t, await $c.create(t), this.extraDimensions);
+ 		} catch (t) {
+ 			throw Il(e, t, "open");
+ 		}
