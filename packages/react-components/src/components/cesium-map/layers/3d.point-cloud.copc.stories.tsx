@@ -28,7 +28,7 @@ const layerManagerMetaMapping = {
     footprint: 'layerRecord.footprint',
   },
 };
-//TEST
+//Local classified with extra dimensions
 const COPC_SAMPLE_URL = '/assets/data/001_small_las_classified_extra_dimensions.copc.laz';
 const copcFootprint = {
   type: 'Polygon',
@@ -59,7 +59,6 @@ const copcFootprint = {
 // };
 
 // const COPC_SAMPLE_URL = 'https://s3.amazonaws.com/hobu-lidar/sofi.copc.laz';
-
 // const COPC_SAMPLE_URL = COPC_SAMPLE_URL_L0026;
 // const copcFootprint = {
 //   "type": "Polygon",
