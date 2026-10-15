@@ -29,6 +29,6 @@
       "@turf/rewind": ["../../node_modules/@turf/rewind/index.d.ts"]
     }
   },
-  "include": ["src/components"],
+  "include": ["src/components", "src/schemas", "src/hydration"],
   "exclude": ["**/node_modules/**", "node_modules", "./dist/**/*", "storybook-static/*/**", "src/**/*.spec.*", "src/**/*.stories.tsx"]
 }

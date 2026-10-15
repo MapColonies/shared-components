@@ -4,13 +4,27 @@
   "main": "./dist/@map-colonies/react-components.umd.js",
   "module": "./dist/@map-colonies/react-components.es.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/@map-colonies/react-components.es.js",
+      "require": "./dist/@map-colonies/react-components.umd.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.mjs",
+      "require": "./dist/schemas/index.cjs"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "license": "MIT",
   "description": "This package contains complex components like maps, datepicker, etc.",
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
     "transpileTS": "tsc --project ./tsconfig-build.json",
-    "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build",
+    "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build && yarn build:schemas",
     "printTSVersion": "echo TS $(tsc -v)",
     "postbuild": "yarn copyassets:all && copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "prepack": "yarn build",
@@ -21,7 +35,8 @@
     "copyassets:components": "copyfiles -u 1 \"./public/assets/**/*\" \"dist\"",
     "storybook": "yarn run copy-storybook_data && storybook dev -p 9010",
     "build-storybook": "rimraf storybook-static && storybook build",
-    "copy-storybook_data": "git clone https://github.com/MapColonies/shared-components-data.git && copyfiles -u 1 \"./shared-components-data/stories-data.json\" \".\" && rimraf shared-components-data"
+    "copy-storybook_data": "git clone https://github.com/MapColonies/shared-components-data.git && copyfiles -u 1 \"./shared-components-data/stories-data.json\" \".\" && rimraf shared-components-data",
+    "build:schemas": "vite build --config vite.schemas.config.mts"
   },
   "dependencies": {
     "@cmcleese/cesium-navigation": "^4.0.7",
@@ -64,7 +79,8 @@
     "rimraf": "3.0.2",
     "rxjs": "^7.8.1",
     "textarea-caret": "^3.1.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "~3.25.76"
   },
   "devDependencies": {
     "@cfaester/enzyme-adapter-react-18": "^0.8.0",
@@ -78,9 +94,11 @@
     "identity-obj-proxy": "^3.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-enzyme": "^7.1.2",
-    "vite-plugin-cesium": "^1.2.23"
+    "vite-plugin-cesium": "^1.2.23",
+    "zod-to-json-schema": "~3.24.6"
   },
   "files": [
-    "dist"
+    "dist",
+    "schemas"
   ]
 }

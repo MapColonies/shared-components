@@ -1,0 +1,7 @@
+{
+  "name": "@map-colonies/react-components-schemas",
+  "private": true,
+  "main": "../dist/schemas/index.cjs",
+  "module": "../dist/schemas/index.mjs",
+  "types": "../dist/schemas/index.d.ts"
+}
