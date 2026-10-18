@@ -34,7 +34,16 @@ export const CesiumCopcPointCloud: React.FC<ICesiumCopcPointCloud> = ({ onReady,
 
   useEffect(() => {
     const layer = new CopcCesiumLayer(
-      extraDimensions !== undefined && options.backend === undefined ? { ...options, backend: new CopcJsBackend({ extraDimensions }) } : options
+      extraDimensions !== undefined && options.backend === undefined
+        ? {
+            ...options,
+            rangeValidation: 'head-fallback',
+            backend: new CopcJsBackend({ extraDimensions }),
+          }
+        : {
+            ...options,
+            rangeValidation: 'head-fallback',
+          }
     );
     layerRef.current = layer;
     let isCancelled = false;
