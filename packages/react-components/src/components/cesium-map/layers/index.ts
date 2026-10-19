@@ -2,6 +2,7 @@ export * from './3d.tileset';
 export * from './3d.point-cloud.copc';
 export * from './geojson.layer';
 export * from './imagery.layer';
+export * from './mvt-data-provider-wgs84';
 export * from './wms.layer';
 export * from './wmts.layer';
 export * from './xyz.layer';
