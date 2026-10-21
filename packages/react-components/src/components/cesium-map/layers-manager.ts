@@ -351,7 +351,8 @@ class LayerManager {
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
           : new UrlTemplateImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
 
         break;
       }
@@ -362,7 +363,9 @@ class LayerManager {
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
           : new WebMapServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
+
         break;
       }
       case 'WMTS_LAYER': {
@@ -372,7 +375,8 @@ class LayerManager {
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)
           : new WebMapTileServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
 
         break;
       }
