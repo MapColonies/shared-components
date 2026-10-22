@@ -1,3 +1,4 @@
+import { ProtocolType } from '../../models/protocol-type.enum';
 import { getValue } from '../../utils/config';
 import { IBaseMaps } from '../map';
 
@@ -17,7 +18,7 @@ export const BASE_MAPS: IBaseMaps = {
       baseRasterLayers: [
         {
           id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 1,
           zIndex: 0,
           options: {
@@ -28,7 +29,7 @@ export const BASE_MAPS: IBaseMaps = {
         },
         {
           id: 'INFRARED_RASTER',
-          type: 'WMS_LAYER',
+          type: ProtocolType.WMS,
           opacity: 0.6,
           zIndex: 1,
           options: {
@@ -50,7 +51,7 @@ export const BASE_MAPS: IBaseMaps = {
       baseRasterLayers: [
         {
           id: 'RADAR_RASTER',
-          type: 'WMS_LAYER',
+          type: ProtocolType.WMS,
           opacity: 0.6,
           zIndex: 1,
           shouldBeUsedInModelDraping: true,
@@ -66,7 +67,7 @@ export const BASE_MAPS: IBaseMaps = {
         },
         {
           id: 'GOOGLE_TERRAIN',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 1,
           zIndex: 0,
           options: {
@@ -77,7 +78,7 @@ export const BASE_MAPS: IBaseMaps = {
         },
         {
           id: 'VECTOR_TILES_GPS',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 1,
           zIndex: 2,
           shouldBeUsedInModelDraping: true,
@@ -97,7 +98,7 @@ export const BASE_MAPS: IBaseMaps = {
       baseRasterLayers: [
         {
           id: 'VECTOR_TILES',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 1,
           zIndex: 0,
           options: {
@@ -108,7 +109,7 @@ export const BASE_MAPS: IBaseMaps = {
         },
         {
           id: 'VECTOR_TILES_GPS',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 1,
           zIndex: 1,
           options: {
@@ -119,7 +120,7 @@ export const BASE_MAPS: IBaseMaps = {
         },
         {
           id: 'TRANSPARENT_LABELS_OVERLAY',
-          type: 'XYZ_LAYER',
+          type: ProtocolType.XYZ,
           opacity: 0.6,
           zIndex: 2,
           shouldBeUsedInModelDraping: true,
