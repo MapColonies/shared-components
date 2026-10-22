@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.20.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.20.1...@map-colonies/react-components@4.20.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* passing rectangle to the imagery layer in addRasterLayer ([3caf28d](https://github.com/MapColonies/shared-components/commit/3caf28de15002d366c6e4aa225b7f530f89bc7ca))
+* use new enum protocol type ([109c935](https://github.com/MapColonies/shared-components/commit/109c93532558a6010bde1ea25c9a15f7b03bb6a8))
+
+
+
+
+
 ## [4.20.1](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.20.0...@map-colonies/react-components@4.20.1) (2026-10-18)
 
 
