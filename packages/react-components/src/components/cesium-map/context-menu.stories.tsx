@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import { Button, Menu, MenuItem, MenuSurfaceAnchor } from '@map-colonies/react-core';
 import type { StoryFn, Meta } from '@storybook/react';
 import { Box } from '../box';
+import { ProtocolType } from '../models/protocol-type.enum';
 import { BASE_MAPS } from './helpers/constants';
 import { getLayerId, ICesiumImageryLayer, IRasterLayer } from './layers-manager';
 import { CesiumMap, IContextMenuData, useCesiumMap } from './map';
@@ -45,7 +46,7 @@ const layerManagerMetaMapping = {
 const layers: IRasterLayer[] = [
   {
     id: 'near_amphy',
-    type: 'XYZ_LAYER',
+    type: ProtocolType.XYZ,
     zIndex: 0,
     opacity: 1,
     show: true,
@@ -69,7 +70,7 @@ const layers: IRasterLayer[] = [
   },
   {
     id: 'coin_zoom_17',
-    type: 'XYZ_LAYER',
+    type: ProtocolType.XYZ,
     zIndex: 1,
     opacity: 1,
     show: true,
@@ -93,7 +94,7 @@ const layers: IRasterLayer[] = [
   },
   {
     id: 'biggest',
-    type: 'XYZ_LAYER',
+    type: ProtocolType.XYZ,
     zIndex: 2,
     opacity: 1,
     show: true,
