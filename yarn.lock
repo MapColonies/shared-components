@@ -2002,10 +2002,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@frillab/copc-adapter@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@frillab/copc-adapter/-/copc-adapter-0.5.0.tgz#b6cbb662f1bbe701289505c1ccef3550c94536b8"
-  integrity sha512-5kq23aFye1CD2bFqbtRYyEn43nfbMEbfnLff3yMemQbcSLDDWEtknW/+zWTMUx8WBad2Y+J/d+Xs4Oa8+1ybKQ==
+"@frillab/copc-adapter@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@frillab/copc-adapter/-/copc-adapter-0.5.3.tgz#9438e720660d97881c0b605a0cc0970c26867923"
+  integrity sha512-3r2UQWqPae+GjZO+FsCByVWioc++ZZTYvCa3Tz0gcS/gRRIS+44toKiMlUzoR2f1JBNGNY/xVroiZNO0GOvIdg==
   dependencies:
     copc "^0.0.9"
     proj4 "^2.20.9"

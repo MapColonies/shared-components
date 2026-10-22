@@ -2,6 +2,7 @@ import { ImageryLayer, Rectangle } from 'cesium';
 import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import type { StoryFn, Meta } from '@storybook/react';
 import bbox from '@turf/bbox';
+import { ProtocolType } from '../../models/protocol-type.enum';
 import { BASE_MAPS } from '../helpers/constants';
 import { getImageryProviderUrl, IRasterLayer, LayerType } from '../layers-manager';
 import { CesiumMap, CesiumMapProps, useCesiumMap } from '../map';
@@ -66,7 +67,7 @@ const layerMetaRectXYZ = {
 
 const layerRaster = {
   id: '2_raster_ext',
-  type: 'XYZ_LAYER' as LayerType,
+  type: ProtocolType.XYZ as LayerType,
   opacity: 1,
   zIndex: 0,
   show: true,

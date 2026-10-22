@@ -33,34 +33,34 @@ const layerManagerMetaMapping = {
   },
 };
 //Local classified with extra dimensions
-const COPC_SAMPLE_URL = '/assets/data/001_small_las_classified_extra_dimensions.copc.laz';
-const copcFootprint = {
-  type: 'Polygon',
-  coordinates: [
-    [
-      [-79.441383440903252, 46.285231808734444],
-      [-79.437062253194526, 46.285172807954723],
-      [-79.436998270493504, 46.287421942498504],
-      [-79.441319634925861, 46.28748094788412],
-      [-79.441383440903252, 46.285231808734444],
-    ],
-  ],
-};
-
-// Publicly hosted COPC sample dataset, commonly used across COPC tooling demos.
-// const COPC_SAMPLE_URL = COPC_SAMPLE_URL_AUTZEN; //cls
+// const COPC_SAMPLE_URL = '/assets/data/001_small_las_classified_extra_dimensions.copc.laz';
 // const copcFootprint = {
 //   type: 'Polygon',
 //   coordinates: [
 //     [
-//       [-123.0749505370863, 44.04720492912755],
-//       [-123.06337410636391, 44.04720492912755],
-//       [-123.06337410636391, 44.062547882173845],
-//       [-123.0749505370863, 44.062547882173845],
-//       [-123.0749505370863, 44.04720492912755],
+//       [-79.441383440903252, 46.285231808734444],
+//       [-79.437062253194526, 46.285172807954723],
+//       [-79.436998270493504, 46.287421942498504],
+//       [-79.441319634925861, 46.28748094788412],
+//       [-79.441383440903252, 46.285231808734444],
 //     ],
 //   ],
 // };
+
+// Publicly hosted COPC sample dataset, commonly used across COPC tooling demos.
+const COPC_SAMPLE_URL = COPC_SAMPLE_URL_AUTZEN; //cls
+const copcFootprint = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-123.0749505370863, 44.04720492912755],
+      [-123.06337410636391, 44.04720492912755],
+      [-123.06337410636391, 44.062547882173845],
+      [-123.0749505370863, 44.062547882173845],
+      [-123.0749505370863, 44.04720492912755],
+    ],
+  ],
+};
 
 // const COPC_SAMPLE_URL = 'https://s3.amazonaws.com/hobu-lidar/sofi.copc.laz';
 // const COPC_SAMPLE_URL = COPC_SAMPLE_URL_L0026;
@@ -141,6 +141,7 @@ export const CopcPointCloudColorModes: StoryFn = (args: Record<string, unknown>)
           colorMode={colorMode}
           pointSize={pointSize}
           meta={{ id: '6666666', layerRecord: { productName: 'COPC Point Cloud (Color Modes)', footprint: copcFootprint } }}
+          rangeValidation="head-fallback"
         />
       </CesiumMap>
     </div>

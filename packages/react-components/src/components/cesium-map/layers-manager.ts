@@ -15,6 +15,7 @@ import { get, isEmpty, set } from 'lodash';
 import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import type { CopcCesiumLayer } from '@frillab/copc-adapter';
+import { ProtocolType } from '../models/protocol-type.enum';
 import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
@@ -80,7 +81,11 @@ export interface ICesiumImageryLayer extends InstanceType<typeof ImageryLayer> {
   meta?: ICesiumImageryLayerMeta;
 }
 
-export type LayerType = 'OSM_LAYER' | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER';
+export type LayerType =
+  | typeof ProtocolType.OSM
+  | typeof ProtocolType.WMTS
+  | typeof ProtocolType.WMS
+  | typeof ProtocolType.XYZ;
 
 export interface IRasterLayer {
   id: string;
@@ -336,39 +341,43 @@ class LayerManager {
   public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
     let cesiumLayer: ICesiumImageryLayer | undefined;
     switch (layer.type) {
-      case 'XYZ_LAYER': {
+      case ProtocolType.XYZ: {
         const options = layer.options as UrlTemplateImageryProvider.ConstructorOptions;
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
           : new UrlTemplateImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
 
         break;
       }
-      case 'WMS_LAYER': {
+      case ProtocolType.WMS: {
         const options = layer.options as WebMapServiceImageryProvider.ConstructorOptions;
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
           : new WebMapServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
+
         break;
       }
-      case 'WMTS_LAYER': {
+      case ProtocolType.WMTS: {
         const options = layer.options as WebMapTileServiceImageryProvider.ConstructorOptions;
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)
           : new WebMapTileServiceImageryProvider(options);
 
-        cesiumLayer = this.mapViewer.imageryLayers.addImageryProvider(providerInstance, index);
+        cesiumLayer = new ImageryLayer(providerInstance, { rectangle: options.rectangle });
+        this.mapViewer.imageryLayers.add(cesiumLayer, index);
 
         break;
       }
-      case 'OSM_LAYER':
+      case ProtocolType.OSM:
         break;
     }
     if (cesiumLayer) {
