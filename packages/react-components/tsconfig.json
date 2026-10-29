@@ -6,7 +6,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "rootDir": "src/components",
+    "rootDir": "src",
     "baseUrl": "./",
     "noEmitOnError": false,
     "paths": {
@@ -22,6 +22,6 @@
       "module": "commonjs"
     }
   },
-  "include": ["src/components/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["**/node_modules/**", "node_modules", "dist", "storybook-static", "*.config.ts", ".storybook"]
 }

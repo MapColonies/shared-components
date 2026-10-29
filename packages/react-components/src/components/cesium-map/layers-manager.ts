@@ -16,6 +16,7 @@ import { Feature, Point, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import type { CopcCesiumLayer } from '@frillab/copc-adapter';
 import { ProtocolType } from '../models/protocol-type.enum';
+import { resolveWmsConstructorOptions, resolveWmtsConstructorOptions, resolveXyzConstructorOptions } from '../../hydration';
 import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
@@ -82,10 +83,13 @@ export interface ICesiumImageryLayer extends InstanceType<typeof ImageryLayer> {
 }
 
 export type LayerType =
-  | typeof ProtocolType.OSM
   | typeof ProtocolType.WMTS
   | typeof ProtocolType.WMS
-  | typeof ProtocolType.XYZ;
+  | typeof ProtocolType.XYZ
+  | typeof ProtocolType.OSM
+  | typeof ProtocolType.MAPBOX_STYLE
+  | typeof ProtocolType.BING_MAPS;
+//| typeof ProtocolType.WCS
 
 export interface IRasterLayer {
   id: string;
@@ -342,7 +346,7 @@ class LayerManager {
     let cesiumLayer: ICesiumImageryLayer | undefined;
     switch (layer.type) {
       case ProtocolType.XYZ: {
-        const options = layer.options as UrlTemplateImageryProvider.ConstructorOptions;
+        const options = resolveXyzConstructorOptions(layer.options);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
@@ -354,7 +358,7 @@ class LayerManager {
         break;
       }
       case ProtocolType.WMS: {
-        const options = layer.options as WebMapServiceImageryProvider.ConstructorOptions;
+        const options = resolveWmsConstructorOptions(layer.options);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
@@ -366,7 +370,8 @@ class LayerManager {
         break;
       }
       case ProtocolType.WMTS: {
-        const options = layer.options as WebMapTileServiceImageryProvider.ConstructorOptions;
+        // JSON-safe options (degrees / named tiling scheme) are hydrated; Cesium-native ones pass through untouched (same for WMS and XYZ)
+        const options = resolveWmtsConstructorOptions(layer.options);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)
@@ -378,6 +383,13 @@ class LayerManager {
         break;
       }
       case ProtocolType.OSM:
+        console.error('***** OSM layer still not implemented ! *****');
+        break;
+      case ProtocolType.MAPBOX_STYLE:
+        console.error('***** MAPBOX_STYLE layer still not implemented ! *****');
+        break;
+      case ProtocolType.BING_MAPS:
+        console.error('***** BING_MAPS layer still not implemented ! *****');
         break;
     }
     if (cesiumLayer) {

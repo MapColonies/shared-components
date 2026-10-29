@@ -1,5 +1,5 @@
 {
-  "name": "@map-colonies/react-components-schemas",
+  "name": "@map-colonies/react-components/schemas",
   "private": true,
   "main": "../dist/schemas/index.cjs",
   "module": "../dist/schemas/index.mjs",
