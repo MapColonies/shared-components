@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.21.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.20.2...@map-colonies/react-components@4.21.0) (2026-10-29)
+
+
+### Features
+
+* wmts schema ([8a51549](https://github.com/MapColonies/shared-components/commit/8a515490247b07becfeac9036406efd96e697c6d))
+* xyz and wms schemas  added ([b580254](https://github.com/MapColonies/shared-components/commit/b5802543e7c75a76c19836c8f8ecd69d22038896))
+
+
+
+
+
 ## [4.20.2](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.20.1...@map-colonies/react-components@4.20.2) (2026-10-22)
 
 
