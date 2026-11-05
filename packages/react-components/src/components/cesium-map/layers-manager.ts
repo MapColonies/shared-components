@@ -17,6 +17,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import type { CopcCesiumLayer } from '@frillab/copc-adapter';
 import { ProtocolType } from '../models/protocol-type.enum';
 import { resolveWmsConstructorOptions, resolveWmtsConstructorOptions, resolveXyzConstructorOptions } from '../../hydration';
+import type { InjectedAuth } from '../../hydration';
 import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
@@ -26,7 +27,7 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
+import type { WmsOptionsInput, WmtsOptionsInput, XyzOptionsInput } from '../../schemas';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
@@ -69,7 +70,7 @@ export interface ICesiumImageryLayerMeta {
   type?: LayerType;
   opacity?: number;
   show?: boolean;
-  options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  options?: WmsOptionsInput | WmtsOptionsInput | XyzOptionsInput;
   skipRelevancyCheck?: boolean;
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
@@ -96,7 +97,7 @@ export interface IRasterLayer {
   type: LayerType;
   opacity: number;
   zIndex: number;
-  options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  options: WmsOptionsInput | WmtsOptionsInput | XyzOptionsInput;
   show?: boolean;
   shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;
@@ -228,7 +229,8 @@ class LayerManager {
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
     shouldOptimizedTileRequests?: boolean,
-    drapingLayerPredicate?: DrapingLayerPredicate
+    drapingLayerPredicate?: DrapingLayerPredicate,
+    public auth?: InjectedAuth
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
@@ -371,7 +373,7 @@ class LayerManager {
       }
       case ProtocolType.WMTS: {
         // JSON-safe options (degrees / named tiling scheme) are hydrated; Cesium-native ones pass through untouched (same for WMS and XYZ)
-        const options = resolveWmtsConstructorOptions(layer.options);
+        const options = resolveWmtsConstructorOptions(layer.options /*, this.auth*/);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)

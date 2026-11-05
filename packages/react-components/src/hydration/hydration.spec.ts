@@ -91,6 +91,13 @@ describe.each([
     expect(result.tilingScheme).toBeInstanceOf(GeographicTilingScheme);
   });
 
+  it('injects shared raster auth into JSON-safe options', () => {
+    const result = resolve(json, auth);
+    expect(result.url).toBeInstanceOf(Resource);
+    expect((result.url as Resource).headers).toEqual(auth.headers);
+    expect((result.url as Resource).queryParameters).toEqual(auth.queryParameters);
+  });
+
   it('returns Cesium-native options untouched, including a radians Rectangle', () => {
     const native = { ...json, rectangle: Rectangle.fromDegrees(34, 29, 36, 34), tilingScheme: new GeographicTilingScheme() };
     expect(resolve(native)).toBe(native);

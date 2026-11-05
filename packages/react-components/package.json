@@ -15,6 +15,11 @@
       "import": "./dist/schemas/index.mjs",
       "require": "./dist/schemas/index.cjs"
     },
+    "./bridge": {
+      "types": "./dist/bridge/index.d.ts",
+      "import": "./dist/bridge/index.mjs",
+      "require": "./dist/bridge/index.cjs"
+    },
     "./dist/*": "./dist/*",
     "./package.json": "./package.json"
   },
@@ -24,7 +29,7 @@
     "dev": "vite",
     "clean": "rimraf dist",
     "transpileTS": "tsc --project ./tsconfig-build.json",
-    "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build && yarn build:schemas",
+    "build": "yarn run clean && yarn printTSVersion && yarn transpileTS && vite build && yarn build:schemas && yarn build:bridge",
     "printTSVersion": "echo TS $(tsc -v)",
     "postbuild": "yarn copyassets:all && copyfiles -u 2 -e \"**/*.ts\" -e \"**/*.tsx\" \"src/components/**/*\" dist",
     "prepack": "yarn build",
@@ -36,7 +41,8 @@
     "storybook": "yarn run copy-storybook_data && storybook dev -p 9010",
     "build-storybook": "rimraf storybook-static && storybook build",
     "copy-storybook_data": "git clone https://github.com/MapColonies/shared-components-data.git && copyfiles -u 1 \"./shared-components-data/stories-data.json\" \".\" && rimraf shared-components-data",
-    "build:schemas": "vite build --config vite.schemas.config.mts"
+    "build:schemas": "vite build --config vite.schemas.config.mts",
+    "build:bridge": "vite build --config vite.bridge.config.mts"
   },
   "dependencies": {
     "@cmcleese/cesium-navigation": "^4.0.7",
@@ -99,6 +105,7 @@
   },
   "files": [
     "dist",
-    "schemas"
+    "schemas",
+    "bridge"
   ]
 }
