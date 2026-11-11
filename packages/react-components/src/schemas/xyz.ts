@@ -34,7 +34,7 @@ export const createXyzOptionsSchema = (policy: UrlPolicy = {}) =>
     });
 
 /** Default (secure) schema: credentials in URLs are rejected. */
-export const XyzOptionsSchema = createXyzOptionsSchema();
+export const XyzOptionsSchema = createXyzOptionsSchema({ allowUrlCredentials: true });
 
 /** Output of parsing (defaults applied). */
 export type XyzOptions = z.infer<typeof XyzOptionsSchema>;
