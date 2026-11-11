@@ -44,8 +44,29 @@ describe('adaptCapabilityToWmtsOptions', () => {
     ).toBe('first');
   });
 
-  it('throws when no URL matches the format', () => {
+  it('falls back to the fallback url when no URL matches the format', () => {
+    expect(adaptCapabilityToWmtsOptions({ ...capability, url: [] }, {}, { url: template }).url).toBe(template);
+  });
+
+  it('throws when no URL can be resolved', () => {
     expect(() => adaptCapabilityToWmtsOptions({ ...capability, url: [] })).toThrow();
+  });
+
+  it('prefers the layer override over the capability id', () => {
+    expect(adaptCapabilityToWmtsOptions(capability, { layer: 'product-1' }).layer).toBe('product-1');
+  });
+
+  it('returns defaults when there is no capability', () => {
+    const options = adaptCapabilityToWmtsOptions(undefined, { layer: 'product-1' }, { url: template });
+    expect(options).toMatchObject({
+      url: template,
+      layer: 'product-1',
+      style: 'default',
+      format: 'image/jpeg',
+      tileMatrixSetID: 'newGrids',
+      maximumLevel: 20,
+    });
+    expect(options.tileMatrixLabels).toHaveLength(21);
   });
 
   it('throws when the URL embeds credentials', () => {
@@ -57,8 +78,10 @@ describe('adaptCapabilityToWmtsOptions', () => {
     ).toThrow();
   });
 
-  it('throws when tileMatrixSet is missing', () => {
-    expect(() => adaptCapabilityToWmtsOptions({ ...capability, tileMatrixSet: [] })).toThrow();
+  it('falls back to the default tile matrix set when it is missing', () => {
+    const options = adaptCapabilityToWmtsOptions({ ...capability, tileMatrixSet: [] });
+    expect(options.tileMatrixSetID).toBe('newGrids');
+    expect(options.maximumLevel).toBe(20);
   });
 
   it('validates the capability before adapting it', () => {

@@ -70,7 +70,7 @@ export interface ICesiumImageryLayerMeta {
   type?: LayerType;
   opacity?: number;
   show?: boolean;
-  options?: WmsOptionsInput | WmtsOptionsInput | XyzOptionsInput;
+  options?: MCOptions;
   skipRelevancyCheck?: boolean;
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
@@ -92,12 +92,17 @@ export type LayerType =
   | typeof ProtocolType.BING_MAPS;
 //| typeof ProtocolType.WCS
 
+export type MCOptions = WmtsOptionsInput | WmsOptionsInput | XyzOptionsInput;
+
+// MAPCO-11365:
+// General raster layer, currently used only for basemap layers.
+// If OL also supports basemaps, this should be moved to a shared location.
 export interface IRasterLayer {
   id: string;
   type: LayerType;
   opacity: number;
   zIndex: number;
-  options: WmsOptionsInput | WmtsOptionsInput | XyzOptionsInput;
+  options: MCOptions;
   show?: boolean;
   shouldBeUsedInModelDraping?: boolean;
   [key: string]: unknown;

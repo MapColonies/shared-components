@@ -1,2 +1,3 @@
-// Runtime-only entry: depends on `zod` alone (no React, no Cesium) so it is safe to use in Node services.
 export * from './adapter';
+export * from './cesium-adapter';
+export * from './ol-adapter';

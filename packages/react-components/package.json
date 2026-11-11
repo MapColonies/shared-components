@@ -50,6 +50,7 @@
     "@frillab/copc-adapter": "^0.5.3",
     "@here/quantized-mesh-decoder": "^1.2.8",
     "@map-colonies/react-core": "^4.2.2",
+    "@map-colonies/wmts-client": "^0.2.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/pickers": "^3.2.10",
     "@turf/area": "^6.5.0",

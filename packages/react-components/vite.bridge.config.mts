@@ -2,7 +2,7 @@ import * as path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-// Node-safe build of the capability adapters only: no React, no Cesium, no CSS. `zod` stays external.
+// Build of the bridge entry (capability + Cesium/OL option adapters). Bare imports (`zod`, `ol`, `cesium`, ...) stay external.
 export default defineConfig({
   publicDir: false,
   plugins: [
