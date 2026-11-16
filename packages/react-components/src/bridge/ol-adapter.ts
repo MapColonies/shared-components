@@ -1,17 +1,19 @@
 import type { Options as WMTSOptions } from 'ol/source/WMTS';
 import type { Options as XYZOptions } from 'ol/source/XYZ';
 import type { Options as WMSOptions } from 'ol/source/TileWMS';
-import { getIntersection } from 'ol/extent';
+import { getIntersection, isEmpty } from 'ol/extent';
 import type { Extent } from 'ol/extent';
 import { get as getProjection, transformExtent } from 'ol/proj';
 import { createXYZ } from 'ol/tilegrid';
-import type TileGrid from 'ol/tilegrid/TileGrid';
+import TileGrid from 'ol/tilegrid/TileGrid';
 import type { LayerType, MCOptions } from '../components/cesium-map/layers-manager';
 import { ProtocolType } from '../components/models/protocol-type.enum';
 import { getWMTSOptions } from '../components/ol-map/source/wmts';
 import { getWMSOptions } from '../components/ol-map/source/wms';
 import { getXYZOptions } from '../components/ol-map/source/xyz';
 import { Proj } from '../components/utils/projections';
+import type { InjectedAuth } from '../hydration';
+import { appendAuthQueryParameters } from './auth';
 import { WmsOptionsSchema, WmtsOptionsSchema, XyzOptionsSchema } from '../schemas';
 import type { WmsOptionsInput, WmtsOptionsInput, XyzOptionsInput } from '../schemas';
 
@@ -22,22 +24,21 @@ export type { Options as LayerOptions } from 'ol/layer/Base';
 
 type Subdomains = string | string[] | undefined;
 
-/** OL has no `{s}` placeholder: it takes `urls`, or a `{a-c}` range inside a single url. */
-const toOlUrlOptions = (url: string, subdomains: Subdomains): { url: string; urls?: string[] } => {
+/** OL has no `{s}` placeholder: it takes `urls`, or a `{a-c}` range inside a single url. The query parameters of `auth` are appended to every url. */
+const toOlUrlOptions = (template: string, subdomains: Subdomains, auth?: InjectedAuth): { url: string; urls?: string[] } => {
+  const url = appendAuthQueryParameters(template, auth);
   if (!url.includes('{s}')) {
     return { url };
   }
   if (subdomains === undefined) {
     return { url: url.replace('{s}', '{a-c}') };
   }
-  // Same semantics as Cesium: a string is a list of single-character subdomains
   const list = typeof subdomains === 'string' ? [...subdomains] : subdomains;
   return { url, urls: list.map((subdomain) => url.replace('{s}', subdomain)) };
 };
 
 type TilingSchemeName = NonNullable<WmtsOptionsInput['tilingScheme']>;
 
-// The MC options name the tiling scheme, OL names the projection
 const TILING_SCHEME_TO_PROJECTION: Record<TilingSchemeName, Proj> = {
   geographic: Proj.WGS84,
   webmercator: Proj.WEB_MERCATOR,
@@ -51,14 +52,44 @@ const TILE_GRID_HEIGHT_WIDTH_RATIO: Record<Proj, number> = {
 
 type RectangleDeg = NonNullable<XyzOptionsInput['rectangle']>;
 
-/** Cesium takes the rectangle in degrees, OL takes an extent in the projection of the source. */
 const toOlExtent = (rectangle: RectangleDeg | undefined, projection: string): Extent | undefined => {
   const projectionExtent = getProjection(projection)?.getExtent();
   if (rectangle === undefined || !projectionExtent) {
     return undefined;
   }
   const { west, south, east, north } = rectangle;
-  return getIntersection(transformExtent([west, south, east, north], Proj.WGS84, projection), projectionExtent);
+  const extent = getIntersection(transformExtent([west, south, east, north], Proj.WGS84, projection), projectionExtent);
+  return isEmpty(extent) || !extent.every(Number.isFinite) ? undefined : extent;
+};
+
+type GridLevels = { minZoom?: number; maxZoom?: number; tileSize: [number, number] };
+
+/**
+ * A tile grid with the standard origin and resolutions of the projection (so the tiles match the server's), limited to the
+ * rectangle: tiles outside of it are not requested. `createXYZ({ extent })` must not be given the rectangle, it would build
+ * the grid (origin and resolutions) from it.
+ */
+const createTileGrid = (
+  projection: string,
+  rectangle: RectangleDeg | undefined,
+  { minZoom, maxZoom, tileSize }: GridLevels
+): TileGrid | undefined => {
+  const projectionExtent = getProjection(projection)?.getExtent();
+  if (!projectionExtent) {
+    return undefined;
+  }
+  const standardGrid = createXYZ({ extent: projectionExtent, minZoom, maxZoom, tileSize });
+  const extent = toOlExtent(rectangle, projection);
+  if (!extent) {
+    return standardGrid;
+  }
+  return new TileGrid({
+    extent,
+    origin: standardGrid.getOrigin(0),
+    resolutions: standardGrid.getResolutions(),
+    minZoom: standardGrid.getMinZoom(),
+    tileSize,
+  });
 };
 
 /**
@@ -67,11 +98,13 @@ const toOlExtent = (rectangle: RectangleDeg | undefined, projection: string): Ex
  * `tileWidth`/`tileHeight` -> `tileSize`, `hasAlphaChannel` -> `opaque` (inverted), `rectangle` -> tile grid extent.
  * Options OL has no counterpart for (`enablePickFeatures`, `pickFeaturesUrl`, `urlSchemeZeroPadding`) are ignored.
  *
+ * `auth` is injected at runtime and never stored in the options: its query parameters are appended to the url(s). Its headers are ignored: OL cannot send them.
+ *
  * Without `tilingScheme` OL's own default (web mercator) applies, as it does in Cesium.
  *
  * @throws when `options` are not valid XYZ options.
  */
-export const adaptToXYZOptions = (options: XyzOptionsInput): XYZOptions => {
+export const adaptToXYZOptions = (options: XyzOptionsInput, auth?: InjectedAuth): XYZOptions => {
   const {
     url: template,
     subdomains,
@@ -84,11 +117,10 @@ export const adaptToXYZOptions = (options: XyzOptionsInput): XYZOptions => {
     hasAlphaChannel,
     rectangle,
   } = XyzOptionsSchema.parse(options);
-  const { url, urls } = toOlUrlOptions(template, subdomains);
+  const { url, urls } = toOlUrlOptions(template, subdomains, auth);
   const projection = tilingScheme && TILING_SCHEME_TO_PROJECTION[tilingScheme];
   const tileSize: [number, number] = [tileWidth, tileHeight];
-  // The XYZ source builds its own tile grid (and ignores `minZoom`, `maxZoom` and `tileSize`) when it is not given one
-  const extent = toOlExtent(rectangle, projection ?? Proj.WEB_MERCATOR);
+  // Without a `tileGrid` the XYZ source builds the standard grid of the projection from `minZoom`, `maxZoom` and `tileSize`; with one it ignores those three, hence they are passed to `createTileGrid` too
   return {
     ...getXYZOptions({
       url,
@@ -98,7 +130,7 @@ export const adaptToXYZOptions = (options: XyzOptionsInput): XYZOptions => {
       maxZoom: maximumLevel,
       tileSize,
       opaque: hasAlphaChannel === undefined ? undefined : !hasAlphaChannel,
-      tileGrid: extent && createXYZ({ extent, minZoom: minimumLevel, maxZoom: maximumLevel, tileSize }),
+      tileGrid: rectangle && createTileGrid(projection ?? Proj.WEB_MERCATOR, rectangle, { minZoom: minimumLevel, maxZoom: maximumLevel, tileSize }),
     }),
     ...(urls && { urls }),
   };
@@ -110,12 +142,12 @@ export const adaptToXYZOptions = (options: XyzOptionsInput): XYZOptions => {
  * `tileWidth`/`tileHeight` -> `tileSize`, `rectangle` -> tile grid extent.
  * Options OL has no counterpart for (`minimumLevel`, `enablePickFeatures`, `getFeatureInfoUrl`, `getFeatureInfoParameters`) are ignored.
  *
- * The tile grid cannot be built without a projection, so without `tilingScheme` web mercator is used, as it is in Cesium.
+ * The tile grid cannot be built without a projection, so without `tilingScheme` geographic is used.
  * The number of levels is `tileMatrixLabels.length`, else `maximumLevel + 1`.
  *
  * @throws when `options` are not valid WMTS options.
  */
-export const adaptToWMTSOptions = (options: WmtsOptionsInput): WMTSOptions => {
+export const adaptToWMTSOptions = (options: WmtsOptionsInput, auth?: InjectedAuth): WMTSOptions => {
   const {
     url: template,
     subdomains,
@@ -132,8 +164,8 @@ export const adaptToWMTSOptions = (options: WmtsOptionsInput): WMTSOptions => {
     dimensions,
     rectangle,
   } = WmtsOptionsSchema.parse(options);
-  const { url, urls } = toOlUrlOptions(template, subdomains);
-  const projection = TILING_SCHEME_TO_PROJECTION[tilingScheme ?? 'webmercator'];
+  const { url, urls } = toOlUrlOptions(template, subdomains, auth);
+  const projection = TILING_SCHEME_TO_PROJECTION[tilingScheme ?? 'geographic'];
   const matrixIds =
     tileMatrixLabels ?? (maximumLevel !== undefined ? Array.from({ length: maximumLevel + 1 }, (_, level) => String(level)) : undefined);
   return {
@@ -169,7 +201,7 @@ const CRS_PARAMETERS = ['CRS', 'SRS'];
  *
  * @throws when `options` are not valid WMS options.
  */
-export const adaptToWMSOptions = (options: WmsOptionsInput): WMSOptions => {
+export const adaptToWMSOptions = (options: WmsOptionsInput, auth?: InjectedAuth): WMSOptions => {
   const {
     url: template,
     subdomains,
@@ -185,7 +217,7 @@ export const adaptToWMSOptions = (options: WmsOptionsInput): WMSOptions => {
     tileWidth,
     tileHeight,
   } = WmsOptionsSchema.parse(options);
-  const { url, urls } = toOlUrlOptions(template, subdomains);
+  const { url, urls } = toOlUrlOptions(template, subdomains, auth);
 
   const upperCaseParameters = Object.fromEntries(Object.entries(parameters ?? {}).map(([name, value]) => [name.toUpperCase(), value]));
   const crsParameter = CRS_PARAMETERS.map((name) => upperCaseParameters[name]).find((value) => value !== undefined);
@@ -193,9 +225,9 @@ export const adaptToWMSOptions = (options: WmsOptionsInput): WMSOptions => {
 
   const projection = (crsParameter as string | undefined) ?? crs ?? srs ?? (tilingScheme && TILING_SCHEME_TO_PROJECTION[tilingScheme]);
   const hasCustomGrid = rectangle !== undefined || tileWidth !== 256 || tileHeight !== 256 || minimumLevel > 0 || maximumLevel !== undefined;
-  const extent = toOlExtent(rectangle, projection ?? Proj.WEB_MERCATOR) ?? getProjection(projection ?? Proj.WEB_MERCATOR)?.getExtent();
-  const tileGrid: TileGrid | undefined =
-    hasCustomGrid && extent ? createXYZ({ extent, minZoom: minimumLevel, maxZoom: maximumLevel, tileSize: [tileWidth, tileHeight] }) : undefined;
+  const tileGrid = hasCustomGrid
+    ? createTileGrid(projection ?? Proj.WEB_MERCATOR, rectangle, { minZoom: minimumLevel, maxZoom: maximumLevel, tileSize: [tileWidth, tileHeight] })
+    : undefined;
 
   return {
     ...getWMSOptions({ url, attributions: credit, params, projection, tileGrid }),
@@ -204,18 +236,26 @@ export const adaptToWMSOptions = (options: WmsOptionsInput): WMSOptions => {
 };
 
 /**
+ * The `rectangle` of the options as an extent in the projection of the map view, for the `extent` of the OL layer.
+ * The `extent` of a tile grid only stops tiles outside of it from being requested: the tiles that cross its edge are still drawn
+ * whole, only the layer `extent` clips the drawing. `undefined` when the options have no (usable) rectangle.
+ */
+export const adaptToOlLayerExtent = (options: MCOptions, viewProjection: string): Extent | undefined =>
+  toOlExtent((options as { rectangle?: RectangleDeg }).rectangle, viewProjection);
+
+/**
  * Converts `MCOptions` into OL source options of the given layer type; `null` for types OL has no adapter for.
  *
  * @throws when `options` are not valid for the type.
  */
-export const adaptToOlOptions = (type: LayerType, options: MCOptions): XYZOptions | WMTSOptions | WMSOptions | null => {
+export const adaptToOlOptions = (type: LayerType, options: MCOptions, auth?: InjectedAuth): XYZOptions | WMTSOptions | WMSOptions | null => {
   switch (type) {
-    case ProtocolType.XYZ:
-      return adaptToXYZOptions(options as XyzOptionsInput);
     case ProtocolType.WMTS:
-      return adaptToWMTSOptions(options as WmtsOptionsInput);
+      return adaptToWMTSOptions(options as WmtsOptionsInput, auth);
+    case ProtocolType.XYZ:
+      return adaptToXYZOptions(options as XyzOptionsInput, auth);
     case ProtocolType.WMS:
-      return adaptToWMSOptions(options as WmsOptionsInput);
+      return adaptToWMSOptions(options as WmsOptionsInput, auth);
     default:
       return null;
   }

@@ -105,6 +105,7 @@ export interface IRasterLayer {
   options: MCOptions;
   show?: boolean;
   shouldBeUsedInModelDraping?: boolean;
+  noAuth?: boolean;
   [key: string]: unknown;
 }
 
@@ -350,10 +351,11 @@ class LayerManager {
   }
 
   public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
+    const auth = layer.noAuth ? undefined : this.auth;
     let cesiumLayer: ICesiumImageryLayer | undefined;
     switch (layer.type) {
       case ProtocolType.XYZ: {
-        const options = resolveXyzConstructorOptions(layer.options);
+        const options = resolveXyzConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
@@ -365,7 +367,7 @@ class LayerManager {
         break;
       }
       case ProtocolType.WMS: {
-        const options = resolveWmsConstructorOptions(layer.options);
+        const options = resolveWmsConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
@@ -378,7 +380,7 @@ class LayerManager {
       }
       case ProtocolType.WMTS: {
         // JSON-safe options (degrees / named tiling scheme) are hydrated; Cesium-native ones pass through untouched (same for WMS and XYZ)
-        const options = resolveWmtsConstructorOptions(layer.options /*, this.auth*/);
+        const options = resolveWmtsConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)

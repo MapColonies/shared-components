@@ -1,5 +1,5 @@
 import { Proj } from '../components/utils/projections';
-import { adaptToOlOptions } from './ol-adapter';
+import { adaptToOlLayerExtent, adaptToOlOptions } from './ol-adapter';
 
 const wmts = { url: 'https://example.com/wmts', layer: 'l', style: 's', tileMatrixSetID: 'newGrids' };
 const xyz = { url: 'https://example.com/{z}/{x}/{y}.png' };
@@ -35,7 +35,7 @@ describe('adaptToOlOptions', () => {
 
     expect(projectionOf(adaptToOlOptions('WMTS', { ...wmts, tilingScheme: 'geographic' }))).toBe(Proj.WGS84);
     expect(projectionOf(adaptToOlOptions('WMTS', { ...wmts, tilingScheme: 'webmercator' }))).toBe(Proj.WEB_MERCATOR);
-    expect(projectionOf(adaptToOlOptions('WMTS', wmts))).toBe(Proj.WEB_MERCATOR);
+    expect(projectionOf(adaptToOlOptions('WMTS', wmts))).toBe(Proj.WGS84);
     expect(projectionOf(adaptToOlOptions('XYZ', { ...xyz, tilingScheme: 'geographic' }))).toBe(Proj.WGS84);
     expect(adaptToOlOptions('XYZ', xyz)).not.toHaveProperty('projection');
   });
@@ -86,6 +86,31 @@ describe('adaptToOlOptions', () => {
     expect(adaptToOlOptions('XYZ', xyz)).not.toHaveProperty('tileGrid');
   });
 
+  it('keeps the standard origin and resolutions of the projection when a rectangle limits the XYZ grid', () => {
+    const rectangle = { west: 30, south: 30, east: 40, north: 40 };
+    type Grid = { getOrigin: (z: number) => number[]; getResolutions: () => number[] };
+    const gridOf = (options: unknown): Grid => (options as { tileGrid: Grid }).tileGrid;
+
+    const clipped = gridOf(adaptToOlOptions('XYZ', { ...xyz, rectangle }));
+    const standard = gridOf(adaptToOlOptions('XYZ', { ...xyz, rectangle: { west: -180, south: -90, east: 180, north: 90 } }));
+    expect(clipped.getOrigin(0)).toEqual(standard.getOrigin(0));
+    expect(clipped.getResolutions()).toEqual(standard.getResolutions());
+  });
+
+  it('ignores a rectangle that is outside of the projection extent', () => {
+    const rectangle = { west: 30, south: 89, east: 40, north: 90 };
+    const options = adaptToOlOptions('XYZ', { ...xyz, rectangle }) as { tileGrid?: { getExtent: () => number[] } };
+    // Falls back to the whole (finite) projection extent
+    expect(options.tileGrid?.getExtent().every(Number.isFinite)).toBe(true);
+  });
+
+  it('adapts the rectangle to the layer extent in the projection of the view', () => {
+    const rectangle = { west: 30, south: 30, east: 40, north: 40 };
+    expect(adaptToOlLayerExtent({ ...xyz, rectangle }, 'EPSG:4326')?.map(Math.round)).toEqual([30, 30, 40, 40]);
+    expect(adaptToOlLayerExtent({ ...xyz, rectangle }, 'EPSG:3857')?.[0]).toBeCloseTo(3339584, -1);
+    expect(adaptToOlLayerExtent(xyz, 'EPSG:4326')).toBeUndefined();
+  });
+
   describe('WMS', () => {
     const wms = { url: 'https://example.com/wms', layers: 'l1,l2' };
 
@@ -124,5 +149,33 @@ describe('adaptToOlOptions', () => {
 
   it('returns null for unsupported types', () => {
     expect(adaptToOlOptions('OSM', { url: 'https://example.com' })).toBeNull();
+  });
+
+  describe('auth', () => {
+    it('appends the query parameters to the url, keeping the template and an existing query', () => {
+      const auth = { queryParameters: { token: 'a b' } };
+      expect(adaptToOlOptions('XYZ', { url: 'https://example.com/{z}/{x}/{y}.png' }, auth)).toMatchObject({
+        url: 'https://example.com/{z}/{x}/{y}.png?token=a%20b',
+      });
+      expect(adaptToOlOptions('WMS', { url: 'https://example.com/wms?x=1', layers: 'l' }, auth)).toMatchObject({
+        url: 'https://example.com/wms?x=1&token=a%20b',
+      });
+    });
+
+    it('appends them to every subdomain url', () => {
+      const options = adaptToOlOptions(
+        'XYZ',
+        { url: 'https://{s}.example.com/{z}/{x}/{y}.png', subdomains: 'ab' },
+        { queryParameters: { token: 't' } }
+      ) as { urls?: string[] };
+      expect(options.urls).toEqual(['https://a.example.com/{z}/{x}/{y}.png?token=t', 'https://b.example.com/{z}/{x}/{y}.png?token=t']);
+    });
+
+    it('ignores the headers: OL cannot send them', () => {
+      const xyz = { url: 'https://example.com/{z}/{x}/{y}.png' };
+      const options = adaptToOlOptions('XYZ', xyz, { headers: { token: 't' } });
+      expect(options).toMatchObject({ url: 'https://example.com/{z}/{x}/{y}.png' });
+      expect(options).not.toHaveProperty('tileLoadFunction');
+    });
   });
 });
