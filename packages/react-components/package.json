@@ -24,7 +24,7 @@
     "./package.json": "./package.json"
   },
   "license": "MIT",
-  "description": "This package contains complex components like maps, datepicker, etc.",
+  "description": "This package contains complex components like maps, datepicker, etc. Bridge sub-package contain adapters for layer capability",
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
