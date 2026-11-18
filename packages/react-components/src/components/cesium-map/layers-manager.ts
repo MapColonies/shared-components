@@ -228,6 +228,7 @@ class LayerManager {
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
   private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
   private readonly drapingLayerPredicate?: DrapingLayerPredicate;
+  private readonly auth?: InjectedAuth;
 
   public constructor(
     mapViewer: CesiumViewer,
@@ -236,7 +237,7 @@ class LayerManager {
     onLayersUpdate?: () => void,
     shouldOptimizedTileRequests?: boolean,
     drapingLayerPredicate?: DrapingLayerPredicate,
-    public auth?: InjectedAuth
+    auth?: InjectedAuth
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
@@ -253,6 +254,7 @@ class LayerManager {
     this.relevancyListenersCleanup = [];
     this.layerToOverlaysMapping = new Map();
     this.drapingLayerPredicate = drapingLayerPredicate;
+    this.auth = auth;
 
     configureLayerManagerMetaMapping(layerManagerMetaMapping);
 
