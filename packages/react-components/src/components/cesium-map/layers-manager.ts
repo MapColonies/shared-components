@@ -17,6 +17,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import type { CopcCesiumLayer } from '@frillab/copc-adapter';
 import { ProtocolType } from '../models/protocol-type.enum';
 import { resolveWmsConstructorOptions, resolveWmtsConstructorOptions, resolveXyzConstructorOptions } from '../../hydration';
+import type { InjectedAuth } from '../../hydration';
 import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
@@ -26,7 +27,7 @@ import {
 } from './helpers/customImageryProviders';
 import { pointToGeoJSON } from './helpers/geojson/point.geojson';
 import { cesiumRectangleContained, customComputeViewRectangle } from './helpers/utils';
-import { RCesiumOSMLayerOptions, RCesiumWMSLayerOptions, RCesiumWMTSLayerOptions, RCesiumXYZLayerOptions } from './layers';
+import type { WmsOptionsInput, WmtsOptionsInput, XyzOptionsInput } from '../../schemas';
 import type { ICesiumWFSLayer, ICesiumWFSLayerMeta } from './layers/wfs.layer';
 import { IMapLegend } from './legend';
 import type { CesiumViewer, IBaseMap } from './map';
@@ -69,7 +70,7 @@ export interface ICesiumImageryLayerMeta {
   type?: LayerType;
   opacity?: number;
   show?: boolean;
-  options?: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  options?: MCOptions;
   skipRelevancyCheck?: boolean;
   isRelevantToExtent?: boolean;
   hasTransparency?: boolean;
@@ -91,14 +92,20 @@ export type LayerType =
   | typeof ProtocolType.BING_MAPS;
 //| typeof ProtocolType.WCS
 
+export type MCOptions = WmtsOptionsInput | WmsOptionsInput | XyzOptionsInput;
+
+// MAPCO-11365:
+// General raster layer, currently used only for basemap layers.
+// If OL also supports basemaps, this should be moved to a shared location.
 export interface IRasterLayer {
   id: string;
   type: LayerType;
   opacity: number;
   zIndex: number;
-  options: RCesiumOSMLayerOptions | RCesiumWMSLayerOptions | RCesiumWMTSLayerOptions | RCesiumXYZLayerOptions;
+  options: MCOptions;
   show?: boolean;
   shouldBeUsedInModelDraping?: boolean;
+  noAuth?: boolean;
   [key: string]: unknown;
 }
 
@@ -221,6 +228,7 @@ class LayerManager {
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
   private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
   private readonly drapingLayerPredicate?: DrapingLayerPredicate;
+  private readonly auth?: InjectedAuth;
 
   public constructor(
     mapViewer: CesiumViewer,
@@ -228,7 +236,8 @@ class LayerManager {
     legendsExtractor?: LegendExtractor,
     onLayersUpdate?: () => void,
     shouldOptimizedTileRequests?: boolean,
-    drapingLayerPredicate?: DrapingLayerPredicate
+    drapingLayerPredicate?: DrapingLayerPredicate,
+    auth?: InjectedAuth
   ) {
     this.mapViewer = mapViewer;
     // eslint-disable-next-line
@@ -245,6 +254,7 @@ class LayerManager {
     this.relevancyListenersCleanup = [];
     this.layerToOverlaysMapping = new Map();
     this.drapingLayerPredicate = drapingLayerPredicate;
+    this.auth = auth;
 
     configureLayerManagerMetaMapping(layerManagerMetaMapping);
 
@@ -343,10 +353,11 @@ class LayerManager {
   }
 
   public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
+    const auth = layer.noAuth ? undefined : this.auth;
     let cesiumLayer: ICesiumImageryLayer | undefined;
     switch (layer.type) {
       case ProtocolType.XYZ: {
-        const options = resolveXyzConstructorOptions(layer.options);
+        const options = resolveXyzConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomUrlTemplateImageryProvider(options, this.mapViewer)
@@ -358,7 +369,7 @@ class LayerManager {
         break;
       }
       case ProtocolType.WMS: {
-        const options = resolveWmsConstructorOptions(layer.options);
+        const options = resolveWmsConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapServiceImageryProvider(options, this.mapViewer)
@@ -371,7 +382,7 @@ class LayerManager {
       }
       case ProtocolType.WMTS: {
         // JSON-safe options (degrees / named tiling scheme) are hydrated; Cesium-native ones pass through untouched (same for WMS and XYZ)
-        const options = resolveWmtsConstructorOptions(layer.options);
+        const options = resolveWmtsConstructorOptions(layer.options, auth);
 
         const providerInstance = this.shouldOptimizedTileRequests
           ? new CustomWebMapTileServiceImageryProvider(options, this.mapViewer)

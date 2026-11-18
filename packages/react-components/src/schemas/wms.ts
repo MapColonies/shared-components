@@ -40,7 +40,7 @@ export const createWmsOptionsSchema = (policy: UrlPolicy = {}) =>
     });
 
 /** Default (secure) schema: credentials in URLs are rejected. */
-export const WmsOptionsSchema = createWmsOptionsSchema();
+export const WmsOptionsSchema = createWmsOptionsSchema({ allowUrlCredentials: true });
 
 /** Output of parsing (defaults applied). */
 export type WmsOptions = z.infer<typeof WmsOptionsSchema>;

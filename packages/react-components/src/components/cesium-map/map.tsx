@@ -15,6 +15,7 @@ import {
 } from 'cesium';
 import { get, isNumber, isArray } from 'lodash';
 import { LinearProgress, ThemeProvider, useTheme } from '@map-colonies/react-core';
+import type { InjectedAuth } from '../../hydration';
 import { Box } from '../box';
 import { useMappedCesiumTheme } from '../theme';
 import { getAltitude, toDegrees } from '../utils/map';
@@ -142,6 +143,7 @@ interface ILegends {
 
 export interface CesiumMapProps extends ViewerProps {
   layerManagerMetaMapping: ILayerManagerMetaMapping;
+  auth?: InjectedAuth;
   showMousePosition?: boolean;
   showZoomLevel?: boolean;
   showScale?: boolean;
@@ -192,6 +194,7 @@ export const useCesiumMapViewstate = (): IMapViewState => {
 };
 
 export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
+  const { auth, ...restProps } = props;
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
   const [mapViewRef, setMapViewRef] = useState<CesiumViewer>();
   const [locale, setLocale] = useState<{ [key: string]: string }>();
@@ -259,7 +262,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     sceneModePicker: true,
     baseLayer: false,
     contextOptions: props.screenshotEnabled ? SCREENSHOT_CONTEXT_OPTIONS : DEFAULT_CONTEXT_OPTIONS,
-    ...(props as ViewerProps),
+    ...(restProps as ViewerProps),
     extend: mergedExtend,
   };
 
@@ -321,7 +324,8 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
             setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
           },
           viewState?.shouldOptimizedTileRequests,
-          props.drapingLayerPredicate
+          props.drapingLayerPredicate,
+          auth
         ),
       });
     }
@@ -331,7 +335,7 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
       viewState,
       setViewState,
     };
-  }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, mapViewRef, viewState]);
+  }, [props.layerManagerMetaMapping, props.legends, props.drapingLayerPredicate, auth, mapViewRef, viewState]);
 
   useEffect(() => {
     const augmentedBaseMaps = props.baseMaps

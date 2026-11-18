@@ -1,0 +1,7 @@
+{
+  "name": "@map-colonies/react-components/bridge",
+  "private": true,
+  "main": "../dist/bridge/index.cjs",
+  "module": "../dist/bridge/index.mjs",
+  "types": "../dist/bridge/index.d.ts"
+}
