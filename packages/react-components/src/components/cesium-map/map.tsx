@@ -315,19 +315,20 @@ export const CesiumMap: React.FC<CesiumMapProps> = (props) => {
     if (!mapViewRef) { return null; }
 
     if (!mapViewRef.layersManager) {
-      mapViewRef.layersManager = new LayerManager(
-        mapViewRef,
-        props.layerManagerMetaMapping,
-        props.legends?.mapLegendsExtractor,
-        () => {
-          setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
-        },
-        viewState?.shouldOptimizedTileRequests,
-        props.drapingLayerPredicate,
-        auth
-      );
+      Object.assign(mapViewRef, {
+        layersManager: new LayerManager(
+          mapViewRef,
+          props.layerManagerMetaMapping,
+          props.legends?.mapLegendsExtractor,
+          () => {
+            setLegendsList(mapViewRef.layersManager?.legendsList as IMapLegend[]);
+          },
+          viewState?.shouldOptimizedTileRequests,
+          props.drapingLayerPredicate,
+          auth
+        ),
+      });
     }
-    mapViewRef.layersManager.auth = auth;
 
     return {
       mapViewer: mapViewRef,

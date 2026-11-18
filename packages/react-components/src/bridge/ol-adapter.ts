@@ -13,7 +13,7 @@ import { getWMSOptions } from '../components/ol-map/source/wms';
 import { getXYZOptions } from '../components/ol-map/source/xyz';
 import { Proj } from '../components/utils/projections';
 import type { InjectedAuth } from '../hydration';
-import { appendAuthQueryParameters } from './auth';
+import { appendAuthQueryParameters, createAuthTileLoadFunction } from './auth';
 import { WmsOptionsSchema, WmtsOptionsSchema, XyzOptionsSchema } from '../schemas';
 import type { WmsOptionsInput, WmtsOptionsInput, XyzOptionsInput } from '../schemas';
 
@@ -35,6 +35,14 @@ const toOlUrlOptions = (template: string, subdomains: Subdomains, auth?: Injecte
   }
   const list = typeof subdomains === 'string' ? [...subdomains] : subdomains;
   return { url, urls: list.map((subdomain) => url.replace('{s}', subdomain)) };
+};
+
+const LOADING_FUNC = 'tileLoadFunction';
+
+/** The `tileLoadFunction` that sends the headers of `auth`, when it has any. */
+const toOlAuthLoadOptions = (auth?: InjectedAuth): Pick<XYZOptions, typeof LOADING_FUNC> => {
+  const authFunc = createAuthTileLoadFunction(auth);
+  return authFunc ? { [LOADING_FUNC]: authFunc } : {};
 };
 
 type TilingSchemeName = NonNullable<WmtsOptionsInput['tilingScheme']>;
@@ -98,7 +106,7 @@ const createTileGrid = (
  * `tileWidth`/`tileHeight` -> `tileSize`, `hasAlphaChannel` -> `opaque` (inverted), `rectangle` -> tile grid extent.
  * Options OL has no counterpart for (`enablePickFeatures`, `pickFeaturesUrl`, `urlSchemeZeroPadding`) are ignored.
  *
- * `auth` is injected at runtime and never stored in the options: its query parameters are appended to the url(s). Its headers are ignored: OL cannot send them.
+ * `auth` is injected at runtime and never stored in the options: its query parameters are appended to the url(s), its headers are sent by a `tileLoadFunction`.
  *
  * Without `tilingScheme` OL's own default (web mercator) applies, as it does in Cesium.
  *
@@ -133,6 +141,7 @@ export const adaptToXYZOptions = (options: XyzOptionsInput, auth?: InjectedAuth)
       tileGrid: rectangle && createTileGrid(projection ?? Proj.WEB_MERCATOR, rectangle, { minZoom: minimumLevel, maxZoom: maximumLevel, tileSize }),
     }),
     ...(urls && { urls }),
+    ...toOlAuthLoadOptions(auth),
   };
 };
 
@@ -184,6 +193,7 @@ export const adaptToWMTSOptions = (options: WmtsOptionsInput, auth?: InjectedAut
       extent: toOlExtent(rectangle, projection),
     }),
     ...(urls && { urls }),
+    ...toOlAuthLoadOptions(auth),
   };
 };
 
@@ -232,6 +242,7 @@ export const adaptToWMSOptions = (options: WmsOptionsInput, auth?: InjectedAuth)
   return {
     ...getWMSOptions({ url, attributions: credit, params, projection, tileGrid }),
     ...(urls && { urls }),
+    ...toOlAuthLoadOptions(auth),
   };
 };
 

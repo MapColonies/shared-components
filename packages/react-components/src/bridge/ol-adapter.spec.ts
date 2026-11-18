@@ -1,5 +1,7 @@
 import { Proj } from '../components/utils/projections';
+import TileState from 'ol/TileState';
 import { adaptToOlLayerExtent, adaptToOlOptions } from './ol-adapter';
+import type { XYZOptions } from './ol-adapter';
 
 const wmts = { url: 'https://example.com/wmts', layer: 'l', style: 's', tileMatrixSetID: 'newGrids' };
 const xyz = { url: 'https://example.com/{z}/{x}/{y}.png' };
@@ -171,11 +173,41 @@ describe('adaptToOlOptions', () => {
       expect(options.urls).toEqual(['https://a.example.com/{z}/{x}/{y}.png?token=t', 'https://b.example.com/{z}/{x}/{y}.png?token=t']);
     });
 
-    it('ignores the headers: OL cannot send them', () => {
-      const xyz = { url: 'https://example.com/{z}/{x}/{y}.png' };
-      const options = adaptToOlOptions('XYZ', xyz, { headers: { token: 't' } });
-      expect(options).toMatchObject({ url: 'https://example.com/{z}/{x}/{y}.png' });
-      expect(options).not.toHaveProperty('tileLoadFunction');
+    it('adds no tileLoadFunction without headers', () => {
+      expect(adaptToOlOptions('XYZ', xyz)).not.toHaveProperty('tileLoadFunction');
+      expect(adaptToOlOptions('XYZ', xyz, { queryParameters: { token: 't' } })).not.toHaveProperty('tileLoadFunction');
+    });
+
+    it('sends the headers with a tileLoadFunction, for every type', async () => {
+      const auth = { headers: { token: 't' } };
+      expect(adaptToOlOptions('WMTS', wmts, auth)).toHaveProperty('tileLoadFunction');
+      expect(adaptToOlOptions('WMS', { url: 'https://example.com/wms', layers: 'l' }, auth)).toHaveProperty('tileLoadFunction');
+
+      const blob = new Blob(['tile']);
+      const fetchMock = jest.fn().mockResolvedValue({ ok: true, blob: async () => blob });
+      global.fetch = fetchMock;
+      URL.createObjectURL = jest.fn().mockReturnValue('blob:tile');
+      URL.revokeObjectURL = jest.fn();
+
+      const { tileLoadFunction } = adaptToOlOptions('XYZ', xyz, auth) as XYZOptions;
+      const image = document.createElement('img');
+      const tile = { getImage: () => image, setState: jest.fn() };
+      tileLoadFunction?.(tile as never, 'https://example.com/1/2/3.png');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(fetchMock).toHaveBeenCalledWith('https://example.com/1/2/3.png', { headers: { token: 't' } });
+      expect(image.src).toBe('blob:tile');
+      expect(tile.setState).not.toHaveBeenCalled();
+    });
+
+    it('marks the tile as failed when the request fails', async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 401 });
+      const { tileLoadFunction } = adaptToOlOptions('XYZ', xyz, { headers: { token: 't' } }) as XYZOptions;
+      const tile = { getImage: () => document.createElement('img'), setState: jest.fn() };
+      tileLoadFunction?.(tile as never, 'https://example.com/1/2/3.png');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(tile.setState).toHaveBeenCalledWith(TileState.ERROR);
     });
   });
 });

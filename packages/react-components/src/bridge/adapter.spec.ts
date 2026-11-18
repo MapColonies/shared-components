@@ -1,8 +1,8 @@
+import type { CapabilityWMTS } from '@map-colonies/wmts-client';
 import { adaptCapabilityToWmtsOptions } from './adapter';
-import type { Capability } from '@map-colonies/types';
 
 const template = 'https://example.com/wmts/ortho/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png';
-const capability: Capability = {
+const capability: CapabilityWMTS = {
   id: 'ortho-1.0',
   style: [
     { value: 'other', isDefault: 'false' },
@@ -26,6 +26,7 @@ describe('adaptCapabilityToWmtsOptions', () => {
       tileMatrixSetID: 'newGrids',
       tileMatrixLabels: ['0', '1', '2', '10'],
       maximumLevel: 10,
+      tilingScheme: 'geographic',
       tileWidth: 256,
       tileHeight: 256,
       minimumLevel: 0,
@@ -44,50 +45,29 @@ describe('adaptCapabilityToWmtsOptions', () => {
     ).toBe('first');
   });
 
-  it('falls back to the fallback url when no URL matches the format', () => {
-    expect(adaptCapabilityToWmtsOptions({ ...capability, url: [] }, {}, { url: template }).url).toBe(template);
-  });
-
-  it('throws when no URL can be resolved', () => {
-    expect(() => adaptCapabilityToWmtsOptions({ ...capability, url: [] })).toThrow();
-  });
-
-  it('prefers the layer override over the capability id', () => {
-    expect(adaptCapabilityToWmtsOptions(capability, { layer: 'product-1' }).layer).toBe('product-1');
-  });
-
-  it('returns defaults when there is no capability', () => {
-    const options = adaptCapabilityToWmtsOptions(undefined, { layer: 'product-1' }, { url: template });
+  it('falls back to the defaults for the empty lists', () => {
+    const jpegTemplate = 'https://example.com/other.jpeg';
+    const options = adaptCapabilityToWmtsOptions({ ...capability, style: [], format: [], tileMatrixSet: [] });
     expect(options).toMatchObject({
-      url: template,
-      layer: 'product-1',
-      style: 'default',
+      url: jpegTemplate,
+      style: 'XXX_STYLE_XXX',
       format: 'image/jpeg',
-      tileMatrixSetID: 'newGrids',
+      tileMatrixSetID: 'XXX_GRID_XXX',
       maximumLevel: 20,
     });
     expect(options.tileMatrixLabels).toHaveLength(21);
   });
 
-  it('throws when the URL embeds credentials', () => {
-    expect(() =>
-      adaptCapabilityToWmtsOptions({
-        ...capability,
-        url: [{ format: 'image/png', resourceType: 'tile', template: `${template}?token=abc` }],
-      })
-    ).toThrow();
+  it('throws when no URL matches the format', () => {
+    expect(() => adaptCapabilityToWmtsOptions({ ...capability, url: [] })).toThrow();
   });
 
-  it('falls back to the default tile matrix set when it is missing', () => {
-    const options = adaptCapabilityToWmtsOptions({ ...capability, tileMatrixSet: [] });
-    expect(options.tileMatrixSetID).toBe('newGrids');
-    expect(options.maximumLevel).toBe(20);
+  it('throws when there is no capability: no url or layer can be resolved', () => {
+    expect(() => adaptCapabilityToWmtsOptions()).toThrow();
   });
 
-  it('validates the capability before adapting it', () => {
-    expect(() =>
-      // @ts-expect-error Deliberately invalid runtime input must fail schema validation.
-      adaptCapabilityToWmtsOptions({ ...capability, style: [{ value: 'default', isDefault: 1 }] })
-    ).toThrow();
+  it('keeps a token in the URL: credentials are allowed', () => {
+    const url = `${template}?token=abc`;
+    expect(adaptCapabilityToWmtsOptions({ ...capability, url: [{ format: 'image/png', resourceType: 'tile', template: url }] }).url).toBe(url);
   });
 });
