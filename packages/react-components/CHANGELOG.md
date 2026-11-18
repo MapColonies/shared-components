@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.22.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.21.0...@map-colonies/react-components@4.22.0) (2026-11-18)
+
+
+### Bug Fixes
+
+* adapters ([12a71ab](https://github.com/MapColonies/shared-components/commit/12a71ab241ec60d8ea450c05c46f90795c4507c7))
+* auth is private field ([fd600de](https://github.com/MapColonies/shared-components/commit/fd600de07a6f97966a6f8457f1be1c617fcde06c))
+* change adaper params ([be711f5](https://github.com/MapColonies/shared-components/commit/be711f51c7cde6ed21f47d6925dbacb10a23e784))
+* integration between ol and cesium ([e39f4ce](https://github.com/MapColonies/shared-components/commit/e39f4cee45751aa45323db2f2074a134f552ff92))
+
+
+### Features
+
+* add bridge sub package and adapter function for wmts options ([22d9d10](https://github.com/MapColonies/shared-components/commit/22d9d10683135cdecdca8e199fdde8f063ff20b0))
+
+
+
+
+
 # [4.21.0](https://github.com/MapColonies/shared-components/compare/@map-colonies/react-components@4.20.2...@map-colonies/react-components@4.21.0) (2026-10-29)
 
 
