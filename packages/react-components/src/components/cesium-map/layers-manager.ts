@@ -18,7 +18,6 @@ import type { CopcCesiumLayer } from '@frillab/copc-adapter';
 import { ProtocolType } from '../models/protocol-type.enum';
 import { resolveWmsConstructorOptions, resolveWmtsConstructorOptions, resolveXyzConstructorOptions } from '../../hydration';
 import type { InjectedAuth } from '../../hydration';
-import { requiresWorldwideTransparentLayer, shouldRemoveTransparentLayerOnOptimizationDisable } from '../utils/optimized-tile-requests';
 import {
   CustomUrlTemplateImageryProvider,
   CustomWebMapServiceImageryProvider,
@@ -223,7 +222,6 @@ class LayerManager {
   private readonly legendsExtractor?: LegendExtractor;
   private readonly layerManagerFootprintMetaFieldPath?: string;
   private shouldOptimizedTileRequests?: boolean;
-  private needsWorldwideTransparentLayer = false;
   private relevancyListenersCleanup: Array<() => void>;
   private relevancyLayerUpdatedHandler?: (meta: Record<string, unknown>) => void;
   private readonly layerToOverlaysMapping: Map<ICesiumImageryLayer, { tileset: CesiumTileset; overlay: ImageryLayer }[]>;
@@ -271,6 +269,14 @@ class LayerManager {
         this.removeDrapingOverlaysByLayer(removedLayer as ICesiumImageryLayer);
       });
     }
+
+    /**
+     *  Always add a transparent layer as the very first layer.
+     *
+     *  Reason: Cesium treats the base imagery layer as if it covers the entire globe,
+     *  even when its actual rectangle is smaller. It can stretch the edge texels across the globe.
+     */
+    this.addTransparentImageryProvider();
   }
 
   public get layerList(): ICesiumImageryLayer[] {
@@ -332,24 +338,6 @@ class LayerManager {
     sortedBaseMapLayers.forEach((layer, idx) => {
       this.addRasterLayer(layer, idx, baseMap.id);
     });
-
-    /**
-     *  Set transparent layer as the first layer. if using optimized tile requests.
-     *
-     *  Apparently, cesium layer's rectangle is not affective when:
-     *  - There is only one active layer && The layer's rectangle contains the extent rectangle.
-     *
-     *  As a result, when using optimized tile requesting and we zoom in a discrete layer,
-     *  there are some visual artifacts due to tiles requesting outside of the layer's rectangle boundary.
-     *
-     *  A simple workaround would be adding a transparent layer as the very first layer at all times,
-     *  so that we ensure the rectangle will always be affective.
-     */
-    this.needsWorldwideTransparentLayer = requiresWorldwideTransparentLayer(sortedBaseMapLayers.length);
-
-    if (this.shouldOptimizedTileRequests || this.needsWorldwideTransparentLayer) {
-      this.addTransparentImageryProvider();
-    }
   }
 
   public addRasterLayer(layer: IRasterLayer, index: number, parentId: string): void {
@@ -441,7 +429,7 @@ class LayerManager {
 
   public removeBaseMapLayers(): void {
     const layerToDelete = this.layers.filter((layer) => {
-      return isBaseMapLayer(layer.meta);
+      return isBaseMapLayer(layer.meta) && getLayerId(layer) !== TRANSPARENT_LAYER_ID;
     });
     layerToDelete.forEach((layer) => {
       this.mapViewer.imageryLayers.remove(layer, true);
@@ -663,9 +651,6 @@ class LayerManager {
     }
 
     this.unbindRelevancyListeners();
-    if (shouldRemoveTransparentLayerOnOptimizationDisable(this.needsWorldwideTransparentLayer)) {
-      this.removeLayer(TRANSPARENT_LAYER_ID);
-    }
     this.restoreAllLayersVisibility();
     this.clearLayersRelevancy();
   }

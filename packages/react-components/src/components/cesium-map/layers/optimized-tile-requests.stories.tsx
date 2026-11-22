@@ -7,6 +7,13 @@ import { getImageryProviderUrl } from '../layers-manager';
 import { CesiumMap, CesiumMapProps } from '../map';
 import { CesiumXYZLayer } from './xyz.layer';
 
+/**
+ * NOTE: `LayerManager` now always adds a worldwide transparent base layer (`TRANSPARENT_BASE_LAYER`)
+ * as the very first imagery layer, unconditionally, from its constructor - not only when
+ * "Tile requests optimization" is enabled (previous behavior). Toggling the optimization checkbox
+ * below therefore no longer adds/removes that base layer; it only toggles the relevancy-based
+ * show/hide logic demonstrated via the debugger's layers list.
+ */
 export default {
   title: 'Cesium Map',
   component: CesiumMap,
@@ -83,17 +90,17 @@ const LayersContainer: React.FC = () => {
 
   return (
     <>
+      <div
+        className="transparentBaseLayerNote"
+        style={{ position: 'absolute', top: 10, left: '50%', zIndex: 1000, transform: 'translate(-50%, 0)', maxWidth: 480, textAlign: 'center' }}
+      >
+        A worldwide transparent base layer is now always added first (constructor-level), regardless of the optimization checkbox below.
+      </div>
       <div className="buttonsContainer" style={{ display: 'flex', gap: '10px', ...btnStyle }}>
-        <button
-          style={{ fontWeight: showTransparent ? 'bold' : 'normal' }}
-          onClick={(): void => setShowTransparent((prev) => !prev)}
-        >
+        <button style={{ fontWeight: showTransparent ? 'bold' : 'normal' }} onClick={(): void => setShowTransparent((prev) => !prev)}>
           Transparent layer
         </button>
-        <button
-          style={{ fontWeight: showOpaque ? 'bold' : 'normal' }}
-          onClick={(): void => setShowOpaque((prev) => !prev)}
-        >
+        <button style={{ fontWeight: showOpaque ? 'bold' : 'normal' }} onClick={(): void => setShowOpaque((prev) => !prev)}>
           Opaque layer
         </button>
       </div>
