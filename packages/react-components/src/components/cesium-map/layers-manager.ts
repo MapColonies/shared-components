@@ -215,6 +215,8 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
+  /** Raised once after the layers stacking order changed. Receives the ids of the non-base layers, ordered from bottom to top. */
+  public layersOrderChanged: Event;
   public dataLayerUpdated: Event;
   public modelUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
@@ -247,6 +249,7 @@ class LayerManager {
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
+    this.layersOrderChanged = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
@@ -471,6 +474,7 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order + positions);
     this.reinvokeOptimizationAfterOrderChange();
+    this.raiseLayersOrderChanged();
   }
 
   public lower(layerId: string, positions = 1): void {
@@ -491,6 +495,7 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order - positions);
     this.reinvokeOptimizationAfterOrderChange();
+    this.raiseLayersOrderChanged();
   }
 
   public raiseToTop(layerId: string): void {
@@ -503,6 +508,30 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
     this.reinvokeOptimizationAfterOrderChange();
+    this.raiseLayersOrderChanged();
+  }
+
+  /**
+   * Sets the stacking order of the given layers in one call.
+   *
+   * @param layerIds - Layer ids ordered from the bottom-most to the top-most layer.
+   *
+   * The listed layers end up above all other layers, in the given order. Layers that are not listed keep their relative order below them.
+   * Ids of unknown layers and of base map layers are ignored.
+   * Layers `meta.zIndex` is updated accordingly, and the relevancy state is refreshed and `layersOrderChanged` is raised once at the end.
+   */
+  public setLayersOrder(layerIds: string[]): void {
+    layerIds.forEach((layerId) => {
+      const layer = this.findLayerById(layerId);
+      if (layer === undefined || isBaseMapLayer(layer.meta)) {
+        return;
+      }
+      const order = layer.meta?.zIndex as number;
+      this.mapViewer.imageryLayers.raiseToTop(layer);
+      this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
+    });
+    this.reinvokeOptimizationAfterOrderChange();
+    this.raiseLayersOrderChanged();
   }
 
   public lowerToBottom(layerId: string): void {
@@ -527,6 +556,25 @@ class LayerManager {
     const layer = this.get(layerId);
     if (layer !== undefined) {
       layer.show = isShow;
+    }
+  }
+
+  /**
+   * Sets the opacity of a single layer.
+   *
+   * @param layerId - The id of the layer.
+   * @param opacity - A number between 0 (fully transparent) and 1 (fully opaque).
+   *
+   * Updates both the Cesium layer `alpha` and `meta.opacity`. Does nothing for an unknown layer id.
+   */
+  public setLayerOpacity(layerId: string, opacity: number): void {
+    const layer = this.findLayerById(layerId);
+    if (layer === undefined) {
+      return;
+    }
+    layer.alpha = opacity;
+    if (layer.meta !== undefined) {
+      (layer.meta as Record<string, unknown>).opacity = opacity;
     }
   }
 
@@ -915,6 +963,17 @@ class LayerManager {
     });
     this.relevancyListenersCleanup = [];
     this.relevancyLayerUpdatedHandler = undefined;
+  }
+
+  private raiseLayersOrderChanged(): void {
+    const layerIds: string[] = [];
+    this.layers.forEach((layer) => {
+      const layerId = getLayerId(layer);
+      if (layerId !== undefined && layerId !== TRANSPARENT_LAYER_ID && !isBaseMapLayer(layer.meta)) {
+        layerIds.push(layerId);
+      }
+    });
+    this.layersOrderChanged.raiseEvent(layerIds);
   }
 
   private reinvokeOptimizationAfterOrderChange(): void {
