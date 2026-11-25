@@ -215,8 +215,9 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
-  /** Raised once after the layers stacking order changed. Receives the ids of the non-base layers, ordered from bottom to top. */
   public layersOrderChanged: Event;
+  public layerRemoved: Event;
+  public layerOpacityChanged: Event;
   public dataLayerUpdated: Event;
   public modelUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
@@ -250,6 +251,8 @@ class LayerManager {
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
     this.layersOrderChanged = new Event();
+    this.layerRemoved = new Event();
+    this.layerOpacityChanged = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
@@ -268,6 +271,10 @@ class LayerManager {
     if (this.shouldOptimizedTileRequests) {
       this.bindRelevancyListeners();
     }
+
+    this.mapViewer.imageryLayers.layerRemoved.addEventListener((removedLayer: ImageryLayer) => {
+      this.layerRemoved.raiseEvent(getLayerId(removedLayer as ICesiumImageryLayer));
+    });
 
     if (drapingLayerPredicate) {
       this.mapViewer.imageryLayers.layerRemoved.addEventListener((removedLayer: ImageryLayer) => {
@@ -576,6 +583,7 @@ class LayerManager {
     if (layer.meta !== undefined) {
       (layer.meta as Record<string, unknown>).opacity = opacity;
     }
+    this.layerOpacityChanged.raiseEvent({ layerId, opacity });
   }
 
   public showAllNotBase(isShow: boolean): void {
