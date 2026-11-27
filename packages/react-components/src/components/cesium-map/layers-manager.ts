@@ -493,6 +493,28 @@ class LayerManager {
     this.reinvokeOptimizationAfterOrderChange();
   }
 
+  /**
+   * Sets the stacking order of the given layers in one call.
+   *
+   * @param layerIds - Layer ids ordered from the bottom-most to the top-most layer.
+   *
+   * The listed layers end up above all other layers, in the given order. Layers that are not listed keep their relative order below them.
+   * Ids of unknown layers and of base map layers are ignored.
+   * Layers `meta.zIndex` is updated accordingly and the relevancy state is refreshed once at the end.
+   */
+  public setLayersOrder(layerIds: string[]): void {
+    layerIds.forEach((layerId) => {
+      const layer = this.findLayerById(layerId);
+      if (layer === undefined || isBaseMapLayer(layer.meta)) {
+        return;
+      }
+      const order = layer.meta?.zIndex as number;
+      this.mapViewer.imageryLayers.raiseToTop(layer);
+      this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
+    });
+    this.reinvokeOptimizationAfterOrderChange();
+  }
+
   public lowerToBottom(layerId: string): void {
     const layer = this.findLayerById(layerId);
     // const order = (layer?.meta as Record<string, unknown>).zIndex as number;
@@ -515,6 +537,25 @@ class LayerManager {
     const layer = this.get(layerId);
     if (layer !== undefined) {
       layer.show = isShow;
+    }
+  }
+
+  /**
+   * Sets the opacity of a single layer.
+   *
+   * @param layerId - The id of the layer.
+   * @param opacity - A number between 0 (fully transparent) and 1 (fully opaque).
+   *
+   * Updates both the Cesium layer `alpha` and `meta.opacity`. Does nothing for an unknown layer id.
+   */
+  public setLayerOpacity(layerId: string, opacity: number): void {
+    const layer = this.findLayerById(layerId);
+    if (layer === undefined) {
+      return;
+    }
+    layer.alpha = opacity;
+    if (layer.meta !== undefined) {
+      (layer.meta as Record<string, unknown>).opacity = opacity;
     }
   }
 
