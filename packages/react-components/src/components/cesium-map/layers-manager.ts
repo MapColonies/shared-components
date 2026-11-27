@@ -215,9 +215,6 @@ class LayerManager {
 
   public legendsList: IMapLegend[];
   public layerUpdated: Event;
-  public layersOrderChanged: Event;
-  public layerRemoved: Event;
-  public layerOpacityChanged: Event;
   public dataLayerUpdated: Event;
   public modelUpdated: Event;
   private readonly layers: ICesiumImageryLayer[];
@@ -250,9 +247,6 @@ class LayerManager {
     this.legendsList = [];
     this.legendsExtractor = legendsExtractor;
     this.layerUpdated = new Event();
-    this.layersOrderChanged = new Event();
-    this.layerRemoved = new Event();
-    this.layerOpacityChanged = new Event();
     this.dataLayerUpdated = new Event();
     this.modelUpdated = new Event();
     this.layerManagerFootprintMetaFieldPath = layerManagerMetaMapping.layer.footprint;
@@ -271,10 +265,6 @@ class LayerManager {
     if (this.shouldOptimizedTileRequests) {
       this.bindRelevancyListeners();
     }
-
-    this.mapViewer.imageryLayers.layerRemoved.addEventListener((removedLayer: ImageryLayer) => {
-      this.layerRemoved.raiseEvent(getLayerId(removedLayer as ICesiumImageryLayer));
-    });
 
     if (drapingLayerPredicate) {
       this.mapViewer.imageryLayers.layerRemoved.addEventListener((removedLayer: ImageryLayer) => {
@@ -481,7 +471,6 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order + positions);
     this.reinvokeOptimizationAfterOrderChange();
-    this.raiseLayersOrderChanged();
   }
 
   public lower(layerId: string, positions = 1): void {
@@ -502,7 +491,6 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, order - positions);
     this.reinvokeOptimizationAfterOrderChange();
-    this.raiseLayersOrderChanged();
   }
 
   public raiseToTop(layerId: string): void {
@@ -515,7 +503,6 @@ class LayerManager {
 
     this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
     this.reinvokeOptimizationAfterOrderChange();
-    this.raiseLayersOrderChanged();
   }
 
   /**
@@ -525,7 +512,7 @@ class LayerManager {
    *
    * The listed layers end up above all other layers, in the given order. Layers that are not listed keep their relative order below them.
    * Ids of unknown layers and of base map layers are ignored.
-   * Layers `meta.zIndex` is updated accordingly, and the relevancy state is refreshed and `layersOrderChanged` is raised once at the end.
+   * Layers `meta.zIndex` is updated accordingly and the relevancy state is refreshed once at the end.
    */
   public setLayersOrder(layerIds: string[]): void {
     layerIds.forEach((layerId) => {
@@ -538,7 +525,6 @@ class LayerManager {
       this.updateLayersOrder(layerId, order, this.mapViewer.imageryLayers.length - this.getBaseLayersCount() - 1);
     });
     this.reinvokeOptimizationAfterOrderChange();
-    this.raiseLayersOrderChanged();
   }
 
   public lowerToBottom(layerId: string): void {
@@ -583,7 +569,6 @@ class LayerManager {
     if (layer.meta !== undefined) {
       (layer.meta as Record<string, unknown>).opacity = opacity;
     }
-    this.layerOpacityChanged.raiseEvent({ layerId, opacity });
   }
 
   public showAllNotBase(isShow: boolean): void {
@@ -971,17 +956,6 @@ class LayerManager {
     });
     this.relevancyListenersCleanup = [];
     this.relevancyLayerUpdatedHandler = undefined;
-  }
-
-  private raiseLayersOrderChanged(): void {
-    const layerIds: string[] = [];
-    this.layers.forEach((layer) => {
-      const layerId = getLayerId(layer);
-      if (layerId !== undefined && layerId !== TRANSPARENT_LAYER_ID && !isBaseMapLayer(layer.meta)) {
-        layerIds.push(layerId);
-      }
-    });
-    this.layersOrderChanged.raiseEvent(layerIds);
   }
 
   private reinvokeOptimizationAfterOrderChange(): void {
